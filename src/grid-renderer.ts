@@ -1,4 +1,4 @@
-import { Graphics, Container } from 'pixi.js';
+import { Graphics, Container, Text } from 'pixi.js';
 import { GridType, EdgeInfo, CellInfo } from './types';
 import { colorToHex } from './color-utils';
 
@@ -12,17 +12,18 @@ export class GridRenderer {
     scale: number,
     cellStates: number[][],
     palette: Record<number, string>,
-    edgeColor: string
+    edgeColor: string,
+    showCoordinates: boolean = false
   ) {
     switch (gridType) {
       case 'squares':
-        this.renderSquares(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor);
+        this.renderSquares(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
         break;
       case 'hexagons':
-        this.renderHexagons(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor);
+        this.renderHexagons(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
         break;
       case 'triangles':
-        this.renderTriangles(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor);
+        this.renderTriangles(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
         break;
     }
   }
@@ -35,7 +36,8 @@ export class GridRenderer {
     scale: number,
     cellStates: number[][],
     palette: Record<number, string>,
-    edgeColor: string
+    edgeColor: string,
+    showCoordinates: boolean
   ) {
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
@@ -59,6 +61,23 @@ export class GridRenderer {
         edges.lineTo(x, y);
         edges.stroke({ color: colorToHex(edgeColor), width: 1 });
         edgeContainer.addChild(edges);
+
+        // Draw coordinates if enabled (add after cell so it's on top)
+        if (showCoordinates) {
+          const coordText = new Text({
+            text: `${col},${row}`,
+            style: {
+              fontSize: Math.max(8, scale / 4),
+              fill: 0xffffff,
+              stroke: { color: 0x000000, width: 2 },
+              align: 'center',
+            },
+          });
+          coordText.anchor.set(0.5);
+          coordText.x = x + scale / 2;
+          coordText.y = y + scale / 2;
+          container.addChild(coordText);
+        }
       }
     }
   }
@@ -71,7 +90,8 @@ export class GridRenderer {
     scale: number,
     cellStates: number[][],
     palette: Record<number, string>,
-    edgeColor: string
+    edgeColor: string,
+    showCoordinates: boolean
   ) {
     // For flat-top hexagons, spacing calculations:
     // Horizontal spacing between centers: scale * sqrt(3)
@@ -98,6 +118,23 @@ export class GridRenderer {
         const edges = this.createHexagonCentered(centerX, centerY, scale);
         edges.stroke({ color: colorToHex(edgeColor), width: 1 });
         edgeContainer.addChild(edges);
+
+        // Draw coordinates if enabled (add after hex so it's on top)
+        if (showCoordinates) {
+          const coordText = new Text({
+            text: `${col},${row}`,
+            style: {
+              fontSize: Math.max(8, scale / 4),
+              fill: 0xffffff,
+              stroke: { color: 0x000000, width: 2 },
+              align: 'center',
+            },
+          });
+          coordText.anchor.set(0.5);
+          coordText.x = centerX;
+          coordText.y = centerY;
+          container.addChild(coordText);
+        }
       }
     }
   }
@@ -110,7 +147,8 @@ export class GridRenderer {
     scale: number,
     cellStates: number[][],
     palette: Record<number, string>,
-    edgeColor: string
+    edgeColor: string,
+    showCoordinates: boolean
   ) {
     const triangleHeight = scale * Math.sqrt(3) / 2;
 
@@ -132,6 +170,27 @@ export class GridRenderer {
         const edges = this.createTriangle(x, y, scale, isUpward);
         edges.stroke({ color: colorToHex(edgeColor), width: 1 });
         edgeContainer.addChild(edges);
+
+        // Draw coordinates if enabled (add after triangle so it's on top)
+        if (showCoordinates) {
+          const triHeight = scale * Math.sqrt(3) / 2;
+          const centerX = x + scale / 2;
+          const centerY = y + triHeight / 2;
+          
+          const coordText = new Text({
+            text: `${col},${row}`,
+            style: {
+              fontSize: Math.max(6, scale / 5),
+              fill: 0xffffff,
+              stroke: { color: 0x000000, width: 2 },
+              align: 'center',
+            },
+          });
+          coordText.anchor.set(0.5);
+          coordText.x = centerX;
+          coordText.y = centerY;
+          container.addChild(coordText);
+        }
       }
     }
   }

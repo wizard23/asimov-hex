@@ -1,4 +1,4 @@
-import { Application, Graphics, Container } from 'pixi.js';
+import { Application, Graphics, Container, Text } from 'pixi.js';
 import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
@@ -14,6 +14,7 @@ interface AppConfig {
   palette: Record<number, ColorValue>;
   edgeColor: ColorValue;
   edgeHighlightColor: ColorValue;
+  showCoordinates: boolean;
 }
 
 class GridApp {
@@ -44,6 +45,7 @@ class GridApp {
       },
       edgeColor: '#ffffff',
       edgeHighlightColor: '#ffff00',
+      showCoordinates: false,
     };
 
     this.initPixi().then(() => {
@@ -70,6 +72,19 @@ class GridApp {
     this.edgeContainer = new Container();
     this.app.stage.addChild(this.gridContainer);
     this.app.stage.addChild(this.edgeContainer);
+
+    // Test text rendering
+    const testText = new Text({
+      text: 'Hello World',
+      style: {
+        fontSize: 24,
+        fill: 0x00ff00, // Green
+        align: 'left',
+      },
+    });
+    testText.x = 10;
+    testText.y = 10;
+    this.app.stage.addChild(testText);
 
     // resizeTo: window handles resizing automatically
   }
@@ -115,6 +130,13 @@ class GridApp {
       max: 100,
       step: 1,
       label: 'Grid Scale',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add show coordinates checkbox
+    this.pane.addBinding(this.config, 'showCoordinates', {
+      label: 'Show Coordinates',
     }).on('change', () => {
       this.updateGrid();
     });
