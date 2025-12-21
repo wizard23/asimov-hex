@@ -1,8 +1,7 @@
 import { Application, Graphics, Container } from 'pixi.js';
-// import { Pane } from 'tweakpane'; // Commented out for now
+import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
-// import { colorToHex } from './color-utils'; // Commented out for now
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -20,7 +19,7 @@ interface AppConfig {
 class GridApp {
   private app!: Application;
   private gridRenderer!: GridRenderer;
-  // private pane!: Pane; // Commented out for now
+  private pane!: Pane;
   private config: AppConfig;
   private gridContainer!: Container;
   private edgeContainer!: Container;
@@ -48,7 +47,7 @@ class GridApp {
     };
 
     this.initPixi().then(() => {
-      // this.initTweakpane(); // Commented out for now
+      this.initTweakpane();
       this.initGrid();
       this.setupInteraction();
     });
@@ -75,11 +74,18 @@ class GridApp {
     // resizeTo: window handles resizing automatically
   }
 
-  // private initTweakpane() {
-  //   // Commented out for now - will add Tweakpane controls later
-  //   // this.pane = new Pane({ title: 'Grid Controls' });
-  //   // ... Tweakpane setup code will be added later ...
-  // }
+  private initTweakpane() {
+    this.pane = new Pane({ title: 'Grid Controls' });
+
+    // Add grid scale control
+    (this.pane as any).addBinding(this.config, 'gridScale', {
+      min: 5,
+      max: 100,
+      step: 1,
+    }).on('change', () => {
+      this.updateGrid();
+    });
+  }
 
   private initGrid() {
     this.gridRenderer = new GridRenderer();
