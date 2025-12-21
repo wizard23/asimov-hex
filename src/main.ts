@@ -10,6 +10,7 @@ interface AppConfig {
   gridHeight: number;
   gridType: GridType;
   gridScale: number;
+  numStates: number;
   drawState: number;
   palette: Record<number, ColorValue>;
   edgeColor: ColorValue;
@@ -33,6 +34,7 @@ class GridApp {
       gridHeight: 20,
       gridType: 'squares',
       gridScale: 30,
+      numStates: 8,
       drawState: 1,
       palette: {
         0: '#000000',
@@ -42,6 +44,7 @@ class GridApp {
         4: '#ffff00',
         5: '#ff00ff',
         6: '#00ffff',
+        7: '#ffffff',
       },
       edgeColor: '#ffffff',
       edgeHighlightColor: '#ffff00',
@@ -117,6 +120,16 @@ class GridApp {
       max: 100,
       step: 1,
       label: 'Grid Scale',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add number of states control
+    this.pane.addBinding(this.config, 'numStates', {
+      min: 2,
+      max: 16,
+      step: 1,
+      label: 'Number of States',
     }).on('change', () => {
       this.updateGrid();
     });
