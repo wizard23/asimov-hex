@@ -63,7 +63,7 @@ class GridApp {
     
     const appElement = document.getElementById('app');
     if (appElement) {
-      appElement.appendChild(this.app.canvas as HTMLCanvasElement);
+      appElement.appendChild(this.app.canvas);
     }
 
     this.gridContainer = new Container();
@@ -153,14 +153,14 @@ class GridApp {
   }
 
   private setupInteraction() {
-    const canvas = this.app.canvas as HTMLCanvasElement;
+    const canvas = this.app.canvas;
     canvas.addEventListener('mousemove', (e: MouseEvent) => this.handleMouseMove(e));
     canvas.addEventListener('mousedown', (e: MouseEvent) => this.handleMouseDown(e));
     canvas.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
   }
 
   private handleMouseMove(e: MouseEvent) {
-    const canvas = this.app.canvas as HTMLCanvasElement;
+    const canvas = this.app.canvas;
     const rect = canvas.getBoundingClientRect();
     // Use edgeContainer position since edges are in edgeContainer
     const x = e.clientX - rect.left - this.edgeContainer.x;
@@ -191,7 +191,7 @@ class GridApp {
   }
 
   private handleMouseDown(e: MouseEvent) {
-    const canvas = this.app.canvas as HTMLCanvasElement;
+    const canvas = this.app.canvas;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left - this.gridContainer.x;
     const y = e.clientY - rect.top - this.gridContainer.y;
