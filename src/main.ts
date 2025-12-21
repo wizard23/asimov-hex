@@ -2,6 +2,7 @@ import { Application, Graphics, Container } from 'pixi.js';
 import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
+import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -27,7 +28,7 @@ class GridApp {
   private edgeContainer!: Container;
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
-  private drawStateFolder: any = null;
+  private drawStateBlade: DrawStateBladeApi | null = null;
 
   constructor() {
     this.config = {
@@ -35,7 +36,7 @@ class GridApp {
       gridHeight: 20,
       gridType: 'squares',
       gridScale: 30,
-      numStates: 8,
+      numStates: 4,
       drawState: 1,
       palette: {
         0: '#000000',
@@ -137,12 +138,12 @@ class GridApp {
         this.config.drawState = this.config.numStates - 1;
       }
       // Rebuild draw state selector
-      this.updateDrawStateSelector();
+      this.updateDrawStateBlade();
       this.updateGrid();
     });
 
     // Add draw state selector (palette color picker)
-    this.updateDrawStateSelector();
+    this.updateDrawStateBlade();
 
     // Add show coordinates checkbox
     this.pane.addBinding(this.config, 'showCoordinates', {
@@ -152,56 +153,34 @@ class GridApp {
     });
   }
 
-  private updateDrawStateSelector() {
-    // Remove existing folder if it exists
-    if (this.drawStateFolder) {
-      this.drawStateFolder.dispose();
+  private updateDrawStateBlade() {
+    // Remove existing blade if it exists
+    if (this.drawStateBlade) {
+      this.drawStateBlade.dispose();
     }
 
-    // Create folder for draw state selection
-    this.drawStateFolder = this.pane.addFolder({ title: 'Draw State (Select Color)' });
-
-    // Create a button for each state
-    for (let i = 0; i < this.config.numStates; i++) {
-      const stateColor = typeof this.config.palette[i] === 'string' 
-        ? this.config.palette[i] 
-        : '#000000';
-      
-      const buttonParams = {
-        label: `State ${i} (${stateColor})`,
-        title: `Select state ${i} - Color: ${stateColor}`,
-      };
-
-      this.drawStateFolder.addButton(buttonParams).on('click', () => {
-        this.config.drawState = i;
-        // Update all buttons to reflect current selection
-        this.updateDrawStateButtons();
-      });
-    }
-
-    // Update button states
-    this.updateDrawStateButtons();
-  }
-
-  private updateDrawStateButtons() {
-    // Update button labels to show which state is selected
-    if (this.drawStateFolder) {
-      const children = this.drawStateFolder.children;
-      children.forEach((child: any, index: number) => {
-        if (index < this.config.numStates) {
-          const isSelected = index === this.config.drawState;
-          const stateColor = typeof this.config.palette[index] === 'string' 
-            ? this.config.palette[index] 
-            : '#000000';
-          // Update button label to show selection
-          if (child.controller && child.controller.label) {
-            child.controller.label.text = isSelected 
-              ? `✓ State ${index} (${stateColor})` 
-              : `State ${index} (${stateColor})`;
-          }
+    // Create custom blade for draw state selection
+    this.drawStateBlade = createDrawStateBlade({
+      numStates: this.config.numStates,
+      palette: this.config.palette,
+      drawState: this.config.drawState,
+      onStateChange: (state: number) => {
+        this.config.drawState = state;
+        if (this.drawStateBlade) {
+          this.drawStateBlade.update({
+            numStates: this.config.numStates,
+            palette: this.config.palette,
+            drawState: this.config.drawState,
+            onStateChange: (state: number) => {
+              this.config.drawState = state;
+            },
+          });
         }
-      });
-    }
+      },
+    });
+
+    // Add the blade to the pane
+    this.pane.add(this.drawStateBlade);
   }
 
   private initGrid() {
