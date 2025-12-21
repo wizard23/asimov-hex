@@ -78,7 +78,7 @@ class GridApp {
     this.pane = new Pane({ title: 'Grid Controls' });
 
     // Add grid scale control
-    (this.pane as any).addBinding(this.config, 'gridScale', {
+    this.pane.addBinding(this.config, 'gridScale', {
       min: 5,
       max: 100,
       step: 1,
