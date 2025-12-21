@@ -77,11 +77,44 @@ class GridApp {
   private initTweakpane() {
     this.pane = new Pane({ title: 'Grid Controls' });
 
+    // Add grid width control
+    this.pane.addBinding(this.config, 'gridWidth', {
+      min: 1,
+      max: 100,
+      step: 1,
+      label: 'Grid Width',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add grid height control
+    this.pane.addBinding(this.config, 'gridHeight', {
+      min: 1,
+      max: 100,
+      step: 1,
+      label: 'Grid Height',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add grid type control
+    this.pane.addBinding(this.config, 'gridType', {
+      options: {
+        squares: 'squares',
+        hexagons: 'hexagons',
+        triangles: 'triangles',
+      },
+      label: 'Grid Type',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
     // Add grid scale control
     this.pane.addBinding(this.config, 'gridScale', {
       min: 5,
       max: 100,
       step: 1,
+      label: 'Grid Scale',
     }).on('change', () => {
       this.updateGrid();
     });
