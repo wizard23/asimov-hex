@@ -200,44 +200,64 @@ export class GridRenderer {
   private getHexagonCellAt(x: number, y: number, width: number, height: number, scale: number): CellInfo | null {
     const hexHeight = scale * Math.sqrt(3);
     const hexWidth = scale * 2;
-    const q = (x * 2/3) / scale;
-    const r = (-x / 3 + y * Math.sqrt(3) / 3) / scale;
     
-    const row = Math.round(r);
-    const col = Math.round(q - (row % 2) * 0.5);
+    // Brute force: check all hexagons to find which one contains the point
+    // This is more reliable than coordinate conversion for offset coordinates
+    let closestHex: CellInfo | null = null;
+    let minDistance = Infinity;
     
-    if (col >= 0 && col < width && row >= 0 && row < height) {
-      // Verify point is actually inside this hexagon
-      const offsetX = (row % 2) * scale;
-      const hexX = col * hexWidth * 0.75 + offsetX;
-      const hexY = row * hexHeight * 0.5;
-      const centerX = hexX + scale;
-      const centerY = hexY + scale * Math.sqrt(3) / 2;
-      
-      const dx = x - centerX;
-      const dy = y - centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance <= scale) {
-        return { type: 'cell', row, col };
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const offsetX = (row % 2) * scale;
+        const hexX = col * hexWidth * 0.75 + offsetX;
+        const hexY = row * hexHeight * 0.5;
+        const centerX = hexX + scale;
+        const centerY = hexY + scale * Math.sqrt(3) / 2;
+        
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < scale && distance < minDistance) {
+          minDistance = distance;
+          closestHex = { type: 'cell', row, col };
+        }
       }
     }
-    return null;
+    
+    return closestHex;
   }
 
   private getTriangleCellAt(x: number, y: number, width: number, height: number, scale: number): CellInfo | null {
     const triangleHeight = scale * Math.sqrt(3) / 2;
-    const row = Math.floor(y / triangleHeight);
-    const col = Math.floor(x / (scale * 0.5));
     
-    if (col >= 0 && col < width && row >= 0 && row < height) {
-      const cellX = col * scale * 0.5;
-      const cellY = row * triangleHeight;
-      const isUpward = (row + col) % 2 === 0;
-      
-      // Check if point is inside triangle
-      if (this.isPointInTriangle(x, y, cellX, cellY, scale, isUpward)) {
-        return { type: 'cell', row, col };
+    // Calculate approximate row and col
+    const approxRow = Math.floor(y / triangleHeight);
+    const approxCol = Math.floor(x / (scale * 0.5));
+    
+    // Check the cell and its neighbors (triangles can overlap in coordinate space)
+    const candidates = [
+      { row: approxRow, col: approxCol },
+      { row: approxRow, col: approxCol - 1 },
+      { row: approxRow, col: approxCol + 1 },
+      { row: approxRow - 1, col: approxCol },
+      { row: approxRow - 1, col: approxCol - 1 },
+      { row: approxRow - 1, col: approxCol + 1 },
+      { row: approxRow + 1, col: approxCol },
+      { row: approxRow + 1, col: approxCol - 1 },
+      { row: approxRow + 1, col: approxCol + 1 },
+    ];
+    
+    for (const candidate of candidates) {
+      if (candidate.col >= 0 && candidate.col < width && candidate.row >= 0 && candidate.row < height) {
+        const cellX = candidate.col * scale * 0.5;
+        const cellY = candidate.row * triangleHeight;
+        const isUpward = (candidate.row + candidate.col) % 2 === 0;
+        
+        // Check if point is inside triangle
+        if (this.isPointInTriangle(x, y, cellX, cellY, scale, isUpward)) {
+          return { type: 'cell', row: candidate.row, col: candidate.col };
+        }
       }
     }
     return null;
@@ -347,50 +367,47 @@ export class GridRenderer {
   private getHexagonEdgeAt(x: number, y: number, width: number, height: number, scale: number): EdgeInfo | null {
     const hexHeight = scale * Math.sqrt(3);
     const hexWidth = scale * 2;
-    const q = (x * 2/3) / scale;
-    const r = (-x / 3 + y * Math.sqrt(3) / 3) / scale;
     
-    const row = Math.round(r);
-    const col = Math.round(q - (row % 2) * 0.5);
-    
-    if (col >= 0 && col < width && row >= 0 && row < height) {
-      const offsetX = (row % 2) * scale;
-      const hexX = col * hexWidth * 0.75 + offsetX;
-      const hexY = row * hexHeight * 0.5;
-      const centerX = hexX + scale;
-      const centerY = hexY + scale * Math.sqrt(3) / 2;
-      
-      // Find closest edge
-      const edges = [
-        { angle: -Math.PI / 6, index: 0 },
-        { angle: Math.PI / 6, index: 1 },
-        { angle: Math.PI / 2, index: 2 },
-        { angle: 5 * Math.PI / 6, index: 3 },
-        { angle: 7 * Math.PI / 6, index: 4 },
-        { angle: -Math.PI / 2, index: 5 },
-      ];
+    let minDist = Infinity;
+    let closestEdge = null;
 
-      let minDist = Infinity;
-      let closestEdge = null;
-
-      for (let i = 0; i < edges.length; i++) {
-        const angle1 = edges[i].angle;
-        const angle2 = edges[(i + 1) % 6].angle;
-        const p1x = centerX + scale * Math.cos(angle1);
-        const p1y = centerY + scale * Math.sin(angle1);
-        const p2x = centerX + scale * Math.cos(angle2);
-        const p2y = centerY + scale * Math.sin(angle2);
+    // Check all hexagons to find the closest edge
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const offsetX = (row % 2) * scale;
+        const hexX = col * hexWidth * 0.75 + offsetX;
+        const hexY = row * hexHeight * 0.5;
+        const centerX = hexX + scale;
+        const centerY = hexY + scale * Math.sqrt(3) / 2;
         
-        const dist = this.distanceToLineSegment(x, y, p1x, p1y, p2x, p2y);
-        if (dist < minDist && dist < 10) {
-          minDist = dist;
-          closestEdge = { points: [{ x: p1x, y: p1y }, { x: p2x, y: p2y }] };
+        // Check all 6 edges of this hexagon
+        const edges = [
+          { angle: -Math.PI / 6, index: 0 },
+          { angle: Math.PI / 6, index: 1 },
+          { angle: Math.PI / 2, index: 2 },
+          { angle: 5 * Math.PI / 6, index: 3 },
+          { angle: 7 * Math.PI / 6, index: 4 },
+          { angle: -Math.PI / 2, index: 5 },
+        ];
+
+        for (let i = 0; i < edges.length; i++) {
+          const angle1 = edges[i].angle;
+          const angle2 = edges[(i + 1) % 6].angle;
+          const p1x = centerX + scale * Math.cos(angle1);
+          const p1y = centerY + scale * Math.sin(angle1);
+          const p2x = centerX + scale * Math.cos(angle2);
+          const p2y = centerY + scale * Math.sin(angle2);
+          
+          const dist = this.distanceToLineSegment(x, y, p1x, p1y, p2x, p2y);
+          if (dist < minDist && dist < 10) {
+            minDist = dist;
+            closestEdge = { points: [{ x: p1x, y: p1y }, { x: p2x, y: p2y }] };
+          }
         }
       }
-
-      return closestEdge ? { type: 'edge', points: closestEdge.points } : null;
     }
-    return null;
+
+    return closestEdge ? { type: 'edge', points: closestEdge.points } : null;
   }
 
   private getTriangleEdgeAt(x: number, y: number, width: number, height: number, scale: number): EdgeInfo | null {
