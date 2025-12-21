@@ -87,13 +87,12 @@ export class GridRenderer {
 
         // Draw hexagon
         const hex = this.createHexagon(x, y, scale);
-        hex.beginFill(color);
-        hex.endFill();
+        hex.fill(color);
         container.addChild(hex);
 
         // Draw edges
         const edges = this.createHexagon(x, y, scale);
-        edges.lineStyle(1, colorToHex(edgeColor));
+        edges.stroke({ color: colorToHex(edgeColor), width: 1 });
         edgeContainer.addChild(edges);
       }
     }

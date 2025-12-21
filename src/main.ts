@@ -1,8 +1,8 @@
 import { Application, Graphics, Container } from 'pixi.js';
-import { Pane } from 'tweakpane';
+// import { Pane } from 'tweakpane'; // Commented out for now
 import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
-import { colorToHex } from './color-utils';
+// import { colorToHex } from './color-utils'; // Commented out for now
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -18,12 +18,12 @@ interface AppConfig {
 }
 
 class GridApp {
-  private app: Application;
-  private gridRenderer: GridRenderer;
-  private pane: Pane;
+  private app!: Application;
+  private gridRenderer!: GridRenderer;
+  // private pane!: Pane; // Commented out for now
   private config: AppConfig;
-  private gridContainer: Container;
-  private edgeContainer: Container;
+  private gridContainer!: Container;
+  private edgeContainer!: Container;
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
 
@@ -48,7 +48,7 @@ class GridApp {
     };
 
     this.initPixi().then(() => {
-      this.initTweakpane();
+      // this.initTweakpane(); // Commented out for now
       this.initGrid();
       this.setupInteraction();
     });
@@ -75,72 +75,11 @@ class GridApp {
     // resizeTo: window handles resizing automatically
   }
 
-  private initTweakpane() {
-    this.pane = new Pane({ title: 'Grid Controls' });
-
-    this.pane.addInput(this.config, 'gridWidth', {
-      min: 1,
-      max: 100,
-      step: 1,
-    }).on('change', () => this.updateGrid());
-
-    this.pane.addInput(this.config, 'gridHeight', {
-      min: 1,
-      max: 100,
-      step: 1,
-    }).on('change', () => this.updateGrid());
-
-    this.pane.addInput(this.config, 'gridType', {
-      options: {
-        squares: 'squares',
-        hexagons: 'hexagons',
-        triangles: 'triangles',
-      },
-    }).on('change', () => this.updateGrid());
-
-    this.pane.addInput(this.config, 'gridScale', {
-      min: 5,
-      max: 100,
-      step: 1,
-    }).on('change', () => this.updateGrid());
-
-    this.pane.addInput(this.config, 'drawState', {
-      min: 0,
-      max: 10,
-      step: 1,
-    });
-
-    // Create palette folder with individual color inputs
-    const paletteFolder = this.pane.addFolder({ title: 'Palette' });
-    for (let i = 0; i <= 10; i++) {
-      if (!this.config.palette[i]) {
-        this.config.palette[i] = '#000000';
-      }
-      paletteFolder.addInput(this.config.palette, i.toString(), {
-        view: 'color',
-        color: { type: 'float' },
-        label: `State ${i}`,
-      }).on('change', (ev: any) => {
-        this.config.palette[i] = ev.value;
-        this.updateGrid();
-      });
-    }
-
-    this.pane.addInput(this.config, 'edgeColor', {
-      view: 'color',
-      color: { type: 'float' },
-    }).on('change', (ev: any) => {
-      this.config.edgeColor = ev.value;
-      this.updateGrid();
-    });
-
-    this.pane.addInput(this.config, 'edgeHighlightColor', {
-      view: 'color',
-      color: { type: 'float' },
-    }).on('change', (ev: any) => {
-      this.config.edgeHighlightColor = ev.value;
-    });
-  }
+  // private initTweakpane() {
+  //   // Commented out for now - will add Tweakpane controls later
+  //   // this.pane = new Pane({ title: 'Grid Controls' });
+  //   // ... Tweakpane setup code will be added later ...
+  // }
 
   private initGrid() {
     this.gridRenderer = new GridRenderer();
