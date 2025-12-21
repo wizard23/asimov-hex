@@ -27,7 +27,7 @@ class GridApp {
   private edgeContainer!: Container;
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
-  private drawStateBinding: any = null;
+  private drawStateFolder: any = null;
 
   constructor() {
     this.config = {
@@ -136,26 +136,13 @@ class GridApp {
       if (this.config.drawState >= this.config.numStates) {
         this.config.drawState = this.config.numStates - 1;
       }
-      // Update drawState max range by removing and re-adding the binding
-      if (this.drawStateBinding) {
-        this.drawStateBinding.dispose();
-      }
-      this.drawStateBinding = this.pane.addBinding(this.config, 'drawState', {
-        min: 0,
-        max: this.config.numStates - 1,
-        step: 1,
-        label: 'Draw State',
-      });
+      // Rebuild draw state selector
+      this.updateDrawStateSelector();
       this.updateGrid();
     });
 
-    // Add draw state control
-    this.drawStateBinding = this.pane.addBinding(this.config, 'drawState', {
-      min: 0,
-      max: this.config.numStates - 1,
-      step: 1,
-      label: 'Draw State',
-    });
+    // Add draw state selector (palette color picker)
+    this.updateDrawStateSelector();
 
     // Add show coordinates checkbox
     this.pane.addBinding(this.config, 'showCoordinates', {
@@ -163,6 +150,58 @@ class GridApp {
     }).on('change', () => {
       this.updateGrid();
     });
+  }
+
+  private updateDrawStateSelector() {
+    // Remove existing folder if it exists
+    if (this.drawStateFolder) {
+      this.drawStateFolder.dispose();
+    }
+
+    // Create folder for draw state selection
+    this.drawStateFolder = this.pane.addFolder({ title: 'Draw State (Select Color)' });
+
+    // Create a button for each state
+    for (let i = 0; i < this.config.numStates; i++) {
+      const stateColor = typeof this.config.palette[i] === 'string' 
+        ? this.config.palette[i] 
+        : '#000000';
+      
+      const buttonParams = {
+        label: `State ${i} (${stateColor})`,
+        title: `Select state ${i} - Color: ${stateColor}`,
+      };
+
+      this.drawStateFolder.addButton(buttonParams).on('click', () => {
+        this.config.drawState = i;
+        // Update all buttons to reflect current selection
+        this.updateDrawStateButtons();
+      });
+    }
+
+    // Update button states
+    this.updateDrawStateButtons();
+  }
+
+  private updateDrawStateButtons() {
+    // Update button labels to show which state is selected
+    if (this.drawStateFolder) {
+      const children = this.drawStateFolder.children;
+      children.forEach((child: any, index: number) => {
+        if (index < this.config.numStates) {
+          const isSelected = index === this.config.drawState;
+          const stateColor = typeof this.config.palette[index] === 'string' 
+            ? this.config.palette[index] 
+            : '#000000';
+          // Update button label to show selection
+          if (child.controller && child.controller.label) {
+            child.controller.label.text = isSelected 
+              ? `✓ State ${index} (${stateColor})` 
+              : `State ${index} (${stateColor})`;
+          }
+        }
+      });
+    }
   }
 
   private initGrid() {
