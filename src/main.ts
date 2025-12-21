@@ -120,8 +120,11 @@ class GridApp {
     const offsetX = (this.app.screen.width - gridWidth) / 2;
     const offsetY = (this.app.screen.height - gridHeight) / 2;
 
+    // Position both containers at the same offset so cells and edges align
     this.gridContainer.x = offsetX;
     this.gridContainer.y = offsetY;
+    this.edgeContainer.x = offsetX;
+    this.edgeContainer.y = offsetY;
 
     // Convert palette to string format for renderer
     const paletteStrings: Record<number, string> = {};
@@ -153,8 +156,9 @@ class GridApp {
   private handleMouseMove(e: MouseEvent) {
     const canvas = this.app.canvas as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left - this.gridContainer.x;
-    const y = e.clientY - rect.top - this.gridContainer.y;
+    // Use edgeContainer position since edges are in edgeContainer
+    const x = e.clientX - rect.left - this.edgeContainer.x;
+    const y = e.clientY - rect.top - this.edgeContainer.y;
 
     const edgeInfo = this.gridRenderer.getEdgeAt(
       x, y,
@@ -195,7 +199,12 @@ class GridApp {
     );
 
     if (cellInfo) {
-      this.cellStates[cellInfo.row][cellInfo.col] = this.config.drawState;
+      // Left click: set to draw state, Right click: clear (set to state 0)
+      if (e.button === 0) {
+        this.cellStates[cellInfo.row][cellInfo.col] = this.config.drawState;
+      } else if (e.button === 2) {
+        this.cellStates[cellInfo.row][cellInfo.col] = 0;
+      }
       this.updateGrid();
     }
   }
