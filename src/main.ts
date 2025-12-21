@@ -27,6 +27,7 @@ class GridApp {
   private edgeContainer!: Container;
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
+  private drawStateBinding: any = null;
 
   constructor() {
     this.config = {
@@ -131,7 +132,25 @@ class GridApp {
       step: 1,
       label: 'Number of States',
     }).on('change', () => {
+      console.log("numStates changed", this.config.numStates);
+
+      // Update drawState max range when numStates changes
+      if (this.drawStateBinding) {
+        this.drawStateBinding.controller.value.rawValue.max = this.config.numStates - 1;
+        // Clamp drawState to valid range
+        if (this.config.drawState >= this.config.numStates) {
+          this.config.drawState = this.config.numStates - 1;
+        }
+      }
       this.updateGrid();
+    });
+
+    // Add draw state control
+    this.drawStateBinding = this.pane.addBinding(this.config, 'drawState', {
+      min: 0,
+      max: this.config.numStates - 1,
+      step: 1,
+      label: 'Draw State',
     });
 
     // Add show coordinates checkbox
