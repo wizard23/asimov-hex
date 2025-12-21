@@ -195,26 +195,6 @@ export class GridRenderer {
     }
   }
 
-  private createHexagon(x: number, y: number, radius: number): Graphics {
-    // Legacy function - treats x,y as top-left of bounding box
-    const graphics = new Graphics();
-    const centerX = x + radius;
-    const centerY = y + radius * Math.sqrt(3) / 2;
-
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i - Math.PI / 6;
-      const px = centerX + radius * Math.cos(angle);
-      const py = centerY + radius * Math.sin(angle);
-      if (i === 0) {
-        graphics.moveTo(px, py);
-      } else {
-        graphics.lineTo(px, py);
-      }
-    }
-    graphics.closePath();
-    return graphics;
-  }
-
   private createHexagonCentered(centerX: number, centerY: number, radius: number): Graphics {
     // Creates a flat-top hexagon centered at (centerX, centerY)
     const graphics = new Graphics();
