@@ -145,10 +145,10 @@ class GridApp {
       gridWidth = this.config.gridWidth * this.config.gridScale;
       gridHeight = this.config.gridHeight * this.config.gridScale;
     } else if (this.config.gridType === 'hexagons') {
-      const hexHeight = this.config.gridScale * Math.sqrt(3);
-      const hexWidth = this.config.gridScale * 2;
-      gridWidth = this.config.gridWidth * hexWidth * 0.75 + this.config.gridScale;
-      gridHeight = this.config.gridHeight * hexHeight * 0.5 + hexHeight;
+      const hexSpacingX = this.config.gridScale * Math.sqrt(3);
+      const hexSpacingY = this.config.gridScale * 1.5;
+      gridWidth = this.config.gridWidth * hexSpacingX + this.config.gridScale;
+      gridHeight = this.config.gridHeight * hexSpacingY + this.config.gridScale;
     } else { // triangles
       const triangleHeight = this.config.gridScale * Math.sqrt(3) / 2;
       gridWidth = this.config.gridWidth * this.config.gridScale * 0.5 + this.config.gridScale;

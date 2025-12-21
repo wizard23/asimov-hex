@@ -73,25 +73,29 @@ export class GridRenderer {
     palette: Record<number, string>,
     edgeColor: string
   ) {
-    const hexHeight = scale * Math.sqrt(3);
-    const hexWidth = scale * 2;
+    // For flat-top hexagons, spacing calculations:
+    // Horizontal spacing between centers: scale * sqrt(3)
+    // Vertical spacing between centers: scale * 1.5
+    const hexSpacingX = scale * Math.sqrt(3);
+    const hexSpacingY = scale * 1.5;
 
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
-        const offsetX = (row % 2) * scale;
-        const x = col * hexWidth * 0.75 + offsetX;
-        const y = row * hexHeight * 0.5;
+        // Offset every other row by half the horizontal spacing
+        const offsetX = (row % 2) * (hexSpacingX / 2);
+        const centerX = col * hexSpacingX + offsetX;
+        const centerY = row * hexSpacingY;
 
         const state = cellStates[row]?.[col] ?? 0;
         const color = colorToHex(palette[state] || '#000000');
 
-        // Draw hexagon
-        const hex = this.createHexagon(x, y, scale);
+        // Draw hexagon centered at (centerX, centerY)
+        const hex = this.createHexagonCentered(centerX, centerY, scale);
         hex.fill(color);
         container.addChild(hex);
 
         // Draw edges
-        const edges = this.createHexagon(x, y, scale);
+        const edges = this.createHexagonCentered(centerX, centerY, scale);
         edges.stroke({ color: colorToHex(edgeColor), width: 1 });
         edgeContainer.addChild(edges);
       }
@@ -133,9 +137,28 @@ export class GridRenderer {
   }
 
   private createHexagon(x: number, y: number, radius: number): Graphics {
+    // Legacy function - treats x,y as top-left of bounding box
     const graphics = new Graphics();
     const centerX = x + radius;
     const centerY = y + radius * Math.sqrt(3) / 2;
+
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i - Math.PI / 6;
+      const px = centerX + radius * Math.cos(angle);
+      const py = centerY + radius * Math.sin(angle);
+      if (i === 0) {
+        graphics.moveTo(px, py);
+      } else {
+        graphics.lineTo(px, py);
+      }
+    }
+    graphics.closePath();
+    return graphics;
+  }
+
+  private createHexagonCentered(centerX: number, centerY: number, radius: number): Graphics {
+    // Creates a flat-top hexagon centered at (centerX, centerY)
+    const graphics = new Graphics();
 
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI / 3) * i - Math.PI / 6;
@@ -198,21 +221,19 @@ export class GridRenderer {
   }
 
   private getHexagonCellAt(x: number, y: number, width: number, height: number, scale: number): CellInfo | null {
-    const hexHeight = scale * Math.sqrt(3);
-    const hexWidth = scale * 2;
+    // Use the same spacing calculations as rendering
+    const hexSpacingX = scale * Math.sqrt(3);
+    const hexSpacingY = scale * 1.5;
     
     // Brute force: check all hexagons to find which one contains the point
-    // This is more reliable than coordinate conversion for offset coordinates
     let closestHex: CellInfo | null = null;
     let minDistance = Infinity;
     
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
-        const offsetX = (row % 2) * scale;
-        const hexX = col * hexWidth * 0.75 + offsetX;
-        const hexY = row * hexHeight * 0.5;
-        const centerX = hexX + scale;
-        const centerY = hexY + scale * Math.sqrt(3) / 2;
+        const offsetX = (row % 2) * (hexSpacingX / 2);
+        const centerX = col * hexSpacingX + offsetX;
+        const centerY = row * hexSpacingY;
         
         const dx = x - centerX;
         const dy = y - centerY;
@@ -365,8 +386,9 @@ export class GridRenderer {
   }
 
   private getHexagonEdgeAt(x: number, y: number, width: number, height: number, scale: number): EdgeInfo | null {
-    const hexHeight = scale * Math.sqrt(3);
-    const hexWidth = scale * 2;
+    // Use the same spacing calculations as rendering
+    const hexSpacingX = scale * Math.sqrt(3);
+    const hexSpacingY = scale * 1.5;
     
     let minDist = Infinity;
     let closestEdge = null;
@@ -374,11 +396,9 @@ export class GridRenderer {
     // Check all hexagons to find the closest edge
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
-        const offsetX = (row % 2) * scale;
-        const hexX = col * hexWidth * 0.75 + offsetX;
-        const hexY = row * hexHeight * 0.5;
-        const centerX = hexX + scale;
-        const centerY = hexY + scale * Math.sqrt(3) / 2;
+        const offsetX = (row % 2) * (hexSpacingX / 2);
+        const centerX = col * hexSpacingX + offsetX;
+        const centerY = row * hexSpacingY;
         
         // Check all 6 edges of this hexagon
         const edges = [
