@@ -203,7 +203,8 @@ class GridApp {
       this.config.gridScale,
       this.cellStates,
       paletteStrings,
-      typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff'
+      typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff',
+      this.config.showCoordinates
     );
   }
 
