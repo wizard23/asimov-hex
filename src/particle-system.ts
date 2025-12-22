@@ -292,10 +292,24 @@ export class ParticleSystem {
     
     // Sort by relative angle
     if (clockwise) {
-      // Clockwise: find the edge with the smallest positive relative angle
-      // If none, wrap around to the most negative (which is actually the next clockwise)
+      // Clockwise: find the edge with the largest negative relative angle
+      // If none, wrap around to the most positive (which is actually the next clockwise)
       edgeAngles.sort((a, b) => {
-        // Prefer positive angles (clockwise)
+        // Prefer negative angles (clockwise in screen coordinates where y increases downward)
+        if (a.relativeAngle < 0 && b.relativeAngle >= 0) return 1;
+        if (a.relativeAngle >= 0 && b.relativeAngle < 0) return -1;
+        // Both same sign, sort by magnitude (reverse for clockwise)
+        return b.relativeAngle - a.relativeAngle;
+      });
+      
+      // Find first negative angle, or if none, use the most positive (wraps around)
+      const negativeAngle = edgeAngles.find(e => e.relativeAngle < 0);
+      return negativeAngle ? negativeAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
+    } else {
+      // Counter-clockwise: find the edge with the smallest positive relative angle
+      // If none, wrap around to the most negative (which is actually the next counter-clockwise)
+      edgeAngles.sort((a, b) => {
+        // Prefer positive angles (counter-clockwise in screen coordinates where y increases downward)
         if (a.relativeAngle > 0 && b.relativeAngle <= 0) return -1;
         if (a.relativeAngle <= 0 && b.relativeAngle > 0) return 1;
         // Both same sign, sort by magnitude
@@ -305,20 +319,6 @@ export class ParticleSystem {
       // Find first positive angle, or if none, use the most negative (wraps around)
       const positiveAngle = edgeAngles.find(e => e.relativeAngle > 0);
       return positiveAngle ? positiveAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
-    } else {
-      // Counter-clockwise: find the edge with the largest negative relative angle
-      // If none, wrap around to the most positive (which is actually the next counter-clockwise)
-      edgeAngles.sort((a, b) => {
-        // Prefer negative angles (counter-clockwise)
-        if (a.relativeAngle < 0 && b.relativeAngle >= 0) return 1;
-        if (a.relativeAngle >= 0 && b.relativeAngle < 0) return -1;
-        // Both same sign, sort by magnitude (reverse for counter-clockwise)
-        return b.relativeAngle - a.relativeAngle;
-      });
-      
-      // Find first negative angle, or if none, use the most positive (wraps around)
-      const negativeAngle = edgeAngles.find(e => e.relativeAngle < 0);
-      return negativeAngle ? negativeAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
     }
   }
 
