@@ -26,6 +26,12 @@ Adapt the  project generation script to exclude all files that are in a folder n
 
 
 
+ add another boolean filed to the config (user changable via the tweakpane) that shows the absolute difference of the cell states
+
+
+
+
+
 * instanced geometry
 https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry
 

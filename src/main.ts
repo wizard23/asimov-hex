@@ -25,7 +25,9 @@ interface AppConfig {
   drawState: number;
   palette: Record<number, ColorValue>;
   selectedPalette: string;
-  edgeColor: ColorValue;
+  edgePalette: Record<number, ColorValue>; // New: Palette for edges
+  selectedEdgePalette: string;             // New: Selected edge palette name
+  edgeColor: ColorValue;                   // Re-add edgeColor
   edgeHighlightColor: ColorValue;
   showCoordinates: boolean;
   particleSpeed: number;
@@ -62,6 +64,12 @@ class GridApp {
       initialPalette[parseInt(key)] = defaultPalette.colors[key];
     });
 
+    // Initialize edge palette with the same default initially
+    const initialEdgePalette: Record<number, ColorValue> = {};
+    Object.keys(defaultPalette.colors).forEach(key => {
+      initialEdgePalette[parseInt(key)] = defaultPalette.colors[key];
+    });
+
     this.config = {
       gridWidth: 25,
       gridHeight: 18,
@@ -71,7 +79,9 @@ class GridApp {
       drawState: 7,
       palette: initialPalette,
       selectedPalette: defaultPalette.name,
-      edgeColor: '#ffffff',
+      edgePalette: initialEdgePalette,       // New: Initialize edge palette
+      selectedEdgePalette: defaultPalette.name, // New: Initialize selected edge palette
+      edgeColor: '#ffffff',                  // Re-add edgeColor
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
       particleSpeed: 100,
@@ -168,6 +178,19 @@ class GridApp {
 
     // Update draw state blade to reflect new colors
     this.updateDrawStateBlade();
+    
+    // Update grid rendering
+    this.updateGrid();
+  }
+
+  private applyEdgePalette(paletteName: string) {
+    const palette = this.palettes.find(p => p.name === paletteName);
+    if (!palette) return;
+
+    // Update edge palette in config
+    Object.keys(palette.colors).forEach(key => {
+      this.config.edgePalette[parseInt(key)] = palette.colors[key];
+    });
     
     // Update grid rendering
     this.updateGrid();
@@ -287,6 +310,26 @@ class GridApp {
       label: 'Palette',
     }).on('change', () => {
       this.applyPalette(this.config.selectedPalette);
+    });
+
+    // Add edge palette selection dropdown
+    const edgePaletteOptions: Record<string, string> = {};
+    this.palettes.forEach(palette => {
+      edgePaletteOptions[palette.name] = palette.name;
+    });
+    
+    this.pane.addBinding(this.config, 'selectedEdgePalette', {
+      options: edgePaletteOptions,
+      label: 'Edge Palette',
+    }).on('change', () => {
+      this.applyEdgePalette(this.config.selectedEdgePalette);
+    });
+
+    // Add edge color picker
+    this.pane.addBinding(this.config, 'edgeColor', {
+      label: 'Edge Color'
+    }).on('change', () => {
+      this.updateGrid();
     });
 
     // Add draw state selector (palette color picker)
