@@ -20,16 +20,16 @@
       "totalWords": 4411
     },
     {
-      "fileType": ".gitignore",
-      "count": 1,
-      "totalLines": 2,
-      "totalWords": 2
-    },
-    {
       "fileType": ".html",
       "count": 1,
       "totalLines": 34,
       "totalWords": 57
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 2,
+      "totalWords": 2
     }
   ],
   "totals": {
