@@ -13,5 +13,19 @@ Add performance tests for these functions in grid-renderer that do grid calculat
 dropdown for edgePalette
 checkbox for absolute difference of states between cells (uses edge palette)
 
+
+
+
+move src/assets/project-statistics/ to src/assets/project-statistics/generated and update the scripts and code that generates and uses the project statistics to refelect that change.
+
+Adapt the  project generation script to exclude all files that are in a folder named generated from the statistics. For now these are:
+* docs/generated
+* src/assets/project-statistics/generated
+
+
+
+
+
 * instanced geometry
 https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry
+
