@@ -41,7 +41,16 @@ function getGitTrackedFiles(): string[] {
 }
 
 function generateStatistics(): ProjectStatistics {
-  const files = getGitTrackedFiles();
+  const allFiles = getGitTrackedFiles();
+  const excludedFolders = [
+    'docs/generated',
+    'src/assets/project-statistics/generated'
+  ];
+
+  const files = allFiles.filter(file => 
+    !excludedFolders.some(folder => file.startsWith(folder))
+  );
+  
   const statsByType = new Map<string, { count: number; lines: number; words: number }>();
 
   let totalLines = 0;
@@ -101,7 +110,7 @@ function main() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   
   const filename = `${year}-${month}-${day}_${hours}-${minutes}.json`;
-  const outputDir = join(process.cwd(), 'src', 'assets', 'project-statistics');
+  const outputDir = join(process.cwd(), 'src', 'assets', 'project-statistics', 'generated');
   const outputPath = join(outputDir, filename);
 
   // Create directory if it doesn't exist

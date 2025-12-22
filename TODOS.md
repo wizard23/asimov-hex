@@ -16,9 +16,9 @@ checkbox for absolute difference of states between cells (uses edge palette)
 
 
 
-move src/assets/project-statistics/ to src/assets/project-statistics/generated and update the scripts and code that generates and uses the project statistics to refelect that change.
+move src/assets/project-statistics/ to src/assets/project-statistics/generated and update the scripts and code that generates and uses the project statistics to reflect that change (scripts/create-project-statistics.ts and src/statistics.ts)
 
-Adapt the  project generation script to exclude all files that are in a folder named generated from the statistics. For now these are:
+Adapt the  project generation script to exclude all files that are in a folder named generated from the statistics. For now these should be:
 * docs/generated
 * src/assets/project-statistics/generated
 
