@@ -22,8 +22,8 @@ class DrawStateBladeView implements View {
 
     for (let i = 0; i < config.numStates; i++) {
       const button = document.createElement('button');
-      button.style.width = '32px';
-      button.style.height = '32px';
+      button.style.width = '24px';
+      button.style.height = '24px';
       button.style.border = '2px solid #666';
       button.style.borderRadius = '4px';
       button.style.cursor = 'pointer';
@@ -74,8 +74,8 @@ class DrawStateBladeView implements View {
     // Create new buttons
     for (let i = 0; i < config.numStates; i++) {
       const button = document.createElement('button');
-      button.style.width = '32px';
-      button.style.height = '32px';
+      button.style.width = '24px';
+      button.style.height = '24px';
       button.style.border = '2px solid #666';
       button.style.borderRadius = '4px';
       button.style.cursor = 'pointer';

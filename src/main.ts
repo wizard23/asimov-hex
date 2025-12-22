@@ -50,12 +50,12 @@ class GridApp {
     });
 
     this.config = {
-      gridWidth: 20,
-      gridHeight: 20,
-      gridType: 'squares',
+      gridWidth: 25,
+      gridHeight: 18,
+      gridType: 'hexagons',
       gridScale: 30,
-      numStates: 4,
-      drawState: 1,
+      numStates: 8,
+      drawState: 7,
       palette: initialPalette,
       selectedPalette: defaultPalette.name,
       edgeColor: '#ffffff',
@@ -113,7 +113,7 @@ class GridApp {
     // Add grid width control
     this.pane.addBinding(this.config, 'gridWidth', {
       min: 1,
-      max: 100,
+      max: 80,
       step: 1,
       label: 'Grid Width',
     }).on('change', () => {
@@ -123,7 +123,7 @@ class GridApp {
     // Add grid height control
     this.pane.addBinding(this.config, 'gridHeight', {
       min: 1,
-      max: 100,
+      max: 50,
       step: 1,
       label: 'Grid Height',
     }).on('change', () => {
@@ -145,7 +145,7 @@ class GridApp {
     // Add grid scale control
     this.pane.addBinding(this.config, 'gridScale', {
       min: 5,
-      max: 100,
+      max: 50,
       step: 1,
       label: 'Grid Scale',
     }).on('change', () => {
