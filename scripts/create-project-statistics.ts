@@ -44,7 +44,7 @@ function generateStatistics(): ProjectStatistics {
   const allFiles = getGitTrackedFiles();
   const excludedFolders = [
     'docs/generated',
-    'src/assets/project-statistics/generated'
+    'public/project-statistics/generated'
   ];
 
   const files = allFiles.filter(file => 
@@ -110,7 +110,7 @@ function main() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   
   const filename = `${year}-${month}-${day}_${hours}-${minutes}.json`;
-  const outputDir = join(process.cwd(), 'src', 'assets', 'project-statistics', 'generated');
+  const outputDir = join(process.cwd(), 'public', 'project-statistics', 'generated');
   const outputPath = join(outputDir, filename);
 
   // Create directory if it doesn't exist
