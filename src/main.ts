@@ -107,7 +107,7 @@ class GridApp {
     
     const reopenButton = document.createElement('button');
     reopenButton.id = 'info-panel-reopen';
-    reopenButton.innerHTML = 'ℹ';
+    reopenButton.innerHTML = '&nbsp;ℹ';
     reopenButton.setAttribute('aria-label', 'Open info panel');
     reopenButton.onclick = () => {
       panel.classList.remove('minimized');

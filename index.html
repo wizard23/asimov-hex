@@ -62,21 +62,25 @@
       display: none;
     }
     #info-panel.minimized #info-panel h2 {
-      display: none;
+      margin: 0;
+      margin-right: 12px;
     }
     #info-panel-reopen {
       display: none;
     }
     #info-panel.minimized #info-panel-reopen {
-      display: block;
+      display: flex;
       background: none;
       border: none;
       color: #aaa;
-      font-size: 18px;
+      font-size: 24px;
       cursor: pointer;
       padding: 0;
       width: auto;
       height: auto;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
       transition: color 0.2s ease;
     }
     #info-panel.minimized #info-panel-reopen:hover {
