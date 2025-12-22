@@ -174,14 +174,24 @@ export class ParticleSystem {
     // Choose random edge
     const nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
     
-    // Determine direction on new edge (toward the vertex we're at)
+    // Determine direction on new edge
+    // We're at a vertex, so we need to move away from it along the new edge
     const nextP1 = nextEdge.points[0];
-    const towardP1 = this.pointsEqual(vertex, nextP1);
+    const vertexIsP1 = this.pointsEqual(vertex, nextP1);
     
     particle.previousEdge = particle.currentEdge;
     particle.currentEdge = nextEdge;
-    particle.direction = towardP1 ? -1 : 1;
-    particle.progress = towardP1 ? 0 : 1;
+    
+    if (vertexIsP1) {
+      // Vertex is at p1, so move toward p2 (positive direction)
+      particle.direction = 1;
+      particle.progress = 0; // Start at p1
+    } else {
+      // Vertex is at p2, so move toward p1 (negative direction)
+      particle.direction = -1;
+      particle.progress = 1; // Start at p2
+    }
+    
     particle.x = vertex.x;
     particle.y = vertex.y;
     
