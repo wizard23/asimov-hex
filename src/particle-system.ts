@@ -143,20 +143,20 @@ export class ParticleSystem {
     console.log("edgeSelectionRule", edgeSelectionRule, "connectedEdges", connectedEdges);
     
     if (edgeSelectionRule === 'randomNoBacktrack') {
-      // Filter out the edge we came from
+      // Filter out the edge we're currently on (the one we just arrived from)
       availableEdges = connectedEdges.filter(edge => {
-        if (!particle.previousEdge) return true;
-        // Check if this edge is the same as previous edge
+        if (!particle.currentEdge) return true;
+        // Check if this edge is the same as the current edge we're on
         // Use a more robust comparison that handles floating point precision
-        const prevP1 = particle.previousEdge.points[0];
-        const prevP2 = particle.previousEdge.points[1];
-        const currP1 = edge.points[0];
-        const currP2 = edge.points[1];
+        const currentP1 = particle.currentEdge.points[0];
+        const currentP2 = particle.currentEdge.points[1];
+        const edgeP1 = edge.points[0];
+        const edgeP2 = edge.points[1];
         
         // Check if edges are the same (same two points, regardless of order)
         const sameEdge = (
-          (this.pointsEqual(prevP1, currP1) && this.pointsEqual(prevP2, currP2)) ||
-          (this.pointsEqual(prevP1, currP2) && this.pointsEqual(prevP2, currP1))
+          (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
+          (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
         );
         
         return !sameEdge;
