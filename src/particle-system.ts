@@ -65,8 +65,8 @@ export class ParticleSystem {
 
   private createParticleGraphics(particle: Particle): void {
     const graphics = new Graphics();
-    graphics.circle(0, 0, 3);
-    graphics.fill(0x00ff00);
+    graphics.circle(0, 0, 4);
+    graphics.fill({ color: 0x00ff00 });
     graphics.x = particle.x;
     graphics.y = particle.y;
     this.particleContainer.addChild(graphics);

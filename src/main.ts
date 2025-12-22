@@ -13,6 +13,8 @@ interface PaletteData {
   colors: Record<string, string>;
 }
 
+type LeftClickMode = 'draw' | 'spawnParticle';
+
 interface AppConfig {
   gridWidth: number;
   gridHeight: number;
@@ -26,6 +28,7 @@ interface AppConfig {
   edgeHighlightColor: ColorValue;
   showCoordinates: boolean;
   particleSpeed: number;
+  leftClickMode: LeftClickMode;
 }
 
 class GridApp {
@@ -66,6 +69,7 @@ class GridApp {
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
       particleSpeed: 10,
+      leftClickMode: 'draw',
     };
 
     this.initPixi().then(() => {
@@ -212,6 +216,15 @@ class GridApp {
       label: 'Show Coordinates',
     }).on('change', () => {
       this.updateGrid();
+    });
+
+    // Add left click mode dropdown
+    this.pane.addBinding(this.config, 'leftClickMode', {
+      options: {
+        draw: 'Draw Cell',
+        spawnParticle: 'Spawn Particle',
+      },
+      label: 'Left Click Mode',
     });
 
     // Add particle speed control
@@ -482,25 +495,70 @@ class GridApp {
   private handleMouseDown(e: MouseEvent) {
     const canvas = this.app.canvas;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left - this.gridContainer.x;
-    const y = e.clientY - rect.top - this.gridContainer.y;
 
-    const cellInfo = this.gridRenderer.getCellAt(
-      x, y,
-      this.config.gridWidth,
-      this.config.gridHeight,
-      this.config.gridType,
-      this.config.gridScale
-    );
+    console.log("leftClickMode", this.config.leftClickMode);
+    
+    if (e.button === 0) {
+      console.log("left click");
 
-    if (cellInfo) {
-      // Left click: set to draw state, Right click: clear (set to state 0)
-      if (e.button === 0) {
-        this.cellStates[cellInfo.row][cellInfo.col] = this.config.drawState;
-      } else if (e.button === 2) {
-        this.cellStates[cellInfo.row][cellInfo.col] = 0;
+      // Left click
+      if (this.config.leftClickMode === 'spawnParticle') {
+        console.log("spawn branch");
+
+        // Check for edge click for particle spawning
+        const edgeX = e.clientX - rect.left - this.edgeContainer.x;
+        const edgeY = e.clientY - rect.top - this.edgeContainer.y;
+        
+        const edgeInfo = this.gridRenderer.getEdgeAt(
+          edgeX, edgeY,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          this.config.gridType,
+          this.config.gridScale
+        );
+
+        if (edgeInfo) {
+          // Spawn particle on edge click
+          this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
+          return;
+        }
+      } else {
+        console.log("draw branch");
+        
+        // Draw mode - check for cell click
+        const x = e.clientX - rect.left - this.gridContainer.x;
+        const y = e.clientY - rect.top - this.gridContainer.y;
+
+        const cellInfo = this.gridRenderer.getCellAt(
+          x, y,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          this.config.gridType,
+          this.config.gridScale
+        );
+
+        if (cellInfo) {
+          this.cellStates[cellInfo.row][cellInfo.col] = this.config.drawState;
+          this.updateGrid();
+        }
       }
-      this.updateGrid();
+    } else if (e.button === 2) {
+      // Right click: always clear cell (set to state 0)
+      const x = e.clientX - rect.left - this.gridContainer.x;
+      const y = e.clientY - rect.top - this.gridContainer.y;
+
+      const cellInfo = this.gridRenderer.getCellAt(
+        x, y,
+        this.config.gridWidth,
+        this.config.gridHeight,
+        this.config.gridType,
+        this.config.gridScale
+      );
+
+      if (cellInfo) {
+        this.cellStates[cellInfo.row][cellInfo.col] = 0;
+        this.updateGrid();
+      }
     }
   }
 }
