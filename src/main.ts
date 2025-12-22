@@ -80,10 +80,67 @@ class GridApp {
     };
 
     this.initPixi().then(() => {
+      this.initInfoPanel();
       this.initTweakpane();
       this.initGrid();
       this.setupInteraction();
     });
+  }
+
+  private initInfoPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'info-panel';
+    
+    const header = document.createElement('div');
+    header.id = 'info-panel-header';
+    
+    const title = document.createElement('h2');
+    title.textContent = 'About';
+    
+    const closeButton = document.createElement('button');
+    closeButton.id = 'info-panel-close';
+    closeButton.innerHTML = '×';
+    closeButton.setAttribute('aria-label', 'Close info panel');
+    closeButton.onclick = () => {
+      panel.classList.add('hidden');
+    };
+    
+    header.appendChild(title);
+    header.appendChild(closeButton);
+    
+    const content = document.createElement('div');
+    content.id = 'info-panel-content';
+    
+    const description = document.createElement('p');
+    description.textContent = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.`;
+    
+    content.appendChild(description);
+    
+    const links = document.createElement('div');
+    links.id = 'info-panel-links';
+    
+    const manualLink = document.createElement('a');
+    manualLink.href = '#';
+    manualLink.textContent = '📖 User Manual';
+    manualLink.onclick = (e) => {
+      e.preventDefault();
+      alert('Manual coming soon!');
+    };
+    
+    const githubLink = document.createElement('a');
+    githubLink.href = 'https://github.com/example/cursor-hex';
+    githubLink.textContent = '🔗 GitHub Repository';
+    githubLink.target = '_blank';
+    githubLink.rel = 'noopener noreferrer';
+    
+    links.appendChild(manualLink);
+    links.appendChild(githubLink);
+    
+    panel.appendChild(header);
+    panel.appendChild(content);
+    panel.appendChild(links);
+    
+    document.body.appendChild(panel);
   }
 
   private applyPalette(paletteName: string) {
