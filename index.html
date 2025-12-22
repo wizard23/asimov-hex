@@ -42,8 +42,45 @@
       overflow-y: auto;
       transition: opacity 0.2s ease;
     }
-    #info-panel.hidden {
+    #info-panel.minimized {
+      width: auto;
+      height: auto;
+      padding: 10px 15px;
+      max-height: none;
+      overflow: hidden;
+    }
+    #info-panel.minimized #info-panel-content,
+    #info-panel.minimized #info-panel-links {
       display: none;
+    }
+    #info-panel.minimized #info-panel-header {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    #info-panel.minimized #info-panel-close {
+      display: none;
+    }
+    #info-panel.minimized #info-panel h2 {
+      display: none;
+    }
+    #info-panel-reopen {
+      display: none;
+    }
+    #info-panel.minimized #info-panel-reopen {
+      display: block;
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+      width: auto;
+      height: auto;
+      transition: color 0.2s ease;
+    }
+    #info-panel.minimized #info-panel-reopen:hover {
+      color: #fff;
     }
     #info-panel-header {
       display: flex;

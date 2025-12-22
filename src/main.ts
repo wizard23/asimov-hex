@@ -100,13 +100,22 @@ class GridApp {
     const closeButton = document.createElement('button');
     closeButton.id = 'info-panel-close';
     closeButton.innerHTML = '×';
-    closeButton.setAttribute('aria-label', 'Close info panel');
+    closeButton.setAttribute('aria-label', 'Minimize info panel');
     closeButton.onclick = () => {
-      panel.classList.add('hidden');
+      panel.classList.add('minimized');
+    };
+    
+    const reopenButton = document.createElement('button');
+    reopenButton.id = 'info-panel-reopen';
+    reopenButton.innerHTML = 'ℹ';
+    reopenButton.setAttribute('aria-label', 'Open info panel');
+    reopenButton.onclick = () => {
+      panel.classList.remove('minimized');
     };
     
     header.appendChild(title);
     header.appendChild(closeButton);
+    header.appendChild(reopenButton);
     
     const content = document.createElement('div');
     content.id = 'info-panel-content';
