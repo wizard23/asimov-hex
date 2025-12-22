@@ -6,7 +6,7 @@ This document contains all user prompts and AI summaries from the development se
 
 This session focused on building and refining an interactive grid application with particle systems, multiple grid types (squares, hexagons, triangles), and various interaction modes.
 
-**Note:** Timestamps are not available in the conversation history. Please add timestamps in the format `YYYY/MM/DD HH:MM` if you have access to them.
+**Note:** Timestamps have been estimated from git commit history. Prompts marked with *(Uncertain)* may not have a clear 1:1 match with commits.
 
 ---
 
@@ -14,7 +14,7 @@ This session focused on building and refining an interactive grid application wi
 
 ### 1. Initial Application Build Request
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 11:11
 
 **User Prompt:**
 ```
@@ -55,7 +55,7 @@ Initial application structure created with TypeScript, Vite, PixiJS v8, and Twea
 
 ### 2. PixiJS Initialization Fix
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 ??:?? *(Uncertain - no clear commit match)*
 
 **User Prompt:**
 ```
@@ -69,7 +69,7 @@ Fixed PixiJS initialization by upgrading to PixiJS v8 and using the async `await
 
 ### 3. Minimal Tweakpane Setup
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 11:33
 
 **User Prompt:**
 ```
@@ -83,7 +83,7 @@ Added minimal Tweakpane integration with a single "grid scale" binding that upda
 
 ### 4. Tweakpane Type Cleanup
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 11:51
 
 **User Prompt:**
 ```
@@ -97,7 +97,7 @@ Removed unnecessary type assertions from Tweakpane bindings after `@tweakpane/co
 
 ### 5. Grid Configuration Options
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 12:02
 
 **User Prompt:**
 ```
@@ -114,7 +114,7 @@ Added Tweakpane controls for grid width, grid height, and grid type (squares, he
 
 ### 6. Triangle and Hexagon Grid Fixes
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 12:09
 
 **User Prompt:**
 ```
@@ -130,7 +130,7 @@ Fixed triangle cell detection by improving coordinate calculations and neighbor 
 
 ### 7. Hexagon Size Fix
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 12:16
 
 **User Prompt:**
 ```
@@ -145,7 +145,7 @@ Fixed hexagon sizing by using the scale value as the radius (distance from cente
 
 ### 8. Coordinate Display Feature
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 13:57
 
 **User Prompt:**
 ```
@@ -159,7 +159,7 @@ Added a `showCoordinates` checkbox to Tweakpane that displays cell coordinates (
 
 ### 9. Coordinate Visibility Fix
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 14:09
 
 **User Prompt:**
 ```
@@ -173,7 +173,7 @@ Fixed coordinate text visibility by adding a black stroke to the text and ensuri
 
 ### 10. Number of States Parameter
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 14:23
 
 **User Prompt:**
 ```
@@ -187,7 +187,7 @@ Added `numStates` parameter (defaults to 8) to control the maximum cell state va
 
 ### 11. Draw State Selection via Palette Colors
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 14:41
 
 **User Prompt:**
 ```
@@ -201,7 +201,7 @@ Replaced the draw state slider with a custom Tweakpane blade that displays color
 
 ### 12. Custom Blade Implementation
 
-**Timestamp:** 2025/12/21 ??:??
+**Timestamp:** 2025/12/21 14:58
 
 **User Prompt:**
 ```
@@ -215,7 +215,7 @@ Created a custom Tweakpane blade (`DrawStateBlade`) that displays small color-co
 
 ### 13. System Documentation
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 09:57
 
 **User Prompt:**
 ```
@@ -229,7 +229,7 @@ Created comprehensive system documentation (`docs/system-description.md`) coveri
 
 ### 14. Palette System with JSON Storage
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 09:57 *(Uncertain - may be combined with prompt 13)*
 
 **User Prompt:**
 ```
@@ -243,7 +243,7 @@ Created `src/assets/palettes.json` with 4 predefined palettes (Default, Pastel, 
 
 ### 15. ILO Color Ramps
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 10:21
 
 **User Prompt:**
 ```
@@ -257,7 +257,7 @@ Added 4 new palettes (ILO Blue, Purple, Turquoise, Yellow) to `palettes.json`, e
 
 ### 16. PNG Save/Load Functionality
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 10:28
 
 **User Prompt:**
 ```
@@ -273,7 +273,7 @@ Implemented PNG save/load functionality:
 
 ### 17. Particle System Implementation
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 10:44
 
 **User Prompt:**
 ```
@@ -295,7 +295,7 @@ Implemented particle system with:
 
 ### 18. Left Click Mode Dropdown
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 10:55
 
 **User Prompt:**
 ```
@@ -312,7 +312,7 @@ Added `leftClickMode` dropdown to Tweakpane with options "Draw Cell" and "Spawn 
 
 ### 19. Particle Edge Selection Rules
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 11:00
 
 **User Prompt:**
 ```
@@ -331,7 +331,7 @@ Fixed particle vertex arrival logic and added edge selection rules:
 
 ### 20. Particle Movement Direction Fix
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 11:14
 
 **User Prompt:**
 ```
@@ -348,7 +348,7 @@ Fixed particle direction logic in `handleVertexArrival`:
 
 ### 21. Grid-Specific Particle Bugs
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 11:52
 
 **User Prompt:**
 ```
@@ -370,7 +370,7 @@ Fixed multiple particle system bugs:
 
 ### 22. Clockwise/Counter-Clockwise Rules
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 12:15
 
 **User Prompt:**
 ```
@@ -389,7 +389,7 @@ Added clockwise and counter-clockwise turning rules:
 
 ### 23. Turn Direction Fix
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 12:19
 
 **User Prompt:**
 ```
@@ -406,7 +406,7 @@ Fixed flipped clockwise/counter-clockwise logic:
 
 ### 24. Cursor-Based Particle Rules
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 12:30
 
 **User Prompt:**
 ```
@@ -426,7 +426,7 @@ Added cursor-based particle rules:
 
 ### 25. Edge Detection Boundary Fixes
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 12:57
 
 **User Prompt:**
 ```
@@ -447,7 +447,7 @@ Fixed edge detection for boundary edges:
 
 ### 26. Context-Aware Highlighting
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 14:20
 
 **User Prompt:**
 ```
@@ -490,7 +490,7 @@ Implemented context-aware highlighting based on `leftClickMode`:
 
 ### 27. Project Statistics Script
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 15:18
 
 **User Prompt:**
 ```
@@ -515,7 +515,7 @@ Created a TypeScript script (`scripts/create-project-statistics.ts`) that:
 
 ### 28. Info Panel Implementation
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 16:21
 
 **User Prompt:**
 ```
@@ -539,7 +539,7 @@ Implemented an info panel overlay:
 
 ### 29. Minimizable Info Panel
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 17:03
 
 **User Prompt:**
 ```
@@ -558,7 +558,7 @@ Changed info panel behavior from hiding to minimizing:
 
 ### 30. Info Panel Reopen Button Improvements
 
-**Timestamp:** 2025/12/22 ??:??
+**Timestamp:** 2025/12/22 17:54
 
 **User Prompt:**
 ```
