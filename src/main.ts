@@ -70,7 +70,7 @@ class GridApp {
       edgeColor: '#ffffff',
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
-      particleSpeed: 10,
+      particleSpeed: 100,
       leftClickMode: 'spawnParticle',
       edgeSelectionRule: 'randomNoBacktrack',
     };
@@ -176,7 +176,7 @@ class GridApp {
     // Add grid scale control
     this.pane.addBinding(this.config, 'gridScale', {
       min: 5,
-      max: 50,
+      max: 100,
       step: 1,
       label: 'Grid Scale',
     }).on('change', () => {
@@ -186,7 +186,7 @@ class GridApp {
     // Add number of states control
     this.pane.addBinding(this.config, 'numStates', {
       min: 2,
-      max: 16,
+      max: 8,
       step: 1,
       label: 'Number of States',
     }).on('change', () => {
@@ -234,7 +234,7 @@ class GridApp {
     // Add particle speed control
     this.pane.addBinding(this.config, 'particleSpeed', {
       min: 1,
-      max: 100,
+      max: 250,
       step: 1,
       label: 'Particle Speed',
     });
