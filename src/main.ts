@@ -4,6 +4,7 @@ import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 import palettesData from './assets/palettes.json';
+import { ParticleSystem } from './particle-system';
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -24,6 +25,7 @@ interface AppConfig {
   edgeColor: ColorValue;
   edgeHighlightColor: ColorValue;
   showCoordinates: boolean;
+  particleSpeed: number;
 }
 
 class GridApp {
@@ -33,10 +35,12 @@ class GridApp {
   private config: AppConfig;
   private gridContainer!: Container;
   private edgeContainer!: Container;
+  private particleContainer!: Container;
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
   private drawStateBlade: DrawStateBladeApi | null = null;
   private palettes: PaletteData[] = [];
+  private particleSystem!: ParticleSystem;
 
   constructor() {
     // Load palettes from JSON
@@ -61,6 +65,7 @@ class GridApp {
       edgeColor: '#ffffff',
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
+      particleSpeed: 10,
     };
 
     this.initPixi().then(() => {
@@ -101,8 +106,26 @@ class GridApp {
 
     this.gridContainer = new Container();
     this.edgeContainer = new Container();
+    this.particleContainer = new Container();
     this.app.stage.addChild(this.gridContainer);
     this.app.stage.addChild(this.edgeContainer);
+    this.app.stage.addChild(this.particleContainer);
+
+    // Initialize particle system
+    this.particleSystem = new ParticleSystem(this.particleContainer);
+
+    // Setup particle update loop
+    this.app.ticker.add((ticker) => {
+      this.particleSystem.update(
+        ticker.deltaMS,
+        this.config.particleSpeed,
+        this.config.gridScale,
+        this.gridRenderer,
+        this.config.gridWidth,
+        this.config.gridHeight,
+        this.config.gridType
+      );
+    });
 
     // resizeTo: window handles resizing automatically
   }
@@ -189,6 +212,14 @@ class GridApp {
       label: 'Show Coordinates',
     }).on('change', () => {
       this.updateGrid();
+    });
+
+    // Add particle speed control
+    this.pane.addBinding(this.config, 'particleSpeed', {
+      min: 1,
+      max: 100,
+      step: 1,
+      label: 'Particle Speed',
     });
 
     // Add save/load PNG buttons
@@ -356,7 +387,7 @@ class GridApp {
         .map(() => Array(this.config.gridWidth).fill(0));
     }
 
-    // Clear existing graphics
+    // Clear existing graphics (but keep particles)
     this.gridContainer.removeChildren();
     this.edgeContainer.removeChildren();
     this.highlightedEdge = null;
@@ -381,11 +412,13 @@ class GridApp {
     const offsetX = (this.app.screen.width - gridWidth) / 2;
     const offsetY = (this.app.screen.height - gridHeight) / 2;
 
-    // Position both containers at the same offset so cells and edges align
+    // Position all containers at the same offset so cells, edges, and particles align
     this.gridContainer.x = offsetX;
     this.gridContainer.y = offsetY;
     this.edgeContainer.x = offsetX;
     this.edgeContainer.y = offsetY;
+    this.particleContainer.x = offsetX;
+    this.particleContainer.y = offsetY;
 
     // Convert palette to string format for renderer
     const paletteStrings: Record<number, string> = {};

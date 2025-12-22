@@ -1,5 +1,5 @@
 import { Graphics, Container, Text } from 'pixi.js';
-import { GridType, EdgeInfo, CellInfo } from './types';
+import { GridType, EdgeInfo, CellInfo, Point } from './types';
 import { colorToHex } from './color-utils';
 
 export class GridRenderer {
@@ -551,6 +551,206 @@ export class GridRenderer {
     graphics.lineTo(edgeInfo.points[1].x, edgeInfo.points[1].y);
     graphics.stroke({ color: colorToHex(color), width: 3 });
     return graphics;
+  }
+
+  getEdgesAtVertex(vertex: Point, width: number, height: number, gridType: GridType, scale: number): EdgeInfo[] {
+    switch (gridType) {
+      case 'squares':
+        return this.getSquareEdgesAtVertex(vertex, width, height, scale);
+      case 'hexagons':
+        return this.getHexagonEdgesAtVertex(vertex, width, height, scale);
+      case 'triangles':
+        return this.getTriangleEdgesAtVertex(vertex, width, height, scale);
+      default:
+        return [];
+    }
+  }
+
+  private getSquareEdgesAtVertex(vertex: Point, width: number, height: number, scale: number): EdgeInfo[] {
+    const edges: EdgeInfo[] = [];
+    const epsilon = 0.001;
+    
+    // Check all possible edges and see if they connect to this vertex
+    for (let row = 0; row <= height; row++) {
+      for (let col = 0; col <= width; col++) {
+        const x = col * scale;
+        const y = row * scale;
+        
+        // Check if vertex matches this grid point
+        if (Math.abs(vertex.x - x) < epsilon && Math.abs(vertex.y - y) < epsilon) {
+          // Add horizontal edges
+          if (row < height && col < width) {
+            // Top edge
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: col * scale, y: row * scale },
+                { x: (col + 1) * scale, y: row * scale }
+              ]
+            });
+          }
+          if (row > 0 && col < width) {
+            // Bottom edge
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: col * scale, y: row * scale },
+                { x: (col + 1) * scale, y: row * scale }
+              ]
+            });
+          }
+          
+          // Add vertical edges
+          if (col < width && row < height) {
+            // Right edge
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: col * scale, y: row * scale },
+                { x: col * scale, y: (row + 1) * scale }
+              ]
+            });
+          }
+          if (col > 0 && row < height) {
+            // Left edge
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: col * scale, y: row * scale },
+                { x: col * scale, y: (row + 1) * scale }
+              ]
+            });
+          }
+        }
+      }
+    }
+    
+    // Remove duplicates
+    return this.removeDuplicateEdges(edges);
+  }
+
+  private getHexagonEdgesAtVertex(vertex: Point, width: number, height: number, scale: number): EdgeInfo[] {
+    const edges: EdgeInfo[] = [];
+    const epsilon = 0.001;
+    const hexSpacingX = scale * Math.sqrt(3);
+    const hexSpacingY = scale * 1.5;
+    
+    // Check all hexagons
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const offsetX = (row % 2) * (hexSpacingX / 2);
+        const centerX = col * hexSpacingX + offsetX;
+        const centerY = row * hexSpacingY;
+        
+        // Check all 6 vertices of this hexagon
+        const angles = [
+          -Math.PI / 6, Math.PI / 6, Math.PI / 2,
+          5 * Math.PI / 6, 7 * Math.PI / 6, -Math.PI / 2
+        ];
+        
+        for (let i = 0; i < angles.length; i++) {
+          const vx = centerX + scale * Math.cos(angles[i]);
+          const vy = centerY + scale * Math.sin(angles[i]);
+          
+          if (Math.abs(vertex.x - vx) < epsilon && Math.abs(vertex.y - vy) < epsilon) {
+            // This vertex matches, add the two edges connected to it
+            const angle2 = angles[(i + 1) % 6];
+            const angle3 = angles[(i + 5) % 6];
+            
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: vx, y: vy },
+                { x: centerX + scale * Math.cos(angle2), y: centerY + scale * Math.sin(angle2) }
+              ]
+            });
+            
+            edges.push({
+              type: 'edge',
+              points: [
+                { x: vx, y: vy },
+                { x: centerX + scale * Math.cos(angle3), y: centerY + scale * Math.sin(angle3) }
+              ]
+            });
+          }
+        }
+      }
+    }
+    
+    return this.removeDuplicateEdges(edges);
+  }
+
+  private getTriangleEdgesAtVertex(vertex: Point, width: number, height: number, scale: number): EdgeInfo[] {
+    const edges: EdgeInfo[] = [];
+    const epsilon = 0.001;
+    const triangleHeight = scale * Math.sqrt(3) / 2;
+    
+    // Check all triangles
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const x = col * scale * 0.5;
+        const y = row * triangleHeight;
+        const isUp = (row + col) % 2 === 0;
+        
+        // Triangle vertices
+        const v1 = { x: x, y: y };
+        const v2 = { x: x + scale * 0.5, y: y };
+        const v3 = { x: x + scale * 0.25, y: isUp ? y - triangleHeight : y + triangleHeight };
+        
+        const triangleVerts = [v1, v2, v3];
+        
+        // Check if vertex matches any triangle vertex
+        for (let i = 0; i < triangleVerts.length; i++) {
+          const v = triangleVerts[i];
+          if (Math.abs(vertex.x - v.x) < epsilon && Math.abs(vertex.y - v.y) < epsilon) {
+            // Add edges connected to this vertex
+            const next = (i + 1) % 3;
+            const prev = (i + 2) % 3;
+            
+            edges.push({
+              type: 'edge',
+              points: [v, triangleVerts[next]]
+            });
+            edges.push({
+              type: 'edge',
+              points: [v, triangleVerts[prev]]
+            });
+          }
+        }
+      }
+    }
+    
+    return this.removeDuplicateEdges(edges);
+  }
+
+  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
+    const unique: EdgeInfo[] = [];
+    const epsilon = 0.001;
+    
+    for (const edge of edges) {
+      let isDuplicate = false;
+      for (const existing of unique) {
+        const p1Match = (
+          (Math.abs(edge.points[0].x - existing.points[0].x) < epsilon &&
+           Math.abs(edge.points[0].y - existing.points[0].y) < epsilon &&
+           Math.abs(edge.points[1].x - existing.points[1].x) < epsilon &&
+           Math.abs(edge.points[1].y - existing.points[1].y) < epsilon) ||
+          (Math.abs(edge.points[0].x - existing.points[1].x) < epsilon &&
+           Math.abs(edge.points[0].y - existing.points[1].y) < epsilon &&
+           Math.abs(edge.points[1].x - existing.points[0].x) < epsilon &&
+           Math.abs(edge.points[1].y - existing.points[0].y) < epsilon)
+        );
+        if (p1Match) {
+          isDuplicate = true;
+          break;
+        }
+      }
+      if (!isDuplicate) {
+        unique.push(edge);
+      }
+    }
+    
+    return unique;
   }
 }
 
