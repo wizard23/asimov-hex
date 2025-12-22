@@ -379,9 +379,16 @@ export class GridRenderer {
     const localY = y - row * scale;
     const threshold = 5; // pixels
 
-    if (col >= 0 && col < width && row >= 0 && row < height) {
-      // Check top edge
-      if (localY < threshold && row > 0) {
+    // Check if we're in a valid cell or just outside the grid boundaries
+    const inCell = col >= 0 && col < width && row >= 0 && row < height;
+    const onRightBoundary = col === width && row >= 0 && row < height;
+    const onBottomBoundary = row === height && col >= 0 && col < width;
+    const onTopBoundary = row === -1 && col >= 0 && col < width;
+    const onLeftBoundary = col === -1 && row >= 0 && row < height;
+
+    if (inCell) {
+      // Check top edge (allow all rows, including boundary)
+      if (localY < threshold) {
         return {
           type: 'edge',
           points: [
@@ -390,8 +397,8 @@ export class GridRenderer {
           ]
         };
       }
-      // Check bottom edge
-      if (localY > scale - threshold && row < height - 1) {
+      // Check bottom edge (allow all rows, including boundary)
+      if (localY > scale - threshold) {
         return {
           type: 'edge',
           points: [
@@ -400,8 +407,8 @@ export class GridRenderer {
           ]
         };
       }
-      // Check left edge
-      if (localX < threshold && col > 0) {
+      // Check left edge (allow all cols, including boundary)
+      if (localX < threshold) {
         return {
           type: 'edge',
           points: [
@@ -410,13 +417,61 @@ export class GridRenderer {
           ]
         };
       }
-      // Check right edge
-      if (localX > scale - threshold && col < width - 1) {
+      // Check right edge (allow all cols, including boundary)
+      if (localX > scale - threshold) {
         return {
           type: 'edge',
           points: [
             { x: (col + 1) * scale, y: row * scale },
             { x: (col + 1) * scale, y: (row + 1) * scale }
+          ]
+        };
+      }
+    } else if (onRightBoundary) {
+      // Right boundary edge
+      const localY = y - row * scale;
+      if (localY >= 0 && localY <= scale) {
+        return {
+          type: 'edge',
+          points: [
+            { x: width * scale, y: row * scale },
+            { x: width * scale, y: (row + 1) * scale }
+          ]
+        };
+      }
+    } else if (onBottomBoundary) {
+      // Bottom boundary edge
+      const localX = x - col * scale;
+      if (localX >= 0 && localX <= scale) {
+        return {
+          type: 'edge',
+          points: [
+            { x: col * scale, y: height * scale },
+            { x: (col + 1) * scale, y: height * scale }
+          ]
+        };
+      }
+    } else if (onTopBoundary) {
+      // Top boundary edge
+      const localX = x - col * scale;
+      if (localX >= 0 && localX <= scale) {
+        return {
+          type: 'edge',
+          points: [
+            { x: col * scale, y: 0 },
+            { x: (col + 1) * scale, y: 0 }
+          ]
+        };
+      }
+    } else if (onLeftBoundary) {
+      // Left boundary edge
+      const localY = y - row * scale;
+      if (localY >= 0 && localY <= scale) {
+        return {
+          type: 'edge',
+          points: [
+            { x: 0, y: row * scale },
+            { x: 0, y: (row + 1) * scale }
           ]
         };
       }
@@ -474,46 +529,182 @@ export class GridRenderer {
     const row = Math.floor(y / triangleHeight);
     const col = Math.floor(x / (scale * 0.5));
     
-    if (col >= 0 && col < width && row >= 0 && row < height) {
-      const cellX = col * scale * 0.5;
-      const cellY = row * triangleHeight;
-      const isUpward = (row + col) % 2 === 0;
-      const height = scale * Math.sqrt(3) / 2;
-      const centerX = cellX + scale / 2;
-      const centerY = cellY + height / 2;
+    let minDist = Infinity;
+    let closestEdge: [{ x: number; y: number }, { x: number; y: number }] | null = null;
 
-      let v1x: number, v1y: number, v2x: number, v2y: number, v3x: number, v3y: number;
-      
-      if (isUpward) {
-        v1x = centerX; v1y = centerY - height / 2;
-        v2x = centerX - scale / 2; v2y = centerY + height / 2;
-        v3x = centerX + scale / 2; v3y = centerY + height / 2;
-      } else {
-        v1x = centerX - scale / 2; v1y = centerY - height / 2;
-        v2x = centerX + scale / 2; v2y = centerY - height / 2;
-        v3x = centerX; v3y = centerY + height / 2;
-      }
+    // Check the cell at the clicked position and neighboring cells
+    // This ensures we catch edges shared between triangles and boundary edges
+    const checkRows = [row - 1, row, row + 1].filter(r => r >= -1 && r <= height);
+    const checkCols = [col - 1, col, col + 1].filter(c => c >= -1 && c <= width);
 
-      const edges = [
-        [{ x: v1x, y: v1y }, { x: v2x, y: v2y }],
-        [{ x: v2x, y: v2y }, { x: v3x, y: v3y }],
-        [{ x: v3x, y: v3y }, { x: v1x, y: v1y }],
-      ];
+    for (const r of checkRows) {
+      for (const c of checkCols) {
+        // Skip if completely outside grid (but allow boundary checks)
+        if (r < 0 || r >= height || c < 0 || c >= width) {
+          // Check boundary edges
+          if (r === -1 && c >= 0 && c < width) {
+            // Top boundary - check top edge of first row
+            const cellX = c * scale * 0.5;
+            const isUpward = (0 + c) % 2 === 0;
+            const centerX = cellX + scale / 2;
+            const centerY = triangleHeight / 2;
+            
+            if (isUpward) {
+              // Top vertex of upward triangle
+              const v1x = centerX;
+              const v1y = centerY - triangleHeight / 2;
+              const v2x = centerX - scale / 2;
+              const v2y = centerY + triangleHeight / 2;
+              const v3x = centerX + scale / 2;
+              const v3y = centerY + triangleHeight / 2;
+              
+              // Top edge (v1 to v2 or v1 to v3)
+              const edge1: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v1x, y: v1y }, { x: v2x, y: v2y }];
+              const edge2: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v1x, y: v1y }, { x: v3x, y: v3y }];
+              
+              for (const edge of [edge1, edge2]) {
+                const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+                if (dist < minDist && dist < 10) {
+                  minDist = dist;
+                  closestEdge = edge;
+                }
+              }
+            }
+          } else if (r === height && c >= 0 && c < width) {
+            // Bottom boundary - check bottom edge of last row
+            const cellX = c * scale * 0.5;
+            const cellY = (height - 1) * triangleHeight;
+            const isUpward = ((height - 1) + c) % 2 === 0;
+            const centerX = cellX + scale / 2;
+            const centerY = cellY + triangleHeight / 2;
+            
+            if (!isUpward) {
+              // Bottom vertex of downward triangle
+              const v1x = centerX - scale / 2;
+              const v1y = centerY - triangleHeight / 2;
+              const v2x = centerX + scale / 2;
+              const v2y = centerY - triangleHeight / 2;
+              const v3x = centerX;
+              const v3y = centerY + triangleHeight / 2;
+              
+              // Bottom edge (v3 to v1 or v3 to v2)
+              const edge1: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v3x, y: v3y }, { x: v1x, y: v1y }];
+              const edge2: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v3x, y: v3y }, { x: v2x, y: v2y }];
+              
+              for (const edge of [edge1, edge2]) {
+                const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+                if (dist < minDist && dist < 10) {
+                  minDist = dist;
+                  closestEdge = edge;
+                }
+              }
+            }
+          } else if (c === -1 && r >= 0 && r < height) {
+            // Left boundary - check left edge
+            const cellX = 0;
+            const cellY = r * triangleHeight;
+            const isUpward = (r + 0) % 2 === 0;
+            const centerX = cellX + scale / 2;
+            const centerY = cellY + triangleHeight / 2;
+            
+            let v1x: number, v1y: number, v2x: number, v2y: number, v3x: number, v3y: number;
+            
+            if (isUpward) {
+              v1x = centerX; v1y = centerY - triangleHeight / 2;
+              v2x = centerX - scale / 2; v2y = centerY + triangleHeight / 2;
+              v3x = centerX + scale / 2; v3y = centerY + triangleHeight / 2;
+              // Left edge: v1 to v2
+              const edge: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v1x, y: v1y }, { x: v2x, y: v2y }];
+              const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+              if (dist < minDist && dist < 10) {
+                minDist = dist;
+                closestEdge = edge;
+              }
+            } else {
+              v1x = centerX - scale / 2; v1y = centerY - triangleHeight / 2;
+              v2x = centerX + scale / 2; v2y = centerY - triangleHeight / 2;
+              v3x = centerX; v3y = centerY + triangleHeight / 2;
+              // Left edge: v1 to v3
+              const edge: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v1x, y: v1y }, { x: v3x, y: v3y }];
+              const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+              if (dist < minDist && dist < 10) {
+                minDist = dist;
+                closestEdge = edge;
+              }
+            }
+          } else if (c === width && r >= 0 && r < height) {
+            // Right boundary - check right edge
+            const cellX = (width - 1) * scale * 0.5;
+            const cellY = r * triangleHeight;
+            const isUpward = (r + (width - 1)) % 2 === 0;
+            const centerX = cellX + scale / 2;
+            const centerY = cellY + triangleHeight / 2;
+            
+            let v1x: number, v1y: number, v2x: number, v2y: number, v3x: number, v3y: number;
+            
+            if (isUpward) {
+              v1x = centerX; v1y = centerY - triangleHeight / 2;
+              v2x = centerX - scale / 2; v2y = centerY + triangleHeight / 2;
+              v3x = centerX + scale / 2; v3y = centerY + triangleHeight / 2;
+              // Right edge: v1 to v3
+              const edge: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v1x, y: v1y }, { x: v3x, y: v3y }];
+              const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+              if (dist < minDist && dist < 10) {
+                minDist = dist;
+                closestEdge = edge;
+              }
+            } else {
+              v1x = centerX - scale / 2; v1y = centerY - triangleHeight / 2;
+              v2x = centerX + scale / 2; v2y = centerY - triangleHeight / 2;
+              v3x = centerX; v3y = centerY + triangleHeight / 2;
+              // Right edge: v2 to v3
+              const edge: [{ x: number; y: number }, { x: number; y: number }] = [{ x: v2x, y: v2y }, { x: v3x, y: v3y }];
+              const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+              if (dist < minDist && dist < 10) {
+                minDist = dist;
+                closestEdge = edge;
+              }
+            }
+          }
+          continue;
+        }
 
-      let minDist = Infinity;
-      let closestEdge = null;
+        // Check edges of this triangle
+        const cellX = c * scale * 0.5;
+        const cellY = r * triangleHeight;
+        const isUpward = (r + c) % 2 === 0;
+        const centerX = cellX + scale / 2;
+        const centerY = cellY + triangleHeight / 2;
 
-      for (const edge of edges) {
-        const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
-        if (dist < minDist && dist < 10) {
-          minDist = dist;
-          closestEdge = edge;
+        let v1x: number, v1y: number, v2x: number, v2y: number, v3x: number, v3y: number;
+        
+        if (isUpward) {
+          v1x = centerX; v1y = centerY - triangleHeight / 2;
+          v2x = centerX - scale / 2; v2y = centerY + triangleHeight / 2;
+          v3x = centerX + scale / 2; v3y = centerY + triangleHeight / 2;
+        } else {
+          v1x = centerX - scale / 2; v1y = centerY - triangleHeight / 2;
+          v2x = centerX + scale / 2; v2y = centerY - triangleHeight / 2;
+          v3x = centerX; v3y = centerY + triangleHeight / 2;
+        }
+
+        const edges: Array<[{ x: number; y: number }, { x: number; y: number }]> = [
+          [{ x: v1x, y: v1y }, { x: v2x, y: v2y }],
+          [{ x: v2x, y: v2y }, { x: v3x, y: v3y }],
+          [{ x: v3x, y: v3y }, { x: v1x, y: v1y }],
+        ];
+
+        for (const edge of edges) {
+          const dist = this.distanceToLineSegment(x, y, edge[0].x, edge[0].y, edge[1].x, edge[1].y);
+          if (dist < minDist && dist < 10) {
+            minDist = dist;
+            closestEdge = edge;
+          }
         }
       }
-
-      return closestEdge ? { type: 'edge', points: closestEdge } : null;
     }
-    return null;
+
+    return closestEdge ? { type: 'edge', points: closestEdge } : null;
   }
 
   private distanceToLineSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
