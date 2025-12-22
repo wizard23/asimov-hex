@@ -14,6 +14,7 @@ interface PaletteData {
 }
 
 type LeftClickMode = 'draw' | 'spawnParticle';
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack';
 
 interface AppConfig {
   gridWidth: number;
@@ -29,6 +30,7 @@ interface AppConfig {
   showCoordinates: boolean;
   particleSpeed: number;
   leftClickMode: LeftClickMode;
+  edgeSelectionRule: EdgeSelectionRule;
 }
 
 class GridApp {
@@ -69,7 +71,8 @@ class GridApp {
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
       particleSpeed: 10,
-      leftClickMode: 'draw',
+      leftClickMode: 'spawnParticle',
+      edgeSelectionRule: 'randomNoBacktrack',
     };
 
     this.initPixi().then(() => {
@@ -127,7 +130,8 @@ class GridApp {
         this.gridRenderer,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.config.gridType
+        this.config.gridType,
+        this.config.edgeSelectionRule
       );
     });
 
@@ -233,6 +237,15 @@ class GridApp {
       max: 100,
       step: 1,
       label: 'Particle Speed',
+    });
+
+    // Add edge selection rule dropdown
+    this.pane.addBinding(this.config, 'edgeSelectionRule', {
+      options: {
+        'Random (No Backtrack)': 'randomNoBacktrack',
+        'Random (With Backtrack)': 'randomWithBacktrack',
+      },
+      label: 'Edge Selection Rule',
     });
 
     // Add save/load PNG buttons

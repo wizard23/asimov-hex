@@ -1,6 +1,8 @@
 import { Graphics, Container } from 'pixi.js';
 import { Point, EdgeInfo, GridType } from './types';
 
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack';
+
 export interface Particle {
   x: number;
   y: number;
@@ -73,7 +75,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridScale: number, gridRenderer: any, gridWidth: number, gridHeight: number, gridType: GridType): void {
+  update(deltaTime: number, particleSpeed: number, gridScale: number, gridRenderer: any, gridWidth: number, gridHeight: number, gridType: GridType, edgeSelectionRule: EdgeSelectionRule): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -95,13 +97,14 @@ export class ParticleSystem {
         particle.progress -= distanceThisFrame / edgeLength;
       }
       
+      console.log("particle.progress", particle.progress);
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, gridRenderer, gridWidth, gridHeight, gridType, gridScale);
+        this.handleVertexArrival(particle, p2, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, gridRenderer, gridWidth, gridHeight, gridType, gridScale);
+        this.handleVertexArrival(particle, p1, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -124,28 +127,43 @@ export class ParticleSystem {
     gridWidth: number,
     gridHeight: number,
     gridType: GridType,
-    gridScale: number
+    gridScale: number,
+    edgeSelectionRule: EdgeSelectionRule
   ): void {
     // Find all edges connected to this vertex
     const connectedEdges = gridRenderer.getEdgesAtVertex(vertex, gridWidth, gridHeight, gridType, gridScale);
     
-    // Filter out the edge we came from
-    const availableEdges = connectedEdges.filter(edge => {
-      if (!particle.previousEdge) return true;
-      // Check if this edge is the same as previous edge
-      const prevP1 = particle.previousEdge.points[0];
-      const prevP2 = particle.previousEdge.points[1];
-      const currP1 = edge.points[0];
-      const currP2 = edge.points[1];
-      
-      // Check if edges are the same (same two points)
-      const sameEdge = (
-        (this.pointsEqual(prevP1, currP1) && this.pointsEqual(prevP2, currP2)) ||
-        (this.pointsEqual(prevP1, currP2) && this.pointsEqual(prevP2, currP1))
-      );
-      
-      return !sameEdge;
-    });
+    if (connectedEdges.length === 0) {
+      // No edges found, remove particle
+      this.removeParticle(particle);
+      return;
+    }
+    
+    let availableEdges: EdgeInfo[];
+    console.log("edgeSelectionRule", edgeSelectionRule, "connectedEdges", connectedEdges);
+    
+    if (edgeSelectionRule === 'randomNoBacktrack') {
+      // Filter out the edge we came from
+      availableEdges = connectedEdges.filter(edge => {
+        if (!particle.previousEdge) return true;
+        // Check if this edge is the same as previous edge
+        const prevP1 = particle.previousEdge.points[0];
+        const prevP2 = particle.previousEdge.points[1];
+        const currP1 = edge.points[0];
+        const currP2 = edge.points[1];
+        
+        // Check if edges are the same (same two points)
+        const sameEdge = (
+          (this.pointsEqual(prevP1, currP1) && this.pointsEqual(prevP2, currP2)) ||
+          (this.pointsEqual(prevP1, currP2) && this.pointsEqual(prevP2, currP1))
+        );
+        
+        return !sameEdge;
+      });
+    } else {
+      // randomWithBacktrack - allow all edges including the one we came from
+      availableEdges = connectedEdges;
+    }
     
     if (availableEdges.length === 0) {
       // No available edges, remove particle
