@@ -147,12 +147,13 @@ export class ParticleSystem {
       availableEdges = connectedEdges.filter(edge => {
         if (!particle.previousEdge) return true;
         // Check if this edge is the same as previous edge
+        // Use a more robust comparison that handles floating point precision
         const prevP1 = particle.previousEdge.points[0];
         const prevP2 = particle.previousEdge.points[1];
         const currP1 = edge.points[0];
         const currP2 = edge.points[1];
         
-        // Check if edges are the same (same two points)
+        // Check if edges are the same (same two points, regardless of order)
         const sameEdge = (
           (this.pointsEqual(prevP1, currP1) && this.pointsEqual(prevP2, currP2)) ||
           (this.pointsEqual(prevP1, currP2) && this.pointsEqual(prevP2, currP1))
@@ -204,7 +205,7 @@ export class ParticleSystem {
   }
 
   private pointsEqual(p1: Point, p2: Point): boolean {
-    const epsilon = 0.001;
+    const epsilon = 0.01; // Increased epsilon for better floating point comparison
     return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
   }
 

@@ -570,63 +570,71 @@ export class GridRenderer {
     const edges: EdgeInfo[] = [];
     const epsilon = 0.001;
     
-    // Check all possible edges and see if they connect to this vertex
+    // Find which grid point this vertex is at
+    let foundRow = -1;
+    let foundCol = -1;
+    
     for (let row = 0; row <= height; row++) {
       for (let col = 0; col <= width; col++) {
         const x = col * scale;
         const y = row * scale;
         
-        // Check if vertex matches this grid point
         if (Math.abs(vertex.x - x) < epsilon && Math.abs(vertex.y - y) < epsilon) {
-          // Add horizontal edges
-          if (row < height && col < width) {
-            // Top edge
-            edges.push({
-              type: 'edge',
-              points: [
-                { x: col * scale, y: row * scale },
-                { x: (col + 1) * scale, y: row * scale }
-              ]
-            });
-          }
-          if (row > 0 && col < width) {
-            // Bottom edge
-            edges.push({
-              type: 'edge',
-              points: [
-                { x: col * scale, y: row * scale },
-                { x: (col + 1) * scale, y: row * scale }
-              ]
-            });
-          }
-          
-          // Add vertical edges
-          if (col < width && row < height) {
-            // Right edge
-            edges.push({
-              type: 'edge',
-              points: [
-                { x: col * scale, y: row * scale },
-                { x: col * scale, y: (row + 1) * scale }
-              ]
-            });
-          }
-          if (col > 0 && row < height) {
-            // Left edge
-            edges.push({
-              type: 'edge',
-              points: [
-                { x: col * scale, y: row * scale },
-                { x: col * scale, y: (row + 1) * scale }
-              ]
-            });
-          }
+          foundRow = row;
+          foundCol = col;
+          break;
         }
       }
+      if (foundRow >= 0) break;
     }
     
-    // Remove duplicates
-    return this.removeDuplicateEdges(edges);
+    if (foundRow < 0 || foundCol < 0) return [];
+    
+    // Add horizontal edges (left and right)
+    if (foundCol > 0) {
+      // Left edge
+      edges.push({
+        type: 'edge',
+        points: [
+          { x: (foundCol - 1) * scale, y: foundRow * scale },
+          { x: foundCol * scale, y: foundRow * scale }
+        ]
+      });
+    }
+    if (foundCol < width) {
+      // Right edge
+      edges.push({
+        type: 'edge',
+        points: [
+          { x: foundCol * scale, y: foundRow * scale },
+          { x: (foundCol + 1) * scale, y: foundRow * scale }
+        ]
+      });
+    }
+    
+    // Add vertical edges (up and down)
+    if (foundRow > 0) {
+      // Top edge (up)
+      edges.push({
+        type: 'edge',
+        points: [
+          { x: foundCol * scale, y: (foundRow - 1) * scale },
+          { x: foundCol * scale, y: foundRow * scale }
+        ]
+      });
+    }
+    if (foundRow < height) {
+      // Bottom edge (down)
+      edges.push({
+        type: 'edge',
+        points: [
+          { x: foundCol * scale, y: foundRow * scale },
+          { x: foundCol * scale, y: (foundRow + 1) * scale }
+        ]
+      });
+    }
+    
+    return edges;
   }
 
   private getHexagonEdgesAtVertex(vertex: Point, width: number, height: number, scale: number): EdgeInfo[] {
@@ -685,25 +693,39 @@ export class GridRenderer {
     const epsilon = 0.001;
     const triangleHeight = scale * Math.sqrt(3) / 2;
     
-    // Check all triangles
+    // Check all triangles using the same coordinate system as getTriangleEdgeAt
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
-        const x = col * scale * 0.5;
-        const y = row * triangleHeight;
-        const isUp = (row + col) % 2 === 0;
+        const cellX = col * scale * 0.5;
+        const cellY = row * triangleHeight;
+        const isUpward = (row + col) % 2 === 0;
+        const h = scale * Math.sqrt(3) / 2;
+        const centerX = cellX + scale / 2;
+        const centerY = cellY + h / 2;
+
+        let v1x: number, v1y: number, v2x: number, v2y: number, v3x: number, v3y: number;
         
-        // Triangle vertices
-        const v1 = { x: x, y: y };
-        const v2 = { x: x + scale * 0.5, y: y };
-        const v3 = { x: x + scale * 0.25, y: isUp ? y - triangleHeight : y + triangleHeight };
+        if (isUpward) {
+          v1x = centerX; v1y = centerY - h / 2;
+          v2x = centerX - scale / 2; v2y = centerY + h / 2;
+          v3x = centerX + scale / 2; v3y = centerY + h / 2;
+        } else {
+          v1x = centerX - scale / 2; v1y = centerY - h / 2;
+          v2x = centerX + scale / 2; v2y = centerY - h / 2;
+          v3x = centerX; v3y = centerY + h / 2;
+        }
         
-        const triangleVerts = [v1, v2, v3];
+        const triangleVerts = [
+          { x: v1x, y: v1y },
+          { x: v2x, y: v2y },
+          { x: v3x, y: v3y }
+        ];
         
         // Check if vertex matches any triangle vertex
         for (let i = 0; i < triangleVerts.length; i++) {
           const v = triangleVerts[i];
           if (Math.abs(vertex.x - v.x) < epsilon && Math.abs(vertex.y - v.y) < epsilon) {
-            // Add edges connected to this vertex
+            // Add edges connected to this vertex (matching getTriangleEdgeAt format)
             const next = (i + 1) % 3;
             const prev = (i + 2) % 3;
             
