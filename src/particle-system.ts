@@ -1,7 +1,7 @@
 import { Graphics, Container } from 'pixi.js';
 import { Point, EdgeInfo, GridType } from './types';
 
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack';
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise';
 
 export interface Particle {
   x: number;
@@ -140,14 +140,13 @@ export class ParticleSystem {
     }
     
     let availableEdges: EdgeInfo[];
-    console.log("edgeSelectionRule", edgeSelectionRule, "connectedEdges", connectedEdges);
+    let nextEdge: EdgeInfo;
     
     if (edgeSelectionRule === 'randomNoBacktrack') {
       // Filter out the edge we're currently on (the one we just arrived from)
       availableEdges = connectedEdges.filter(edge => {
         if (!particle.currentEdge) return true;
         // Check if this edge is the same as the current edge we're on
-        // Use a more robust comparison that handles floating point precision
         const currentP1 = particle.currentEdge.points[0];
         const currentP2 = particle.currentEdge.points[1];
         const edgeP1 = edge.points[0];
@@ -161,19 +160,53 @@ export class ParticleSystem {
         
         return !sameEdge;
       });
+      
+      if (availableEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+      
+      // Choose random edge
+      nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
+    } else if (edgeSelectionRule === 'randomWithBacktrack') {
+      // Allow all edges including the one we came from
+      if (connectedEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+      nextEdge = connectedEdges[Math.floor(Math.random() * connectedEdges.length)];
+    } else if (edgeSelectionRule === 'clockwise' || edgeSelectionRule === 'counterClockwise') {
+      // Find the edge that is clockwise or counter-clockwise from the current edge
+      if (!particle.currentEdge) {
+        // If no current edge, fall back to random
+        if (connectedEdges.length === 0) {
+          this.removeParticle(particle);
+          return;
+        }
+        nextEdge = connectedEdges[Math.floor(Math.random() * connectedEdges.length)];
+      } else {
+        const foundEdge = this.findTurnEdge(
+          particle.currentEdge,
+          vertex,
+          connectedEdges,
+          edgeSelectionRule === 'clockwise'
+        );
+        
+        if (!foundEdge) {
+          // No valid turn found, remove particle
+          this.removeParticle(particle);
+          return;
+        }
+        nextEdge = foundEdge;
+      }
     } else {
-      // randomWithBacktrack - allow all edges including the one we came from
-      availableEdges = connectedEdges;
+      // Fallback to random
+      if (connectedEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+      nextEdge = connectedEdges[Math.floor(Math.random() * connectedEdges.length)];
     }
-    
-    if (availableEdges.length === 0) {
-      // No available edges, remove particle
-      this.removeParticle(particle);
-      return;
-    }
-    
-    // Choose random edge
-    const nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
     
     // Determine direction on new edge
     // We're at a vertex, so we need to move away from it along the new edge
@@ -207,6 +240,86 @@ export class ParticleSystem {
   private pointsEqual(p1: Point, p2: Point): boolean {
     const epsilon = 0.01; // Increased epsilon for better floating point comparison
     return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
+  }
+
+  private findTurnEdge(
+    currentEdge: EdgeInfo,
+    vertex: Point,
+    connectedEdges: EdgeInfo[],
+    clockwise: boolean
+  ): EdgeInfo | null {
+    // Calculate the angle of the incoming edge (from vertex, pointing away from vertex)
+    const currentP1 = currentEdge.points[0];
+    const currentP2 = currentEdge.points[1];
+    
+    // Find the other endpoint of the current edge (not the vertex)
+    const otherPoint = this.pointsEqual(vertex, currentP1) ? currentP2 : currentP1;
+    
+    // Calculate angle of incoming edge (from vertex to other point)
+    const incomingAngle = Math.atan2(otherPoint.y - vertex.y, otherPoint.x - vertex.x);
+    
+    // Calculate angles of all outgoing edges
+    const edgeAngles: Array<{ edge: EdgeInfo; angle: number; relativeAngle: number }> = [];
+    
+    for (const edge of connectedEdges) {
+      // Skip the current edge
+      const edgeP1 = edge.points[0];
+      const edgeP2 = edge.points[1];
+      const isCurrentEdge = (
+        (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
+        (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
+      );
+      
+      if (isCurrentEdge) continue;
+      
+      // Find the other endpoint (not the vertex)
+      const edgeOtherPoint = this.pointsEqual(vertex, edgeP1) ? edgeP2 : edgeP1;
+      
+      // Calculate angle from vertex to other point
+      const angle = Math.atan2(edgeOtherPoint.y - vertex.y, edgeOtherPoint.x - vertex.x);
+      
+      // Calculate relative angle (difference from incoming angle, normalized to -π to π)
+      let relativeAngle = angle - incomingAngle;
+      
+      // Normalize to -π to π
+      while (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
+      while (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
+      
+      edgeAngles.push({ edge, angle, relativeAngle });
+    }
+    
+    if (edgeAngles.length === 0) return null;
+    
+    // Sort by relative angle
+    if (clockwise) {
+      // Clockwise: find the edge with the smallest positive relative angle
+      // If none, wrap around to the most negative (which is actually the next clockwise)
+      edgeAngles.sort((a, b) => {
+        // Prefer positive angles (clockwise)
+        if (a.relativeAngle > 0 && b.relativeAngle <= 0) return -1;
+        if (a.relativeAngle <= 0 && b.relativeAngle > 0) return 1;
+        // Both same sign, sort by magnitude
+        return a.relativeAngle - b.relativeAngle;
+      });
+      
+      // Find first positive angle, or if none, use the most negative (wraps around)
+      const positiveAngle = edgeAngles.find(e => e.relativeAngle > 0);
+      return positiveAngle ? positiveAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
+    } else {
+      // Counter-clockwise: find the edge with the largest negative relative angle
+      // If none, wrap around to the most positive (which is actually the next counter-clockwise)
+      edgeAngles.sort((a, b) => {
+        // Prefer negative angles (counter-clockwise)
+        if (a.relativeAngle < 0 && b.relativeAngle >= 0) return 1;
+        if (a.relativeAngle >= 0 && b.relativeAngle < 0) return -1;
+        // Both same sign, sort by magnitude (reverse for counter-clockwise)
+        return b.relativeAngle - a.relativeAngle;
+      });
+      
+      // Find first negative angle, or if none, use the most positive (wraps around)
+      const negativeAngle = edgeAngles.find(e => e.relativeAngle < 0);
+      return negativeAngle ? negativeAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
+    }
   }
 
   private removeParticle(particle: Particle): void {

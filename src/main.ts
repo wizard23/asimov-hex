@@ -14,7 +14,7 @@ interface PaletteData {
 }
 
 type LeftClickMode = 'draw' | 'spawnParticle';
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack';
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise';
 
 interface AppConfig {
   gridWidth: number;
@@ -244,6 +244,8 @@ class GridApp {
       options: {
         'Random (No Backtrack)': 'randomNoBacktrack',
         'Random (With Backtrack)': 'randomWithBacktrack',
+        'Always Turn Clockwise': 'clockwise',
+        'Always Turn Counter-Clockwise': 'counterClockwise',
       },
       label: 'Edge Selection Rule',
     });
