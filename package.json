@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "create-project-statistics": "tsx scripts/create-project-statistics.ts"
   },
   "devDependencies": {
     "@tweakpane/core": "^2.0.5",
     "@types/node": "^20.10.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.8"
   },
