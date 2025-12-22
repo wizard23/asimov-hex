@@ -28,6 +28,7 @@ interface AppConfig {
   edgePalette: Record<number, ColorValue>; // New: Palette for edges
   selectedEdgePalette: string;             // New: Selected edge palette name
   edgeColor: ColorValue;                   // Re-add edgeColor
+  edgeWidth: number;                       // New: for edge width
   edgeHighlightColor: ColorValue;
   showCoordinates: boolean;
   particleSpeed: number;
@@ -82,6 +83,7 @@ class GridApp {
       edgePalette: initialEdgePalette,       // New: Initialize edge palette
       selectedEdgePalette: defaultPalette.name, // New: Initialize selected edge palette
       edgeColor: '#ffffff',                  // Re-add edgeColor
+      edgeWidth: 1,                          // New: Initialize edge width
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
       particleSpeed: 100,
@@ -328,6 +330,16 @@ class GridApp {
     // Add edge color picker
     this.pane.addBinding(this.config, 'edgeColor', {
       label: 'Edge Color'
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add edge width slider
+    this.pane.addBinding(this.config, 'edgeWidth', {
+      label: 'Edge Width',
+      min: 0,
+      max: 10,
+      step: 0.1,
     }).on('change', () => {
       this.updateGrid();
     });
@@ -589,6 +601,7 @@ class GridApp {
       this.cellStates,
       paletteStrings,
       typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff',
+      this.config.edgeWidth,
       this.config.showCoordinates
     );
   }

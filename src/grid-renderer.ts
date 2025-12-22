@@ -13,17 +13,18 @@ export class GridRenderer {
     cellStates: number[][],
     palette: Record<number, string>,
     edgeColor: string,
+    edgeWidth: number, // New parameter
     showCoordinates: boolean = false
   ) {
     switch (gridType) {
       case 'squares':
-        this.renderSquares(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
+        this.renderSquares(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, edgeWidth, showCoordinates);
         break;
       case 'hexagons':
-        this.renderHexagons(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
+        this.renderHexagons(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, edgeWidth, showCoordinates);
         break;
       case 'triangles':
-        this.renderTriangles(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, showCoordinates);
+        this.renderTriangles(container, edgeContainer, width, height, scale, cellStates, palette, edgeColor, edgeWidth, showCoordinates);
         break;
     }
   }
@@ -37,6 +38,7 @@ export class GridRenderer {
     cellStates: number[][],
     palette: Record<number, string>,
     edgeColor: string,
+    edgeWidth: number, // New parameter
     showCoordinates: boolean
   ) {
     for (let row = 0; row < height; row++) {
@@ -59,7 +61,7 @@ export class GridRenderer {
         edges.lineTo(x + scale, y + scale);
         edges.lineTo(x, y + scale);
         edges.lineTo(x, y);
-        edges.stroke({ color: colorToHex(edgeColor), width: 1 });
+        edges.stroke({ color: colorToHex(edgeColor), width: edgeWidth }); // Use edgeWidth
         edgeContainer.addChild(edges);
 
         // Draw coordinates if enabled (add after cell so it's on top)
@@ -91,6 +93,7 @@ export class GridRenderer {
     cellStates: number[][],
     palette: Record<number, string>,
     edgeColor: string,
+    edgeWidth: number, // New parameter
     showCoordinates: boolean
   ) {
     // For flat-top hexagons, spacing calculations:
@@ -116,7 +119,7 @@ export class GridRenderer {
 
         // Draw edges
         const edges = this.createHexagonCentered(centerX, centerY, scale);
-        edges.stroke({ color: colorToHex(edgeColor), width: 1 });
+        edges.stroke({ color: colorToHex(edgeColor), width: edgeWidth }); // Use edgeWidth
         edgeContainer.addChild(edges);
 
         // Draw coordinates if enabled (add after hex so it's on top)
@@ -148,6 +151,7 @@ export class GridRenderer {
     cellStates: number[][],
     palette: Record<number, string>,
     edgeColor: string,
+    edgeWidth: number, // New parameter
     showCoordinates: boolean
   ) {
     const triangleHeight = scale * Math.sqrt(3) / 2;
@@ -168,7 +172,7 @@ export class GridRenderer {
 
         // Draw edges
         const edges = this.createTriangle(x, y, scale, isUpward);
-        edges.stroke({ color: colorToHex(edgeColor), width: 1 });
+        edges.stroke({ color: colorToHex(edgeColor), width: edgeWidth }); // Use edgeWidth
         edgeContainer.addChild(edges);
 
         // Draw coordinates if enabled (add after triangle so it's on top)
