@@ -488,5 +488,92 @@ Implemented context-aware highlighting based on `leftClickMode`:
 
 ---
 
+### 27. Project Statistics Script
+
+**Timestamp:** 2025/12/22 ??:??
+
+**User Prompt:**
+```
+create a script (in typescript) that generates src/assets/project-statistics/YYYY-MM-DD_HH-MM.json )use current time at execution time of the script) that contains:
+* count of files by filetype
+* line count  and word count for each filetype 
+*  line count  and word count for all files
+these statistics should only include  that git controlls (not node_modules for example)
+the script should be callable via:
+npm run create-project-statsistics
+```
+
+**AI Summary:**
+Created a TypeScript script (`scripts/create-project-statistics.ts`) that:
+- Uses `git ls-files` to get only git-tracked files (excludes node_modules, etc.)
+- Groups files by extension and counts lines/words per file type
+- Generates JSON output with timestamped filename (YYYY-MM-DD_HH-MM.json)
+- Added npm script `create-project-statistics` using `tsx` to run TypeScript directly
+- Installed `tsx` as dev dependency for executing TypeScript scripts
+
+---
+
+### 28. Info Panel Implementation
+
+**Timestamp:** 2025/12/22 ??:??
+
+**User Prompt:**
+```
+add an info tab to the app. the info tab should be closable and open by default. it should be at the left top side of the window.
+
+It contains:
+* a lorem ipsum project description (150 worda)
+* a link to a manual (stub for now)
+* a link to the github project (use dummy link for now)
+```
+
+**AI Summary:**
+Implemented an info panel overlay:
+- Created `initInfoPanel()` method that builds a DOM-based info panel
+- Positioned at top-left (20px from edges) with dark theme matching the app
+- Contains 150-word lorem ipsum description, User Manual link (stub with alert), and GitHub link (dummy URL)
+- Styled with semi-transparent background, rounded corners, and hover effects
+- Panel is open by default and can be closed with × button
+
+---
+
+### 29. Minimizable Info Panel
+
+**Timestamp:** 2025/12/22 ??:??
+
+**User Prompt:**
+```
+when the info panel is "closed" it should  be minimizes so that it can be reopened again.
+```
+
+**AI Summary:**
+Changed info panel behavior from hiding to minimizing:
+- Replaced `hidden` class with `minimized` class
+- When minimized, panel shows only header with "About" title and reopen button
+- Added reopen button (ℹ icon) that appears when minimized
+- Panel can be toggled between expanded and minimized states
+- Content and links are hidden when minimized, but panel remains visible
+
+---
+
+### 30. Info Panel Reopen Button Improvements
+
+**Timestamp:** 2025/12/22 ??:??
+
+**User Prompt:**
+```
+When the info panel is minimized: the i "i" icon to open it again is too close to the About text. Give it some space.  Also it is hard to click since its so narrow. use either another icon that has about the same size as the X icon for closing or find another way to make it easier to click
+```
+
+**AI Summary:**
+Improved minimized panel reopen button:
+- Added 12px margin-right to "About" heading for spacing
+- Changed reopen button to use same size as close button (24px × 24px)
+- Changed icon from 'ℹ' to '▼' (down arrow) for better visibility
+- Made button use flexbox layout matching close button for consistent styling
+- Improved clickability with larger target area
+
+---
+
 *Document generated from development session history*
 
