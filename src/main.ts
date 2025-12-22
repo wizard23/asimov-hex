@@ -3,8 +3,14 @@ import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
 import { GridType } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
+import palettesData from './assets/palettes.json';
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
+
+interface PaletteData {
+  name: string;
+  colors: Record<string, string>;
+}
 
 interface AppConfig {
   gridWidth: number;
@@ -14,6 +20,7 @@ interface AppConfig {
   numStates: number;
   drawState: number;
   palette: Record<number, ColorValue>;
+  selectedPalette: string;
   edgeColor: ColorValue;
   edgeHighlightColor: ColorValue;
   showCoordinates: boolean;
@@ -29,8 +36,19 @@ class GridApp {
   private highlightedEdge: Graphics | null = null;
   private cellStates: number[][] = [];
   private drawStateBlade: DrawStateBladeApi | null = null;
+  private palettes: PaletteData[] = [];
 
   constructor() {
+    // Load palettes from JSON
+    this.palettes = palettesData.palettes;
+    
+    // Initialize with first palette
+    const defaultPalette = this.palettes[0];
+    const initialPalette: Record<number, ColorValue> = {};
+    Object.keys(defaultPalette.colors).forEach(key => {
+      initialPalette[parseInt(key)] = defaultPalette.colors[key];
+    });
+
     this.config = {
       gridWidth: 20,
       gridHeight: 20,
@@ -38,16 +56,8 @@ class GridApp {
       gridScale: 30,
       numStates: 4,
       drawState: 1,
-      palette: {
-        0: '#000000',
-        1: '#ff0000',
-        2: '#00ff00',
-        3: '#0000ff',
-        4: '#ffff00',
-        5: '#ff00ff',
-        6: '#00ffff',
-        7: '#ffffff',
-      },
+      palette: initialPalette,
+      selectedPalette: defaultPalette.name,
       edgeColor: '#ffffff',
       edgeHighlightColor: '#ffff00',
       showCoordinates: false,
@@ -58,6 +68,22 @@ class GridApp {
       this.initGrid();
       this.setupInteraction();
     });
+  }
+
+  private applyPalette(paletteName: string) {
+    const palette = this.palettes.find(p => p.name === paletteName);
+    if (!palette) return;
+
+    // Update palette in config
+    Object.keys(palette.colors).forEach(key => {
+      this.config.palette[parseInt(key)] = palette.colors[key];
+    });
+
+    // Update draw state blade to reflect new colors
+    this.updateDrawStateBlade();
+    
+    // Update grid rendering
+    this.updateGrid();
   }
 
   private async initPixi() {
@@ -140,6 +166,19 @@ class GridApp {
       // Rebuild draw state selector
       this.updateDrawStateBlade();
       this.updateGrid();
+    });
+
+    // Add palette selection dropdown
+    const paletteOptions: Record<string, string> = {};
+    this.palettes.forEach(palette => {
+      paletteOptions[palette.name] = palette.name;
+    });
+    
+    this.pane.addBinding(this.config, 'selectedPalette', {
+      options: paletteOptions,
+      label: 'Palette',
+    }).on('change', () => {
+      this.applyPalette(this.config.selectedPalette);
     });
 
     // Add draw state selector (palette color picker)
