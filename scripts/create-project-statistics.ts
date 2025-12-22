@@ -133,50 +133,13 @@ function main() {
   writeFileSync(outputPath, JSON.stringify(stats, null, 2), 'utf-8');
   
   // Update index.json with list of all available statistics files
-  const allJsonFiles = readdirSync(outputDir)
-    .filter(f => f.endsWith('.json') && f !== 'index.json');
-
-  const fileStatsWithData: { 
-    filename: string; 
-    files: number; 
-    lines: number; 
-    words: number 
-  }[] = [];
-
-  for (const file of allJsonFiles) {
-    const filePath = join(outputDir, file);
-    try {
-      const content = readFileSync(filePath, 'utf-8');
-      const data: ProjectStatistics = JSON.parse(content);
-      fileStatsWithData.push({
-        filename: file,
-        files: data.totals.files,
-        lines: data.totals.lines,
-        words: data.totals.words,
-      });
-    } catch (error) {
-      console.error(`Error reading or parsing statistics file ${file}:`, error);
-    }
-  }
-
-  fileStatsWithData.sort((a, b) => {
-    // Primary sort by total files (descending)
-    if (b.files !== a.files) {
-      return b.files - a.files;
-    }
-    // Secondary sort by total lines (descending)
-    if (b.lines !== a.lines) {
-      return b.lines - a.lines;
-    }
-    // Tertiary sort by total words (descending)
-    return b.words - a.words;
-  });
-
-  const sortedFileNames = fileStatsWithData.map(item => item.filename);
-
+  const existingFiles = readdirSync(outputDir)
+    .filter(f => f.endsWith('.json') && f !== 'index.json')
+    .sort()
+    .reverse(); // Newest first
   const indexPath = join(outputDir, 'index.json');
   const indexData = {
-    files: sortedFileNames
+    files: existingFiles
   };
   writeFileSync(indexPath, JSON.stringify(indexData, null, 2), 'utf-8');
   
