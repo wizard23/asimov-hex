@@ -221,8 +221,8 @@ class GridApp {
     // Add left click mode dropdown
     this.pane.addBinding(this.config, 'leftClickMode', {
       options: {
-        draw: 'Draw Cell',
-        spawnParticle: 'Spawn Particle',
+        'Draw Cell': 'draw',
+        'Spawn Particle': 'spawnParticle',
       },
       label: 'Left Click Mode',
     });
