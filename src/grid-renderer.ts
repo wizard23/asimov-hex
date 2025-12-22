@@ -744,6 +744,178 @@ export class GridRenderer {
     return graphics;
   }
 
+  drawVertex(vertex: Point, color: string): Graphics {
+    const graphics = new Graphics();
+    const radius = 5;
+    graphics.circle(vertex.x, vertex.y, radius);
+    graphics.fill(colorToHex(color));
+    graphics.stroke({ color: colorToHex('#000000'), width: 1 });
+    return graphics;
+  }
+
+  drawCellHighlight(cellInfo: CellInfo, _width: number, _height: number, gridType: GridType, scale: number, color: string): Graphics {
+    const graphics = new Graphics();
+    
+    switch (gridType) {
+      case 'squares': {
+        const x = cellInfo.col * scale;
+        const y = cellInfo.row * scale;
+        graphics.rect(x, y, scale, scale);
+        graphics.stroke({ color: colorToHex(color), width: 3 });
+        break;
+      }
+      case 'hexagons': {
+        const hexSpacingX = scale * Math.sqrt(3);
+        const hexSpacingY = scale * 1.5;
+        const offsetX = (cellInfo.row % 2) * (hexSpacingX / 2);
+        const centerX = cellInfo.col * hexSpacingX + offsetX;
+        const centerY = cellInfo.row * hexSpacingY;
+        
+        // Draw hexagon outline
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 6;
+          const px = centerX + scale * Math.cos(angle);
+          const py = centerY + scale * Math.sin(angle);
+          if (i === 0) {
+            graphics.moveTo(px, py);
+          } else {
+            graphics.lineTo(px, py);
+          }
+        }
+        graphics.closePath();
+        graphics.stroke({ color: colorToHex(color), width: 3 });
+        break;
+      }
+      case 'triangles': {
+        const triangleHeight = scale * Math.sqrt(3) / 2;
+        const x = cellInfo.col * scale * 0.5;
+        const y = cellInfo.row * triangleHeight;
+        const isUpward = (cellInfo.row + cellInfo.col) % 2 === 0;
+        const centerX = x + scale / 2;
+        const centerY = y + triangleHeight / 2;
+
+        if (isUpward) {
+          graphics.moveTo(centerX, centerY - triangleHeight / 2);
+          graphics.lineTo(centerX - scale / 2, centerY + triangleHeight / 2);
+          graphics.lineTo(centerX + scale / 2, centerY + triangleHeight / 2);
+        } else {
+          graphics.moveTo(centerX - scale / 2, centerY - triangleHeight / 2);
+          graphics.lineTo(centerX + scale / 2, centerY - triangleHeight / 2);
+          graphics.lineTo(centerX, centerY + triangleHeight / 2);
+        }
+        graphics.closePath();
+        graphics.stroke({ color: colorToHex(color), width: 3 });
+        break;
+      }
+    }
+    
+    return graphics;
+  }
+
+  getClosestVertex(x: number, y: number, width: number, height: number, gridType: GridType, scale: number): Point | null {
+    let closestVertex: Point | null = null;
+    let minDist = Infinity;
+    const threshold = 20; // pixels
+
+    switch (gridType) {
+      case 'squares': {
+        // Check vertices of all nearby cells
+        const col = Math.floor(x / scale);
+        const row = Math.floor(y / scale);
+        
+        for (let r = row - 1; r <= row + 1; r++) {
+          for (let c = col - 1; c <= col + 1; c++) {
+            if (r >= 0 && r <= height && c >= 0 && c <= width) {
+              const vx = c * scale;
+              const vy = r * scale;
+              const dist = Math.sqrt((x - vx) ** 2 + (y - vy) ** 2);
+              if (dist < minDist && dist < threshold) {
+                minDist = dist;
+                closestVertex = { x: vx, y: vy };
+              }
+            }
+          }
+        }
+        break;
+      }
+      case 'hexagons': {
+        const hexSpacingX = scale * Math.sqrt(3);
+        const hexSpacingY = scale * 1.5;
+        
+        // Estimate which hexagon we're near
+        const estimatedRow = Math.floor(y / hexSpacingY);
+        const estimatedCol = Math.floor(x / hexSpacingX);
+        
+        // Check vertices of nearby hexagons (within 2 rows/cols)
+        for (let row = Math.max(0, estimatedRow - 2); row < Math.min(height, estimatedRow + 3); row++) {
+          for (let col = Math.max(0, estimatedCol - 2); col < Math.min(width, estimatedCol + 3); col++) {
+            const offsetX = (row % 2) * (hexSpacingX / 2);
+            const centerX = col * hexSpacingX + offsetX;
+            const centerY = row * hexSpacingY;
+            
+            // Check all 6 vertices of this hexagon
+            const angles = [
+              -Math.PI / 6, Math.PI / 6, Math.PI / 2,
+              5 * Math.PI / 6, 7 * Math.PI / 6, -Math.PI / 2
+            ];
+            
+            for (const angle of angles) {
+              const vx = centerX + scale * Math.cos(angle);
+              const vy = centerY + scale * Math.sin(angle);
+              const dist = Math.sqrt((x - vx) ** 2 + (y - vy) ** 2);
+              if (dist < minDist && dist < threshold) {
+                minDist = dist;
+                closestVertex = { x: vx, y: vy };
+              }
+            }
+          }
+        }
+        break;
+      }
+      case 'triangles': {
+        const triangleHeight = scale * Math.sqrt(3) / 2;
+        const row = Math.floor(y / triangleHeight);
+        const col = Math.floor(x / (scale * 0.5));
+        
+        // Check vertices of nearby triangles
+        for (let r = row - 1; r <= row + 1; r++) {
+          for (let c = col - 1; c <= col + 1; c++) {
+            if (r >= 0 && r < height && c >= 0 && c < width) {
+              const cellX = c * scale * 0.5;
+              const cellY = r * triangleHeight;
+              const isUpward = (r + c) % 2 === 0;
+              const centerX = cellX + scale / 2;
+              const centerY = cellY + triangleHeight / 2;
+
+              let v1: Point, v2: Point, v3: Point;
+              
+              if (isUpward) {
+                v1 = { x: centerX, y: centerY - triangleHeight / 2 };
+                v2 = { x: centerX - scale / 2, y: centerY + triangleHeight / 2 };
+                v3 = { x: centerX + scale / 2, y: centerY + triangleHeight / 2 };
+              } else {
+                v1 = { x: centerX - scale / 2, y: centerY - triangleHeight / 2 };
+                v2 = { x: centerX + scale / 2, y: centerY - triangleHeight / 2 };
+                v3 = { x: centerX, y: centerY + triangleHeight / 2 };
+              }
+              
+              for (const vertex of [v1, v2, v3]) {
+                const dist = Math.sqrt((x - vertex.x) ** 2 + (y - vertex.y) ** 2);
+                if (dist < minDist && dist < threshold) {
+                  minDist = dist;
+                  closestVertex = vertex;
+                }
+              }
+            }
+          }
+        }
+        break;
+      }
+    }
+
+    return closestVertex;
+  }
+
   getEdgesAtVertex(vertex: Point, width: number, height: number, gridType: GridType, scale: number): EdgeInfo[] {
     switch (gridType) {
       case 'squares':

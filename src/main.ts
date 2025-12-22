@@ -42,6 +42,8 @@ class GridApp {
   private edgeContainer!: Container;
   private particleContainer!: Container;
   private highlightedEdge: Graphics | null = null;
+  private highlightedCell: Graphics | null = null;
+  private highlightedVertex: Graphics | null = null;
   private cellStates: number[][] = [];
   private drawStateBlade: DrawStateBladeApi | null = null;
   private palettes: PaletteData[] = [];
@@ -238,7 +240,7 @@ class GridApp {
     // Add particle speed control
     this.pane.addBinding(this.config, 'particleSpeed', {
       min: 1,
-      max: 250,
+      max: 400,
       step: 1,
       label: 'Particle Speed',
     });
@@ -425,6 +427,8 @@ class GridApp {
     this.gridContainer.removeChildren();
     this.edgeContainer.removeChildren();
     this.highlightedEdge = null;
+    this.highlightedCell = null;
+    this.highlightedVertex = null;
 
     // Calculate grid dimensions based on type
     let gridWidth: number, gridHeight: number;
@@ -493,27 +497,77 @@ class GridApp {
     this.mouseX = x;
     this.mouseY = y;
 
-    const edgeInfo = this.gridRenderer.getEdgeAt(
-      x, y,
-      this.config.gridWidth,
-      this.config.gridHeight,
-      this.config.gridType,
-      this.config.gridScale
-    );
-
-    // Remove previous highlight
+    // Remove previous highlights
     if (this.highlightedEdge) {
       this.edgeContainer.removeChild(this.highlightedEdge);
       this.highlightedEdge = null;
     }
+    if (this.highlightedCell) {
+      this.gridContainer.removeChild(this.highlightedCell);
+      this.highlightedCell = null;
+    }
+    if (this.highlightedVertex) {
+      this.edgeContainer.removeChild(this.highlightedVertex);
+      this.highlightedVertex = null;
+    }
 
-    // Draw new highlight
-    if (edgeInfo) {
-      const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
-        ? this.config.edgeHighlightColor 
-        : '#ffff00';
-      this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
-      this.edgeContainer.addChild(this.highlightedEdge);
+    if (this.config.leftClickMode === 'draw') {
+      // Highlight cell
+      const cellInfo = this.gridRenderer.getCellAt(
+        x, y,
+        this.config.gridWidth,
+        this.config.gridHeight,
+        this.config.gridType,
+        this.config.gridScale
+      );
+
+      if (cellInfo) {
+        const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
+          ? this.config.edgeHighlightColor 
+          : '#ffff00';
+        this.highlightedCell = this.gridRenderer.drawCellHighlight(
+          cellInfo,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          this.config.gridType,
+          this.config.gridScale,
+          highlightColor
+        );
+        this.gridContainer.addChild(this.highlightedCell);
+      }
+    } else {
+      // Highlight edge and closest vertex
+      const edgeInfo = this.gridRenderer.getEdgeAt(
+        x, y,
+        this.config.gridWidth,
+        this.config.gridHeight,
+        this.config.gridType,
+        this.config.gridScale
+      );
+
+      if (edgeInfo) {
+        const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
+          ? this.config.edgeHighlightColor 
+          : '#ffff00';
+        this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
+        this.edgeContainer.addChild(this.highlightedEdge);
+
+        // Find and highlight closest vertex
+        const closestVertex = this.gridRenderer.getClosestVertex(
+          x, y,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          this.config.gridType,
+          this.config.gridScale
+        );
+
+        if (closestVertex) {
+          this.highlightedVertex = this.gridRenderer.drawVertex(closestVertex, highlightColor);
+          if (this.highlightedVertex) {
+            this.edgeContainer.addChild(this.highlightedVertex);
+          }
+        }
+      }
     }
   }
 
