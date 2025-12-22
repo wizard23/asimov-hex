@@ -14,7 +14,7 @@ interface PaletteData {
 }
 
 type LeftClickMode = 'draw' | 'spawnParticle';
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise';
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise' | 'followCursor' | 'avoidCursor';
 
 interface AppConfig {
   gridWidth: number;
@@ -46,6 +46,8 @@ class GridApp {
   private drawStateBlade: DrawStateBladeApi | null = null;
   private palettes: PaletteData[] = [];
   private particleSystem!: ParticleSystem;
+  private mouseX: number = 0;
+  private mouseY: number = 0;
 
   constructor() {
     // Load palettes from JSON
@@ -131,7 +133,9 @@ class GridApp {
         this.config.gridWidth,
         this.config.gridHeight,
         this.config.gridType,
-        this.config.edgeSelectionRule
+        this.config.edgeSelectionRule,
+        this.mouseX,
+        this.mouseY
       );
     });
 
@@ -246,6 +250,8 @@ class GridApp {
         'Random (With Backtrack)': 'randomWithBacktrack',
         'Always Turn Clockwise': 'clockwise',
         'Always Turn Counter-Clockwise': 'counterClockwise',
+        'Follow Cursor': 'followCursor',
+        'Avoid Cursor': 'avoidCursor',
       },
       label: 'Edge Selection Rule',
     });
@@ -482,6 +488,10 @@ class GridApp {
     // Use edgeContainer position since edges are in edgeContainer
     const x = e.clientX - rect.left - this.edgeContainer.x;
     const y = e.clientY - rect.top - this.edgeContainer.y;
+
+    // Store mouse position for particle cursor rules
+    this.mouseX = x;
+    this.mouseY = y;
 
     const edgeInfo = this.gridRenderer.getEdgeAt(
       x, y,

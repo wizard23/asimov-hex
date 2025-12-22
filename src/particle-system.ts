@@ -1,7 +1,7 @@
 import { Graphics, Container } from 'pixi.js';
 import { Point, EdgeInfo, GridType } from './types';
 
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise';
+type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise' | 'followCursor' | 'avoidCursor';
 
 export interface Particle {
   x: number;
@@ -75,7 +75,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridScale: number, gridRenderer: any, gridWidth: number, gridHeight: number, gridType: GridType, edgeSelectionRule: EdgeSelectionRule): void {
+  update(deltaTime: number, particleSpeed: number, gridScale: number, gridRenderer: any, gridWidth: number, gridHeight: number, gridType: GridType, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -101,10 +101,10 @@ export class ParticleSystem {
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule);
+        this.handleVertexArrival(particle, p2, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule, mouseX, mouseY);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule);
+        this.handleVertexArrival(particle, p1, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule, mouseX, mouseY);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -128,7 +128,9 @@ export class ParticleSystem {
     gridHeight: number,
     gridType: GridType,
     gridScale: number,
-    edgeSelectionRule: EdgeSelectionRule
+    edgeSelectionRule: EdgeSelectionRule,
+    mouseX: number,
+    mouseY: number
   ): void {
     // Find all edges connected to this vertex
     const connectedEdges = gridRenderer.getEdgesAtVertex(vertex, gridWidth, gridHeight, gridType, gridScale);
@@ -199,6 +201,47 @@ export class ParticleSystem {
         }
         nextEdge = foundEdge;
       }
+    } else if (edgeSelectionRule === 'followCursor' || edgeSelectionRule === 'avoidCursor') {
+      // Find the edge that minimizes or maximizes distance to cursor
+      if (connectedEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+      
+      // Filter out current edge for follow/avoid cursor rules
+      const availableEdges = connectedEdges.filter(edge => {
+        if (!particle.currentEdge) return true;
+        const currentP1 = particle.currentEdge.points[0];
+        const currentP2 = particle.currentEdge.points[1];
+        const edgeP1 = edge.points[0];
+        const edgeP2 = edge.points[1];
+        
+        const sameEdge = (
+          (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
+          (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
+        );
+        
+        return !sameEdge;
+      });
+      
+      if (availableEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+      
+      const foundEdge = this.findCursorEdge(
+        vertex,
+        availableEdges,
+        mouseX,
+        mouseY,
+        edgeSelectionRule === 'followCursor'
+      );
+      
+      if (!foundEdge) {
+        this.removeParticle(particle);
+        return;
+      }
+      nextEdge = foundEdge;
     } else {
       // Fallback to random
       if (connectedEdges.length === 0) {
@@ -320,6 +363,45 @@ export class ParticleSystem {
       const positiveAngle = edgeAngles.find(e => e.relativeAngle > 0);
       return positiveAngle ? positiveAngle.edge : edgeAngles[edgeAngles.length - 1].edge;
     }
+  }
+
+  private findCursorEdge(
+    vertex: Point,
+    connectedEdges: EdgeInfo[],
+    mouseX: number,
+    mouseY: number,
+    follow: boolean
+  ): EdgeInfo | null {
+    if (connectedEdges.length === 0) return null;
+    
+    let bestEdge: EdgeInfo | null = null;
+    let bestDist = follow ? Infinity : -Infinity;
+    
+    for (const edge of connectedEdges) {
+      // Find the other endpoint of the edge (not the vertex)
+      const edgeP1 = edge.points[0];
+      const edgeP2 = edge.points[1];
+      const otherPoint = this.pointsEqual(vertex, edgeP1) ? edgeP2 : edgeP1;
+      
+      // Calculate distance from the other endpoint to cursor
+      const distToCursor = Math.sqrt((mouseX - otherPoint.x) ** 2 + (mouseY - otherPoint.y) ** 2);
+      
+      // For follow: choose edge that minimizes distance to cursor
+      // For avoid: choose edge that maximizes distance to cursor
+      if (follow) {
+        if (distToCursor < bestDist) {
+          bestDist = distToCursor;
+          bestEdge = edge;
+        }
+      } else {
+        if (distToCursor > bestDist) {
+          bestDist = distToCursor;
+          bestEdge = edge;
+        }
+      }
+    }
+    
+    return bestEdge;
   }
 
   private removeParticle(particle: Particle): void {
