@@ -30,6 +30,7 @@ interface AppConfig {
   edgeColor: ColorValue;                   // Re-add edgeColor
   edgeWidth: number;                       // New: for edge width
   edgeHighlightColor: ColorValue;
+  visualizeEdgeDelta: boolean;             // New: for delta visualization
   showCoordinates: boolean;
   particleSpeed: number;
   leftClickMode: LeftClickMode;
@@ -85,6 +86,7 @@ class GridApp {
       edgeColor: '#ffffff',                  // Re-add edgeColor
       edgeWidth: 1,                          // New: Initialize edge width
       edgeHighlightColor: '#ffff00',
+      visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
       particleSpeed: 100,
       leftClickMode: 'spawnParticle',
@@ -344,6 +346,13 @@ class GridApp {
       this.updateGrid();
     });
 
+    // Add visualize edge delta checkbox
+    this.pane.addBinding(this.config, 'visualizeEdgeDelta', {
+      label: 'Visualize Edge Delta'
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
     // Add draw state selector (palette color picker)
     this.updateDrawStateBlade();
 
@@ -590,6 +599,12 @@ class GridApp {
       paletteStrings[parseInt(key)] = typeof value === 'string' ? value : '#000000';
     }
 
+    // Convert edge palette to string format for renderer
+    const edgePaletteStrings: Record<number, string> = {};
+    for (const [key, value] of Object.entries(this.config.edgePalette)) {
+      edgePaletteStrings[parseInt(key)] = typeof value === 'string' ? value : '#000000';
+    }
+
     // Render grid
     this.gridRenderer.render(
       this.gridContainer,
@@ -602,6 +617,8 @@ class GridApp {
       paletteStrings,
       typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff',
       this.config.edgeWidth,
+      this.config.visualizeEdgeDelta,
+      edgePaletteStrings,
       this.config.showCoordinates
     );
   }
