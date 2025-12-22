@@ -142,8 +142,13 @@ class GridApp {
     githubLink.target = '_blank';
     githubLink.rel = 'noopener noreferrer';
     
+    const statisticsLink = document.createElement('a');
+    statisticsLink.href = 'statistics.html';
+    statisticsLink.textContent = '📊 Project Statistics';
+    
     links.appendChild(manualLink);
     links.appendChild(githubLink);
+    links.appendChild(statisticsLink);
     
     panel.appendChild(header);
     panel.appendChild(content);

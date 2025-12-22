@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { join, extname, basename } from 'path';
 
 interface FileStats {
@@ -111,6 +111,17 @@ function main() {
 
   // Write statistics to file
   writeFileSync(outputPath, JSON.stringify(stats, null, 2), 'utf-8');
+  
+  // Update index.json with list of all available statistics files
+  const existingFiles = readdirSync(outputDir)
+    .filter(f => f.endsWith('.json') && f !== 'index.json')
+    .sort()
+    .reverse(); // Newest first
+  const indexPath = join(outputDir, 'index.json');
+  const indexData = {
+    files: existingFiles
+  };
+  writeFileSync(indexPath, JSON.stringify(indexData, null, 2), 'utf-8');
   
   console.log(`Project statistics generated: ${outputPath}`);
   console.log(`Total files: ${stats.totals.files}`);
