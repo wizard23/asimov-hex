@@ -190,6 +190,126 @@ class GridApp {
     }).on('change', () => {
       this.updateGrid();
     });
+
+    // Add save/load PNG buttons
+    this.pane.addButton({
+      title: 'Save to PNG',
+      label: 'Save to PNG',
+    }).on('click', () => {
+      this.saveToPNG();
+    });
+
+    this.pane.addButton({
+      title: 'Load from PNG',
+      label: 'Load from PNG',
+    }).on('click', () => {
+      this.loadFromPNG();
+    });
+  }
+
+  private saveToPNG() {
+    // Create a canvas with grid dimensions
+    const canvas = document.createElement('canvas');
+    canvas.width = this.config.gridWidth;
+    canvas.height = this.config.gridHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Create ImageData
+    const imageData = ctx.createImageData(canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // Convert states to grayscale
+    for (let row = 0; row < this.config.gridHeight; row++) {
+      for (let col = 0; col < this.config.gridWidth; col++) {
+        const state = this.cellStates[row]?.[col] ?? 0;
+        const grayscale = Math.round(255 * state / (this.config.numStates - 1));
+        const index = (row * canvas.width + col) * 4;
+        data[index] = grayscale;     // R
+        data[index + 1] = grayscale; // G
+        data[index + 2] = grayscale; // B
+        data[index + 3] = 255;       // A
+      }
+    }
+
+    // Draw ImageData to canvas
+    ctx.putImageData(imageData, 0, 0);
+
+    // Convert to PNG and download
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'grid.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  }
+
+  private loadFromPNG() {
+    // Create file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png';
+    input.onchange = (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Create temporary canvas to read image data
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          // Resize grid if needed
+          if (canvas.width !== this.config.gridWidth || canvas.height !== this.config.gridHeight) {
+            this.config.gridWidth = canvas.width;
+            this.config.gridHeight = canvas.height;
+            // Update Tweakpane controls if they exist
+            // (The grid will be resized in updateGrid)
+          }
+
+          // Initialize cell states array
+          this.cellStates = Array(this.config.gridHeight)
+            .fill(0)
+            .map(() => Array(this.config.gridWidth).fill(0));
+
+          // Convert grayscale back to states
+          for (let row = 0; row < this.config.gridHeight; row++) {
+            for (let col = 0; col < this.config.gridWidth; col++) {
+              const index = (row * canvas.width + col) * 4;
+              const r = data[index];
+              const g = data[index + 1];
+              const b = data[index + 2];
+              // Use average of RGB as grayscale value
+              const grayscale = Math.round((r + g + b) / 3);
+              // Convert back to state
+              const state = Math.round(grayscale * (this.config.numStates - 1) / 255);
+              // Clamp to valid range
+              this.cellStates[row][col] = Math.max(0, Math.min(this.config.numStates - 1, state));
+            }
+          }
+
+          // Update grid display
+          this.updateGrid();
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   }
 
   private updateDrawStateBlade() {
