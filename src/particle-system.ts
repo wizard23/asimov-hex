@@ -1,8 +1,6 @@
 import { Graphics, Container } from 'pixi.js';
-import { Point, EdgeInfo } from './types';
+import { Point, EdgeInfo, EdgeSelectionRule } from './types';
 import { Grid } from './grid';
-
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise' | 'followCursor' | 'avoidCursor';
 
 export interface Particle {
   x: number;
@@ -98,7 +96,6 @@ export class ParticleSystem {
         particle.progress -= distanceThisFrame / edgeLength;
       }
       
-      console.log("particle.progress", particle.progress);
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
@@ -304,7 +301,7 @@ export class ParticleSystem {
   }
 
   private pointsClose(p1: Point, p2: Point): boolean {
-    const epsilon = 0.1;
+    const epsilon = 0.01;
     return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
   }
 
@@ -361,7 +358,7 @@ export class ParticleSystem {
     const currentP2 = currentEdge.points[1];
     
     // Find the other endpoint of the current edge (not the vertex)
-    const otherPoint = this.pointsEqual(vertex, currentP1) ? currentP2 : currentP1;
+    const otherPoint = this.pointsClose(vertex, currentP1) ? currentP2 : currentP1;
     
     // Calculate angle of incoming edge (from vertex to other point)
     const incomingAngle = Math.atan2(otherPoint.y - vertex.y, otherPoint.x - vertex.x);
@@ -374,14 +371,14 @@ export class ParticleSystem {
       const edgeP1 = edge.points[0];
       const edgeP2 = edge.points[1];
       const isCurrentEdge = (
-        (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
-        (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
+        (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
+        (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
       );
       
       if (isCurrentEdge) continue;
       
       // Find the other endpoint (not the vertex)
-      const edgeOtherPoint = this.pointsEqual(vertex, edgeP1) ? edgeP2 : edgeP1;
+      const edgeOtherPoint = this.pointsClose(vertex, edgeP1) ? edgeP2 : edgeP1;
       
       // Calculate angle from vertex to other point
       const angle = Math.atan2(edgeOtherPoint.y - vertex.y, edgeOtherPoint.x - vertex.x);
@@ -446,7 +443,7 @@ export class ParticleSystem {
       // Find the other endpoint of the edge (not the vertex)
       const edgeP1 = edge.points[0];
       const edgeP2 = edge.points[1];
-      const otherPoint = this.pointsEqual(vertex, edgeP1) ? edgeP2 : edgeP1;
+      const otherPoint = this.pointsClose(vertex, edgeP1) ? edgeP2 : edgeP1;
       
       // Calculate distance from the other endpoint to cursor
       const distToCursor = Math.sqrt((mouseX - otherPoint.x) ** 2 + (mouseY - otherPoint.y) ** 2);
@@ -487,4 +484,3 @@ export class ParticleSystem {
     }
   }
 }
-

@@ -1038,22 +1038,6 @@ export class CairoGrid implements Grid {
     return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
   }
 
-  private shareEdge(edgesA: EdgeInfo[], edgesB: EdgeInfo[]): boolean {
-    const epsilon = 0.1;
-    for (const edgeA of edgesA) {
-      for (const edgeB of edgesB) {
-        const a0 = edgeA.points[0];
-        const a1 = edgeA.points[1];
-        const b0 = edgeB.points[0];
-        const b1 = edgeB.points[1];
-        const same = (this.pointsEqual(a0, b0, epsilon) && this.pointsEqual(a1, b1, epsilon))
-          || (this.pointsEqual(a0, b1, epsilon) && this.pointsEqual(a1, b0, epsilon));
-        if (same) return true;
-      }
-    }
-    return false;
-  }
-
   private distanceToLineSegment(p: Point, v: Point, w: Point): number {
     const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
     if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);

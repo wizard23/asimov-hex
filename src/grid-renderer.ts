@@ -63,7 +63,6 @@ export class GridRenderer {
                 drawnEdges.add(key);
 
                 let delta = 0;
-                let foundNeighbor = false;
 
                 // Find neighbor sharing this edge
                 for (const n of neighbors) {
@@ -81,7 +80,6 @@ export class GridRenderer {
                          if (this.hasEdge(nPoly, p1, p2)) {
                              const nState = cellStates[n.row][n.col];
                              delta = Math.abs(state - nState);
-                             foundNeighbor = true;
                              break;
                          }
                     }
