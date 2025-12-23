@@ -5,6 +5,7 @@ interface FileTypeStats {
   count: number;
   totalLines: number;
   totalWords: number;
+  totalBytes?: number;
 }
 
 interface ProjectStatistics {
@@ -14,6 +15,7 @@ interface ProjectStatistics {
     files: number;
     lines: number;
     words: number;
+    bytes?: number;
   };
 }
 
@@ -170,6 +172,10 @@ class StatisticsViewer {
             <div class="stat-item-value">${data.totals.words.toLocaleString()}</div>
           </div>
           <div class="stat-item">
+            <div class="stat-item-label">Total Bytes</div>
+            <div class="stat-item-value">${data.totals.bytes !== undefined ? data.totals.bytes.toLocaleString() : '?'}</div>
+          </div>
+          <div class="stat-item">
             <div class="stat-item-label">Generated</div>
             <div class="stat-item-value" style="font-size: 14px;">${timestamp}</div>
           </div>
@@ -185,6 +191,7 @@ class StatisticsViewer {
               <th>Count</th>
               <th>Lines</th>
               <th>Words</th>
+              <th>Bytes</th>
             </tr>
           </thead>
           <tbody>
@@ -194,6 +201,7 @@ class StatisticsViewer {
                 <td>${ft.count.toLocaleString()}</td>
                 <td>${ft.totalLines.toLocaleString()}</td>
                 <td>${ft.totalWords.toLocaleString()}</td>
+                <td>${ft.totalBytes !== undefined ? ft.totalBytes.toLocaleString() : '?'}</td>
               </tr>
             `).join('')}
           </tbody>

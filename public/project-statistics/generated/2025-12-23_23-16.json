@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-12-23T22:16:30.017Z",
+  "fileTypes": [
+    {
+      "fileType": ".ts",
+      "count": 11,
+      "totalLines": 3521,
+      "totalWords": 13467,
+      "totalBytes": 112506
+    },
+    {
+      "fileType": ".json",
+      "count": 4,
+      "totalLines": 2181,
+      "totalWords": 3780,
+      "totalBytes": 69208
+    },
+    {
+      "fileType": ".html",
+      "count": 2,
+      "totalLines": 303,
+      "totalWords": 647,
+      "totalBytes": 6764
+    },
+    {
+      "fileType": ".sh",
+      "count": 1,
+      "totalLines": 83,
+      "totalWords": 435,
+      "totalBytes": 3307
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 2,
+      "totalWords": 2,
+      "totalBytes": 17
+    }
+  ],
+  "totals": {
+    "files": 19,
+    "lines": 6090,
+    "words": 18331,
+    "bytes": 191802
+  }
+}

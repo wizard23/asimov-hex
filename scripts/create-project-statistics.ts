@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, basename } from 'path';
 
 interface FileStats {
@@ -7,6 +7,7 @@ interface FileStats {
   count: number;
   totalLines: number;
   totalWords: number;
+  totalBytes: number;
 }
 
 interface ProjectStatistics {
@@ -16,6 +17,7 @@ interface ProjectStatistics {
     files: number;
     lines: number;
     words: number;
+    bytes: number;
   };
 }
 
@@ -43,35 +45,44 @@ function getGitTrackedFiles(): string[] {
 function generateStatistics(): ProjectStatistics {
   const allFiles = getGitTrackedFiles();
   const excludedFolders = [
-    'docs/generated',
+    'docs',
     'public/project-statistics/generated'
+  ];
+  const excludedFiles = [
+    'TODOS.md'
   ];
 
   const files = allFiles.filter(file => 
-    !excludedFolders.some(folder => file.startsWith(folder))
+    !excludedFolders.some(folder => file.startsWith(folder)) &&
+    !excludedFiles.includes(file)
   );
   
-  const statsByType = new Map<string, { count: number; lines: number; words: number }>();
+  const statsByType = new Map<string, { count: number; lines: number; words: number; bytes: number }>();
 
   let totalLines = 0;
   let totalWords = 0;
+  let totalBytes = 0;
 
   for (const file of files) {
     try {
       const content = readFileSync(file, 'utf-8');
       const { lines, words } = countLinesAndWords(content);
+      const stats = statSync(file);
+      const bytes = stats.size;
       
       const fileType = getFileExtension(file);
-      const current = statsByType.get(fileType) || { count: 0, lines: 0, words: 0 };
+      const current = statsByType.get(fileType) || { count: 0, lines: 0, words: 0, bytes: 0 };
       
       statsByType.set(fileType, {
         count: current.count + 1,
         lines: current.lines + lines,
         words: current.words + words,
+        bytes: current.bytes + bytes,
       });
 
       totalLines += lines;
       totalWords += words;
+      totalBytes += bytes;
     } catch (error) {
       // Skip files that can't be read (binary files, etc.)
       console.warn(`Warning: Could not read file ${file}:`, error);
@@ -84,6 +95,7 @@ function generateStatistics(): ProjectStatistics {
       count: stats.count,
       totalLines: stats.lines,
       totalWords: stats.words,
+      totalBytes: stats.bytes,
     }))
     .sort((a, b) => {
       // Primary sort by count (descending)
@@ -105,6 +117,7 @@ function generateStatistics(): ProjectStatistics {
       files: files.length,
       lines: totalLines,
       words: totalWords,
+      bytes: totalBytes,
     },
   };
 }
@@ -147,6 +160,7 @@ function main() {
   console.log(`Total files: ${stats.totals.files}`);
   console.log(`Total lines: ${stats.totals.lines}`);
   console.log(`Total words: ${stats.totals.words}`);
+  console.log(`Total bytes: ${stats.totals.bytes}`);
   console.log(`File types: ${stats.fileTypes.length}`);
 }
 
