@@ -5,6 +5,7 @@ import { GridType } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 import palettesData from './assets/palettes.json';
 import { ParticleSystem } from './particle-system';
+import { Grid, SquareGrid, HexagonGrid, TriangleGrid } from './grid';
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -54,6 +55,7 @@ class GridApp {
   private particleSystem!: ParticleSystem;
   private mouseX: number = 0;
   private mouseY: number = 0;
+  private grid!: Grid;
 
   constructor() {
     // Load palettes from JSON
@@ -93,12 +95,28 @@ class GridApp {
       edgeSelectionRule: 'randomNoBacktrack',
     };
 
+    this.updateGridInstance();
+
     this.initPixi().then(() => {
       this.initInfoPanel();
       this.initTweakpane();
       this.initGrid();
       this.setupInteraction();
     });
+  }
+
+  private updateGridInstance() {
+    switch (this.config.gridType) {
+      case 'squares':
+        this.grid = new SquareGrid(this.config.gridScale);
+        break;
+      case 'hexagons':
+        this.grid = new HexagonGrid(this.config.gridScale);
+        break;
+      case 'triangles':
+        this.grid = new TriangleGrid(this.config.gridScale);
+        break;
+    }
   }
 
   private initInfoPanel() {
@@ -228,11 +246,9 @@ class GridApp {
       this.particleSystem.update(
         ticker.deltaMS,
         this.config.particleSpeed,
-        this.config.gridScale,
-        this.gridRenderer,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.config.gridType,
+        this.grid, // Pass grid instance
         this.config.edgeSelectionRule,
         this.mouseX,
         this.mouseY
@@ -550,6 +566,8 @@ class GridApp {
   }
 
   private updateGrid() {
+    this.updateGridInstance();
+
     // Initialize cell states if needed
     if (this.cellStates.length !== this.config.gridHeight || 
         this.cellStates[0]?.length !== this.config.gridWidth) {
@@ -611,8 +629,7 @@ class GridApp {
       this.edgeContainer,
       this.config.gridWidth,
       this.config.gridHeight,
-      this.config.gridType,
-      this.config.gridScale,
+      this.grid, // Pass grid instance
       this.cellStates,
       paletteStrings,
       typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff',
@@ -659,8 +676,7 @@ class GridApp {
         x, y,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.config.gridType,
-        this.config.gridScale
+        this.grid // Pass grid
       );
 
       if (cellInfo) {
@@ -669,10 +685,7 @@ class GridApp {
           : '#ffff00';
         this.highlightedCell = this.gridRenderer.drawCellHighlight(
           cellInfo,
-          this.config.gridWidth,
-          this.config.gridHeight,
-          this.config.gridType,
-          this.config.gridScale,
+          this.grid, // Pass grid
           highlightColor
         );
         this.gridContainer.addChild(this.highlightedCell);
@@ -683,8 +696,7 @@ class GridApp {
         x, y,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.config.gridType,
-        this.config.gridScale
+        this.grid // Pass grid
       );
 
       if (edgeInfo) {
@@ -699,8 +711,7 @@ class GridApp {
           x, y,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.config.gridType,
-          this.config.gridScale
+          this.grid // Pass grid
         );
 
         if (closestVertex) {
@@ -734,8 +745,7 @@ class GridApp {
           edgeX, edgeY,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.config.gridType,
-          this.config.gridScale
+          this.grid // Pass grid
         );
 
         if (edgeInfo) {
@@ -754,8 +764,7 @@ class GridApp {
           x, y,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.config.gridType,
-          this.config.gridScale
+          this.grid // Pass grid
         );
 
         if (cellInfo) {
@@ -772,8 +781,7 @@ class GridApp {
         x, y,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.config.gridType,
-        this.config.gridScale
+        this.grid // Pass grid
       );
 
       if (cellInfo) {
@@ -790,4 +798,3 @@ if (document.readyState === 'loading') {
 } else {
   new GridApp();
 }
-

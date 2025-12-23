@@ -1,5 +1,6 @@
 import { Graphics, Container } from 'pixi.js';
-import { Point, EdgeInfo, GridType } from './types';
+import { Point, EdgeInfo } from './types';
+import { Grid } from './grid';
 
 type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise' | 'followCursor' | 'avoidCursor';
 
@@ -75,7 +76,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridScale: number, gridRenderer: any, gridWidth: number, gridHeight: number, gridType: GridType, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number): void {
+  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -101,10 +102,10 @@ export class ParticleSystem {
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule, mouseX, mouseY);
+        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, gridRenderer, gridWidth, gridHeight, gridType, gridScale, edgeSelectionRule, mouseX, mouseY);
+        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -123,17 +124,15 @@ export class ParticleSystem {
   private handleVertexArrival(
     particle: Particle,
     vertex: Point,
-    gridRenderer: { getEdgesAtVertex: (vertex: Point, width: number, height: number, gridType: GridType, scale: number) => EdgeInfo[] },
+    grid: Grid,
     gridWidth: number,
     gridHeight: number,
-    gridType: GridType,
-    gridScale: number,
     edgeSelectionRule: EdgeSelectionRule,
     mouseX: number,
     mouseY: number
   ): void {
     // Find all edges connected to this vertex
-    const connectedEdges = gridRenderer.getEdgesAtVertex(vertex, gridWidth, gridHeight, gridType, gridScale);
+    const connectedEdges = grid.getEdgesAtVertex(vertex, gridWidth, gridHeight);
     
     if (connectedEdges.length === 0) {
       // No edges found, remove particle

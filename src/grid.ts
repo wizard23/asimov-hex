@@ -151,15 +151,9 @@ export class SquareGrid implements Grid {
   }
 }
 
+// pointy-top, odd-r offset coordinates
 export class HexagonGrid implements Grid {
   constructor(private scale: number) {}
-
-  // pointy-top, odd-r offset coordinates
-  private offsetToAxial(cell: { col: number, row: number }): { q: number, r: number } {
-    const q = cell.col - (cell.row - (cell.row & 1)) / 2;
-    const r = cell.row;
-    return { q, r };
-  }
 
   private axialToOffset(axial: { q: number, r: number }): { col: number, row: number } {
     const col = axial.q + (axial.r - (axial.r & 1)) / 2;
