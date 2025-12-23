@@ -32,6 +32,7 @@ Adapt the  project generation script to exclude all files that are in a folder n
 
 
 
+
 * instanced geometry
 https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry
 

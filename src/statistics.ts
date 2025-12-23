@@ -85,7 +85,7 @@ class StatisticsViewer {
     const options: Record<string, string> = {};
     this.availableFiles.forEach(file => {
       // Use filename as both key and value, but display a nicer format
-      const displayName = file.replace('.json', '').replace(/_/g, ' ').replace(/-/g, '/');
+      const displayName = formatTimestampFilename(file);
       options[displayName] = file;
     });
 
@@ -124,7 +124,10 @@ class StatisticsViewer {
   }
 
   private displayStatistics(data: ProjectStatistics) {
-    const timestamp = new Date(data.timestamp).toLocaleString();
+    // const timestamp = new Date(data.timestamp).toLocaleString();
+    // const timestamp = formatIsoTimestampUtc(data.timestamp);
+    const timestamp = formatIsoTimestampLocal(data.timestamp);
+
     
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics</h2>
@@ -180,4 +183,64 @@ class StatisticsViewer {
 
 // Initialize the statistics viewer when the page loads
 new StatisticsViewer();
+
+function formatTimestampFilename(filename: string): string {
+  // Expected: YYYY-MM-DD_HH-MM(.ext)
+  const match = filename.match(
+    /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})(?:\.\w+)?$/
+  );
+
+  if (!match) {
+    throw new Error(`Invalid timestamp filename: ${filename}`);
+  }
+
+  const [, year, month, day, hour, minute] = match;
+
+  return `${year}/${month}/${day} ${hour}:${minute}`;
+}
+
+function formatIsoTimestampUtc(iso: string): string {
+  const date = new Date(iso);
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Invalid ISO timestamp: ${iso}`);
+  }
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return [
+    date.getUTCFullYear(),
+    pad(date.getUTCMonth() + 1),
+    pad(date.getUTCDate()),
+  ].join("/") + " " +
+    [
+      pad(date.getUTCHours()),
+      pad(date.getUTCMinutes()),
+      pad(date.getUTCSeconds()),
+    ].join(":");
+}
+
+export function formatIsoTimestampLocal(iso: string): string {
+  const date = new Date(iso);
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Invalid ISO timestamp: ${iso}`);
+  }
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+  ].join("/") + " " +
+    [
+      pad(date.getHours()),
+      pad(date.getMinutes()),
+      pad(date.getSeconds()),
+    ].join(":");
+}
+
+
+
 
