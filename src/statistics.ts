@@ -17,11 +17,18 @@ interface ProjectStatistics {
   };
 }
 
+type DateTimeTimeZone = 'local' | 'utc';
+
 class StatisticsViewer {
   private pane!: Pane;
   private selectedFile: string = '';
   private availableFiles: string[] = [];
   private statisticsPanel: HTMLElement;
+  private config = {
+    selectedFile: '',
+    dateTimeTimeZone: 'local' as DateTimeTimeZone,
+  };
+  private currentStatistics: ProjectStatistics | null = null;
 
   constructor() {
     this.statisticsPanel = document.getElementById('statistics-panel')!;
@@ -77,9 +84,7 @@ class StatisticsViewer {
       container: container
     });
 
-    const config = {
-      selectedFile: this.selectedFile,
-    };
+    this.config.selectedFile = this.selectedFile;
 
     // Create options object for dropdown
     const options: Record<string, string> = {};
@@ -89,12 +94,29 @@ class StatisticsViewer {
       options[displayName] = file;
     });
 
-    this.pane.addBinding(config, 'selectedFile', {
+    this.pane.addBinding(this.config, 'selectedFile', {
       options: options,
       label: 'Statistics File',
     }).on('change', (ev) => {
       this.selectedFile = ev.value;
       this.loadStatistics(this.selectedFile);
+    });
+
+    this.pane.addBinding(this.config, 'dateTimeTimeZone', {
+      options: {
+        'Local Time': 'local',
+        'UTC': 'utc',
+      },
+      label: 'Timestamp Format',
+    }).on('change', () => {
+      if (this.currentStatistics) {
+        this.displayStatistics(this.currentStatistics);
+        return;
+      }
+
+      if (this.selectedFile) {
+        this.loadStatistics(this.selectedFile);
+      }
     });
 
     // Load initial file
@@ -111,6 +133,7 @@ class StatisticsViewer {
       }
 
       const data: ProjectStatistics = await response.json();
+      this.currentStatistics = data;
       this.displayStatistics(data);
     } catch (error) {
       console.error('Error loading statistics:', error);
@@ -124,11 +147,10 @@ class StatisticsViewer {
   }
 
   private displayStatistics(data: ProjectStatistics) {
-    // const timestamp = new Date(data.timestamp).toLocaleString();
-    // const timestamp = formatIsoTimestampUtc(data.timestamp);
-    const timestamp = formatIsoTimestampLocal(data.timestamp);
+    const timestamp = this.config.dateTimeTimeZone === 'utc'
+      ? formatIsoTimestampUtc(data.timestamp)
+      : formatIsoTimestampLocal(data.timestamp);
 
-    
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics</h2>
       
@@ -240,7 +262,3 @@ export function formatIsoTimestampLocal(iso: string): string {
       pad(date.getSeconds()),
     ].join(":");
 }
-
-
-
-
