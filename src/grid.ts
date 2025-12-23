@@ -920,14 +920,14 @@ export class CairoGrid implements Grid {
     const orientation = this.getOrientation(cell);
     switch (orientation) {
       case 'N':
-        return 180;
+        return 0;
       case 'E':
-        return 270;
-      case 'W':
         return 90;
+      case 'W':
+        return 270;
       case 'S':
       default:
-        return 0;
+        return 180;
     }
   }
 
