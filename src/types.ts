@@ -1,4 +1,4 @@
-export type GridType = 'squares' | 'hexagons' | 'triangles';
+export type GridType = 'squares' | 'hexagons' | 'triangles' | 'cairo';
 
 export interface Point {
   x: number;
@@ -15,4 +15,3 @@ export interface CellInfo {
   row: number;
   col: number;
 }
-

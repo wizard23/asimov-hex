@@ -13,6 +13,14 @@ export interface Grid {
   getEdgesAtVertex(vertex: Point, gridWidth: number, gridHeight: number): EdgeInfo[];
 }
 
+export interface CairoGridOptions {
+  scale: number;
+  baseWidth: number;
+  shoulderOffsetX: number;
+  shoulderOffsetY: number;
+  apexOffsetY: number;
+}
+
 export class SquareGrid implements Grid {
   constructor(private scale: number) {}
 
@@ -628,4 +636,289 @@ export class TriangleGrid implements Grid {
 
   }
 
+}
+
+const DEFAULT_CAIRO_OPTIONS: CairoGridOptions = {
+  scale: 1,
+  baseWidth: 4,
+  shoulderOffsetX: 1,
+  shoulderOffsetY: 3,
+  apexOffsetY: 1,
+};
+
+export class CairoGrid implements Grid {
+  private readonly options: CairoGridOptions;
+  private readonly basePoints: Point[];
+  private readonly step: number;
+  private readonly tileBounds: { minX: number; maxX: number; minY: number; maxY: number };
+
+  constructor(options?: Partial<CairoGridOptions>) {
+    this.options = {
+      ...DEFAULT_CAIRO_OPTIONS,
+      ...(options ?? {}),
+    };
+
+    const scale = this.options.scale;
+    const baseWidth = this.options.baseWidth * scale;
+    const shoulderOffsetX = this.options.shoulderOffsetX * scale;
+    const shoulderOffsetY = this.options.shoulderOffsetY * scale;
+    const apexOffsetY = this.options.apexOffsetY * scale;
+    const span = baseWidth + shoulderOffsetX * 2;
+
+    this.step = span;
+    this.basePoints = [
+      { x: 0, y: 0 },
+      { x: shoulderOffsetX, y: -shoulderOffsetY },
+      { x: shoulderOffsetX + baseWidth, y: -shoulderOffsetY },
+      { x: span, y: 0 },
+      { x: span / 2, y: apexOffsetY },
+    ];
+
+    this.tileBounds = this.computeTileBounds();
+  }
+
+  getGridBounds(cols: number, rows: number): { width: number; height: number; minX: number; minY: number } {
+    const spanX = Math.max(0, cols - 1) * this.step;
+    const spanY = Math.max(0, rows - 1) * this.step;
+    const minX = this.tileBounds.minX;
+    const minY = this.tileBounds.minY;
+    const maxX = spanX + this.tileBounds.maxX;
+    const maxY = spanY + this.tileBounds.maxY;
+
+    return {
+      width: maxX - minX,
+      height: maxY - minY,
+      minX,
+      minY,
+    };
+  }
+
+  pixelToCell(pixel: Point): { col: number; row: number } | null {
+    const approxCol = Math.floor(pixel.x / this.step);
+    const approxRow = Math.floor(pixel.y / this.step);
+
+    for (let r = approxRow - 2; r <= approxRow + 2; r++) {
+      for (let c = approxCol - 2; c <= approxCol + 2; c++) {
+        const poly = this.getCellPolygon({ col: c, row: r });
+        if (this.pointInPolygon(pixel, poly)) {
+          return { col: c, row: r };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  cellToPixel(cell: { col: number; row: number }): Point {
+    const poly = this.getCellPolygon(cell);
+    const center = poly.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    return { x: center.x / poly.length, y: center.y / poly.length };
+  }
+
+  getNeighbors(cell: { col: number; row: number }): { col: number; row: number }[] {
+    const neighbors: { col: number; row: number }[] = [];
+    const edges = this.getCellEdges(cell);
+    const seen = new Set<string>();
+
+    for (let dr = -2; dr <= 2; dr++) {
+      for (let dc = -2; dc <= 2; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const candidate = { col: cell.col + dc, row: cell.row + dr };
+        const key = `${candidate.col},${candidate.row}`;
+        if (seen.has(key)) continue;
+
+        const candidateEdges = this.getCellEdges(candidate);
+        if (this.shareEdge(edges, candidateEdges)) {
+          neighbors.push(candidate);
+          seen.add(key);
+        }
+      }
+    }
+
+    return neighbors;
+  }
+
+  getCellPolygon(cell: { col: number; row: number }): Point[] {
+    const anchor = this.getAnchor(cell);
+    const rotation = this.getRotation(cell);
+    const rotated = this.basePoints.map(point => this.rotatePoint(point, rotation));
+    return rotated.map(point => ({ x: point.x + anchor.x, y: point.y + anchor.y }));
+  }
+
+  getCellEdges(cell: { col: number; row: number }): EdgeInfo[] {
+    const poly = this.getCellPolygon(cell);
+    return poly.map((p, i) => ({
+      type: 'edge',
+      points: [p, poly[(i + 1) % poly.length]],
+    }));
+  }
+
+  getEdgeAt(pixel: Point, threshold: number, gridWidth: number, gridHeight: number): EdgeInfo | null {
+    let minDist = Infinity;
+    let closestEdge: EdgeInfo | null = null;
+    const approxCol = Math.floor(pixel.x / this.step);
+    const approxRow = Math.floor(pixel.y / this.step);
+
+    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
+      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+        const edges = this.getCellEdges({ col: c, row: r });
+        for (const edge of edges) {
+          const dist = this.distanceToLineSegment(pixel, edge.points[0], edge.points[1]);
+          if (dist < minDist) {
+            minDist = dist;
+            closestEdge = edge;
+          }
+        }
+      }
+    }
+
+    return closestEdge && minDist < threshold ? closestEdge : null;
+  }
+
+  getVertexAt(pixel: Point, threshold: number, gridWidth: number, gridHeight: number): Point | null {
+    let minDistSq = Infinity;
+    let closestVertex: Point | null = null;
+    const approxCol = Math.floor(pixel.x / this.step);
+    const approxRow = Math.floor(pixel.y / this.step);
+
+    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
+      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+        const poly = this.getCellPolygon({ col: c, row: r });
+        for (const v of poly) {
+          const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
+          if (distSq < minDistSq) {
+            minDistSq = distSq;
+            closestVertex = v;
+          }
+        }
+      }
+    }
+
+    return closestVertex && Math.sqrt(minDistSq) < threshold ? closestVertex : null;
+  }
+
+  getEdgesAtVertex(vertex: Point, gridWidth: number, gridHeight: number): EdgeInfo[] {
+    const edges: EdgeInfo[] = [];
+    const epsilon = 0.1;
+    const approxCol = Math.floor(vertex.x / this.step);
+    const approxRow = Math.floor(vertex.y / this.step);
+
+    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
+      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+        const cellEdges = this.getCellEdges({ col: c, row: r });
+        for (const edge of cellEdges) {
+          if (this.pointsEqual(vertex, edge.points[0], epsilon) || this.pointsEqual(vertex, edge.points[1], epsilon)) {
+            edges.push(edge);
+          }
+        }
+      }
+    }
+
+    return this.removeDuplicateEdges(edges);
+  }
+
+  private getAnchor(cell: { col: number; row: number }): Point {
+    return { x: cell.col * this.step, y: cell.row * this.step };
+  }
+
+  private getRotation(cell: { col: number; row: number }): number {
+    const colOdd = cell.col & 1;
+    const rowOdd = cell.row & 1;
+
+    if (!rowOdd && !colOdd) return 0;
+    if (!rowOdd && colOdd) return 180;
+    if (rowOdd && !colOdd) return 90;
+    return 270;
+  }
+
+  private rotatePoint(point: Point, rotation: number): Point {
+    switch (rotation) {
+      case 0:
+        return { x: point.x, y: point.y };
+      case 90:
+        return { x: -point.y, y: point.x };
+      case 180:
+        return { x: -point.x, y: -point.y };
+      case 270:
+        return { x: point.y, y: -point.x };
+      default:
+        return { x: point.x, y: point.y };
+    }
+  }
+
+  private computeTileBounds(): { minX: number; maxX: number; minY: number; maxY: number } {
+    const rotations = [0, 90, 180, 270];
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    for (const rotation of rotations) {
+      for (const point of this.basePoints) {
+        const rotated = this.rotatePoint(point, rotation);
+        minX = Math.min(minX, rotated.x);
+        maxX = Math.max(maxX, rotated.x);
+        minY = Math.min(minY, rotated.y);
+        maxY = Math.max(maxY, rotated.y);
+      }
+    }
+
+    return { minX, maxX, minY, maxY };
+  }
+
+  private pointInPolygon(point: Point, polygon: Point[]): boolean {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x;
+      const yi = polygon[i].y;
+      const xj = polygon[j].x;
+      const yj = polygon[j].y;
+      const intersect = ((yi > point.y) !== (yj > point.y))
+        && (point.x < (xj - xi) * (point.y - yi) / (yj - yi + Number.EPSILON) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  private shareEdge(edgesA: EdgeInfo[], edgesB: EdgeInfo[]): boolean {
+    const epsilon = 0.1;
+    for (const edgeA of edgesA) {
+      for (const edgeB of edgesB) {
+        const a0 = edgeA.points[0];
+        const a1 = edgeA.points[1];
+        const b0 = edgeB.points[0];
+        const b1 = edgeB.points[1];
+        const same = (this.pointsEqual(a0, b0, epsilon) && this.pointsEqual(a1, b1, epsilon))
+          || (this.pointsEqual(a0, b1, epsilon) && this.pointsEqual(a1, b0, epsilon));
+        if (same) return true;
+      }
+    }
+    return false;
+  }
+
+  private distanceToLineSegment(p: Point, v: Point, w: Point): number {
+    const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
+    if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
+    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.sqrt((p.x - (v.x + t * (w.x - v.x))) ** 2 + (p.y - (v.y + t * (w.y - v.y))) ** 2);
+  }
+
+  private pointsEqual(p1: Point, p2: Point, epsilon: number): boolean {
+    return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
+  }
+
+  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
+    const unique: EdgeInfo[] = [];
+    const epsilon = 0.1;
+    for (const edge of edges) {
+      if (!unique.some(u =>
+        (this.pointsEqual(edge.points[0], u.points[0], epsilon) && this.pointsEqual(edge.points[1], u.points[1], epsilon)) ||
+        (this.pointsEqual(edge.points[0], u.points[1], epsilon) && this.pointsEqual(edge.points[1], u.points[0], epsilon))
+      )) {
+        unique.push(edge);
+      }
+    }
+    return unique;
+  }
 }

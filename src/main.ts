@@ -5,7 +5,7 @@ import { GridType } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 import palettesData from './assets/palettes.json';
 import { ParticleSystem } from './particle-system';
-import { Grid, SquareGrid, HexagonGrid, TriangleGrid } from './grid';
+import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './grid';
 
 type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
@@ -115,6 +115,11 @@ class GridApp {
         break;
       case 'triangles':
         this.grid = new TriangleGrid(this.config.gridScale);
+        break;
+      case 'cairo':
+        this.grid = new CairoGrid({
+          scale: this.config.gridScale / Math.sqrt(10),
+        });
         break;
     }
   }
@@ -287,6 +292,7 @@ class GridApp {
         squares: 'squares',
         hexagons: 'hexagons',
         triangles: 'triangles',
+        cairo: 'cairo',
       },
       label: 'Grid Type',
     }).on('change', () => {
@@ -593,15 +599,26 @@ class GridApp {
       const hexSpacingY = this.config.gridScale * 1.5;
       gridWidth = this.config.gridWidth * hexSpacingX + this.config.gridScale;
       gridHeight = this.config.gridHeight * hexSpacingY + this.config.gridScale;
-    } else { // triangles
+    } else if (this.config.gridType === 'triangles') {
       const triangleHeight = this.config.gridScale * Math.sqrt(3) / 2;
       gridWidth = this.config.gridWidth * this.config.gridScale * 0.5 + this.config.gridScale;
       gridHeight = this.config.gridHeight * triangleHeight + triangleHeight;
+    } else { // cairo
+      const cairoGrid = this.grid as CairoGrid;
+      const bounds = cairoGrid.getGridBounds(this.config.gridWidth, this.config.gridHeight);
+      gridWidth = bounds.width;
+      gridHeight = bounds.height;
     }
 
     // Center the grid
-    const offsetX = (this.app.screen.width - gridWidth) / 2;
-    const offsetY = (this.app.screen.height - gridHeight) / 2;
+    let offsetX = (this.app.screen.width - gridWidth) / 2;
+    let offsetY = (this.app.screen.height - gridHeight) / 2;
+
+    if (this.grid instanceof CairoGrid) {
+      const bounds = this.grid.getGridBounds(this.config.gridWidth, this.config.gridHeight);
+      offsetX -= bounds.minX;
+      offsetY -= bounds.minY;
+    }
 
     // Position all containers at the same offset so cells, edges, and particles align
     this.gridContainer.x = offsetX;
