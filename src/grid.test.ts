@@ -148,6 +148,35 @@ describe('CairoGrid (catalan)', () => {
     return angles;
   };
 
+  const shortEdgeDirection = (points: { x: number; y: number }[]) => {
+    const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    centroid.x /= points.length;
+    centroid.y /= points.length;
+
+    let shortIndex = 0;
+    let shortLength = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      if (length < shortLength) {
+        shortLength = length;
+        shortIndex = i;
+      }
+    }
+
+    const p1 = points[shortIndex];
+    const p2 = points[(shortIndex + 1) % points.length];
+    const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+    const dx = mid.x - centroid.x;
+    const dy = mid.y - centroid.y;
+
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      return dx >= 0 ? 'E' : 'W';
+    }
+    return dy >= 0 ? 'S' : 'N';
+  };
+
   it('should have four long edges and one short edge with expected lengths', () => {
     const poly = grid.getCellPolygon({ col: 0, row: 0 });
     expect(poly.length).toBe(5);
@@ -197,6 +226,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (3,0) (even row, short edge points S)', () => {
     const neighbors = grid.getNeighbors({ col: 3, row: 0 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 3, row: 0 }));
+    expect(direction).toBe('S');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 2, row: 0 }, // NNE
@@ -211,6 +242,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (2,2) (even row, short edge points E)', () => {
     const neighbors = grid.getNeighbors({ col: 2, row: 2 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 2, row: 2 }));
+    expect(direction).toBe('E');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 0, row: 3 }, // SWW 
@@ -225,6 +258,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (4,2) (even row, short edge points W)', () => {
     const neighbors = grid.getNeighbors({ col: 4, row: 2 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 4, row: 2 }));
+    expect(direction).toBe('W');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 2, row: 2 }, // W
@@ -239,6 +274,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (5,2) (even row, short edge points S)', () => {
     const neighbors = grid.getNeighbors({ col: 5, row: 2 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 5, row: 2 }));
+    expect(direction).toBe('S');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 5, row: 1 }, // NNE
@@ -258,6 +295,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (2,1) (odd row, short edge points N)', () => {
     const neighbors = grid.getNeighbors({ col: 2, row: 1 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 2, row: 1 }));
+    expect(direction).toBe('N');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 3, row: 1 }, // NEE
@@ -272,6 +311,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (3,1) (odd row, short edge points E)', () => {
     const neighbors = grid.getNeighbors({ col: 3, row: 1 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 3, row: 1 }));
+    expect(direction).toBe('E');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 2, row: 1 }, // SWW 
@@ -286,6 +327,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (5,1) (odd row, , short edge points W)', () => {
     const neighbors = grid.getNeighbors({ col: 5, row: 1 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 5, row: 1 }));
+    expect(direction).toBe('W');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 3, row: 1 }, // W
@@ -300,6 +343,8 @@ describe('CairoGrid (catalan)', () => {
 
   it('should return correct neighbors for cell (4,1) (odd row, short edge points N)', () => {
     const neighbors = grid.getNeighbors({ col: 4, row: 1 });
+    const direction = shortEdgeDirection(grid.getCellPolygon({ col: 4, row: 1 }));
+    expect(direction).toBe('N');
     expect(neighbors).toEqual(
       expect.arrayContaining([
         { col: 6, row: 0 }, // NEE
