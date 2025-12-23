@@ -652,6 +652,8 @@ class GridApp {
       paletteStrings,
       typeof this.config.edgeColor === 'string' ? this.config.edgeColor : '#ffffff',
       this.config.edgeWidth,
+      this.config.visualizeEdgeDelta, // Pass visualizeEdgeDelta
+      edgePaletteStrings, // Pass edgePalette
       this.config.showCoordinates
     );
   }
