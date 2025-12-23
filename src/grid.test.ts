@@ -382,6 +382,27 @@ describe('CairoGrid (catalan)', () => {
     (pointsClose(s1.a, s2.a) && pointsClose(s1.b, s2.b)) ||
     (pointsClose(s1.a, s2.b) && pointsClose(s1.b, s2.a));
 
+  const longEdgeSegments = (points: { x: number; y: number }[]) => {
+    const segments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = [];
+    const expectedLong = scale;
+    const tolerance = 1e-6;
+    for (let i = 0; i < points.length; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      if (Math.abs(length - expectedLong) < tolerance) {
+        segments.push({ a: p1, b: p2 });
+      }
+    }
+    return segments;
+  };
+
+  const anyLongEdgeCoincide = (a: { col: number; row: number }, b: { col: number; row: number }) => {
+    const segsA = longEdgeSegments(grid.getCellPolygon(a));
+    const segsB = longEdgeSegments(grid.getCellPolygon(b));
+    return segsA.some(segA => segsB.some(segB => segmentsCoincide(segA, segB)));
+  };
+
   it('should align short edges for expected adjacent cells', () => {
     const pairs: Array<[{ col: number; row: number }, { col: number; row: number }]> = [
       [{ col: 2, row: 0 }, { col: 4, row: 0 }],
@@ -397,4 +418,22 @@ describe('CairoGrid (catalan)', () => {
     });
   });
 
+  it('should align long edges for expected adjacent cells', () => {
+    const pairs: Array<[{ col: number; row: number }, { col: number; row: number }]> = [
+      [{ col: 0, row: 0 }, { col: 1, row: 0 }],
+      [{ col: 0, row: 0 }, { col: 0, row: 1 }],
+      [{ col: 1, row: 0 }, { col: 2, row: 0 }],
+      [{ col: 6, row: 0 }, { col: 7, row: 0 }],
+      [{ col: 6, row: 0 }, { col: 4, row: 1 }],
+      [{ col: 0, row: 1 }, { col: 2, row: 0 }],
+      [{ col: 1, row: 1 }, { col: 0, row: 1 }],
+      [{ col: 1, row: 1 }, { col: 3, row: 0 }],
+      [{ col: 2, row: 1 }, { col: 4, row: 2 }],
+      [{ col: 2, row: 1 }, { col: 2, row: 2 }],
+    ];
+
+    pairs.forEach(([a, b]) => {
+      expect(anyLongEdgeCoincide(a, b)).toBe(true);
+    });
+  });
 });
