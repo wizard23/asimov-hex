@@ -640,6 +640,7 @@ export class CairoGrid implements Grid {
   private readonly basePoints: Point[];
   private readonly stepX: number;
   private readonly stepY: number;
+  private readonly rowOffsetX: number;
   private readonly tileBounds: { minX: number; maxX: number; minY: number; maxY: number };
 
   constructor(options?: Partial<CairoGridOptions>) {
@@ -670,8 +671,10 @@ export class CairoGrid implements Grid {
     centroid.y /= rawPoints.length;
 
     this.basePoints = rawPoints.map(p => ({ x: p.x - centroid.x, y: p.y - centroid.y }));
-    this.stepX = Math.sqrt(3) * scale;
-    this.stepY = 1.5 * scale;
+    const shortMid = this.getShortEdgeMidpoint(this.basePoints);
+    this.stepX = Math.abs(shortMid.y);
+    this.stepY = this.stepX * 2;
+    this.rowOffsetX = this.stepX;
 
     this.tileBounds = this.computeTileBounds();
   }
@@ -802,7 +805,7 @@ export class CairoGrid implements Grid {
   }
 
   private getAnchor(cell: { col: number; row: number }): Point {
-    const offsetX = (cell.row & 1) ? this.stepX * 0.5 : 0;
+    const offsetX = (cell.row & 1) ? this.rowOffsetX : 0;
     return { x: cell.col * this.stepX + offsetX, y: cell.row * this.stepY };
   }
 
@@ -978,6 +981,23 @@ export class CairoGrid implements Grid {
       if (intersect) inside = !inside;
     }
     return inside;
+  }
+
+  private getShortEdgeMidpoint(points: Point[]): Point {
+    let shortIndex = 0;
+    let shortLength = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      if (length < shortLength) {
+        shortLength = length;
+        shortIndex = i;
+      }
+    }
+    const p1 = points[shortIndex];
+    const p2 = points[(shortIndex + 1) % points.length];
+    return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
   }
 
   private shareEdge(edgesA: EdgeInfo[], edgesB: EdgeInfo[]): boolean {
