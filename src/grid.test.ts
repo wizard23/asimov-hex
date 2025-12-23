@@ -190,4 +190,127 @@ describe('CairoGrid (catalan)', () => {
     const unique = new Set(neighbors.map(n => `${n.col},${n.row}`));
     expect(unique.size).toBe(5);
   });
+
+
+
+
+
+  it('should return correct neighbors for cell (3,0) (even row)', () => {
+    const neighbors = grid.getNeighbors({ col: 3, row: 0 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 2, row: 0 }, // NNE
+        { col: 4, row: 0 }, // NNW
+        { col: 1, row: 1 }, // SWW
+        { col: 3, row: 1 }, // SOO
+        { col: 2, row: 1 }, // S
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (2,2) (even row)', () => {
+    const neighbors = grid.getNeighbors({ col: 2, row: 2 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 0, row: 3 }, // SWW 
+        { col: 1, row: 2 }, // NWW
+        { col: 2, row: 1 }, // NNO
+        { col: 4, row: 2 }, // O
+        { col: 3, row: 2 }, // SSO
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (4,2) (even row)', () => {
+    const neighbors = grid.getNeighbors({ col: 4, row: 2 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 2, row: 2 }, // W
+        { col: 2, row: 1 }, // NNW
+        { col: 5, row: 2 }, // NEE
+        { col: 4, row: 3 }, // SEE
+        { col: 3, row: 2 }, // SSE
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (5,2) (even row)', () => {
+    const neighbors = grid.getNeighbors({ col: 5, row: 2 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 5, row: 1 }, // NNE
+        { col: 3, row: 1 }, // NNW
+        { col: 4, row: 2 }, // SWW
+        { col: 6, row: 2 }, // SOO
+        { col: 4, row: 3 }, // S
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+
+
+
+
+
+  it('should return correct neighbors for cell (2,1) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 2, row: 1 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 3, row: 1 }, // NEE
+        { col: 1, row: 1 }, // NWW
+        { col: 2, row: 2 }, // SSW
+        { col: 4, row: 2 }, // SSO
+        { col: 3, row: 0 }, // N
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (3,1) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 3, row: 1 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 2, row: 1 }, // SWW 
+        { col: 3, row: 0 }, // NWW
+        { col: 4, row: 1 }, // NNO
+        { col: 5, row: 1 }, // O
+        { col: 5, row: 2 }, // SSO
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (5,1) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 5, row: 1 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 3, row: 1 }, // W
+        { col: 4, row: 1 }, // NNW
+        { col: 7, row: 0 }, // NEE
+        { col: 6, row: 1 }, // SEE
+        { col: 5, row: 2 }, // SSE
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+  it('should return correct neighbors for cell (4,1) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 4, row: 1 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 6, row: 0 }, // NEE
+        { col: 4, row: 0 }, // NWW
+        { col: 3, row: 1 }, // SSW
+        { col: 5, row: 1 }, // SSO
+        { col: 5, row: 0 }, // N
+      ])
+    );
+    expect(neighbors.length).toBe(5);
+  });
+
+
 });
