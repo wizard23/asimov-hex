@@ -357,5 +357,44 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
+  const shortEdgeSegment = (points: { x: number; y: number }[]) => {
+    let shortIndex = 0;
+    let shortLength = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      if (length < shortLength) {
+        shortLength = length;
+        shortIndex = i;
+      }
+    }
+    return {
+      a: points[shortIndex],
+      b: points[(shortIndex + 1) % points.length],
+    };
+  };
+
+  const pointsClose = (p1: { x: number; y: number }, p2: { x: number; y: number }) =>
+    Math.hypot(p1.x - p2.x, p1.y - p2.y) < 1e-6;
+
+  const segmentsCoincide = (s1: { a: { x: number; y: number }; b: { x: number; y: number } }, s2: { a: { x: number; y: number }; b: { x: number; y: number } }) =>
+    (pointsClose(s1.a, s2.a) && pointsClose(s1.b, s2.b)) ||
+    (pointsClose(s1.a, s2.b) && pointsClose(s1.b, s2.a));
+
+  it('should align short edges for expected adjacent cells', () => {
+    const pairs: Array<[{ col: number; row: number }, { col: number; row: number }]> = [
+      [{ col: 2, row: 0 }, { col: 4, row: 0 }],
+      [{ col: 3, row: 0 }, { col: 2, row: 1 }],
+      [{ col: 3, row: 1 }, { col: 5, row: 1 }],
+      [{ col: 5, row: 0 }, { col: 4, row: 1 }],
+    ];
+
+    pairs.forEach(([a, b]) => {
+      const segA = shortEdgeSegment(grid.getCellPolygon(a));
+      const segB = shortEdgeSegment(grid.getCellPolygon(b));
+      expect(segmentsCoincide(segA, segB)).toBe(true);
+    });
+  });
 
 });
