@@ -18,34 +18,64 @@ describe('SquareGrid', () => {
   });
 });
 
-describe('HexagonGrid (pointy-top, odd-q vertical)', () => {
+describe('HexagonGrid (pointy-top, odd-r)', () => {
   const grid = new HexagonGrid(10);
 
-  it('should return correct neighbors for an even column', () => {
-    const neighbors = grid.getNeighbors({ col: 2, row: 2 }); // Even column
+  it('should return correct neighbors for cell (1,1) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 1, row: 1 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
-        { col: 3, row: 2 },
-        { col: 2, row: 3 },
-        { col: 1, row: 3 },
-        { col: 1, row: 2 },
-        { col: 1, row: 1 },
-        { col: 2, row: 1 },
+        { col: 2, row: 1 }, // E
+        { col: 0, row: 1 }, // W
+        { col: 1, row: 0 }, // NW
+        { col: 1, row: 2 }, // SW
+        { col: 2, row: 0 }, // NE
+        { col: 2, row: 2 }, // SE
       ])
     );
     expect(neighbors.length).toBe(6);
   });
 
-  it('should return correct neighbors for an odd column', () => {
-    const neighbors = grid.getNeighbors({ col: 1, row: 2 }); // Odd column
+  it('should return correct neighbors for cell (1,2) (even row)', () => {
+    const neighbors = grid.getNeighbors({ col: 1, row: 2 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
-        { col: 2, row: 2 },
-        { col: 1, row: 3 },
-        { col: 0, row: 3 },
-        { col: 0, row: 2 },
-        { col: 0, row: 1 },
-        { col: 1, row: 1 },
+        { col: 2, row: 2 }, // E
+        { col: 0, row: 2 }, // W
+        { col: 1, row: 1 }, // N
+        { col: 1, row: 3 }, // S
+        { col: 0, row: 1 }, // NW
+        { col: 0, row: 3 }, // SW
+      ])
+    );
+    expect(neighbors.length).toBe(6);
+  });
+
+  it('should return correct neighbors for cell (1,3) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 1, row: 3 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 2, row: 3 }, // E
+        { col: 0, row: 3 }, // W
+        { col: 1, row: 2 }, // NW
+        { col: 1, row: 4 }, // SW
+        { col: 2, row: 2 }, // NE
+        { col: 2, row: 4 }, // SE
+      ])
+    );
+    expect(neighbors.length).toBe(6);
+  });
+
+  it('should return correct neighbors for cell (2,3) (odd row)', () => {
+    const neighbors = grid.getNeighbors({ col: 2, row: 3 });
+    expect(neighbors).toEqual(
+      expect.arrayContaining([
+        { col: 3, row: 3 }, // E
+        { col: 1, row: 3 }, // W
+        { col: 2, row: 2 }, // NW
+        { col: 2, row: 4 }, // SW
+        { col: 3, row: 2 }, // NE
+        { col: 3, row: 4 }, // SE
       ])
     );
     expect(neighbors.length).toBe(6);
@@ -60,9 +90,9 @@ describe('TriangleGrid', () => {
         const neighbors = grid.getNeighbors({ col: 0, row: 0 });
         expect(neighbors).toEqual(
             expect.arrayContaining([
-                { col: -1, row: 0 },
-                { col: 1, row: 0 },
-                { col: 0, row: 1 },
+                { col: -1, row: 0 }, // Left
+                { col: 1, row: 0 },  // Right
+                { col: 0, row: 1 },  // Bottom (forms a downward triangle with this cell)
             ])
         );
         expect(neighbors.length).toBe(3);
@@ -73,9 +103,9 @@ describe('TriangleGrid', () => {
         const neighbors = grid.getNeighbors({ col: 1, row: 0 });
         expect(neighbors).toEqual(
             expect.arrayContaining([
-                { col: 0, row: 0 },
-                { col: 2, row: 0 },
-                { col: 1, row: -1 },
+                { col: 0, row: 0 }, // Left
+                { col: 2, row: 0 }, // Right
+                { col: 1, row: -1 }, // Top (forms an upward triangle with this cell)
             ])
         );
         expect(neighbors.length).toBe(3);

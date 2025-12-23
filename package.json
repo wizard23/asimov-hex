@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
     "create-project-statistics": "tsx scripts/create-project-statistics.ts"
   },
   "devDependencies": {
