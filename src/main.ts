@@ -118,7 +118,8 @@ class GridApp {
         break;
       case 'cairo':
         this.grid = new CairoGrid({
-          scale: this.config.gridScale / Math.sqrt(10),
+          scale: this.config.gridScale,
+          pentagonType: 'catalan',
         });
         break;
     }

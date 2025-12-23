@@ -15,10 +15,7 @@ export interface Grid {
 
 export interface CairoGridOptions {
   scale: number;
-  baseWidth: number;
-  shoulderOffsetX: number;
-  shoulderOffsetY: number;
-  apexOffsetY: number;
+  pentagonType: 'catalan' | 'type4';
 }
 
 export class SquareGrid implements Grid {
@@ -638,48 +635,50 @@ export class TriangleGrid implements Grid {
 
 }
 
-const DEFAULT_CAIRO_OPTIONS: CairoGridOptions = {
-  scale: 1,
-  baseWidth: 4,
-  shoulderOffsetX: 1,
-  shoulderOffsetY: 3,
-  apexOffsetY: 1,
-};
-
 export class CairoGrid implements Grid {
   private readonly options: CairoGridOptions;
   private readonly basePoints: Point[];
-  private readonly step: number;
+  private readonly stepX: number;
+  private readonly stepY: number;
   private readonly tileBounds: { minX: number; maxX: number; minY: number; maxY: number };
 
   constructor(options?: Partial<CairoGridOptions>) {
     this.options = {
-      ...DEFAULT_CAIRO_OPTIONS,
-      ...(options ?? {}),
+      scale: 1,
+      pentagonType: 'catalan',
+      ...(options ?? {})
     };
 
-    const scale = this.options.scale;
-    const baseWidth = this.options.baseWidth * scale;
-    const shoulderOffsetX = this.options.shoulderOffsetX * scale;
-    const shoulderOffsetY = this.options.shoulderOffsetY * scale;
-    const apexOffsetY = this.options.apexOffsetY * scale;
-    const span = baseWidth + shoulderOffsetX * 2;
+    if (this.options.pentagonType === 'type4') {
+      throw new Error('CairoGrid pentagonType "type4" is not implemented yet.');
+    }
 
-    this.step = span;
-    this.basePoints = [
-      { x: 0, y: 0 },
-      { x: shoulderOffsetX, y: -shoulderOffsetY },
-      { x: shoulderOffsetX + baseWidth, y: -shoulderOffsetY },
-      { x: span, y: 0 },
-      { x: span / 2, y: apexOffsetY },
+    const scale = this.options.scale;
+    const halfRoot3 = Math.sqrt(3) / 2;
+    const shortHalf = (Math.sqrt(3) - 1) / 2;
+
+    const rawPoints = [
+      { x: halfRoot3 * scale, y: halfRoot3 * scale },
+      { x: 0, y: (halfRoot3 + 0.5) * scale },
+      { x: -halfRoot3 * scale, y: halfRoot3 * scale },
+      { x: -shortHalf * scale, y: 0 },
+      { x: shortHalf * scale, y: 0 },
     ];
+
+    const centroid = rawPoints.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    centroid.x /= rawPoints.length;
+    centroid.y /= rawPoints.length;
+
+    this.basePoints = rawPoints.map(p => ({ x: p.x - centroid.x, y: p.y - centroid.y }));
+    this.stepX = Math.sqrt(3) * scale;
+    this.stepY = 1.5 * scale;
 
     this.tileBounds = this.computeTileBounds();
   }
 
   getGridBounds(cols: number, rows: number): { width: number; height: number; minX: number; minY: number } {
-    const spanX = Math.max(0, cols - 1) * this.step;
-    const spanY = Math.max(0, rows - 1) * this.step;
+    const spanX = Math.max(0, cols - 1) * this.stepX;
+    const spanY = Math.max(0, rows - 1) * this.stepY;
     const minX = this.tileBounds.minX;
     const minY = this.tileBounds.minY;
     const maxX = spanX + this.tileBounds.maxX;
@@ -694,8 +693,8 @@ export class CairoGrid implements Grid {
   }
 
   pixelToCell(pixel: Point): { col: number; row: number } | null {
-    const approxCol = Math.floor(pixel.x / this.step);
-    const approxRow = Math.floor(pixel.y / this.step);
+    const approxCol = Math.floor(pixel.x / this.stepX);
+    const approxRow = Math.floor(pixel.y / this.stepY);
 
     for (let r = approxRow - 2; r <= approxRow + 2; r++) {
       for (let c = approxCol - 2; c <= approxCol + 2; c++) {
@@ -716,26 +715,11 @@ export class CairoGrid implements Grid {
   }
 
   getNeighbors(cell: { col: number; row: number }): { col: number; row: number }[] {
-    const neighbors: { col: number; row: number }[] = [];
-    const edges = this.getCellEdges(cell);
-    const seen = new Set<string>();
-
-    for (let dr = -2; dr <= 2; dr++) {
-      for (let dc = -2; dc <= 2; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const candidate = { col: cell.col + dc, row: cell.row + dr };
-        const key = `${candidate.col},${candidate.row}`;
-        if (seen.has(key)) continue;
-
-        const candidateEdges = this.getCellEdges(candidate);
-        if (this.shareEdge(edges, candidateEdges)) {
-          neighbors.push(candidate);
-          seen.add(key);
-        }
-      }
-    }
-
-    return neighbors;
+    const offsets = this.getNeighborOffsets(cell);
+    return offsets.map(offset => ({
+      col: cell.col + offset.dc,
+      row: cell.row + offset.dr,
+    }));
   }
 
   getCellPolygon(cell: { col: number; row: number }): Point[] {
@@ -756,8 +740,8 @@ export class CairoGrid implements Grid {
   getEdgeAt(pixel: Point, threshold: number, gridWidth: number, gridHeight: number): EdgeInfo | null {
     let minDist = Infinity;
     let closestEdge: EdgeInfo | null = null;
-    const approxCol = Math.floor(pixel.x / this.step);
-    const approxRow = Math.floor(pixel.y / this.step);
+    const approxCol = Math.floor(pixel.x / this.stepX);
+    const approxRow = Math.floor(pixel.y / this.stepY);
 
     for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
       for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
@@ -778,8 +762,8 @@ export class CairoGrid implements Grid {
   getVertexAt(pixel: Point, threshold: number, gridWidth: number, gridHeight: number): Point | null {
     let minDistSq = Infinity;
     let closestVertex: Point | null = null;
-    const approxCol = Math.floor(pixel.x / this.step);
-    const approxRow = Math.floor(pixel.y / this.step);
+    const approxCol = Math.floor(pixel.x / this.stepX);
+    const approxRow = Math.floor(pixel.y / this.stepY);
 
     for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
       for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
@@ -800,8 +784,8 @@ export class CairoGrid implements Grid {
   getEdgesAtVertex(vertex: Point, gridWidth: number, gridHeight: number): EdgeInfo[] {
     const edges: EdgeInfo[] = [];
     const epsilon = 0.1;
-    const approxCol = Math.floor(vertex.x / this.step);
-    const approxRow = Math.floor(vertex.y / this.step);
+    const approxCol = Math.floor(vertex.x / this.stepX);
+    const approxRow = Math.floor(vertex.y / this.stepY);
 
     for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
       for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
@@ -818,17 +802,133 @@ export class CairoGrid implements Grid {
   }
 
   private getAnchor(cell: { col: number; row: number }): Point {
-    return { x: cell.col * this.step, y: cell.row * this.step };
+    const offsetX = (cell.row & 1) ? this.stepX * 0.5 : 0;
+    return { x: cell.col * this.stepX + offsetX, y: cell.row * this.stepY };
+  }
+
+  private getOrientation(cell: { col: number; row: number }): 'N' | 'E' | 'S' | 'W' {
+    const mod = ((cell.col % 4) + 4) % 4;
+    const rowOdd = cell.row & 1;
+
+    if (!rowOdd) {
+      switch (mod) {
+        case 0:
+          return 'W';
+        case 1:
+          return 'S';
+        case 2:
+          return 'E';
+        case 3:
+        default:
+          return 'S';
+      }
+    }
+
+    switch (mod) {
+      case 0:
+        return 'N';
+      case 1:
+        return 'W';
+      case 2:
+        return 'N';
+      case 3:
+      default:
+        return 'E';
+    }
+  }
+
+  private getNeighborOffsets(cell: { col: number; row: number }): Array<{ dc: number; dr: number }> {
+    const mod = ((cell.col % 4) + 4) % 4;
+    const rowOdd = cell.row & 1;
+
+    if (!rowOdd) {
+      switch (mod) {
+        case 0:
+          return [
+            { dc: -2, dr: 0 },
+            { dc: -2, dr: -1 },
+            { dc: 1, dr: 0 },
+            { dc: 0, dr: 1 },
+            { dc: -1, dr: 0 },
+          ];
+        case 1:
+          return [
+            { dc: 0, dr: -1 },
+            { dc: -2, dr: -1 },
+            { dc: -1, dr: 0 },
+            { dc: 1, dr: 0 },
+            { dc: -1, dr: 1 },
+          ];
+        case 2:
+          return [
+            { dc: -2, dr: 1 },
+            { dc: -1, dr: 0 },
+            { dc: 0, dr: -1 },
+            { dc: 2, dr: 0 },
+            { dc: 1, dr: 0 },
+          ];
+        case 3:
+        default:
+          return [
+            { dc: -1, dr: 0 },
+            { dc: 1, dr: 0 },
+            { dc: -2, dr: 1 },
+            { dc: 0, dr: 1 },
+            { dc: -1, dr: 1 },
+          ];
+      }
+    }
+
+    switch (mod) {
+      case 0:
+        return [
+          { dc: 2, dr: -1 },
+          { dc: 0, dr: -1 },
+          { dc: -1, dr: 0 },
+          { dc: 1, dr: 0 },
+          { dc: 1, dr: -1 },
+        ];
+      case 1:
+        return [
+          { dc: -2, dr: 0 },
+          { dc: -1, dr: 0 },
+          { dc: 2, dr: -1 },
+          { dc: 1, dr: 0 },
+          { dc: 0, dr: 1 },
+        ];
+      case 2:
+        return [
+          { dc: 1, dr: 0 },
+          { dc: -1, dr: 0 },
+          { dc: 0, dr: 1 },
+          { dc: 2, dr: 1 },
+          { dc: 1, dr: -1 },
+        ];
+      case 3:
+      default:
+        return [
+          { dc: -1, dr: 0 },
+          { dc: 0, dr: -1 },
+          { dc: 1, dr: 0 },
+          { dc: 2, dr: 0 },
+          { dc: 2, dr: 1 },
+        ];
+    }
   }
 
   private getRotation(cell: { col: number; row: number }): number {
-    const colOdd = cell.col & 1;
-    const rowOdd = cell.row & 1;
-
-    if (!rowOdd && !colOdd) return 0;
-    if (!rowOdd && colOdd) return 180;
-    if (rowOdd && !colOdd) return 90;
-    return 270;
+    const orientation = this.getOrientation(cell);
+    switch (orientation) {
+      case 'N':
+        return 180;
+      case 'E':
+        return 270;
+      case 'W':
+        return 90;
+      case 'S':
+      default:
+        return 0;
+    }
   }
 
   private rotatePoint(point: Point, rotation: number): Point {
