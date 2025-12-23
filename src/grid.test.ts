@@ -195,7 +195,7 @@ describe('CairoGrid (catalan)', () => {
 
 
 
-  it('should return correct neighbors for cell (3,0) (even row)', () => {
+  it('should return correct neighbors for cell (3,0) (even row, short edge points S)', () => {
     const neighbors = grid.getNeighbors({ col: 3, row: 0 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -209,7 +209,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (2,2) (even row)', () => {
+  it('should return correct neighbors for cell (2,2) (even row, short edge points E)', () => {
     const neighbors = grid.getNeighbors({ col: 2, row: 2 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -223,7 +223,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (4,2) (even row)', () => {
+  it('should return correct neighbors for cell (4,2) (even row, short edge points W)', () => {
     const neighbors = grid.getNeighbors({ col: 4, row: 2 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -237,7 +237,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (5,2) (even row)', () => {
+  it('should return correct neighbors for cell (5,2) (even row, short edge points S)', () => {
     const neighbors = grid.getNeighbors({ col: 5, row: 2 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -256,7 +256,7 @@ describe('CairoGrid (catalan)', () => {
 
 
 
-  it('should return correct neighbors for cell (2,1) (odd row)', () => {
+  it('should return correct neighbors for cell (2,1) (odd row, short edge points N)', () => {
     const neighbors = grid.getNeighbors({ col: 2, row: 1 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -270,7 +270,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (3,1) (odd row)', () => {
+  it('should return correct neighbors for cell (3,1) (odd row, short edge points E)', () => {
     const neighbors = grid.getNeighbors({ col: 3, row: 1 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -284,7 +284,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (5,1) (odd row)', () => {
+  it('should return correct neighbors for cell (5,1) (odd row, , short edge points W)', () => {
     const neighbors = grid.getNeighbors({ col: 5, row: 1 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
@@ -298,7 +298,7 @@ describe('CairoGrid (catalan)', () => {
     expect(neighbors.length).toBe(5);
   });
 
-  it('should return correct neighbors for cell (4,1) (odd row)', () => {
+  it('should return correct neighbors for cell (4,1) (odd row, short edge points N)', () => {
     const neighbors = grid.getNeighbors({ col: 4, row: 1 });
     expect(neighbors).toEqual(
       expect.arrayContaining([
