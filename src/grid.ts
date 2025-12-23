@@ -640,7 +640,10 @@ export class CairoGrid implements Grid {
   private readonly basePoints: Point[];
   private readonly stepX: number;
   private readonly stepY: number;
-  private readonly rowOffsetX: number;
+  private readonly blockStep: Point;
+  private readonly rowStep: Point;
+  private readonly evenOffsets: Point[];
+  private readonly oddOffsets: Point[];
   private readonly tileBounds: { minX: number; maxX: number; minY: number; maxY: number };
 
   constructor(options?: Partial<CairoGridOptions>) {
@@ -672,20 +675,47 @@ export class CairoGrid implements Grid {
 
     this.basePoints = rawPoints.map(p => ({ x: p.x - centroid.x, y: p.y - centroid.y }));
     const shortMid = this.getShortEdgeMidpoint(this.basePoints);
-    this.stepX = Math.abs(shortMid.y);
-    this.stepY = this.stepX * 2;
-    this.rowOffsetX = this.stepX;
+    const shortOffset = Math.abs(shortMid.y);
+    const sqrt3 = Math.sqrt(3) * scale;
+
+    this.blockStep = { x: sqrt3 * 2, y: 0 };
+    this.rowStep = { x: 0, y: sqrt3 * 2 };
+
+    this.evenOffsets = [
+      { x: 0, y: 0 },
+      { x: sqrt3 - shortOffset, y: -shortOffset },
+      { x: (sqrt3 - shortOffset) * 2, y: 0 },
+      { x: sqrt3 * 2 - shortOffset, y: sqrt3 - shortOffset },
+    ];
+
+    this.oddOffsets = [
+      { x: sqrt3 - shortOffset, y: shortOffset },
+      { x: sqrt3, y: sqrt3 },
+      { x: sqrt3 * 2 - shortOffset, y: sqrt3 + shortOffset },
+      { x: sqrt3 * 3 - shortOffset * 2, y: sqrt3 },
+    ];
+
+    this.stepX = this.blockStep.x / 4;
+    this.stepY = this.rowStep.y / 2;
 
     this.tileBounds = this.computeTileBounds();
   }
 
   getGridBounds(cols: number, rows: number): { width: number; height: number; minX: number; minY: number } {
-    const spanX = Math.max(0, cols - 1) * this.stepX;
-    const spanY = Math.max(0, rows - 1) * this.stepY;
-    const minX = this.tileBounds.minX;
-    const minY = this.tileBounds.minY;
-    const maxX = spanX + this.tileBounds.maxX;
-    const maxY = spanY + this.tileBounds.maxY;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const anchor = this.getAnchor({ col: c, row: r });
+        minX = Math.min(minX, anchor.x + this.tileBounds.minX);
+        maxX = Math.max(maxX, anchor.x + this.tileBounds.maxX);
+        minY = Math.min(minY, anchor.y + this.tileBounds.minY);
+        maxY = Math.max(maxY, anchor.y + this.tileBounds.maxY);
+      }
+    }
 
     return {
       width: maxX - minX,
@@ -699,8 +729,8 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(pixel.x / this.stepX);
     const approxRow = Math.floor(pixel.y / this.stepY);
 
-    for (let r = approxRow - 2; r <= approxRow + 2; r++) {
-      for (let c = approxCol - 2; c <= approxCol + 2; c++) {
+    for (let r = approxRow - 4; r <= approxRow + 4; r++) {
+      for (let c = approxCol - 4; c <= approxCol + 4; c++) {
         const poly = this.getCellPolygon({ col: c, row: r });
         if (this.pointInPolygon(pixel, poly)) {
           return { col: c, row: r };
@@ -746,8 +776,8 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(pixel.x / this.stepX);
     const approxRow = Math.floor(pixel.y / this.stepY);
 
-    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
-      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+    for (let r = Math.max(0, approxRow - 4); r <= Math.min(gridHeight - 1, approxRow + 4); r++) {
+      for (let c = Math.max(0, approxCol - 4); c <= Math.min(gridWidth - 1, approxCol + 4); c++) {
         const edges = this.getCellEdges({ col: c, row: r });
         for (const edge of edges) {
           const dist = this.distanceToLineSegment(pixel, edge.points[0], edge.points[1]);
@@ -768,8 +798,8 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(pixel.x / this.stepX);
     const approxRow = Math.floor(pixel.y / this.stepY);
 
-    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
-      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+    for (let r = Math.max(0, approxRow - 4); r <= Math.min(gridHeight - 1, approxRow + 4); r++) {
+      for (let c = Math.max(0, approxCol - 4); c <= Math.min(gridWidth - 1, approxCol + 4); c++) {
         const poly = this.getCellPolygon({ col: c, row: r });
         for (const v of poly) {
           const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
@@ -790,8 +820,8 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(vertex.x / this.stepX);
     const approxRow = Math.floor(vertex.y / this.stepY);
 
-    for (let r = Math.max(0, approxRow - 2); r <= Math.min(gridHeight - 1, approxRow + 2); r++) {
-      for (let c = Math.max(0, approxCol - 2); c <= Math.min(gridWidth - 1, approxCol + 2); c++) {
+    for (let r = Math.max(0, approxRow - 4); r <= Math.min(gridHeight - 1, approxRow + 4); r++) {
+      for (let c = Math.max(0, approxCol - 4); c <= Math.min(gridWidth - 1, approxCol + 4); c++) {
         const cellEdges = this.getCellEdges({ col: c, row: r });
         for (const edge of cellEdges) {
           if (this.pointsEqual(vertex, edge.points[0], epsilon) || this.pointsEqual(vertex, edge.points[1], epsilon)) {
@@ -805,8 +835,16 @@ export class CairoGrid implements Grid {
   }
 
   private getAnchor(cell: { col: number; row: number }): Point {
-    const offsetX = (cell.row & 1) ? this.rowOffsetX : 0;
-    return { x: cell.col * this.stepX + offsetX, y: cell.row * this.stepY };
+    const mod = ((cell.col % 4) + 4) % 4;
+    const rowOdd = (cell.row & 1) !== 0;
+    const colBlock = Math.floor(cell.col / 4);
+    const rowBlock = Math.floor(cell.row / 2);
+    const offsets = rowOdd ? this.oddOffsets : this.evenOffsets;
+    const base = offsets[mod];
+    return {
+      x: base.x + colBlock * this.blockStep.x + rowBlock * this.rowStep.x,
+      y: base.y + colBlock * this.blockStep.y + rowBlock * this.rowStep.y,
+    };
   }
 
   private getOrientation(cell: { col: number; row: number }): 'N' | 'E' | 'S' | 'W' {

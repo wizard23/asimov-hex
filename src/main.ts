@@ -77,7 +77,7 @@ class GridApp {
     this.config = {
       gridWidth: 25,
       gridHeight: 18,
-      gridType: 'hexagons',
+      gridType: 'cairo',
       gridScale: 30,
       numStates: 8,
       drawState: 7,
