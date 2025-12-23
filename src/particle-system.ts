@@ -76,7 +76,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number): void {
+  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number, cellStates: number[][]): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -102,10 +102,10 @@ export class ParticleSystem {
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY);
+        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY);
+        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -129,7 +129,8 @@ export class ParticleSystem {
     gridHeight: number,
     edgeSelectionRule: EdgeSelectionRule,
     mouseX: number,
-    mouseY: number
+    mouseY: number,
+    cellStates: number[][]
   ): void {
     // Find all edges connected to this vertex
     const connectedEdges = grid.getEdgesAtVertex(vertex, gridWidth, gridHeight);
@@ -143,7 +144,7 @@ export class ParticleSystem {
     let availableEdges: EdgeInfo[];
     let nextEdge: EdgeInfo;
     
-    if (edgeSelectionRule === 'randomNoBacktrack') {
+    if (edgeSelectionRule === 'randomNoBacktrack' || edgeSelectionRule === 'highestEdgeDelta') {
       // Filter out the edge we're currently on (the one we just arrived from)
       availableEdges = connectedEdges.filter(edge => {
         if (!particle.currentEdge) return true;
@@ -155,8 +156,8 @@ export class ParticleSystem {
         
         // Check if edges are the same (same two points, regardless of order)
         const sameEdge = (
-          (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
-          (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
+          (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
+          (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
         );
         
         return !sameEdge;
@@ -167,8 +168,31 @@ export class ParticleSystem {
         return;
       }
       
-      // Choose random edge
-      nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
+      if (edgeSelectionRule === 'highestEdgeDelta') {
+        // Find edges with highest delta
+        let maxDelta = -1;
+        let bestEdges: EdgeInfo[] = [];
+        
+        for (const edge of availableEdges) {
+          const delta = this.getEdgeDelta(edge, grid, cellStates, gridWidth, gridHeight);
+          if (delta > maxDelta) {
+            maxDelta = delta;
+            bestEdges = [edge];
+          } else if (delta === maxDelta) {
+            bestEdges.push(edge);
+          }
+        }
+        
+        if (bestEdges.length > 0) {
+          nextEdge = bestEdges[Math.floor(Math.random() * bestEdges.length)];
+        } else {
+          // Should not happen if availableEdges > 0
+          nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
+        }
+      } else {
+        // Choose random edge
+        nextEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)];
+      }
     } else if (edgeSelectionRule === 'randomWithBacktrack') {
       // Allow all edges including the one we came from
       if (connectedEdges.length === 0) {
@@ -216,8 +240,8 @@ export class ParticleSystem {
         const edgeP2 = edge.points[1];
         
         const sameEdge = (
-          (this.pointsEqual(currentP1, edgeP1) && this.pointsEqual(currentP2, edgeP2)) ||
-          (this.pointsEqual(currentP1, edgeP2) && this.pointsEqual(currentP2, edgeP1))
+          (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
+          (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
         );
         
         return !sameEdge;
@@ -253,7 +277,7 @@ export class ParticleSystem {
     // Determine direction on new edge
     // We're at a vertex, so we need to move away from it along the new edge
     const nextP1 = nextEdge.points[0];
-    const vertexIsP1 = this.pointsEqual(vertex, nextP1);
+    const vertexIsP1 = this.pointsClose(vertex, nextP1);
     
     particle.previousEdge = particle.currentEdge;
     particle.currentEdge = nextEdge;
@@ -279,10 +303,52 @@ export class ParticleSystem {
     }
   }
 
-  private pointsEqual(p1: Point, p2: Point): boolean {
-    const epsilon = 0.01; // Increased epsilon for better floating point comparison
+  private pointsClose(p1: Point, p2: Point): boolean {
+    const epsilon = 0.1;
     return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
   }
+
+  private getEdgeDelta(edge: EdgeInfo, grid: Grid, cellStates: number[][], gridWidth: number, gridHeight: number): number {
+    const p1 = edge.points[0];
+    const p2 = edge.points[1];
+    
+    // Midpoint
+    const midX = (p1.x + p2.x) / 2;
+    const midY = (p1.y + p2.y) / 2;
+    
+    // Vector
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    
+    // Normal vector (normalized)
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length === 0) return 0;
+    
+    const nx = -dy / length;
+    const ny = dx / length;
+    
+    // Sample points on both sides
+    const epsilon = 2; // Small offset
+    const sample1 = { x: midX + nx * epsilon, y: midY + ny * epsilon };
+    const sample2 = { x: midX - nx * epsilon, y: midY - ny * epsilon };
+    
+    const cell1 = grid.pixelToCell(sample1);
+    const cell2 = grid.pixelToCell(sample2);
+    
+    let state1 = 0;
+    let state2 = 0;
+    
+    if (cell1 && cell1.col >= 0 && cell1.col < gridWidth && cell1.row >= 0 && cell1.row < gridHeight) {
+      state1 = cellStates[cell1.row][cell1.col];
+    }
+    
+    if (cell2 && cell2.col >= 0 && cell2.col < gridWidth && cell2.row >= 0 && cell2.row < gridHeight) {
+      state2 = cellStates[cell2.row][cell2.col];
+    }
+    
+    return Math.abs(state1 - state2);
+  }
+
 
   private findTurnEdge(
     currentEdge: EdgeInfo,

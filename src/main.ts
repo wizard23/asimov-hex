@@ -1,7 +1,7 @@
 import { Application, Graphics, Container } from 'pixi.js';
 import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
-import { GridType } from './types';
+import { GridType, EdgeSelectionRule } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 import palettesData from './assets/palettes.json';
 import { ParticleSystem } from './particle-system';
@@ -15,7 +15,6 @@ interface PaletteData {
 }
 
 type LeftClickMode = 'draw' | 'spawnParticle';
-type EdgeSelectionRule = 'randomNoBacktrack' | 'randomWithBacktrack' | 'clockwise' | 'counterClockwise' | 'followCursor' | 'avoidCursor';
 
 interface AppConfig {
   gridWidth: number;
@@ -257,7 +256,8 @@ class GridApp {
         this.grid, // Pass grid instance
         this.config.edgeSelectionRule,
         this.mouseX,
-        this.mouseY
+        this.mouseY,
+        this.cellStates
       );
     });
 
@@ -412,6 +412,7 @@ class GridApp {
         'Always Turn Counter-Clockwise': 'counterClockwise',
         'Follow Cursor': 'followCursor',
         'Avoid Cursor': 'avoidCursor',
+        'Highest Edge Delta': 'highestEdgeDelta',
       },
       label: 'Edge Selection Rule',
     });

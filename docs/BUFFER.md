@@ -60,3 +60,9 @@ Please use this flag to modify how edges are drawn:
 * When it is false: edges are rendered like now. 
 * When it iss true: For the edge the absolute difference between the states of the two adjacent cells is calculated and this absolute difference is used to lookup the color of the edge in the edgePalette.
 
+
+
+implement a new edgeSelectionRule named highestEdgeDelte in src/particle-system.ts that works like this:
+* the particle chooses one of the edges with the highest "edge delta" (the absolute difference between the cells sharing the edge)
+* the particle never backtracks (the edge it arrived at is excluded from the candidates of edges it chooses from)
+
