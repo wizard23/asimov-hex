@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SquareGrid, HexagonGrid, TriangleGrid } from './grid';
+import { SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './grid';
 
 describe('SquareGrid', () => {
   const grid = new SquareGrid(10);
@@ -110,4 +110,84 @@ describe('TriangleGrid', () => {
         );
         expect(neighbors.length).toBe(3);
     });
+});
+
+describe('CairoGrid (catalan)', () => {
+  const scale = 10;
+  const grid = new CairoGrid({ scale, pentagonType: 'catalan' });
+
+  const edgeLengths = (points: { x: number; y: number }[]) => {
+    const lengths: number[] = [];
+    for (let i = 0; i < points.length; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % points.length];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      lengths.push(Math.hypot(dx, dy));
+    }
+    return lengths;
+  };
+
+  const interiorAngles = (points: { x: number; y: number }[]) => {
+    const angles: number[] = [];
+    for (let i = 0; i < points.length; i++) {
+      const prev = points[(i - 1 + points.length) % points.length];
+      const curr = points[i];
+      const next = points[(i + 1) % points.length];
+      const v1x = prev.x - curr.x;
+      const v1y = prev.y - curr.y;
+      const v2x = next.x - curr.x;
+      const v2y = next.y - curr.y;
+      const dot = v1x * v2x + v1y * v2y;
+      const mag1 = Math.hypot(v1x, v1y);
+      const mag2 = Math.hypot(v2x, v2y);
+      const cos = Math.max(-1, Math.min(1, dot / (mag1 * mag2)));
+      const angle = Math.acos(cos) * (180 / Math.PI);
+      angles.push(angle);
+    }
+    return angles;
+  };
+
+  it('should have four long edges and one short edge with expected lengths', () => {
+    const poly = grid.getCellPolygon({ col: 0, row: 0 });
+    expect(poly.length).toBe(5);
+
+    const lengths = edgeLengths(poly).sort((a, b) => a - b);
+    const shortEdge = lengths[0];
+    const longEdges = lengths.slice(1);
+
+    const expectedShort = scale * (Math.sqrt(3) - 1);
+    const expectedLong = scale;
+
+    expect(shortEdge).toBeCloseTo(expectedShort, 4);
+    longEdges.forEach(length => {
+      expect(length).toBeCloseTo(expectedLong, 4);
+    });
+  });
+
+  it('should have interior angles of 120°, 120°, 90°, 120°, 90°', () => {
+    const poly = grid.getCellPolygon({ col: 0, row: 0 });
+    const angles = interiorAngles(poly);
+
+    const closeTo = (value: number, target: number) => Math.abs(value - target) < 0.5;
+    const counts = angles.reduce(
+      (acc, angle) => {
+        if (closeTo(angle, 120)) acc.count120 += 1;
+        if (closeTo(angle, 90)) acc.count90 += 1;
+        return acc;
+      },
+      { count120: 0, count90: 0 }
+    );
+
+    expect(counts.count120).toBe(3);
+    expect(counts.count90).toBe(2);
+  });
+
+  it('should return five neighbors for a typical cell', () => {
+    const neighbors = grid.getNeighbors({ col: 1, row: 1 });
+    expect(neighbors.length).toBe(5);
+
+    const unique = new Set(neighbors.map(n => `${n.col},${n.row}`));
+    expect(unique.size).toBe(5);
+  });
 });
