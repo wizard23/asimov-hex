@@ -1,5 +1,5 @@
 import { Pane } from 'tweakpane';
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application, Container, Graphics, Text } from 'pixi.js';
 
 type Point = { x: number; y: number };
 
@@ -44,6 +44,7 @@ class TileEditor {
   // Pixi
   private app!: Application;
   private polygonContainer!: Container;
+  private labelContainer!: Container;
   private previewGraphics!: Graphics;
   private polygons: PolygonData[] = [];
   private selectedPolygon: PolygonData | null = null;
@@ -118,9 +119,15 @@ class TileEditor {
     }, { passive: false });
 
     this.polygonContainer = new Container();
+    this.polygonContainer.sortableChildren = true;
     this.app.stage.addChild(this.polygonContainer);
 
+    this.labelContainer = new Container();
+    this.labelContainer.zIndex = 2;
+    this.polygonContainer.addChild(this.labelContainer);
+
     this.previewGraphics = new Graphics();
+    this.previewGraphics.zIndex = 1;
     this.polygonContainer.addChild(this.previewGraphics);
     this.updateScale();
     this.updateViewportCenter();
@@ -371,6 +378,8 @@ class TileEditor {
       if (clickedPoly) {
           this.selectedPolygon = clickedPoly;
           this.buildEditPane(clickedPoly);
+          this.updateSelectedLabels();
+          this.redrawPolygons();
           this.draggedPolygon = clickedPoly;
           this.dragOffset = {
               x: clickedPoly.x - worldPos.x,
@@ -379,6 +388,8 @@ class TileEditor {
       } else {
           this.selectedPolygon = null;
           this.buildEditPane(null);
+          this.updateSelectedLabels();
+          this.redrawPolygons();
           this.isViewDragging = true;
           this.viewDragStart = { x: e.global.x, y: e.global.y };
           this.viewOffsetStart = { ...this.config.viewOffset };
@@ -391,6 +402,9 @@ class TileEditor {
           this.draggedPolygon.x = worldPos.x + this.dragOffset.x;
           this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
           this.drawPolygonInstance(this.draggedPolygon);
+          if (this.selectedPolygon === this.draggedPolygon) {
+            this.updateSelectedLabels();
+          }
       } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
           const deltaY = (e.global.y - this.viewDragStart.y) / this.config.scale;
@@ -415,7 +429,9 @@ class TileEditor {
 
   private createPolygon(x: number, y: number, sides: number, sideLength: number) {
       const g = new Graphics();
+      g.zIndex = 0;
       this.polygonContainer.addChild(g);
+      this.polygonContainer.addChild(this.labelContainer);
       const sideLengthExpressions = Array(sides).fill(this.config.sideLengthExpression);
       const interiorAngleExpressions = Array(sides).fill(this.defaultInteriorAngleExpression(sides));
       const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, true);
@@ -444,9 +460,10 @@ class TileEditor {
   }
 
   private drawPolygonInstance(poly: PolygonData) {
+      const isSelected = this.selectedPolygon === poly;
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
       const alpha = poly.isClosed ? 0.8 : 0;
-      const strokeColor = poly.isHovered ? 0xffd24d : (poly.isClosed ? 0xffffff : 0xff4d4d);
+      const strokeColor = (poly.isHovered || isSelected) ? 0xffd24d : (poly.isClosed ? 0xffffff : 0xff4d4d);
       
       this.drawPolygonPath(
           poly.graphics,
@@ -457,6 +474,16 @@ class TileEditor {
           strokeColor,
           this.getStrokeWidth()
       );
+
+      if (!poly.isClosed) {
+          this.drawDottedConnection(
+              poly.graphics,
+              { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
+              { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
+              strokeColor,
+              this.getStrokeWidth()
+          );
+      }
   }
 
   private redrawPolygons() {
@@ -468,11 +495,7 @@ class TileEditor {
       for (let i = this.polygons.length - 1; i >= 0; i--) {
           const p = this.polygons[i];
           const worldPoints = this.translatePoints(p.points, { x: p.x, y: p.y });
-          if (p.isClosed) {
-              if (this.pointInPolygon({ x, y }, worldPoints) || this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance())) {
-                  return p;
-              }
-          } else if (this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance())) {
+          if (this.pointInPolygon({ x, y }, worldPoints) || this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance(), true)) {
               return p;
           }
       }
@@ -529,6 +552,25 @@ class TileEditor {
       g.stroke({ color: strokeColor, width: strokeWidth });
   }
 
+  private drawDottedConnection(g: Graphics, start: Point, end: Point, color: number, width: number) {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      const length = Math.hypot(dx, dy);
+      if (length === 0) return;
+      const dashLength = Math.max(width * 2, 4 / this.config.scale);
+      const gapLength = dashLength;
+      const step = dashLength + gapLength;
+      const ux = dx / length;
+      const uy = dy / length;
+      for (let dist = 0; dist < length; dist += step) {
+          const segmentStart = dist;
+          const segmentEnd = Math.min(dist + dashLength, length);
+          g.moveTo(start.x + ux * segmentStart, start.y + uy * segmentStart);
+          g.lineTo(start.x + ux * segmentEnd, start.y + uy * segmentEnd);
+      }
+      g.stroke({ color, width });
+  }
+
   private translatePoints(points: Point[], offset: Point): Point[] {
       return points.map(p => ({ x: p.x + offset.x, y: p.y + offset.y }));
   }
@@ -547,10 +589,17 @@ class TileEditor {
       return inside;
   }
 
-  private pointNearPolyline(point: Point, polyline: Point[], threshold: number): boolean {
+  private pointNearPolyline(point: Point, polyline: Point[], threshold: number, closePath: boolean): boolean {
       for (let i = 0; i < polyline.length - 1; i++) {
           const a = polyline[i];
           const b = polyline[i + 1];
+          if (this.distanceToSegment(point, a, b) <= threshold) {
+              return true;
+          }
+      }
+      if (closePath && polyline.length > 1) {
+          const a = polyline[polyline.length - 1];
+          const b = polyline[0];
           if (this.distanceToSegment(point, a, b) <= threshold) {
               return true;
           }
@@ -616,6 +665,7 @@ class TileEditor {
         view: 'text',
         label: 'Hint',
         value: "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it.",
+        parse: (value) => String(value),
       });
       return;
     }
@@ -671,6 +721,9 @@ class TileEditor {
     poly.points = evaluated.points;
     poly.isClosed = evaluated.isClosed;
     this.drawPolygonInstance(poly);
+    if (this.selectedPolygon === poly) {
+      this.updateSelectedLabels();
+    }
     return true;
   }
 
@@ -696,6 +749,27 @@ class TileEditor {
     if (token === 'd' || token === 'deg' || token === 'degree' || token === 'degrees') return 'deg';
     if (token === 'r' || token === 'rad' || token === 'radian' || token === 'radians') return 'rad';
     throw new Error(`Unknown angle unit: ${token}`);
+  }
+
+  private updateSelectedLabels() {
+    if (!this.labelContainer) return;
+    this.labelContainer.removeChildren().forEach(child => child.destroy());
+
+    if (!this.selectedPolygon) return;
+    const labels = this.buildVertexLabels(this.selectedPolygon.sides);
+    const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
+    points.forEach((point, index) => {
+      const label = new Text({
+        text: `${labels[index]}`,
+        style: {
+          fill: 0xffd24d,
+          fontSize: 12,
+        },
+      });
+      label.x = this.selectedPolygon!.x + point.x + 4 / this.config.scale;
+      label.y = this.selectedPolygon!.y + point.y + 4 / this.config.scale;
+      this.labelContainer.addChild(label);
+    });
   }
 }
 
