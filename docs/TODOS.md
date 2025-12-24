@@ -92,5 +92,15 @@ Please look at the src/tile-editor.ts , tile-editor.html and vite.config.ts and 
 
 
 
+The scaling is good now but please fix the following things:
+* the edges of the polygon should be drawn with a new parameter called "Edge Width"
+* the scaling should always be relative to the center of the "Tile Unit Cell Editor"
+
+
+Implement these changes:
+* use scroll wheel inputs to modify scaling
+* The "Edge Width" should not be subject to the scaling but should be used as is for the edges of the polygons
+
+
 
 

@@ -7,6 +7,7 @@ interface EditorConfig {
   scale: number;
   numSides: number;
   sideLengthExpression: string;
+  edgeWidth: number;
   tool: Tool;
 }
 
@@ -26,6 +27,7 @@ class TileEditor {
     scale: 100,
     numSides: 4,
     sideLengthExpression: '1',
+    edgeWidth: 2,
     tool: 'Create Polygon',
   };
   private displayContainer: HTMLElement;
@@ -81,6 +83,7 @@ class TileEditor {
     // Add ResizeObserver to handle container size changes robustly
     const resizeObserver = new ResizeObserver(() => {
       this.app.resize();
+      this.updateViewportCenter();
     });
     resizeObserver.observe(container);
     
@@ -92,6 +95,7 @@ class TileEditor {
     this.previewGraphics = new Graphics();
     this.polygonContainer.addChild(this.previewGraphics);
     this.updateScale();
+    this.updateViewportCenter();
 
     // Events
     this.app.stage.eventMode = 'static';
@@ -150,6 +154,16 @@ class TileEditor {
       label: 'Side Length Expr',
     }).on('change', () => this.updateDisplay());
 
+    this.pane.addBinding(this.config, 'edgeWidth', {
+      min: 1,
+      max: 12,
+      step: 1,
+      label: 'Edge Width',
+    }).on('change', () => {
+        this.updateDisplay();
+        this.redrawPolygons();
+    });
+
     this.pane.addBinding(this.config, 'tool', {
       options: {
         'Move': 'Move',
@@ -191,6 +205,10 @@ class TileEditor {
         <div class="value-label">Side Length</div>
         <div class="value-content">${resultDisplay}</div>
       </div>
+      <div class="value-row">
+        <div class="value-label">Edge Width</div>
+        <div class="value-content">${this.config.edgeWidth}</div>
+      </div>
     `;
   }
 
@@ -231,7 +249,9 @@ class TileEditor {
                   this.config.numSides, 
                   radius, 
                   0x888888, 
-                  0.5
+                  0.5,
+                  0xffffff,
+                  this.config.edgeWidth
               );
           }
       }
@@ -305,7 +325,9 @@ class TileEditor {
           poly.sides,
           poly.radius,
           color,
-          alpha
+          alpha,
+          0xffffff,
+          this.config.edgeWidth
       );
   }
 
@@ -358,6 +380,14 @@ class TileEditor {
   private updateScale() {
     if (!this.polygonContainer) return;
     this.polygonContainer.scale.set(this.config.scale);
+  }
+
+  private updateViewportCenter() {
+    if (!this.app || !this.polygonContainer) return;
+    const centerX = this.app.screen.width / 2;
+    const centerY = this.app.screen.height / 2;
+    this.polygonContainer.position.set(centerX, centerY);
+    this.polygonContainer.pivot.set(0, 0);
   }
 }
 
