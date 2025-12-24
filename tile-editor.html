@@ -54,12 +54,32 @@
     }
     #editor-panel {
       flex: 1;
-      padding: 30px;
-      overflow-y: auto;
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     #editor-panel h2 {
-      margin-bottom: 20px;
+      margin-bottom: 0;
       color: #fff;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #toggle-values {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      padding: 5px;
+    }
+    #toggle-values.collapsed {
+      transform: rotate(-90deg);
     }
     .value-display {
       background: rgba(50, 50, 50, 0.8);
@@ -67,6 +87,18 @@
       border-radius: 6px;
       border: 1px solid #666;
       margin-bottom: 20px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      max-height: 500px; /* Approximate max height */
+      opacity: 1;
+    }
+    .value-display.collapsed {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      opacity: 0;
+      border: none;
     }
     .value-row {
       display: flex;
@@ -92,6 +124,21 @@
     .value-content.error {
       color: #ff6b6b;
     }
+    .canvas-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      margin-top: 20px;
+    }
+    #pixi-container {
+      flex: 1;
+      width: 100%;
+      border: 1px solid #555;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+    }
   </style>
 </head>
 <body>
@@ -103,13 +150,18 @@
     <div id="content">
       <div id="tweakpane-container"></div>
       <div id="editor-panel">
-        <h2>Current Values</h2>
+        <div class="section-header">
+          <h2>Current Values</h2>
+          <button id="toggle-values" aria-label="Toggle values display">▼</button>
+        </div>
         <div id="values-display" class="value-display">
           <!-- Values will be injected here -->
         </div>
         
-        <h2>Unit Cell Editor</h2>
-        <div id="pixi-container" style="width: 100%; height: 600px; border: 1px solid #555; border-radius: 6px; overflow: hidden; background: #000;"></div>
+        <div class="canvas-section">
+          <h2>Unit Cell Editor</h2>
+          <div id="pixi-container"></div>
+        </div>
       </div>
     </div>
   </div>

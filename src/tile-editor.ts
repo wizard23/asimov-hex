@@ -46,6 +46,24 @@ class TileEditor {
     this.initTweakpane();
     this.initPixi();
     this.updateDisplay();
+    this.setupUI();
+  }
+
+  private setupUI() {
+    const toggleBtn = document.getElementById('toggle-values');
+    const valuesDisplay = document.getElementById('values-display');
+    
+    if (toggleBtn && valuesDisplay) {
+      toggleBtn.onclick = () => {
+        valuesDisplay.classList.toggle('collapsed');
+        toggleBtn.classList.toggle('collapsed');
+        
+        // Force resize after transition
+        setTimeout(() => {
+          this.app.resize();
+        }, 350); // Slightly longer than CSS transition
+      };
+    }
   }
 
   private async initPixi() {
@@ -58,6 +76,12 @@ class TileEditor {
       resizeTo: container,
       antialias: true,
     });
+    
+    // Add ResizeObserver to handle container size changes robustly
+    const resizeObserver = new ResizeObserver(() => {
+      this.app.resize();
+    });
+    resizeObserver.observe(container);
     
     container.appendChild(this.app.canvas);
 
