@@ -40,6 +40,7 @@ class TileEditor {
   private draggedPolygon: PolygonData | null = null;
   private dragOffset = { x: 0, y: 0 };
   private mousePosition = { x: 0, y: 0 };
+  private worldMousePosition = { x: 0, y: 0 };
 
   constructor() {
     this.displayContainer = document.getElementById('values-display')!;
@@ -89,7 +90,8 @@ class TileEditor {
     this.app.stage.addChild(this.polygonContainer);
 
     this.previewGraphics = new Graphics();
-    this.app.stage.addChild(this.previewGraphics);
+    this.polygonContainer.addChild(this.previewGraphics);
+    this.updateScale();
 
     // Events
     this.app.stage.eventMode = 'static';
@@ -97,6 +99,7 @@ class TileEditor {
     
     this.app.stage.on('pointermove', (e) => {
       this.mousePosition = { x: e.global.x, y: e.global.y };
+      this.worldMousePosition = this.globalToWorld(e.global);
       this.handlePointerMove(e);
     });
     
@@ -133,7 +136,7 @@ class TileEditor {
       label: 'Scale',
     }).on('change', () => {
         this.updateDisplay();
-        this.redrawPolygons();
+        this.updateScale();
     });
 
     this.pane.addBinding(this.config, 'numSides', {
@@ -198,7 +201,7 @@ class TileEditor {
 
   private calculateRadius(sideLength: number, numSides: number): number {
       // s = 2 * r * sin(PI / n) => r = s / (2 * sin(PI / n))
-      return (sideLength * this.config.scale) / (2 * Math.sin(Math.PI / numSides));
+      return sideLength / (2 * Math.sin(Math.PI / numSides));
   }
 
   private drawPolygonShape(g: Graphics, x: number, y: number, sides: number, radius: number, color: number, alpha: number, strokeColor: number = 0xffffff, strokeWidth: number = 2) {
@@ -223,8 +226,8 @@ class TileEditor {
               const radius = this.calculateRadius(sideLength, this.config.numSides);
               this.drawPolygonShape(
                   this.previewGraphics, 
-                  this.mousePosition.x, 
-                  this.mousePosition.y, 
+                  this.worldMousePosition.x, 
+                  this.worldMousePosition.y, 
                   this.config.numSides, 
                   radius, 
                   0x888888, 
@@ -238,15 +241,17 @@ class TileEditor {
       if (this.config.tool === 'Create Polygon') {
           const sideLength = this.getEvaluatedSideLength();
           if (sideLength !== null && sideLength > 0) {
-              this.createPolygon(e.global.x, e.global.y, this.config.numSides, sideLength);
+              const worldPos = this.globalToWorld(e.global);
+              this.createPolygon(worldPos.x, worldPos.y, this.config.numSides, sideLength);
           }
       } else if (this.config.tool === 'Move') {
-          const clickedPoly = this.getPolygonAt(e.global.x, e.global.y);
+          const worldPos = this.globalToWorld(e.global);
+          const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
           if (clickedPoly) {
               this.draggedPolygon = clickedPoly;
               this.dragOffset = {
-                  x: clickedPoly.x - e.global.x,
-                  y: clickedPoly.y - e.global.y
+                  x: clickedPoly.x - worldPos.x,
+                  y: clickedPoly.y - worldPos.y
               };
           }
       }
@@ -255,8 +260,9 @@ class TileEditor {
   private handlePointerMove(e: any) {
       if (this.config.tool === 'Move') {
           if (this.draggedPolygon) {
-              this.draggedPolygon.x = e.global.x + this.dragOffset.x;
-              this.draggedPolygon.y = e.global.y + this.dragOffset.y;
+              const worldPos = this.globalToWorld(e.global);
+              this.draggedPolygon.x = worldPos.x + this.dragOffset.x;
+              this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
               this.drawPolygonInstance(this.draggedPolygon);
           } else {
               this.updateHoverState();
@@ -287,17 +293,6 @@ class TileEditor {
   }
 
   private drawPolygonInstance(poly: PolygonData) {
-      // Recalculate radius based on current scale and stored sideLength
-      poly.radius = this.calculateRadius(poly.sideLength / this.config.scale, poly.sides); // Wait, sideLength is unit length or pixels? 
-      // The requirement says: "a polygon with the chosen side length... scaled by the scale factor".
-      // So sideLength stored should be unit length.
-      // My calculateRadius takes 'unit side length' * scale. 
-      // In createPolygon I passed `sideLength` which came from getEvaluatedSideLength() which is the raw number (e.g. 1).
-      // So calculateRadius usage: (sideLength * this.config.scale) is correct if sideLength is unit.
-      
-      // Actually calculateRadius implementation: `(sideLength * this.config.scale) / ...`
-      // So if I pass raw sideLength (1), it becomes 100 pixels. Correct.
-      
       poly.radius = this.calculateRadius(poly.sideLength, poly.sides);
 
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
@@ -334,7 +329,7 @@ class TileEditor {
   private updateHoverState() {
       let hovered: PolygonData | null = null;
       if (this.config.tool === 'Move') {
-          hovered = this.getPolygonAt(this.mousePosition.x, this.mousePosition.y);
+          hovered = this.getPolygonAt(this.worldMousePosition.x, this.worldMousePosition.y);
       }
 
       this.polygons.forEach(p => {
@@ -352,6 +347,17 @@ class TileEditor {
     } catch (e) {
       return e instanceof Error ? e.message : 'Error';
     }
+  }
+
+  private globalToWorld(point: { x: number; y: number }): Point {
+    if (!this.polygonContainer) return { x: point.x, y: point.y };
+    const local = this.polygonContainer.toLocal(point);
+    return { x: local.x, y: local.y };
+  }
+
+  private updateScale() {
+    if (!this.polygonContainer) return;
+    this.polygonContainer.scale.set(this.config.scale);
   }
 }
 

@@ -22,3 +22,5 @@ Create a new page with
 ## Cleanup time
 Please look at the src directory and suggest refactorings for technical debt reduction, cleanup possibilities and performance opportunities.
 
+## instanced geometry to speed up rendering
+https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry

@@ -73,9 +73,24 @@ Please make the "Current Values" area minimizable
 At the moment the "Unit Cell Editor" is higher in height than than the window and a scroll bar appears. There should not be a scrollbar but the "Unit Cell Editor" should just take up the remaining height.
   
 
+The editor works very well but there is a bug in the way the scaling is used. At the moment the "scale" value is used to scale each individual polygon individually. But tha "scale" value should be used to scale the whole arrangement of polygons together. So when the scaling is changed the polygons would appear in the same relative size and would seem to move together or further apart.
+
+
+Please look at the src/tile-editor.ts , tile-editor.html and vite.config.ts and analzye the functionalitz of the "Tile Editor" 
+
+The editor works very well but there is a bug in the way the scaling is used. At the moment the "scale" value is used to scale each individual polygon individually. But tha "scale" value should be used to scale the whole arrangement of polygons together. So when the scaling is changed the polygons would appear in the same relative size and would seem to move together or further apart.
 
 
 
-* instanced geometry
-https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry
+
+Please look at the src/tile-editor.ts , tile-editor.html and vite.config.ts and analzye the functionalitz of the "Tile Editor"
+
+  The editor works very well but there is a bug in the way the scaling is used. At the moment the "scale" value is used to scale each individual polygon individually. But tha "scale" value should be used to
+  scale the whole arrangement of polygons together. So when the scaling is changed the polygons should appear in the same relative size and should seem to move together or further apart as an effect of the
+  scaling.
+
+
+
+
+
 
