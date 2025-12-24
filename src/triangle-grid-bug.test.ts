@@ -141,53 +141,46 @@ describe('TriangleGrid Particle Bug', () => {
       cellStates[0][1] = 10; // Cell(1,0) has state 10
       // All others 0.
       
-      // We expect E2 to be chosen.
+      // We expect E2 to be chosen. E2 is shared by (1,0) and (2,0).
       // E2 connects V(100, 86.6) and (150, 0).
       
-      const particle: Particle = {
-        x: V.x,
-        y: V.y,
-        currentEdge: { type: 'edge', points: [{x: 50, y: 0}, {x: 100, y: height}] }, // Arrived from E1
-        direction: 1,
-        progress: 1,
-        previousEdge: null
-      };
-      
-      // Mock getEdgesAtVertex to ensure we get expected edges
-      // But we want to test real logic, so we rely on grid.
-      
-      // Call private method handleVertexArrival
-      (system as any).handleVertexArrival(
-        particle,
-        V,
-        grid,
-        5,
-        5,
-        'highestEdgeDelta',
-        0, 0, // mouse
-        cellStates
-      );
-      
-      const newEdge = particle.currentEdge;
-      const p1 = newEdge.points[0];
-      const p2 = newEdge.points[1];
-      
-      // Check if newEdge is E2: (100, 86.6) to (150, 0)
-      // or (150,0) to (100,86.6)
-      
-      const isE2 = (
-        (Math.abs(p1.x - 100) < 1 && Math.abs(p1.y - height) < 1 && Math.abs(p2.x - 150) < 1 && Math.abs(p2.y - 0) < 1) ||
-        (Math.abs(p2.x - 100) < 1 && Math.abs(p2.y - height) < 1 && Math.abs(p1.x - 150) < 1 && Math.abs(p1.y - 0) < 1)
-      );
-      
-      if (!isE2) {
-          console.log("Selected edge points:", p1, p2);
-          // Calculate delta for selected edge to see what happened
-          const delta = (system as any).getEdgeDelta(newEdge, grid, cellStates, 5, 5);
-          console.log("Selected edge delta:", delta);
+      for (let i = 0; i < 100; i++) {
+        const particle: Particle = {
+          x: V.x,
+          y: V.y,
+          currentEdge: { type: 'edge', points: [{x: 50, y: 0}, {x: 100, y: height}] }, // Arrived from E1
+          direction: 1,
+          progress: 1,
+          previousEdge: null
+        };
+        
+        // Call private method handleVertexArrival
+        (system as any).handleVertexArrival(
+          particle,
+          V,
+          grid,
+          5,
+          5,
+          'highestEdgeDelta',
+          0, 0, // mouse
+          cellStates
+        );
+        
+        const newEdge = particle.currentEdge;
+        const p1 = newEdge.points[0];
+        const p2 = newEdge.points[1];
+        
+        // Check if newEdge is E2: (100, 86.6) to (150, 0)
+        const isE2 = (
+          (Math.abs(p1.x - 100) < 1 && Math.abs(p1.y - height) < 1 && Math.abs(p2.x - 150) < 1 && Math.abs(p2.y - 0) < 1) ||
+          (Math.abs(p2.x - 100) < 1 && Math.abs(p2.y - height) < 1 && Math.abs(p1.x - 150) < 1 && Math.abs(p1.y - 0) < 1)
+        );
+        
+        if (!isE2) {
+            const delta = (system as any).getEdgeDelta(newEdge, grid, cellStates, 5, 5);
+            throw new Error(`Iteration ${i}: Wrong edge chosen. Points: (${p1.x},${p1.y})-(${p2.x},${p2.y}), Delta: ${delta}`);
+        }
       }
-
-      expect(isE2).toBe(true);
     });
   });
 });
