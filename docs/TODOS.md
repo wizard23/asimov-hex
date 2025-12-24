@@ -39,6 +39,30 @@ in public/project-history/git-timeline.json is a list of commits. Please create 
 The page should use this information to show the list of the commits matching the entered criteria
 
 
+
+
+
+
+Please create a new page called "tile editor" (same principal layout as the page rendered by src/statistics.ts) that allows user to:
+* enter a float (from 1 to 200) default 100
+* enter an integer called "number of sides" (defaults to 4)
+* enter a string called "side length expression" (defaults to "1")
+* drop down list "tool": for now this only contains "Move", "Create Polygon", "Join"
+
+The page should use this information to just display the chosen values. The "side length expression" should be evaluated as a mathematical expression and th result should be shown.
+
+In the formula the following should be bossible:
+* brackets for frouping expressions
+* operations + - * / ^
+* functions like sin(<expression>) please add the following functions: 
+  * sin, cos, tan, tanh, tanh2, pow, log
+  * tanh2 and log get two parameters seperated by ,
+
+  
+
+
+
+
 * instanced geometry
 https://pixijs.com/8.x/examples?example=mesh_custom_instanced_geometry
 
