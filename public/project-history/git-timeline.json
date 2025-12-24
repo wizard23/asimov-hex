@@ -1,0 +1,803 @@
+[
+  {
+    "hash": "18634bcafba5eb3b2d599a748b7d03dd3bd72181",
+    "timestamp": 1766539361,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tests seperately in statistics :)",
+    "addedLines": 104,
+    "removedLines": 0
+  },
+  {
+    "hash": "1f66c6f9a5b638046145c64c2ac21952aba8db31",
+    "timestamp": 1766537895,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: better about",
+    "addedLines": 3,
+    "removedLines": 3
+  },
+  {
+    "hash": "a9159875f5f74843383eabd4857f16a9390b4fd2",
+    "timestamp": 1766537874,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix triangle edge detection bug",
+    "addedLines": 77,
+    "removedLines": 5
+  },
+  {
+    "hash": "4fa7c4b7706a90055d819419745a6d9cada2fa0f",
+    "timestamp": 1766535738,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "iterating in handleVertexArrival to avoid accidental success",
+    "addedLines": 37,
+    "removedLines": 44
+  },
+  {
+    "hash": "08464c4077b73090379dc6e67160f92e82f90a12",
+    "timestamp": 1766534747,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tests for triangle edge follow bug",
+    "addedLines": 193,
+    "removedLines": 0
+  },
+  {
+    "hash": "168dae9e818963573d83b85982dece348c0dc635",
+    "timestamp": 1766532949,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixing complile error; highest edge delta does not work on triangles but works on all other grid types",
+    "addedLines": 10,
+    "removedLines": 46
+  },
+  {
+    "hash": "3e35d98a42fd69fe82a74daee12e76284d8ca1a4",
+    "timestamp": 1766531418,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": ":))) finally \"Highest Edge Delta\" rule :)))",
+    "addedLines": 107,
+    "removedLines": 18
+  },
+  {
+    "hash": "1de38f2dc6a32255f268e81ad75694b94792780a",
+    "timestamp": 1766530044,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement \"visualize edge delta\"",
+    "addedLines": 88,
+    "removedLines": 5
+  },
+  {
+    "hash": "5370c36320903108ada065ceef1630bee5d57277",
+    "timestamp": 1766529255,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "comitting debug docs",
+    "addedLines": 986,
+    "removedLines": 0
+  },
+  {
+    "hash": "bf99fc49b7b62c3fb41bee97057ed88e53ac4dab",
+    "timestamp": 1766529239,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bytes in project statistics",
+    "addedLines": 175,
+    "removedLines": 5
+  },
+  {
+    "hash": "6e47865b7ab9c4e2940d5011b7928101fc5baaa5",
+    "timestamp": 1766525563,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "working cairo tiling by codex :)",
+    "addedLines": 59,
+    "removedLines": 21
+  },
+  {
+    "hash": "44e2a3750aec12e53ec175e9b9d561b514e3facd",
+    "timestamp": 1766521842,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tests for longe edge alignement",
+    "addedLines": 39,
+    "removedLines": 0
+  },
+  {
+    "hash": "3b2af3ed5ac0bb666ca2b07cd35c9e6be4057b8e",
+    "timestamp": 1766521185,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "align short edges, but long edges are still wrong",
+    "addedLines": 23,
+    "removedLines": 3
+  },
+  {
+    "hash": "9d6210e5bee6456f76b246cb36dd35bcbc14200a",
+    "timestamp": 1766520725,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add test for ebsuring that spacing between cairo pentagons cells is correct",
+    "addedLines": 39,
+    "removedLines": 0
+  },
+  {
+    "hash": "7a2ee4934a7b4b21fad6a0e4b78811b6f7916560",
+    "timestamp": 1766520337,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "orient cairo pentagrams according to sketch",
+    "addedLines": 4,
+    "removedLines": 4
+  },
+  {
+    "hash": "df321d911f78f8dab653434081b4108e4864caac",
+    "timestamp": 1766519719,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "explicitly check for direction of cairo cells that was only mentioned in the it description",
+    "addedLines": 45,
+    "removedLines": 0
+  },
+  {
+    "hash": "5a8062bcbf0f7cf96511ddb9d8abd262c220726b",
+    "timestamp": 1766519228,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "does not work full yet, but decent cairo implementation by codex based on my tests",
+    "addedLines": 167,
+    "removedLines": 66
+  },
+  {
+    "hash": "4637b958293fbc77cd46a07899cf13a3b19db858",
+    "timestamp": 1766517569,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: describe direction of short edge",
+    "addedLines": 8,
+    "removedLines": 8
+  },
+  {
+    "hash": "d3e4e1e5b4068da2e8ae66b886bb6be460560ace",
+    "timestamp": 1766514969,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add getNeighbours test for cairo catalan",
+    "addedLines": 123,
+    "removedLines": 0
+  },
+  {
+    "hash": "38a355129502916381ed3647173369337bb8212a",
+    "timestamp": 1766512817,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "test for cairo grid catalan",
+    "addedLines": 81,
+    "removedLines": 1
+  },
+  {
+    "hash": "84bfb5dded2e122f5249c020a8f9b0d87f670214",
+    "timestamp": 1766506631,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "first draft of cairo tiling: it works but it does not tile",
+    "addedLines": 316,
+    "removedLines": 7
+  },
+  {
+    "hash": "0ba602f346da7f327aaea2e7f970fdecc15aac95",
+    "timestamp": 1766503898,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "trying out codex",
+    "addedLines": 30,
+    "removedLines": 12
+  },
+  {
+    "hash": "82748cbc20db590785724b7298b4f7807c86cd25",
+    "timestamp": 1766503123,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: fix project name",
+    "addedLines": 219,
+    "removedLines": 702
+  },
+  {
+    "hash": "3c9303a1bf18d3180797416c620d91e0f55fdcb8",
+    "timestamp": 1766502890,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: fix formating of datetime in filename dropdown and in generated field",
+    "addedLines": 113,
+    "removedLines": 2
+  },
+  {
+    "hash": "1765abac19b3b73b2184a0dd5987ac4e3815907a",
+    "timestamp": 1766458387,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup coordinate logic by moving it into grid.ts",
+    "addedLines": 71,
+    "removedLines": 267
+  },
+  {
+    "hash": "ca0e3478cf6f1724c55db47cc0dfc5d50d91542e",
+    "timestamp": 1766456299,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "expand grid interface for vertices and edges",
+    "addedLines": 516,
+    "removedLines": 39
+  },
+  {
+    "hash": "2c586e6fa427b83e9f92580b879b3a279246d5d7",
+    "timestamp": 1766455516,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "working on tests",
+    "addedLines": 7104,
+    "removedLines": 74
+  },
+  {
+    "hash": "7f594f5be6fdf05cd43155755f4fee1e2820617a",
+    "timestamp": 1766452825,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "trying refactoring the grid adressing",
+    "addedLines": 1137,
+    "removedLines": 2
+  },
+  {
+    "hash": "eb3209b33338062edae0912a58aadc8231184e29",
+    "timestamp": 1766450868,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "gemini reverted it because it failed to implement Visualize Edge Delta",
+    "addedLines": 169,
+    "removedLines": 346
+  },
+  {
+    "hash": "82fffd88a093df0efd88bf4d1b2e3af4c2bf1c19",
+    "timestamp": 1766449026,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "repaired a bit but hex and triangle highlighting still broken; particles broken",
+    "addedLines": 404,
+    "removedLines": 140
+  },
+  {
+    "hash": "a8da1ca39a57880c245f71572080c481e95cb3b0",
+    "timestamp": 1766445394,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: save gemini session transcript",
+    "addedLines": 8761,
+    "removedLines": 0
+  },
+  {
+    "hash": "1c04360273477713c9e58d0b745a60d837acfa5d",
+    "timestamp": 1766445008,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "wip: cell delta for edges visualisation, but I ran out of free requests and it stopped in the middle of the edits :|",
+    "addedLines": 127,
+    "removedLines": 1040
+  },
+  {
+    "hash": "77f9fbac9c6405af9658c2840d291003884c0f7d",
+    "timestamp": 1766444089,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "make edgewidth configurable",
+    "addedLines": 23,
+    "removedLines": 6
+  },
+  {
+    "hash": "0486664e503a51ad1e198090aac4cd218e348501",
+    "timestamp": 1766443452,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add drop down for edge palette (unused for now)",
+    "addedLines": 51,
+    "removedLines": 2
+  },
+  {
+    "hash": "4d463465488f6a304921076f34b96beab413d494",
+    "timestamp": 1766441748,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add npm autocompletion hack :)",
+    "addedLines": 83,
+    "removedLines": 0
+  },
+  {
+    "hash": "57d4b8bb112597dc342fca90545a11605b88eba9",
+    "timestamp": 1766441375,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: move generated files to generated folder ;)",
+    "addedLines": 41,
+    "removedLines": 0
+  },
+  {
+    "hash": "594eec00f023c30d58f877861dcad315de401fe2",
+    "timestamp": 1766440373,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup statistics page",
+    "addedLines": 27,
+    "removedLines": 49
+  },
+  {
+    "hash": "1e9e404d2967198abd5a3b23fed81e3798547244",
+    "timestamp": 1766439969,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix buggy sorting of project stat filenames in index.json",
+    "addedLines": 50,
+    "removedLines": 46
+  },
+  {
+    "hash": "f36dacbce87f3aaa6b5333715a3a4c680d0653ef",
+    "timestamp": 1766439819,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup sorting in project statistics",
+    "addedLines": 156,
+    "removedLines": 26
+  },
+  {
+    "hash": "403789a615deb906dba2bc824ea770ebb2441465",
+    "timestamp": 1766438590,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "vite config to also generate statistics.html",
+    "addedLines": 9,
+    "removedLines": 0
+  },
+  {
+    "hash": "9509baaa6d5aced4f8c4d0e2e20f8c32e60eab1c",
+    "timestamp": 1766438392,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "using public dir for project statistics :)",
+    "addedLines": 87,
+    "removedLines": 5
+  },
+  {
+    "hash": "6ee86b599571f75139999a38951c01144f682536",
+    "timestamp": 1766437139,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "exclude generated files from project statistics",
+    "addedLines": 98,
+    "removedLines": 7
+  },
+  {
+    "hash": "a1843e0cce428bf526f1cade545937417bc0481c",
+    "timestamp": 1766435722,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: save prompt in TODOs",
+    "addedLines": 15,
+    "removedLines": 1
+  },
+  {
+    "hash": "d7f3d14d899fdfc8fd0fbd1723986201d9865854",
+    "timestamp": 1766435672,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update statistics and transcript of cursor session; ran out of tokens ;)",
+    "addedLines": 1972,
+    "removedLines": 1
+  },
+  {
+    "hash": "ccc1bf8bef44470055eba2da9a3d6849823deb01",
+    "timestamp": 1766430448,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add project statistics",
+    "addedLines": 424,
+    "removedLines": 1
+  },
+  {
+    "hash": "28903437390a01e009dbaea41fa35177a9041213",
+    "timestamp": 1766429169,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: dump of transcrip exported from cursor; new project-statistics snapshot",
+    "addedLines": 133541,
+    "removedLines": 0
+  },
+  {
+    "hash": "25b87c8f8ab2f908328be482a3b20bede830ecb4",
+    "timestamp": 1766424663,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add HH:MM estimated from commits to prompt-history.md",
+    "addedLines": 31,
+    "removedLines": 31
+  },
+  {
+    "hash": "5d723b41c04e9aab9bf276b50c9aa06e51f85325",
+    "timestamp": 1766424620,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "update prompt-history.md",
+    "addedLines": 87,
+    "removedLines": 0
+  },
+  {
+    "hash": "c8990e2b5492e4434732efac2397b2d08cc699bd",
+    "timestamp": 1766422449,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "reopen info panel a bit nicer",
+    "addedLines": 8,
+    "removedLines": 4
+  },
+  {
+    "hash": "e6f67f1597c698b2f98c8d1afd9fb9b4c56091be",
+    "timestamp": 1766419416,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "reopen panel",
+    "addedLines": 49,
+    "removedLines": 3
+  },
+  {
+    "hash": "1c1228d82bcb55719fcaa79d44c7176659bcd5aa",
+    "timestamp": 1766416906,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "info panel",
+    "addedLines": 131,
+    "removedLines": 0
+  },
+  {
+    "hash": "f41c4854a74a51edd44fafdffd5554628fbb7c45",
+    "timestamp": 1766413101,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "project statistics",
+    "addedLines": 735,
+    "removedLines": 2
+  },
+  {
+    "hash": "d0e246fd3e6afa1675e8b5f2f3acb9f4647ae75c",
+    "timestamp": 1766410735,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add dates",
+    "addedLines": 54,
+    "removedLines": 0
+  },
+  {
+    "hash": "87f17ce77b48ab2b5e0eead4a24d7c5c56ecbe3f",
+    "timestamp": 1766410363,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add prompt history :)",
+    "addedLines": 438,
+    "removedLines": 0
+  },
+  {
+    "hash": "c4de5891813fca93ecb50c802b8e844ae9eff4f8",
+    "timestamp": 1766409625,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "edge/vertex/cell highlighting dependent on left click mode",
+    "addedLines": 246,
+    "removedLines": 18
+  },
+  {
+    "hash": "e5d3c144c4aed0835e95cdddf1b7fc7b50f8641b",
+    "timestamp": 1766404670,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix square and triangle edge highlighting on the edge of the grid; fix horizontal edge highlighting bug for triangles",
+    "addedLines": 244,
+    "removedLines": 43
+  },
+  {
+    "hash": "4d53b1efa570de2960ab577c102a7c5b83e27e58",
+    "timestamp": 1766403057,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "follow/avoid mouse cursor rules for particles :)",
+    "addedLines": 99,
+    "removedLines": 7
+  },
+  {
+    "hash": "7e80cb93b6c95489d2496332553bd28e57bb5659",
+    "timestamp": 1766402381,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix clockwise/counter clockwise flip",
+    "addedLines": 17,
+    "removedLines": 17
+  },
+  {
+    "hash": "413dd8093eb498a852284a1a03fe0d85a1f780a3",
+    "timestamp": 1766402135,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "clockwise and counter clockwise rules",
+    "addedLines": 130,
+    "removedLines": 15
+  },
+  {
+    "hash": "d0f83fe17e3f3c5014a3baa79ac0d6f6319c6105",
+    "timestamp": 1766401542,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix backtracking bug",
+    "addedLines": 9,
+    "removedLines": 9
+  },
+  {
+    "hash": "8567094ae8c8a8a6848fac46622a49bf18f1da1d",
+    "timestamp": 1766401498,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "better min max ranges",
+    "addedLines": 4,
+    "removedLines": 4
+  },
+  {
+    "hash": "1bc929a5b4ea95067ba8df378464d246b37033e4",
+    "timestamp": 1766400727,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix triange off grid particles bug; fix square only down and right bug",
+    "addedLines": 82,
+    "removedLines": 59
+  },
+  {
+    "hash": "c184fd2b437606bf1bade7c9f6d2671ec611d225",
+    "timestamp": 1766398924,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cursor fixed the particles getting stuck but with weird bugs",
+    "addedLines": 14,
+    "removedLines": 4
+  },
+  {
+    "hash": "c2c1356d06fa764bfc9e260364038d2205aa306c",
+    "timestamp": 1766398440,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "debugging particles getting stuck",
+    "addedLines": 54,
+    "removedLines": 23
+  },
+  {
+    "hash": "b728f3a7a3507e1c40a69e562bd330791e84d102",
+    "timestamp": 1766397637,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "spawning particles works now :) branching does not",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "32c0c0dd270bad59c18a2b3885905b9d373cb2e0",
+    "timestamp": 1766397300,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Does not work yet: drop down for leftClickMode",
+    "addedLines": 75,
+    "removedLines": 17
+  },
+  {
+    "hash": "5c08e47e7d914be69cf8e59fef2d0fdc742c57fa",
+    "timestamp": 1766396682,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "WIP: draft of particles",
+    "addedLines": 437,
+    "removedLines": 3
+  },
+  {
+    "hash": "ecae8937df8e4b9103f7a6aeb78094c5ad915ab2",
+    "timestamp": 1766395726,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Save/Load PNG buttons :)",
+    "addedLines": 120,
+    "removedLines": 0
+  },
+  {
+    "hash": "c0b420461b9fb07b78c33f94c4587771f3cb2cce",
+    "timestamp": 1766395293,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "ilo palettes",
+    "addedLines": 57,
+    "removedLines": 44
+  },
+  {
+    "hash": "88a7991852510a0daecc16aeeaa8ad544024b068",
+    "timestamp": 1766393825,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add system description and palettes",
+    "addedLines": 481,
+    "removedLines": 11
+  },
+  {
+    "hash": "76d623779d419c7f52d3a52e9e07c580ce4e1114",
+    "timestamp": 1766325533,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "custom tweakpane blade for selecting drawState",
+    "addedLines": 179,
+    "removedLines": 51
+  },
+  {
+    "hash": "e6bc989ffea4d8b0683ed41ff8e825a556b24bc2",
+    "timestamp": 1766324489,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "select drawColor with buttons",
+    "addedLines": 57,
+    "removedLines": 18
+  },
+  {
+    "hash": "4f097f640c320a4a87269226b4da4efe239e5f87",
+    "timestamp": 1766324091,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixed drawState clamping by numStates",
+    "addedLines": 12,
+    "removedLines": 8
+  },
+  {
+    "hash": "1b6e200aa58898d629e22fdf8b2a0e658d08de05",
+    "timestamp": 1766323989,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "wip nr of states and draw state interaction",
+    "addedLines": 19,
+    "removedLines": 0
+  },
+  {
+    "hash": "56073237cbd3a7437ffc9d98acf176209a8b3fd7",
+    "timestamp": 1766323437,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add parameter for number of states",
+    "addedLines": 13,
+    "removedLines": 0
+  },
+  {
+    "hash": "233c0a99829105afecafde8093ef4bb169f7715c",
+    "timestamp": 1766323060,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup unused stuff",
+    "addedLines": 1,
+    "removedLines": 34
+  },
+  {
+    "hash": "c3aeaf9143cac64a14b8df6148b4e8db5c03b9fd",
+    "timestamp": 1766322588,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "show grid coordinates",
+    "addedLines": 2,
+    "removedLines": 1
+  },
+  {
+    "hash": "8872dec40892fe3fd65709cbb4751ba0ee01c2cc",
+    "timestamp": 1766321848,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "working on coordinates for cells",
+    "addedLines": 92,
+    "removedLines": 9
+  },
+  {
+    "hash": "54b09c1ed2d070375c643634ff19398f9ba5a32a",
+    "timestamp": 1766315809,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "hex works now but scaled weirdly",
+    "addedLines": 47,
+    "removedLines": 27
+  },
+  {
+    "hash": "96efffd4894202d3519ceb9f76400e823287336f",
+    "timestamp": 1766315368,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixing trangle clicking; attempted hex fix",
+    "addedLines": 84,
+    "removedLines": 67
+  },
+  {
+    "hash": "5b1a5a6c6cbc8228e92c12a47ce5287581969be1",
+    "timestamp": 1766314958,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "grid types but flakey",
+    "addedLines": 33,
+    "removedLines": 0
+  },
+  {
+    "hash": "f20c20d85ab826cd04231983e03c9c3c6875e0cd",
+    "timestamp": 1766314808,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup",
+    "addedLines": 4,
+    "removedLines": 4
+  },
+  {
+    "hash": "846bad4a051dfd6da22de45c1e3e653e80deb7cc",
+    "timestamp": 1766314694,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "clean up typing for tweakpan pane",
+    "addedLines": 1,
+    "removedLines": 1
+  },
+  {
+    "hash": "334454c147571a5bf42dd5e9d2ffa0fab54bf38f",
+    "timestamp": 1766314278,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human fixes tweakpane type problem :) Add missing @tweakpane/core dev dep",
+    "addedLines": 9,
+    "removedLines": 1
+  },
+  {
+    "hash": "cd4e7a54ea691b351875b9ce7c618eab2c9ccea0",
+    "timestamp": 1766313198,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "gridScale via tweakpane",
+    "addedLines": 15,
+    "removedLines": 9
+  },
+  {
+    "hash": "d08fa9484dfb250c1d90a5f6abd07594dccff149",
+    "timestamp": 1766312767,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixed alignement",
+    "addedLines": 12,
+    "removedLines": 3
+  },
+  {
+    "hash": "7b52f080ac72fb266b7170b3f730e3fd616568da",
+    "timestamp": 1766312605,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "it works but grid and cells are not aligned yet",
+    "addedLines": 73,
+    "removedLines": 766
+  },
+  {
+    "hash": "de22406f6c5f9e5124c8ff8ca70eba2585fa2c73",
+    "timestamp": 1766311913,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "first draft by cursor :)",
+    "addedLines": 2591,
+    "removedLines": 0
+  },
+  {
+    "hash": "eb9d2a4cab294842c47edc1c8d2c25756024d762",
+    "timestamp": 1766310550,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "gitignore for node",
+    "addedLines": 2,
+    "removedLines": 0
+  }
+]

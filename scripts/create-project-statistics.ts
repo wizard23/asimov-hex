@@ -49,7 +49,8 @@ function generateStatistics(): ProjectStatistics {
   const allFiles = getGitTrackedFiles();
   const excludedFolders = [
     'docs',
-    'public/project-statistics/generated'
+    'public/project-history',
+    'public/project-statistics'
   ];
   const excludedFiles = [
     'TODOS.md'
