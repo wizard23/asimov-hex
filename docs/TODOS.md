@@ -155,5 +155,23 @@ Redesign the Tool system in such a way that the "Tool" parameter becomes obsolet
 * When the user drags the "Unit Cell Editor" viewOffset is modified (atm this happens only when tool "View" is selected)
 
 
+Please implement these changes to the tile editor:
+* When hovering over a polygon draw the edges in yellow to indicate that it will be edited or moved when clicked or dragged.
+* clicking on an non closed polygon does not work atm. This makes it impossible to edit it. Pleas fix this. Use the same technique of drawing the edges in yellow to indicate to the user that it will be edited or moved when clicked or dragged.  
+* remove the preview polygon
+* always show the "Polygon Editor" (atm it opens and closes depending on whether a polygon is being edited). When there is no polygon being edited make it empty except for a label with the text: "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it."
+
+
+
+Please implement these changes to the tile editor:
+* "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it."
+* For non closed polygons draw a dotted line connecting the first and the last vertex of the non closed polygon.
+* Use the same technique of connecting the first and the last vertex of the non closed polygon you can treat it like a closed polygon for hovering, clicking and dragging.
+* While editing a polygon please keep it highlighted so that is clear for the user which polygon is being edited.
+* While editing a polygon please add text labels to the vertices with the letter of the vertex (i.e. A. B, C, D, ...)
+* The polygon editor stays open when no polygon is being edited but it is just empty. I don't see the text "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it." in it. I see that it is in the source code but this does not work. Please find out how to show static texts in a twekpane and then fix this.
+
+If anything is unclear please just ask.
+
 
 Add a center view button in the controls that adjusts scale and offset such that 

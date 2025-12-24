@@ -64,6 +64,8 @@ class TileEditor {
     this.initPixi();
     this.updateDisplay();
     this.setupUI();
+    this.showEditPane(true);
+    this.buildEditPane(null);
   }
 
   private setupUI() {
@@ -361,25 +363,6 @@ class TileEditor {
       if (!this.app) return;
       
       this.previewGraphics.clear();
-
-      const sideLength = this.getEvaluatedSideLength();
-      if (sideLength !== null && sideLength > 0) {
-          const sideLengthExpressions = Array(this.config.numSides).fill(this.config.sideLengthExpression);
-          const interiorAngleExpressions = Array(this.config.numSides).fill(
-              this.defaultInteriorAngleExpression(this.config.numSides)
-          );
-          const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, false);
-          if (!evaluated || !evaluated.isClosed) return;
-          this.drawPolygonPath(
-              this.previewGraphics,
-              evaluated.points,
-              this.worldMousePosition,
-              0x888888,
-              0.5,
-              0xffffff,
-              this.getStrokeWidth()
-          );
-      }
   }
 
   private handlePointerDown(e: any) {
@@ -387,7 +370,6 @@ class TileEditor {
       const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
       if (clickedPoly) {
           this.selectedPolygon = clickedPoly;
-          this.showEditPane(true);
           this.buildEditPane(clickedPoly);
           this.draggedPolygon = clickedPoly;
           this.dragOffset = {
@@ -396,7 +378,7 @@ class TileEditor {
           };
       } else {
           this.selectedPolygon = null;
-          this.showEditPane(false);
+          this.buildEditPane(null);
           this.isViewDragging = true;
           this.viewDragStart = { x: e.global.x, y: e.global.y };
           this.viewOffsetStart = { ...this.config.viewOffset };
@@ -464,7 +446,7 @@ class TileEditor {
   private drawPolygonInstance(poly: PolygonData) {
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
       const alpha = poly.isClosed ? 0.8 : 0;
-      const strokeColor = poly.isClosed ? 0xffffff : 0xff4d4d;
+      const strokeColor = poly.isHovered ? 0xffd24d : (poly.isClosed ? 0xffffff : 0xff4d4d);
       
       this.drawPolygonPath(
           poly.graphics,
@@ -487,7 +469,7 @@ class TileEditor {
           const p = this.polygons[i];
           const worldPoints = this.translatePoints(p.points, { x: p.x, y: p.y });
           if (p.isClosed) {
-              if (this.pointInPolygon({ x, y }, worldPoints)) {
+              if (this.pointInPolygon({ x, y }, worldPoints) || this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance())) {
                   return p;
               }
           } else if (this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance())) {
@@ -619,7 +601,7 @@ class TileEditor {
     this.editPaneContainer.style.display = visible ? 'block' : 'none';
   }
 
-  private buildEditPane(poly: PolygonData) {
+  private buildEditPane(poly: PolygonData | null) {
     if (this.editPane) {
       this.editPane.dispose();
     }
@@ -628,6 +610,15 @@ class TileEditor {
       title: 'Polygon Editor',
       container: this.editPaneContainer,
     });
+
+    if (!poly) {
+      this.editPane.addBlade({
+        view: 'text',
+        label: 'Hint',
+        value: "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it.",
+      });
+      return;
+    }
 
     const editState: Record<string, string> = {};
     const sideLabels = this.buildEdgeLabels(poly.sides);
@@ -645,12 +636,12 @@ class TileEditor {
         label: `Side Length Expression ${label}`,
       }).on('change', (event) => {
         const previous = poly.sideLengthExpressions[i];
-        poly.sideLengthExpressions[i] = event.value;
-        if (!this.tryApplyPolygonExpressions(poly)) {
-          poly.sideLengthExpressions[i] = previous;
-          editState[`side_${label}`] = previous;
-          this.editPane!.refresh();
-        }
+          poly.sideLengthExpressions[i] = event.value;
+          if (!this.tryApplyPolygonExpressions(poly)) {
+            poly.sideLengthExpressions[i] = previous;
+            editState[`side_${label}`] = previous;
+            this.editPane!.refresh();
+          }
       });
     });
 
@@ -659,12 +650,12 @@ class TileEditor {
         label: `Angle Expression ${label}`,
       }).on('change', (event) => {
         const previous = poly.interiorAngleExpressions[i];
-        poly.interiorAngleExpressions[i] = event.value;
-        if (!this.tryApplyPolygonExpressions(poly)) {
-          poly.interiorAngleExpressions[i] = previous;
-          editState[`angle_${label}`] = previous;
-          this.editPane!.refresh();
-        }
+          poly.interiorAngleExpressions[i] = event.value;
+          if (!this.tryApplyPolygonExpressions(poly)) {
+            poly.interiorAngleExpressions[i] = previous;
+            editState[`angle_${label}`] = previous;
+            this.editPane!.refresh();
+          }
       });
     });
   }
