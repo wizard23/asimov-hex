@@ -539,6 +539,10 @@ class ExpressionParser {
     if (this.isIdentifier()) {
       const name = this.advance().toLowerCase();
       if (this.match('(')) {
+        if (this.isTrigFunction(name)) {
+          return this.parseTrigCall(name);
+        }
+
         const args: number[] = [];
         if (!this.check(')')) {
           do {
@@ -551,6 +555,7 @@ class ExpressionParser {
         // Constants?
         if (name === 'pi') return Math.PI;
         if (name === 'e') return Math.E;
+        if (name === 'phi') return (1 + Math.sqrt(5)) / 2;
         throw new Error(`Unknown variable or function: ${name}`);
       }
     }
@@ -574,9 +579,40 @@ class ExpressionParser {
       case 'tanh': return Math.tanh(this.checkArgs(name, args, 1));
       case 'tanh2': return Math.atan2(this.checkArgs(name, args, 2, 0), this.checkArgs(name, args, 2, 1));
       case 'pow': return Math.pow(this.checkArgs(name, args, 2, 0), this.checkArgs(name, args, 2, 1));
+      case 'sqrt': return Math.sqrt(this.checkArgs(name, args, 1));
+      case 'cbrt': return Math.cbrt(this.checkArgs(name, args, 1));
       case 'log': return Math.log(this.checkArgs(name, args, 2, 0)) / Math.log(this.checkArgs(name, args, 2, 1));
       default: throw new Error(`Unknown function: ${name}`);
     }
+  }
+
+  private parseTrigCall(name: string): number {
+    const angle = this.parseExpression();
+    let unit: 'rad' | 'deg' = 'rad';
+    if (this.match(',')) {
+      if (!this.isIdentifier()) throw new Error(`Expected angle unit for ${name}()`);
+      const token = this.advance().toLowerCase();
+      unit = this.parseAngleUnit(token);
+    }
+    if (!this.match(')')) throw new Error("Expected ')' after arguments");
+
+    const radians = unit === 'deg' ? (angle * Math.PI) / 180 : angle;
+    switch (name) {
+      case 'sin': return Math.sin(radians);
+      case 'cos': return Math.cos(radians);
+      case 'tan': return Math.tan(radians);
+      default: throw new Error(`Unknown trigonometric function: ${name}`);
+    }
+  }
+
+  private isTrigFunction(name: string): boolean {
+    return name === 'sin' || name === 'cos' || name === 'tan';
+  }
+
+  private parseAngleUnit(token: string): 'rad' | 'deg' {
+    if (token === 'd' || token === 'deg' || token === 'degree' || token === 'degrees') return 'deg';
+    if (token === 'r' || token === 'rad' || token === 'radian' || token === 'radians') return 'rad';
+    throw new Error(`Unknown angle unit: ${token}`);
   }
 
   private checkArgs(name: string, args: number[], count: number, index: number = 0): number {
