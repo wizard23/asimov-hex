@@ -24,6 +24,7 @@ interface PolygonData {
   interiorAngleExpressions: string[];
   interiorAngles: number[];
   points: Point[];
+  isClosed: boolean;
   graphics: Graphics;
   isHovered: boolean;
 }
@@ -328,7 +329,7 @@ class TileEditor {
       sideLengthExpressions: string[],
       interiorAngleExpressions: string[],
       alertOnError: boolean
-  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[] } | null {
+  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
       const sideLengths: number[] = [];
       for (const expr of sideLengthExpressions) {
           const value = this.evaluateSideLengthExpression(expr);
@@ -355,11 +356,9 @@ class TileEditor {
 
       const points = this.buildPolygonPoints(sideLengths, interiorAngles);
       const end = points[points.length - 1];
-      if (!this.pointsClose(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon)) {
-          return null;
-      }
+      const isClosed = this.pointsClose(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
 
-      return { sideLengths, interiorAngles, points };
+      return { sideLengths, interiorAngles, points, isClosed };
   }
 
   private drawPolygonShape(g: Graphics, x: number, y: number, sides: number, radius: number, color: number, alpha: number, strokeColor: number = 0xffffff, strokeWidth: number = 2) {
@@ -387,6 +386,7 @@ class TileEditor {
               );
               const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, false);
               if (!evaluated) return;
+              if (!evaluated.isClosed) return;
               this.drawPolygonPath(
                   this.previewGraphics,
                   evaluated.points,
@@ -468,7 +468,7 @@ class TileEditor {
       const sideLengthExpressions = Array(sides).fill(this.config.sideLengthExpression);
       const interiorAngleExpressions = Array(sides).fill(this.defaultInteriorAngleExpression(sides));
       const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, true);
-      if (!evaluated) {
+      if (!evaluated || !evaluated.isClosed) {
           alert('Polygon is not closed with the current parameters.');
           g.destroy();
           return;
@@ -483,6 +483,7 @@ class TileEditor {
           interiorAngleExpressions,
           interiorAngles: evaluated.interiorAngles,
           points: evaluated.points,
+          isClosed: evaluated.isClosed,
           graphics: g,
           isHovered: false
       };
@@ -493,7 +494,8 @@ class TileEditor {
 
   private drawPolygonInstance(poly: PolygonData) {
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
-      const alpha = 0.8;
+      const alpha = poly.isClosed ? 0.8 : 0;
+      const strokeColor = poly.isClosed ? 0xffffff : 0xff4d4d;
       
       this.drawPolygonPath(
           poly.graphics,
@@ -501,7 +503,7 @@ class TileEditor {
           { x: poly.x, y: poly.y },
           color,
           alpha,
-          0xffffff,
+          strokeColor,
           this.getStrokeWidth()
       );
   }
@@ -515,7 +517,11 @@ class TileEditor {
       for (let i = this.polygons.length - 1; i >= 0; i--) {
           const p = this.polygons[i];
           const worldPoints = this.translatePoints(p.points, { x: p.x, y: p.y });
-          if (this.pointInPolygon({ x, y }, worldPoints)) {
+          if (p.isClosed) {
+              if (this.pointInPolygon({ x, y }, worldPoints)) {
+                  return p;
+              }
+          } else if (this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance())) {
               return p;
           }
       }
@@ -549,6 +555,10 @@ class TileEditor {
     return this.config.edgeWidth / this.config.scale;
   }
 
+  private getHitTolerance(): number {
+    return Math.max(0.1, this.getStrokeWidth() * 2);
+  }
+
   private drawPolygonPath(
       g: Graphics,
       points: Point[],
@@ -564,7 +574,9 @@ class TileEditor {
       for (let i = 1; i < points.length; i++) {
           g.lineTo(points[i].x + offset.x, points[i].y + offset.y);
       }
-      g.fill({ color, alpha });
+      if (alpha > 0) {
+          g.fill({ color, alpha });
+      }
       g.stroke({ color: strokeColor, width: strokeWidth });
   }
 
@@ -584,6 +596,25 @@ class TileEditor {
           if (intersect) inside = !inside;
       }
       return inside;
+  }
+
+  private pointNearPolyline(point: Point, polyline: Point[], threshold: number): boolean {
+      for (let i = 0; i < polyline.length - 1; i++) {
+          const a = polyline[i];
+          const b = polyline[i + 1];
+          if (this.distanceToSegment(point, a, b) <= threshold) {
+              return true;
+          }
+      }
+      return false;
+  }
+
+  private distanceToSegment(p: Point, a: Point, b: Point): number {
+      const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+      if (l2 === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+      let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(p.x - (a.x + t * (b.x - a.x)), p.y - (a.y + t * (b.y - a.y)));
   }
 
   private pointsClose(a: Point, b: Point, epsilon: number): boolean {
@@ -674,13 +705,13 @@ class TileEditor {
   private tryApplyPolygonExpressions(poly: PolygonData): boolean {
     const evaluated = this.evaluatePolygonExpressions(poly.sideLengthExpressions, poly.interiorAngleExpressions, true);
     if (!evaluated) {
-      alert('Polygon is not closed. Reverting to last valid values.');
       return false;
     }
 
     poly.sideLengths = evaluated.sideLengths;
     poly.interiorAngles = evaluated.interiorAngles;
     poly.points = evaluated.points;
+    poly.isClosed = evaluated.isClosed;
     this.drawPolygonInstance(poly);
     return true;
   }
