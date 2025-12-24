@@ -205,10 +205,15 @@ class GridApp {
     timelineLink.href = 'timeline.html';
     timelineLink.textContent = '📅 Project Timeline';
     
+    const tileEditorLink = document.createElement('a');
+    tileEditorLink.href = 'tile-editor.html';
+    tileEditorLink.textContent = '🧩 Tile Editor';
+    
     links.appendChild(manualLink);
     links.appendChild(githubLink);
     links.appendChild(statisticsLink);
     links.appendChild(timelineLink);
+    links.appendChild(tileEditorLink);
     
     aboutContent.appendChild(content);
     aboutContent.appendChild(links);
