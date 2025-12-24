@@ -22,6 +22,9 @@ interface ProjectStatistics {
 }
 
 function getFileExtension(filename: string): string {
+  if (filename.endsWith('.test.ts')) {
+    return '.test.ts';
+  }
   const ext = extname(filename);
   return ext || basename(filename);
 }
