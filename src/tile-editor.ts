@@ -1,13 +1,16 @@
 import { Pane } from 'tweakpane';
 import { Application, Container, Graphics } from 'pixi.js';
 
-type Tool = 'Move' | 'Create Polygon' | 'Join' | 'View';
+type Point = { x: number; y: number };
+
+type Tool = 'Move' | 'Create Polygon' | 'Join' | 'View' | 'Edit';
 
 interface EditorConfig {
   scale: number;
   numSides: number;
   sideLengthExpression: string;
   edgeWidth: number;
+  closedPolygonEpsilon: number;
   viewOffset: { x: number; y: number };
   tool: Tool;
 }
@@ -16,20 +19,26 @@ interface PolygonData {
   x: number;
   y: number;
   sides: number;
-  radius: number; // calculated from side length and sides
-  sideLength: number; // raw evaluated side length
+  sideLengthExpressions: string[];
+  sideLengths: number[];
+  interiorAngleExpressions: string[];
+  interiorAngles: number[];
+  points: Point[];
   graphics: Graphics;
   isHovered: boolean;
 }
 
 class TileEditor {
   private pane!: Pane;
+  private editPane: Pane | null = null;
+  private editPaneContainer!: HTMLElement;
   private readonly scaleBounds = { min: 1, max: 200 };
   private config: EditorConfig = {
     scale: 100,
     numSides: 4,
     sideLengthExpression: '1',
     edgeWidth: 2,
+    closedPolygonEpsilon: 1e-4,
     viewOffset: { x: 0, y: 0 },
     tool: 'Create Polygon',
   };
@@ -40,6 +49,7 @@ class TileEditor {
   private polygonContainer!: Container;
   private previewGraphics!: Graphics;
   private polygons: PolygonData[] = [];
+  private selectedPolygon: PolygonData | null = null;
   
   // Interaction
   private draggedPolygon: PolygonData | null = null;
@@ -52,6 +62,7 @@ class TileEditor {
 
   constructor() {
     this.displayContainer = document.getElementById('values-display')!;
+    this.editPaneContainer = document.getElementById('editpane-container')!;
     this.initTweakpane();
     this.initPixi();
     this.updateDisplay();
@@ -183,6 +194,15 @@ class TileEditor {
         this.redrawPolygons();
     });
 
+    this.pane.addBinding(this.config, 'closedPolygonEpsilon', {
+      min: 1e-6,
+      max: 1e-2,
+      step: 1e-6,
+      label: 'Closed Polygon Epsilon',
+    }).on('change', () => {
+        this.updateDisplay();
+    });
+
     this.pane.addBinding(this.config, 'viewOffset', {
       label: 'View Offset',
     }).on('change', () => {
@@ -196,12 +216,15 @@ class TileEditor {
         'Create Polygon': 'Create Polygon',
         'Join': 'Join',
         'View': 'View',
+        'Edit': 'Edit',
       },
       label: 'Tool',
     }).on('change', () => {
         this.updateDisplay();
         this.draggedPolygon = null;
         this.isViewDragging = false;
+        this.selectedPolygon = null;
+        this.showEditPane(false);
         this.updateHoverState();
     });
   }
@@ -238,6 +261,10 @@ class TileEditor {
         <div class="value-content">${this.config.edgeWidth}</div>
       </div>
       <div class="value-row">
+        <div class="value-label">Closed Polygon Epsilon</div>
+        <div class="value-content">${this.config.closedPolygonEpsilon}</div>
+      </div>
+      <div class="value-row">
         <div class="value-label">View Offset</div>
         <div class="value-content">${this.config.viewOffset.x.toFixed(2)}, ${this.config.viewOffset.y.toFixed(2)}</div>
       </div>
@@ -252,6 +279,87 @@ class TileEditor {
   private calculateRadius(sideLength: number, numSides: number): number {
       // s = 2 * r * sin(PI / n) => r = s / (2 * sin(PI / n))
       return sideLength / (2 * Math.sin(Math.PI / numSides));
+  }
+
+  private defaultInteriorAngleExpression(sides: number): string {
+      return `(${sides - 2} / ${sides}) * PI`;
+  }
+
+  private buildPolygonPoints(sideLengths: number[], interiorAngles: number[]): Point[] {
+      const points: Point[] = [{ x: 0, y: 0 }];
+      let angle = 0;
+      let current = { x: 0, y: 0 };
+
+      for (let i = 0; i < sideLengths.length; i++) {
+          current = {
+              x: current.x + Math.cos(angle) * sideLengths[i],
+              y: current.y + Math.sin(angle) * sideLengths[i],
+          };
+          points.push({ x: current.x, y: current.y });
+
+          if (i < sideLengths.length - 1) {
+              const nextAngle = interiorAngles[(i + 1) % interiorAngles.length];
+              angle += Math.PI - nextAngle;
+          }
+      }
+
+      return points;
+  }
+
+  private evaluateSideLengthExpression(expr: string): number | string {
+      return this.evaluateExpression(expr);
+  }
+
+  private evaluateAngleExpression(expr: string): number | string {
+      try {
+          const parts = expr.split(',');
+          const value = this.evaluateExpression(parts[0].trim());
+          if (typeof value !== 'number') return value;
+          if (parts.length === 1) return value;
+          const unitToken = parts.slice(1).join(',').trim().toLowerCase();
+          const unit = this.parseAngleUnit(unitToken);
+          return unit === 'deg' ? (value * Math.PI) / 180 : value;
+      } catch (err) {
+          return err instanceof Error ? err.message : 'Angle expression error';
+      }
+  }
+
+  private evaluatePolygonExpressions(
+      sideLengthExpressions: string[],
+      interiorAngleExpressions: string[],
+      alertOnError: boolean
+  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[] } | null {
+      const sideLengths: number[] = [];
+      for (const expr of sideLengthExpressions) {
+          const value = this.evaluateSideLengthExpression(expr);
+          if (typeof value !== 'number') {
+              if (alertOnError) {
+                  alert(`Side length error: ${value}`);
+              }
+              return null;
+          }
+          sideLengths.push(value);
+      }
+
+      const interiorAngles: number[] = [];
+      for (const expr of interiorAngleExpressions) {
+          const value = this.evaluateAngleExpression(expr);
+          if (typeof value !== 'number') {
+              if (alertOnError) {
+                  alert(`Angle error: ${value}`);
+              }
+              return null;
+          }
+          interiorAngles.push(value);
+      }
+
+      const points = this.buildPolygonPoints(sideLengths, interiorAngles);
+      const end = points[points.length - 1];
+      if (!this.pointsClose(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon)) {
+          return null;
+      }
+
+      return { sideLengths, interiorAngles, points };
   }
 
   private drawPolygonShape(g: Graphics, x: number, y: number, sides: number, radius: number, color: number, alpha: number, strokeColor: number = 0xffffff, strokeWidth: number = 2) {
@@ -273,14 +381,17 @@ class TileEditor {
       if (this.config.tool === 'Create Polygon') {
           const sideLength = this.getEvaluatedSideLength();
           if (sideLength !== null && sideLength > 0) {
-              const radius = this.calculateRadius(sideLength, this.config.numSides);
-              this.drawPolygonShape(
-                  this.previewGraphics, 
-                  this.worldMousePosition.x, 
-                  this.worldMousePosition.y, 
-                  this.config.numSides, 
-                  radius, 
-                  0x888888, 
+              const sideLengthExpressions = Array(this.config.numSides).fill(this.config.sideLengthExpression);
+              const interiorAngleExpressions = Array(this.config.numSides).fill(
+                  this.defaultInteriorAngleExpression(this.config.numSides)
+              );
+              const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, false);
+              if (!evaluated) return;
+              this.drawPolygonPath(
+                  this.previewGraphics,
+                  evaluated.points,
+                  this.worldMousePosition,
+                  0x888888,
                   0.5,
                   0xffffff,
                   this.getStrokeWidth()
@@ -310,6 +421,14 @@ class TileEditor {
           this.isViewDragging = true;
           this.viewDragStart = { x: e.global.x, y: e.global.y };
           this.viewOffsetStart = { ...this.config.viewOffset };
+      } else if (this.config.tool === 'Edit') {
+          const worldPos = this.globalToWorld(e.global);
+          const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
+          if (clickedPoly) {
+              this.selectedPolygon = clickedPoly;
+              this.showEditPane(true);
+              this.buildEditPane(clickedPoly);
+          }
       }
   }
 
@@ -346,13 +465,24 @@ class TileEditor {
   private createPolygon(x: number, y: number, sides: number, sideLength: number) {
       const g = new Graphics();
       this.polygonContainer.addChild(g);
-      
+      const sideLengthExpressions = Array(sides).fill(this.config.sideLengthExpression);
+      const interiorAngleExpressions = Array(sides).fill(this.defaultInteriorAngleExpression(sides));
+      const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, true);
+      if (!evaluated) {
+          alert('Polygon is not closed with the current parameters.');
+          g.destroy();
+          return;
+      }
+
       const poly: PolygonData = {
           x,
           y,
           sides,
-          sideLength,
-          radius: 0, // Recalculated in redraw
+          sideLengthExpressions,
+          sideLengths: evaluated.sideLengths,
+          interiorAngleExpressions,
+          interiorAngles: evaluated.interiorAngles,
+          points: evaluated.points,
           graphics: g,
           isHovered: false
       };
@@ -362,17 +492,13 @@ class TileEditor {
   }
 
   private drawPolygonInstance(poly: PolygonData) {
-      poly.radius = this.calculateRadius(poly.sideLength, poly.sides);
-
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
       const alpha = 0.8;
       
-      this.drawPolygonShape(
+      this.drawPolygonPath(
           poly.graphics,
-          poly.x,
-          poly.y,
-          poly.sides,
-          poly.radius,
+          poly.points,
+          { x: poly.x, y: poly.y },
           color,
           alpha,
           0xffffff,
@@ -388,9 +514,8 @@ class TileEditor {
       // Reverse iterate to pick top-most
       for (let i = this.polygons.length - 1; i >= 0; i--) {
           const p = this.polygons[i];
-          const dx = x - p.x;
-          const dy = y - p.y;
-          if (dx * dx + dy * dy <= p.radius * p.radius) {
+          const worldPoints = this.translatePoints(p.points, { x: p.x, y: p.y });
+          if (this.pointInPolygon({ x, y }, worldPoints)) {
               return p;
           }
       }
@@ -424,6 +549,47 @@ class TileEditor {
     return this.config.edgeWidth / this.config.scale;
   }
 
+  private drawPolygonPath(
+      g: Graphics,
+      points: Point[],
+      offset: Point,
+      color: number,
+      alpha: number,
+      strokeColor: number,
+      strokeWidth: number
+  ) {
+      g.clear();
+      if (points.length < 2) return;
+      g.moveTo(points[0].x + offset.x, points[0].y + offset.y);
+      for (let i = 1; i < points.length; i++) {
+          g.lineTo(points[i].x + offset.x, points[i].y + offset.y);
+      }
+      g.fill({ color, alpha });
+      g.stroke({ color: strokeColor, width: strokeWidth });
+  }
+
+  private translatePoints(points: Point[], offset: Point): Point[] {
+      return points.map(p => ({ x: p.x + offset.x, y: p.y + offset.y }));
+  }
+
+  private pointInPolygon(point: Point, polygon: Point[]): boolean {
+      let inside = false;
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+          const xi = polygon[i].x;
+          const yi = polygon[i].y;
+          const xj = polygon[j].x;
+          const yj = polygon[j].y;
+          const intersect = ((yi > point.y) !== (yj > point.y))
+            && (point.x < (xj - xi) * (point.y - yi) / (yj - yi + Number.EPSILON) + xi);
+          if (intersect) inside = !inside;
+      }
+      return inside;
+  }
+
+  private pointsClose(a: Point, b: Point, epsilon: number): boolean {
+      return Math.hypot(a.x - b.x, a.y - b.y) <= epsilon;
+  }
+
   private globalToWorld(point: { x: number; y: number }): Point {
     if (!this.polygonContainer) return { x: point.x, y: point.y };
     const local = this.polygonContainer.toLocal(point);
@@ -448,6 +614,99 @@ class TileEditor {
 
   private clamp(value: number, min: number, max: number): number {
     return Math.min(max, Math.max(min, value));
+  }
+
+  private showEditPane(visible: boolean) {
+    if (!this.editPaneContainer) return;
+    this.editPaneContainer.style.display = visible ? 'block' : 'none';
+  }
+
+  private buildEditPane(poly: PolygonData) {
+    if (this.editPane) {
+      this.editPane.dispose();
+    }
+
+    this.editPane = new Pane({
+      title: 'Polygon Editor',
+      container: this.editPaneContainer,
+    });
+
+    const editState: Record<string, string> = {};
+    const sideLabels = this.buildEdgeLabels(poly.sides);
+    const angleLabels = this.buildVertexLabels(poly.sides);
+
+    poly.sideLengthExpressions.forEach((expr, i) => {
+      editState[`side_${sideLabels[i]}`] = expr;
+    });
+    poly.interiorAngleExpressions.forEach((expr, i) => {
+      editState[`angle_${angleLabels[i]}`] = expr;
+    });
+
+    sideLabels.forEach((label, i) => {
+      this.editPane!.addBinding(editState, `side_${label}`, {
+        label: `Side Length Expression ${label}`,
+      }).on('change', (event) => {
+        const previous = poly.sideLengthExpressions[i];
+        poly.sideLengthExpressions[i] = event.value;
+        if (!this.tryApplyPolygonExpressions(poly)) {
+          poly.sideLengthExpressions[i] = previous;
+          editState[`side_${label}`] = previous;
+          this.editPane!.refresh();
+        }
+      });
+    });
+
+    angleLabels.forEach((label, i) => {
+      this.editPane!.addBinding(editState, `angle_${label}`, {
+        label: `Angle Expression ${label}`,
+      }).on('change', (event) => {
+        const previous = poly.interiorAngleExpressions[i];
+        poly.interiorAngleExpressions[i] = event.value;
+        if (!this.tryApplyPolygonExpressions(poly)) {
+          poly.interiorAngleExpressions[i] = previous;
+          editState[`angle_${label}`] = previous;
+          this.editPane!.refresh();
+        }
+      });
+    });
+  }
+
+  private tryApplyPolygonExpressions(poly: PolygonData): boolean {
+    const evaluated = this.evaluatePolygonExpressions(poly.sideLengthExpressions, poly.interiorAngleExpressions, true);
+    if (!evaluated) {
+      alert('Polygon is not closed. Reverting to last valid values.');
+      return false;
+    }
+
+    poly.sideLengths = evaluated.sideLengths;
+    poly.interiorAngles = evaluated.interiorAngles;
+    poly.points = evaluated.points;
+    this.drawPolygonInstance(poly);
+    return true;
+  }
+
+  private buildVertexLabels(sides: number): string[] {
+    const labels: string[] = [];
+    for (let i = 0; i < sides; i++) {
+      labels.push(String.fromCharCode('A'.charCodeAt(0) + i));
+    }
+    return labels;
+  }
+
+  private buildEdgeLabels(sides: number): string[] {
+    const labels: string[] = [];
+    for (let i = 0; i < sides; i++) {
+      const start = String.fromCharCode('A'.charCodeAt(0) + i);
+      const end = String.fromCharCode('A'.charCodeAt(0) + ((i + 1) % sides));
+      labels.push(`${start}${end}`);
+    }
+    return labels;
+  }
+
+  private parseAngleUnit(token: string): 'rad' | 'deg' {
+    if (token === 'd' || token === 'deg' || token === 'degree' || token === 'degrees') return 'deg';
+    if (token === 'r' || token === 'rad' || token === 'radian' || token === 'radians') return 'rad';
+    throw new Error(`Unknown angle unit: ${token}`);
   }
 }
 

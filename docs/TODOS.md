@@ -103,4 +103,46 @@ Implement these changes:
 
 
 
+Please add a new parameter: viewOffset (a 2d vector) that controls an offset to change the (0,0) coordinate of the Unit Cell Editor window view at the polygons 
+Please implement a "View" tool that allows the viewer tho change this viewOffset by just draging anywher in the editor window.
 
+
+Add the following things to the expression syntax:
+* constants PI and E and PHI
+* sqrt, cbrt (cubic root)
+* optional last parameter for al trigonometric fucntions that determines if they use radians or degrees. if this is d deg degree or degrees it should use degrees. and if it is r rad randian or radians it shold huse radians. Radians is the default.
+
+
+
+For the polygons please adapt the PolygonData data structure to be able to support arbitrary closed polygons:
+* instead of just one sideLength: number it has to have sideLengthExpressions: string[] that contains an expression for each of the sides. These are initialized with the sideLengthExpression from the Editor Controls and the result of the expressions is cached in sideLengths: number[]
+* it should also have an interiorAngleExpressions array that contains an expression that determines the interior angle at each vertex. The default values are derived from the "Number of Sides" parameter and are expressed as a suitable fraction of PI. The results of thesese expressions are cacged in interiorAngles: number[]
+* whenever the expressions are reevaluated they get checked for internal consistency. If the polygon is not closed then an error dialog box is shown and the previous known good cached valuies are kept.
+
+Once the data structure is adapted. Add a "Edit" tool that does the following when it's selected and the user clicks a polygon:
+It opens a different tweakpane on the right side of the screen that has controls for each edge of the polygon:
+* for each side there is a "Side Length Expression <Edge>" control that is either a formula like the one in the "Editor Controls"
+* for each angle there is a "Angle Expression <Vertex>" control that 
+* <Vertex> is A, B, C, D, ...
+* <Edge> is AB, BC, CD, DE, ...
+
+If anything is unclear please just ask.
+
+
+
+1.a. When using the "Create Polygon" tool the polygons that get created initialy are (just like now) regular n-gons. Please initialize the sideLengthExpressions and the interiorAngleExpressions accordingly using the "Side Length Expression" and the "Number of Sides" paramter from the "Editor Controls" 
+
+1.b. Your suggested algorithm for constructing the polygon is correct: “walking” edges in order, turning by π - interiorAngle at each vertex, starting at origin with the first edge along +X please.
+
+1.c. Once the user modifies the polygon using the "Edit" tool the polygon might not be convex anymore. Before applying the edit make sure that the resulting polygon is closed and show an error dialog as described earlier.
+
+2. angle unit s is radians by default but can be degrees for individual vertices using the same keywords as for trig functions. For example an expression of "90, degrees" or "45, d" should be interpreted as PI/2 or PI/4
+
+3.a. your proposed closed polygon validation is correct: last vertex equals the first within a small tolerance
+3.b. Please add a parameter in the Editor Controls called "Closed Polygon Epsilon" defaulting to 1e-4
+
+4. Use an alert for now to keep it simple.
+
+
+
+Add a center view button in the controls that adjusts scale and offset such that 
