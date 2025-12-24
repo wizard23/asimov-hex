@@ -23,6 +23,7 @@ interface PolygonData {
 
 class TileEditor {
   private pane!: Pane;
+  private readonly scaleBounds = { min: 1, max: 200 };
   private config: EditorConfig = {
     scale: 100,
     numSides: 4,
@@ -88,6 +89,18 @@ class TileEditor {
     resizeObserver.observe(container);
     
     container.appendChild(this.app.canvas);
+    this.app.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const direction = Math.sign(e.deltaY);
+      const factor = Math.pow(1.05, -direction);
+      const nextScale = this.clamp(this.config.scale * factor, this.scaleBounds.min, this.scaleBounds.max);
+      if (nextScale === this.config.scale) return;
+      this.config.scale = nextScale;
+      this.updateDisplay();
+      this.updateScale();
+      this.redrawPolygons();
+      this.pane.refresh();
+    }, { passive: false });
 
     this.polygonContainer = new Container();
     this.app.stage.addChild(this.polygonContainer);
@@ -135,12 +148,13 @@ class TileEditor {
     });
 
     this.pane.addBinding(this.config, 'scale', {
-      min: 1,
-      max: 200,
+      min: this.scaleBounds.min,
+      max: this.scaleBounds.max,
       label: 'Scale',
     }).on('change', () => {
         this.updateDisplay();
         this.updateScale();
+        this.redrawPolygons();
     });
 
     this.pane.addBinding(this.config, 'numSides', {
@@ -251,7 +265,7 @@ class TileEditor {
                   0x888888, 
                   0.5,
                   0xffffff,
-                  this.config.edgeWidth
+                  this.getStrokeWidth()
               );
           }
       }
@@ -327,7 +341,7 @@ class TileEditor {
           color,
           alpha,
           0xffffff,
-          this.config.edgeWidth
+          this.getStrokeWidth()
       );
   }
 
@@ -371,6 +385,10 @@ class TileEditor {
     }
   }
 
+  private getStrokeWidth(): number {
+    return this.config.edgeWidth / this.config.scale;
+  }
+
   private globalToWorld(point: { x: number; y: number }): Point {
     if (!this.polygonContainer) return { x: point.x, y: point.y };
     const local = this.polygonContainer.toLocal(point);
@@ -388,6 +406,10 @@ class TileEditor {
     const centerY = this.app.screen.height / 2;
     this.polygonContainer.position.set(centerX, centerY);
     this.polygonContainer.pivot.set(0, 0);
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, value));
   }
 }
 
