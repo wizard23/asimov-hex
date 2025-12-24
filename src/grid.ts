@@ -341,15 +341,87 @@ export class TriangleGrid implements Grid {
 
 
 
-  pixelToCell(pixel: Point): { col: number; row: number; } {
+    pixelToCell(pixel: Point): { col: number; row: number; } {
 
-    const row = Math.floor(pixel.y / this.triHeight);
 
-    const col = Math.floor(pixel.x / (this.triWidth / 2));
 
-    return { col, row };
+      const q = pixel.x / (this.triWidth / 2);
 
-  }
+
+
+      const r = pixel.y / this.triHeight;
+
+
+
+      let col = Math.floor(q);
+
+
+
+      const row = Math.floor(r);
+
+
+
+      
+
+
+
+      const u = q - col;
+
+
+
+      const v = r - row;
+
+
+
+  
+
+
+
+      if ((row + col) % 2 === 0) {
+
+
+
+        if (u + v < 1) {
+
+
+
+          col--;
+
+
+
+        }
+
+
+
+      } else {
+
+
+
+        if (u < v) {
+
+
+
+          col--;
+
+
+
+        }
+
+
+
+      }
+
+
+
+  
+
+
+
+      return { col, row };
+
+
+
+    }
 
   
 
