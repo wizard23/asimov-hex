@@ -58,6 +58,13 @@ In the formula the following should be bossible:
   * sin, cos, tan, tanh, tanh2, pow, log
   * tanh2 and log get two parameters seperated by ,
 
+
+
+Add a pixi js window below the current values titled "Unit Cell Editor"
+When the tool "Create Polygon" is selected and the user left clicks into the unit cell editor a polygon with the chosen side length and the number of sides should be created centered at the location of the mouse click. The polygons should be scaled by the scale factor. When the user just moves the mouse around a grayed out preview of the polygon that would be created by left clicking should be shown.
+
+When the tool "Move" is selected and the mouse curser is on top of one of the polygons the polygon should be highlighted and when dragged araund the polygon should be moved to the desired location.
+
   
 
 

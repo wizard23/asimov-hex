@@ -1,4 +1,5 @@
 import { Pane } from 'tweakpane';
+import { Application, Container, Graphics } from 'pixi.js';
 
 type Tool = 'Move' | 'Create Polygon' | 'Join';
 
@@ -9,20 +10,88 @@ interface EditorConfig {
   tool: Tool;
 }
 
+interface PolygonData {
+  x: number;
+  y: number;
+  sides: number;
+  radius: number; // calculated from side length and sides
+  sideLength: number; // raw evaluated side length
+  graphics: Graphics;
+  isHovered: boolean;
+}
+
 class TileEditor {
   private pane!: Pane;
   private config: EditorConfig = {
     scale: 100,
     numSides: 4,
     sideLengthExpression: '1',
-    tool: 'Move',
+    tool: 'Create Polygon',
   };
   private displayContainer: HTMLElement;
+  
+  // Pixi
+  private app!: Application;
+  private polygonContainer!: Container;
+  private previewGraphics!: Graphics;
+  private polygons: PolygonData[] = [];
+  
+  // Interaction
+  private draggedPolygon: PolygonData | null = null;
+  private dragOffset = { x: 0, y: 0 };
+  private mousePosition = { x: 0, y: 0 };
 
   constructor() {
     this.displayContainer = document.getElementById('values-display')!;
     this.initTweakpane();
+    this.initPixi();
     this.updateDisplay();
+  }
+
+  private async initPixi() {
+    const container = document.getElementById('pixi-container');
+    if (!container) return;
+
+    this.app = new Application();
+    await this.app.init({
+      background: '#1a1a1a',
+      resizeTo: container,
+      antialias: true,
+    });
+    
+    container.appendChild(this.app.canvas);
+
+    this.polygonContainer = new Container();
+    this.app.stage.addChild(this.polygonContainer);
+
+    this.previewGraphics = new Graphics();
+    this.app.stage.addChild(this.previewGraphics);
+
+    // Events
+    this.app.stage.eventMode = 'static';
+    this.app.stage.hitArea = this.app.screen;
+    
+    this.app.stage.on('pointermove', (e) => {
+      this.mousePosition = { x: e.global.x, y: e.global.y };
+      this.handlePointerMove(e);
+    });
+    
+    this.app.stage.on('pointerdown', (e) => {
+      this.handlePointerDown(e);
+    });
+    
+    this.app.stage.on('pointerup', (e) => {
+      this.handlePointerUp(e);
+    });
+    
+    this.app.stage.on('pointerupoutside', (e) => {
+      this.handlePointerUp(e);
+    });
+
+    // Update loop
+    this.app.ticker.add(() => {
+      this.updatePreview();
+    });
   }
 
   private initTweakpane() {
@@ -38,7 +107,10 @@ class TileEditor {
       min: 1,
       max: 200,
       label: 'Scale',
-    }).on('change', () => this.updateDisplay());
+    }).on('change', () => {
+        this.updateDisplay();
+        this.redrawPolygons();
+    });
 
     this.pane.addBinding(this.config, 'numSides', {
       min: 3,
@@ -58,7 +130,11 @@ class TileEditor {
         'Join': 'Join',
       },
       label: 'Tool',
-    }).on('change', () => this.updateDisplay());
+    }).on('change', () => {
+        this.updateDisplay();
+        this.draggedPolygon = null;
+        this.updateHoverState();
+    });
   }
 
   private updateDisplay() {
@@ -89,6 +165,168 @@ class TileEditor {
         <div class="value-content">${resultDisplay}</div>
       </div>
     `;
+  }
+
+  private getEvaluatedSideLength(): number | null {
+      const res = this.evaluateExpression(this.config.sideLengthExpression);
+      return typeof res === 'number' ? res : null;
+  }
+
+  private calculateRadius(sideLength: number, numSides: number): number {
+      // s = 2 * r * sin(PI / n) => r = s / (2 * sin(PI / n))
+      return (sideLength * this.config.scale) / (2 * Math.sin(Math.PI / numSides));
+  }
+
+  private drawPolygonShape(g: Graphics, x: number, y: number, sides: number, radius: number, color: number, alpha: number, strokeColor: number = 0xffffff, strokeWidth: number = 2) {
+      g.clear();
+      g.moveTo(x + radius, y); // Start at angle 0
+      for (let i = 1; i <= sides; i++) {
+          const angle = (i * 2 * Math.PI) / sides;
+          g.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
+      }
+      g.fill({ color, alpha });
+      g.stroke({ color: strokeColor, width: strokeWidth });
+  }
+
+  private updatePreview() {
+      if (!this.app) return;
+      
+      this.previewGraphics.clear();
+
+      if (this.config.tool === 'Create Polygon') {
+          const sideLength = this.getEvaluatedSideLength();
+          if (sideLength !== null && sideLength > 0) {
+              const radius = this.calculateRadius(sideLength, this.config.numSides);
+              this.drawPolygonShape(
+                  this.previewGraphics, 
+                  this.mousePosition.x, 
+                  this.mousePosition.y, 
+                  this.config.numSides, 
+                  radius, 
+                  0x888888, 
+                  0.5
+              );
+          }
+      }
+  }
+
+  private handlePointerDown(e: any) {
+      if (this.config.tool === 'Create Polygon') {
+          const sideLength = this.getEvaluatedSideLength();
+          if (sideLength !== null && sideLength > 0) {
+              this.createPolygon(e.global.x, e.global.y, this.config.numSides, sideLength);
+          }
+      } else if (this.config.tool === 'Move') {
+          const clickedPoly = this.getPolygonAt(e.global.x, e.global.y);
+          if (clickedPoly) {
+              this.draggedPolygon = clickedPoly;
+              this.dragOffset = {
+                  x: clickedPoly.x - e.global.x,
+                  y: clickedPoly.y - e.global.y
+              };
+          }
+      }
+  }
+
+  private handlePointerMove(e: any) {
+      if (this.config.tool === 'Move') {
+          if (this.draggedPolygon) {
+              this.draggedPolygon.x = e.global.x + this.dragOffset.x;
+              this.draggedPolygon.y = e.global.y + this.dragOffset.y;
+              this.drawPolygonInstance(this.draggedPolygon);
+          } else {
+              this.updateHoverState();
+          }
+      }
+  }
+
+  private handlePointerUp(e: any) {
+      this.draggedPolygon = null;
+  }
+
+  private createPolygon(x: number, y: number, sides: number, sideLength: number) {
+      const g = new Graphics();
+      this.polygonContainer.addChild(g);
+      
+      const poly: PolygonData = {
+          x,
+          y,
+          sides,
+          sideLength,
+          radius: 0, // Recalculated in redraw
+          graphics: g,
+          isHovered: false
+      };
+      
+      this.polygons.push(poly);
+      this.drawPolygonInstance(poly);
+  }
+
+  private drawPolygonInstance(poly: PolygonData) {
+      // Recalculate radius based on current scale and stored sideLength
+      poly.radius = this.calculateRadius(poly.sideLength / this.config.scale, poly.sides); // Wait, sideLength is unit length or pixels? 
+      // The requirement says: "a polygon with the chosen side length... scaled by the scale factor".
+      // So sideLength stored should be unit length.
+      // My calculateRadius takes 'unit side length' * scale. 
+      // In createPolygon I passed `sideLength` which came from getEvaluatedSideLength() which is the raw number (e.g. 1).
+      // So calculateRadius usage: (sideLength * this.config.scale) is correct if sideLength is unit.
+      
+      // Actually calculateRadius implementation: `(sideLength * this.config.scale) / ...`
+      // So if I pass raw sideLength (1), it becomes 100 pixels. Correct.
+      
+      poly.radius = this.calculateRadius(poly.sideLength, poly.sides);
+
+      const color = poly.isHovered ? 0x4a9eff : 0x444444;
+      const alpha = 0.8;
+      
+      this.drawPolygonShape(
+          poly.graphics,
+          poly.x,
+          poly.y,
+          poly.sides,
+          poly.radius,
+          color,
+          alpha
+      );
+  }
+
+  private redrawPolygons() {
+      this.polygons.forEach(p => this.drawPolygonInstance(p));
+  }
+
+  private getPolygonAt(x: number, y: number): PolygonData | null {
+      // Simple distance check against circumradius for hit testing
+      // For more precision, point-in-polygon check is better, but radius check is fast and usually okay for convex regular polys
+      // Using a slightly smaller radius or actual check would be better for Move tool feeling.
+      // Let's use radius check for now.
+      
+      // Reverse iterate to pick top-most
+      for (let i = this.polygons.length - 1; i >= 0; i--) {
+          const p = this.polygons[i];
+          const dx = x - p.x;
+          const dy = y - p.y;
+          if (dx * dx + dy * dy <= p.radius * p.radius) {
+              return p;
+          }
+      }
+      return null;
+  }
+
+  private updateHoverState() {
+      let hovered: PolygonData | null = null;
+      if (this.config.tool === 'Move') {
+          hovered = this.getPolygonAt(this.mousePosition.x, this.mousePosition.y);
+      }
+
+      let changed = false;
+      this.polygons.forEach(p => {
+          const wasHovered = p.isHovered;
+          p.isHovered = (p === hovered);
+          if (p.isHovered !== wasHovered) {
+              this.drawPolygonInstance(p);
+              changed = true;
+          }
+      });
   }
 
   private evaluateExpression(expr: string): number | string {
