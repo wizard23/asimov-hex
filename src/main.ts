@@ -60,17 +60,18 @@ class GridApp {
     // Load palettes from JSON
     this.palettes = palettesData.palettes;
     
-    // Initialize with first palette
-    const defaultPalette = this.palettes[0];
+    // Initialize with a palette
+    const defaultPalette = this.palettes[1] ?? this.palettes[0] ;
     const initialPalette: Record<number, ColorValue> = {};
     Object.keys(defaultPalette.colors).forEach(key => {
       initialPalette[parseInt(key)] = defaultPalette.colors[key];
     });
 
-    // Initialize edge palette with the same default initially
+    // Initialize edge palette with the contrasting default initially
+    const defaultEdgePalette = this.palettes[2] ?? defaultPalette;
     const initialEdgePalette: Record<number, ColorValue> = {};
-    Object.keys(defaultPalette.colors).forEach(key => {
-      initialEdgePalette[parseInt(key)] = defaultPalette.colors[key];
+    Object.keys(defaultEdgePalette.colors).forEach(key => {
+      initialEdgePalette[parseInt(key)] = defaultEdgePalette.colors[key];
     });
 
     this.config = {
@@ -79,18 +80,18 @@ class GridApp {
       gridType: 'cairo',
       gridScale: 30,
       numStates: 8,
-      drawState: 7,
+      drawState: 4,
       palette: initialPalette,
       selectedPalette: defaultPalette.name,
       edgePalette: initialEdgePalette,       // New: Initialize edge palette
-      selectedEdgePalette: defaultPalette.name, // New: Initialize selected edge palette
+      selectedEdgePalette: defaultEdgePalette.name, // New: Initialize selected edge palette
       edgeColor: '#ffffff',                  // Re-add edgeColor
-      edgeWidth: 1,                          // New: Initialize edge width
+      edgeWidth: 2,                          // New: Initialize edge width
       edgeHighlightColor: '#ffff00',
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
       particleSpeed: 100,
-      leftClickMode: 'spawnParticle',
+      leftClickMode: 'draw',
       edgeSelectionRule: 'randomNoBacktrack',
     };
 
@@ -183,9 +184,14 @@ class GridApp {
     statisticsLink.href = 'statistics.html';
     statisticsLink.textContent = '📊 Project Statistics';
     
+    const timelineLink = document.createElement('a');
+    timelineLink.href = 'timeline.html';
+    timelineLink.textContent = '📅 Project Timeline';
+    
     links.appendChild(manualLink);
     links.appendChild(githubLink);
     links.appendChild(statisticsLink);
+    links.appendChild(timelineLink);
     
     panel.appendChild(header);
     panel.appendChild(content);
