@@ -1,7 +1,7 @@
 {
   "palettes": [
     {
-      "name": "ILO Blue",
+      "name": "Blue",
       "colors": {
         "0": "#000000",
         "1": "#0F1B4C",
@@ -14,7 +14,7 @@
       }
     },
     {
-      "name": "ILO Purple",
+      "name": "Purple",
       "colors": {
         "0": "#000000",
         "1": "#2A0A3D",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "name": "ILO Turquoise",
+      "name": "Turquoise",
       "colors": {
         "0": "#000000",
         "1": "#1E4F4E",
@@ -40,7 +40,7 @@
       }
     },
     {
-      "name": "ILO Yellow",
+      "name": "Yellow",
       "colors": {
         "0": "#000000",
         "1": "#B97A2B",
