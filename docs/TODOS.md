@@ -186,6 +186,12 @@ Use colors black and white for the "moving ants" and make it slower by a factor 
 For non closed polygons please exclude the implied closing edge from both yellow highlighting when hovering and the moving ants
 
 
+please fix these bugs:
+* now the vertex labels are not visible anymore. They look great when I use "Scale" 1 but since I usually use scale 100 they become a antialiased mess.
+* highlighting when hovering over a non closed polygon still shows the implied part in yellow (but it should be in red just as it is already working for the marching ant highlighting)
+
+
+
 
 Please add a multi line text box in the "Editor Controls" for constants that will be available for expressions in all fields that allow expressions. Constants are calculated line by line and expressions defining constants can use all constants that have been defined before
 

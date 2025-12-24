@@ -125,7 +125,7 @@ class TileEditor {
 
     this.labelContainer = new Container();
     this.labelContainer.zIndex = 2;
-    this.polygonContainer.addChild(this.labelContainer);
+    this.app.stage.addChild(this.labelContainer);
 
     this.previewGraphics = new Graphics();
     this.previewGraphics.zIndex = 1;
@@ -171,6 +171,7 @@ class TileEditor {
       this.updatePreview();
       if (this.selectedPolygon) {
         this.drawPolygonInstance(this.selectedPolygon);
+        this.updateSelectedLabelPositions();
       }
     });
   }
@@ -408,7 +409,7 @@ class TileEditor {
           this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
           this.drawPolygonInstance(this.draggedPolygon);
           if (this.selectedPolygon === this.draggedPolygon) {
-            this.updateSelectedLabels();
+            this.updateSelectedLabelPositions();
           }
       } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
@@ -419,6 +420,7 @@ class TileEditor {
           };
           this.updateDisplay();
           this.updateViewportCenter();
+          this.updateSelectedLabelPositions();
       }
 
       this.updateHoverState();
@@ -470,6 +472,7 @@ class TileEditor {
       const alpha = poly.isClosed ? 0.8 : 0;
       const baseStroke = poly.isClosed ? 0xffffff : 0xff4d4d;
       const strokeColor = (poly.isHovered && !isSelected) ? 0xffd24d : baseStroke;
+      const openStrokeColor = 0xff4d4d;
       
       this.drawPolygonPath(
           poly.graphics,
@@ -486,7 +489,7 @@ class TileEditor {
               poly.graphics,
               { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
               { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
-              strokeColor,
+              openStrokeColor,
               this.getStrokeWidth()
           );
       }
@@ -728,6 +731,7 @@ class TileEditor {
     if (!this.polygonContainer) return;
     this.polygonContainer.scale.set(this.config.scale);
     this.updateViewportCenter();
+    this.updateSelectedLabelPositions();
   }
 
   private updateViewportCenter() {
@@ -738,6 +742,7 @@ class TileEditor {
     const offsetY = this.config.viewOffset.y * this.config.scale;
     this.polygonContainer.position.set(centerX + offsetX, centerY + offsetY);
     this.polygonContainer.pivot.set(0, 0);
+    this.updateSelectedLabelPositions();
   }
 
   private clamp(value: number, min: number, max: number): number {
@@ -858,7 +863,7 @@ class TileEditor {
     if (!this.selectedPolygon) return;
     const labels = this.buildVertexLabels(this.selectedPolygon.sides);
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
-    const fontSize = 12 / this.config.scale;
+    const fontSize = 12;
     points.forEach((point, index) => {
       const label = new Text({
         text: `${labels[index]}`,
@@ -868,9 +873,20 @@ class TileEditor {
         },
       });
       label.anchor.set(0.5, 0.5);
-      label.x = this.selectedPolygon!.x + point.x;
-      label.y = this.selectedPolygon!.y + point.y;
       this.labelContainer.addChild(label);
+    });
+    this.updateSelectedLabelPositions();
+  }
+
+  private updateSelectedLabelPositions() {
+    if (!this.selectedPolygon || !this.polygonContainer) return;
+    const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
+    this.labelContainer.children.forEach((child, index) => {
+      const point = points[index];
+      if (!point) return;
+      const world = { x: this.selectedPolygon!.x + point.x, y: this.selectedPolygon!.y + point.y };
+      const global = this.polygonContainer.toGlobal(world);
+      child.position.set(global.x, global.y);
     });
   }
 }
