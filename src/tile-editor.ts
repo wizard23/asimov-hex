@@ -240,7 +240,7 @@ class TileEditor {
       }
   }
 
-  private handlePointerUp(e: any) {
+  private handlePointerUp(_e: any) {
       this.draggedPolygon = null;
   }
 
@@ -295,11 +295,6 @@ class TileEditor {
   }
 
   private getPolygonAt(x: number, y: number): PolygonData | null {
-      // Simple distance check against circumradius for hit testing
-      // For more precision, point-in-polygon check is better, but radius check is fast and usually okay for convex regular polys
-      // Using a slightly smaller radius or actual check would be better for Move tool feeling.
-      // Let's use radius check for now.
-      
       // Reverse iterate to pick top-most
       for (let i = this.polygons.length - 1; i >= 0; i--) {
           const p = this.polygons[i];
@@ -318,13 +313,11 @@ class TileEditor {
           hovered = this.getPolygonAt(this.mousePosition.x, this.mousePosition.y);
       }
 
-      let changed = false;
       this.polygons.forEach(p => {
           const wasHovered = p.isHovered;
           p.isHovered = (p === hovered);
           if (p.isHovered !== wasHovered) {
               this.drawPolygonInstance(p);
-              changed = true;
           }
       });
   }

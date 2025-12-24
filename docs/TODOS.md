@@ -65,6 +65,12 @@ When the tool "Create Polygon" is selected and the user left clicks into the uni
 
 When the tool "Move" is selected and the mouse curser is on top of one of the polygons the polygon should be highlighted and when dragged araund the polygon should be moved to the desired location.
 
+
+
+
+
+Please make the "Current Values" area minimizable
+At the moment the "Unit Cell Editor" is higher in height than than the window and a scroll bar appears. There should not be a scrollbar but the "Unit Cell Editor" should just take up the remaining height.
   
 
 
