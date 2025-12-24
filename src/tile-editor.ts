@@ -1,13 +1,14 @@
 import { Pane } from 'tweakpane';
 import { Application, Container, Graphics } from 'pixi.js';
 
-type Tool = 'Move' | 'Create Polygon' | 'Join';
+type Tool = 'Move' | 'Create Polygon' | 'Join' | 'View';
 
 interface EditorConfig {
   scale: number;
   numSides: number;
   sideLengthExpression: string;
   edgeWidth: number;
+  viewOffset: { x: number; y: number };
   tool: Tool;
 }
 
@@ -29,6 +30,7 @@ class TileEditor {
     numSides: 4,
     sideLengthExpression: '1',
     edgeWidth: 2,
+    viewOffset: { x: 0, y: 0 },
     tool: 'Create Polygon',
   };
   private displayContainer: HTMLElement;
@@ -44,6 +46,9 @@ class TileEditor {
   private dragOffset = { x: 0, y: 0 };
   private mousePosition = { x: 0, y: 0 };
   private worldMousePosition = { x: 0, y: 0 };
+  private isViewDragging = false;
+  private viewDragStart = { x: 0, y: 0 };
+  private viewOffsetStart = { x: 0, y: 0 };
 
   constructor() {
     this.displayContainer = document.getElementById('values-display')!;
@@ -178,16 +183,25 @@ class TileEditor {
         this.redrawPolygons();
     });
 
+    this.pane.addBinding(this.config, 'viewOffset', {
+      label: 'View Offset',
+    }).on('change', () => {
+        this.updateDisplay();
+        this.updateViewportCenter();
+    });
+
     this.pane.addBinding(this.config, 'tool', {
       options: {
         'Move': 'Move',
         'Create Polygon': 'Create Polygon',
         'Join': 'Join',
+        'View': 'View',
       },
       label: 'Tool',
     }).on('change', () => {
         this.updateDisplay();
         this.draggedPolygon = null;
+        this.isViewDragging = false;
         this.updateHoverState();
     });
   }
@@ -222,6 +236,10 @@ class TileEditor {
       <div class="value-row">
         <div class="value-label">Edge Width</div>
         <div class="value-content">${this.config.edgeWidth}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">View Offset</div>
+        <div class="value-content">${this.config.viewOffset.x.toFixed(2)}, ${this.config.viewOffset.y.toFixed(2)}</div>
       </div>
     `;
   }
@@ -288,6 +306,10 @@ class TileEditor {
                   y: clickedPoly.y - worldPos.y
               };
           }
+      } else if (this.config.tool === 'View') {
+          this.isViewDragging = true;
+          this.viewDragStart = { x: e.global.x, y: e.global.y };
+          this.viewOffsetStart = { ...this.config.viewOffset };
       }
   }
 
@@ -301,11 +323,24 @@ class TileEditor {
           } else {
               this.updateHoverState();
           }
+      } else if (this.config.tool === 'View' && this.isViewDragging) {
+          const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
+          const deltaY = (e.global.y - this.viewDragStart.y) / this.config.scale;
+          this.config.viewOffset = {
+            x: this.viewOffsetStart.x + deltaX,
+            y: this.viewOffsetStart.y + deltaY,
+          };
+          this.updateDisplay();
+          this.updateViewportCenter();
       }
   }
 
   private handlePointerUp(_e: any) {
       this.draggedPolygon = null;
+      if (this.isViewDragging) {
+        this.isViewDragging = false;
+        this.pane.refresh();
+      }
   }
 
   private createPolygon(x: number, y: number, sides: number, sideLength: number) {
@@ -398,13 +433,16 @@ class TileEditor {
   private updateScale() {
     if (!this.polygonContainer) return;
     this.polygonContainer.scale.set(this.config.scale);
+    this.updateViewportCenter();
   }
 
   private updateViewportCenter() {
     if (!this.app || !this.polygonContainer) return;
     const centerX = this.app.screen.width / 2;
     const centerY = this.app.screen.height / 2;
-    this.polygonContainer.position.set(centerX, centerY);
+    const offsetX = this.config.viewOffset.x * this.config.scale;
+    const offsetY = this.config.viewOffset.y * this.config.scale;
+    this.polygonContainer.position.set(centerX + offsetX, centerY + offsetY);
     this.polygonContainer.pivot.set(0, 0);
   }
 
