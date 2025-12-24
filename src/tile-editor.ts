@@ -3,8 +3,6 @@ import { Application, Container, Graphics } from 'pixi.js';
 
 type Point = { x: number; y: number };
 
-type Tool = 'Move' | 'Create Polygon' | 'Join' | 'View' | 'Edit';
-
 interface EditorConfig {
   scale: number;
   numSides: number;
@@ -12,7 +10,6 @@ interface EditorConfig {
   edgeWidth: number;
   closedPolygonEpsilon: number;
   viewOffset: { x: number; y: number };
-  tool: Tool;
 }
 
 interface PolygonData {
@@ -41,7 +38,6 @@ class TileEditor {
     edgeWidth: 2,
     closedPolygonEpsilon: 1e-4,
     viewOffset: { x: 0, y: 0 },
-    tool: 'Create Polygon',
   };
   private displayContainer: HTMLElement;
   
@@ -149,6 +145,16 @@ class TileEditor {
       this.handlePointerUp(e);
     });
 
+    this.app.canvas.addEventListener('dblclick', (e) => {
+      const rect = this.app.canvas.getBoundingClientRect();
+      const global = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      const worldPos = this.globalToWorld(global);
+      const sideLength = this.getEvaluatedSideLength();
+      if (sideLength !== null && sideLength > 0) {
+        this.createPolygon(worldPos.x, worldPos.y, this.config.numSides, sideLength);
+      }
+    });
+
     // Update loop
     this.app.ticker.add(() => {
       this.updatePreview();
@@ -211,23 +217,6 @@ class TileEditor {
         this.updateViewportCenter();
     });
 
-    this.pane.addBinding(this.config, 'tool', {
-      options: {
-        'Move': 'Move',
-        'Create Polygon': 'Create Polygon',
-        'Join': 'Join',
-        'View': 'View',
-        'Edit': 'Edit',
-      },
-      label: 'Tool',
-    }).on('change', () => {
-        this.updateDisplay();
-        this.draggedPolygon = null;
-        this.isViewDragging = false;
-        this.selectedPolygon = null;
-        this.showEditPane(false);
-        this.updateHoverState();
-    });
   }
 
   private updateDisplay() {
@@ -248,10 +237,6 @@ class TileEditor {
       <div class="value-row">
         <div class="value-label">Number of Sides</div>
         <div class="value-content">${this.config.numSides}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Tool</div>
-        <div class="value-content">${this.config.tool}</div>
       </div>
       <div class="value-row">
         <div class="value-label">Side Length</div>
@@ -377,72 +362,54 @@ class TileEditor {
       
       this.previewGraphics.clear();
 
-      if (this.config.tool === 'Create Polygon') {
-          const sideLength = this.getEvaluatedSideLength();
-          if (sideLength !== null && sideLength > 0) {
-              const sideLengthExpressions = Array(this.config.numSides).fill(this.config.sideLengthExpression);
-              const interiorAngleExpressions = Array(this.config.numSides).fill(
-                  this.defaultInteriorAngleExpression(this.config.numSides)
-              );
-              const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, false);
-              if (!evaluated) return;
-              if (!evaluated.isClosed) return;
-              this.drawPolygonPath(
-                  this.previewGraphics,
-                  evaluated.points,
-                  this.worldMousePosition,
-                  0x888888,
-                  0.5,
-                  0xffffff,
-                  this.getStrokeWidth()
-              );
-          }
+      const sideLength = this.getEvaluatedSideLength();
+      if (sideLength !== null && sideLength > 0) {
+          const sideLengthExpressions = Array(this.config.numSides).fill(this.config.sideLengthExpression);
+          const interiorAngleExpressions = Array(this.config.numSides).fill(
+              this.defaultInteriorAngleExpression(this.config.numSides)
+          );
+          const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, false);
+          if (!evaluated || !evaluated.isClosed) return;
+          this.drawPolygonPath(
+              this.previewGraphics,
+              evaluated.points,
+              this.worldMousePosition,
+              0x888888,
+              0.5,
+              0xffffff,
+              this.getStrokeWidth()
+          );
       }
   }
 
   private handlePointerDown(e: any) {
-      if (this.config.tool === 'Create Polygon') {
-          const sideLength = this.getEvaluatedSideLength();
-          if (sideLength !== null && sideLength > 0) {
-              const worldPos = this.globalToWorld(e.global);
-              this.createPolygon(worldPos.x, worldPos.y, this.config.numSides, sideLength);
-          }
-      } else if (this.config.tool === 'Move') {
-          const worldPos = this.globalToWorld(e.global);
-          const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
-          if (clickedPoly) {
-              this.draggedPolygon = clickedPoly;
-              this.dragOffset = {
-                  x: clickedPoly.x - worldPos.x,
-                  y: clickedPoly.y - worldPos.y
-              };
-          }
-      } else if (this.config.tool === 'View') {
+      const worldPos = this.globalToWorld(e.global);
+      const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
+      if (clickedPoly) {
+          this.selectedPolygon = clickedPoly;
+          this.showEditPane(true);
+          this.buildEditPane(clickedPoly);
+          this.draggedPolygon = clickedPoly;
+          this.dragOffset = {
+              x: clickedPoly.x - worldPos.x,
+              y: clickedPoly.y - worldPos.y
+          };
+      } else {
+          this.selectedPolygon = null;
+          this.showEditPane(false);
           this.isViewDragging = true;
           this.viewDragStart = { x: e.global.x, y: e.global.y };
           this.viewOffsetStart = { ...this.config.viewOffset };
-      } else if (this.config.tool === 'Edit') {
-          const worldPos = this.globalToWorld(e.global);
-          const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
-          if (clickedPoly) {
-              this.selectedPolygon = clickedPoly;
-              this.showEditPane(true);
-              this.buildEditPane(clickedPoly);
-          }
       }
   }
 
   private handlePointerMove(e: any) {
-      if (this.config.tool === 'Move') {
-          if (this.draggedPolygon) {
-              const worldPos = this.globalToWorld(e.global);
-              this.draggedPolygon.x = worldPos.x + this.dragOffset.x;
-              this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
-              this.drawPolygonInstance(this.draggedPolygon);
-          } else {
-              this.updateHoverState();
-          }
-      } else if (this.config.tool === 'View' && this.isViewDragging) {
+      if (this.draggedPolygon) {
+          const worldPos = this.globalToWorld(e.global);
+          this.draggedPolygon.x = worldPos.x + this.dragOffset.x;
+          this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
+          this.drawPolygonInstance(this.draggedPolygon);
+      } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
           const deltaY = (e.global.y - this.viewDragStart.y) / this.config.scale;
           this.config.viewOffset = {
@@ -452,6 +419,8 @@ class TileEditor {
           this.updateDisplay();
           this.updateViewportCenter();
       }
+
+      this.updateHoverState();
   }
 
   private handlePointerUp(_e: any) {
@@ -530,9 +499,7 @@ class TileEditor {
 
   private updateHoverState() {
       let hovered: PolygonData | null = null;
-      if (this.config.tool === 'Move') {
-          hovered = this.getPolygonAt(this.worldMousePosition.x, this.worldMousePosition.y);
-      }
+      hovered = this.getPolygonAt(this.worldMousePosition.x, this.worldMousePosition.y);
 
       this.polygons.forEach(p => {
           const wasHovered = p.isHovered;

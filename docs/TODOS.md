@@ -144,5 +144,16 @@ If anything is unclear please just ask.
 4. Use an alert for now to keep it simple.
 
 
+Please make the "Edit" tool less strict and allow open polygons. To support this please extend the PolygonData data structure with an isClosed boolean that gets set by the "Edit Mode" when the polygon side length and angle expressions are reevaluated. Open polygons are just a path of line segments and get drawn in red so the user sees that the polygon is not correctly closed.
+
+
+Redesign the Tool system in such a way that the "Tool" parameter becomes obsolete: 
+* When the mouse cursor hovers over a polygon it always gets highlighted (atm this happens only when tool "Move" is selected)
+* Polygons are created by double clicking in the "Unit Cell Editor" (atm this happens when tool "Create Polygon" is selected with a single click)
+* Polygons are edited simply by clicking them (atm this happens only when tool "Edit" is selected)
+* Polygons are moved by dragging polygons (atm this happens only when tool "Move" is selected)
+* When the user drags the "Unit Cell Editor" viewOffset is modified (atm this happens only when tool "View" is selected)
+
+
 
 Add a center view button in the controls that adjusts scale and offset such that 
