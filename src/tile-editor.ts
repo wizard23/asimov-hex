@@ -48,6 +48,7 @@ class TileEditor {
   private previewGraphics!: Graphics;
   private polygons: PolygonData[] = [];
   private selectedPolygon: PolygonData | null = null;
+  private dashOffset = 0;
   
   // Interaction
   private draggedPolygon: PolygonData | null = null;
@@ -166,7 +167,11 @@ class TileEditor {
 
     // Update loop
     this.app.ticker.add(() => {
+      this.dashOffset += 4 / this.config.scale;
       this.updatePreview();
+      if (this.selectedPolygon) {
+        this.drawPolygonInstance(this.selectedPolygon);
+      }
     });
   }
 
@@ -463,7 +468,8 @@ class TileEditor {
       const isSelected = this.selectedPolygon === poly;
       const color = poly.isHovered ? 0x4a9eff : 0x444444;
       const alpha = poly.isClosed ? 0.8 : 0;
-      const strokeColor = (poly.isHovered || isSelected) ? 0xffd24d : (poly.isClosed ? 0xffffff : 0xff4d4d);
+      const baseStroke = poly.isClosed ? 0xffffff : 0xff4d4d;
+      const strokeColor = (poly.isHovered && !isSelected) ? 0xffd24d : baseStroke;
       
       this.drawPolygonPath(
           poly.graphics,
@@ -482,6 +488,18 @@ class TileEditor {
               { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
               strokeColor,
               this.getStrokeWidth()
+          );
+      }
+
+      if (isSelected) {
+          this.drawDashedPath(
+              poly.graphics,
+              poly.points,
+              { x: poly.x, y: poly.y },
+              0xffd24d,
+              this.getStrokeWidth(),
+              true,
+              this.dashOffset
           );
       }
   }
@@ -567,6 +585,53 @@ class TileEditor {
           const segmentEnd = Math.min(dist + dashLength, length);
           g.moveTo(start.x + ux * segmentStart, start.y + uy * segmentStart);
           g.lineTo(start.x + ux * segmentEnd, start.y + uy * segmentEnd);
+      }
+      g.stroke({ color, width });
+  }
+
+  private drawDashedPath(
+      g: Graphics,
+      points: Point[],
+      offset: Point,
+      color: number,
+      width: number,
+      closePath: boolean,
+      dashOffset: number
+  ) {
+      if (points.length < 2) return;
+      const dashLength = Math.max(width * 3, 6 / this.config.scale);
+      const gapLength = dashLength;
+      const pattern = dashLength + gapLength;
+      const offsetNorm = ((dashOffset % pattern) + pattern) % pattern;
+      let drawOn = offsetNorm < dashLength;
+      let remaining = drawOn ? dashLength - offsetNorm : pattern - offsetNorm;
+      const pathPoints = closePath ? [...points, points[0]] : points;
+
+      for (let i = 0; i < pathPoints.length - 1; i++) {
+          const start = { x: pathPoints[i].x + offset.x, y: pathPoints[i].y + offset.y };
+          const end = { x: pathPoints[i + 1].x + offset.x, y: pathPoints[i + 1].y + offset.y };
+          const dx = end.x - start.x;
+          const dy = end.y - start.y;
+          const segLen = Math.hypot(dx, dy);
+          if (segLen === 0) continue;
+          const ux = dx / segLen;
+          const uy = dy / segLen;
+          let segPos = 0;
+          while (segPos < segLen) {
+              const step = Math.min(remaining, segLen - segPos);
+              if (drawOn && step > 0) {
+                  const from = segPos;
+                  const to = segPos + step;
+                  g.moveTo(start.x + ux * from, start.y + uy * from);
+                  g.lineTo(start.x + ux * to, start.y + uy * to);
+              }
+              segPos += step;
+              remaining -= step;
+              if (remaining <= 1e-6) {
+                  drawOn = !drawOn;
+                  remaining = drawOn ? dashLength : gapLength;
+              }
+          }
       }
       g.stroke({ color, width });
   }
@@ -666,6 +731,7 @@ class TileEditor {
         label: 'Hint',
         value: "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it.",
         parse: (value) => String(value),
+        format: (value) => String(value),
       });
       return;
     }
@@ -758,16 +824,18 @@ class TileEditor {
     if (!this.selectedPolygon) return;
     const labels = this.buildVertexLabels(this.selectedPolygon.sides);
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
+    const fontSize = 12 / this.config.scale;
     points.forEach((point, index) => {
       const label = new Text({
         text: `${labels[index]}`,
         style: {
           fill: 0xffd24d,
-          fontSize: 12,
+          fontSize,
         },
       });
-      label.x = this.selectedPolygon!.x + point.x + 4 / this.config.scale;
-      label.y = this.selectedPolygon!.y + point.y + 4 / this.config.scale;
+      label.anchor.set(0.5, 0.5);
+      label.x = this.selectedPolygon!.x + point.x;
+      label.y = this.selectedPolygon!.y + point.y;
       this.labelContainer.addChild(label);
     });
   }

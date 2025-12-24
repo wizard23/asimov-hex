@@ -174,4 +174,32 @@ Please implement these changes to the tile editor:
 If anything is unclear please just ask.
 
 
+Please implement these changes to the tile editor:
+* Visually differentiate between the yellow highlighting when hovering and the highlighting when editing a polygon by changing the highlighting while it is being edited to a moving dashed line (this kind of "moving dashed line" is used in some drawing applications for highlighting selected areas)
+* The labels for the vertices of polygons that are being edited work but they appear way too large. Also the positioning is a little bit off since they appear to be shifted towards the bottom right relative to where I would expect them.
+
+Use colors black and white for the "moving ants" and make it slower by a factor of 10
+For non closed polygons please exclude the implied closing edge from both yellow highlighting when hovering and the moving ants
+
+
+If anything is unclear please just ask.
+
+Please add a multi line text box in the "Editor Controls" for constants that will be available for expressions in all fields that allow expressions. Constants are calculated line by line and expressions defining constants can use all constants that have been defined before
+
+Example of a constants block:
+
+TEST=12
+X=TEST/3
+Y=X+sin(PI/4)
+
+
+If anything is unclear please just ask.
+
+
+
+
+
+
+
+
 Add a center view button in the controls that adjusts scale and offset such that 
