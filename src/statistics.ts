@@ -82,7 +82,7 @@ class StatisticsViewer {
     if (!container) return;
 
     this.pane = new Pane({ 
-      title: 'Statistics Files',
+      title: 'Statistics Controls',
       container: container
     });
 
