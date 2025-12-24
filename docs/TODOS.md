@@ -49,10 +49,10 @@ Please create a new page called "tile editor" (same principal layout as the page
 * enter a string called "side length expression" (defaults to "1")
 * drop down list "tool": for now this only contains "Move", "Create Polygon", "Join"
 
-The page should use this information to just display the chosen values. The "side length expression" should be evaluated as a mathematical expression and th result should be shown.
+The page should use this information to just display the chosen values. The "side length expression" should be evaluated as a mathematical expression and the result should be shown.
 
 In the formula the following should be bossible:
-* brackets for frouping expressions
+* brackets for grouping expressions
 * operations + - * / ^
 * functions like sin(<expression>) please add the following functions: 
   * sin, cos, tan, tanh, tanh2, pow, log

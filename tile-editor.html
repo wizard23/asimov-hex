@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tile Editor - Grid Drawing App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    #header {
+      padding: 20px;
+      border-bottom: 1px solid #555;
+      background: rgba(30, 30, 30, 0.95);
+    }
+    #header h1 {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    #header a {
+      color: #4a9eff;
+      text-decoration: none;
+    }
+    #header a:hover {
+      color: #6bb0ff;
+      text-decoration: underline;
+    }
+    #content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    #tweakpane-container {
+      width: 300px;
+      border-right: 1px solid #555;
+      background: rgba(30, 30, 30, 0.95);
+      overflow-y: auto;
+    }
+    #editor-panel {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+    #editor-panel h2 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .value-display {
+      background: rgba(50, 50, 50, 0.8);
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid #666;
+      margin-bottom: 20px;
+    }
+    .value-row {
+      display: flex;
+      margin-bottom: 10px;
+      align-items: baseline;
+    }
+    .value-row:last-child {
+      margin-bottom: 0;
+    }
+    .value-label {
+      width: 150px;
+      color: #aaa;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .value-content {
+      font-family: monospace;
+      font-size: 16px;
+      color: #fff;
+    }
+    .value-content.error {
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <h1>Tile Editor</h1>
+      <a href="index.html">← Back to Main App</a>
+    </div>
+    <div id="content">
+      <div id="tweakpane-container"></div>
+      <div id="editor-panel">
+        <h2>Current Values</h2>
+        <div id="values-display" class="value-display">
+          <!-- Values will be injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/tile-editor.ts"></script>
+</body>
+</html>
