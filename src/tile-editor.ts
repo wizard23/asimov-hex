@@ -167,7 +167,7 @@ class TileEditor {
 
     // Update loop
     this.app.ticker.add(() => {
-      this.dashOffset += 4 / this.config.scale;
+      this.dashOffset += 0.4 / this.config.scale;
       this.updatePreview();
       if (this.selectedPolygon) {
         this.drawPolygonInstance(this.selectedPolygon);
@@ -496,9 +496,10 @@ class TileEditor {
               poly.graphics,
               poly.points,
               { x: poly.x, y: poly.y },
-              0xffd24d,
+              0x000000,
+              0xffffff,
               this.getStrokeWidth(),
-              true,
+              poly.isClosed,
               this.dashOffset
           );
       }
@@ -593,7 +594,8 @@ class TileEditor {
       g: Graphics,
       points: Point[],
       offset: Point,
-      color: number,
+      primaryColor: number,
+      secondaryColor: number,
       width: number,
       closePath: boolean,
       dashOffset: number
@@ -633,7 +635,39 @@ class TileEditor {
               }
           }
       }
-      g.stroke({ color, width });
+      g.stroke({ color: primaryColor, width });
+
+      const secondaryOffset = dashOffset + dashLength;
+      const secondaryNorm = ((secondaryOffset % pattern) + pattern) % pattern;
+      drawOn = secondaryNorm < dashLength;
+      remaining = drawOn ? dashLength - secondaryNorm : pattern - secondaryNorm;
+      for (let i = 0; i < pathPoints.length - 1; i++) {
+          const start = { x: pathPoints[i].x + offset.x, y: pathPoints[i].y + offset.y };
+          const end = { x: pathPoints[i + 1].x + offset.x, y: pathPoints[i + 1].y + offset.y };
+          const dx = end.x - start.x;
+          const dy = end.y - start.y;
+          const segLen = Math.hypot(dx, dy);
+          if (segLen === 0) continue;
+          const ux = dx / segLen;
+          const uy = dy / segLen;
+          let segPos = 0;
+          while (segPos < segLen) {
+              const step = Math.min(remaining, segLen - segPos);
+              if (drawOn && step > 0) {
+                  const from = segPos;
+                  const to = segPos + step;
+                  g.moveTo(start.x + ux * from, start.y + uy * from);
+                  g.lineTo(start.x + ux * to, start.y + uy * to);
+              }
+              segPos += step;
+              remaining -= step;
+              if (remaining <= 1e-6) {
+                  drawOn = !drawOn;
+                  remaining = drawOn ? dashLength : gapLength;
+              }
+          }
+      }
+      g.stroke({ color: secondaryColor, width });
   }
 
   private translatePoints(points: Point[], offset: Point): Point[] {
