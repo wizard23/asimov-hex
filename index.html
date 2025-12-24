@@ -118,6 +118,55 @@
     #info-panel-close:hover {
       color: #fff;
     }
+    .info-panel-tabs {
+      display: flex;
+      border-bottom: 1px solid #555;
+      margin-bottom: 15px;
+    }
+    .info-panel-tab {
+      padding: 5px 10px;
+      cursor: pointer;
+      color: #aaa;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-panel-tab.active {
+      color: #fff;
+      border-bottom-color: #4a9eff;
+    }
+    .info-panel-tab:hover:not(.active) {
+      color: #fff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .tech-stack-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tech-stack-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #444;
+    }
+    .tech-stack-name {
+      font-weight: 600;
+      color: #4a9eff;
+    }
+    .tech-stack-version {
+      font-family: monospace;
+      color: #888;
+    }
     #info-panel-content {
       margin-bottom: 15px;
     }

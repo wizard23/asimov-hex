@@ -155,6 +155,23 @@ class GridApp {
     header.appendChild(closeButton);
     header.appendChild(reopenButton);
     
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'info-panel-tabs';
+    
+    const aboutTab = document.createElement('div');
+    aboutTab.className = 'info-panel-tab active';
+    aboutTab.textContent = 'About';
+    
+    const techTab = document.createElement('div');
+    techTab.className = 'info-panel-tab';
+    techTab.textContent = 'Tech Stack';
+    
+    tabsContainer.appendChild(aboutTab);
+    tabsContainer.appendChild(techTab);
+    
+    const aboutContent = document.createElement('div');
+    aboutContent.className = 'tab-content active';
+    
     const content = document.createElement('div');
     content.id = 'info-panel-content';
     
@@ -193,9 +210,60 @@ class GridApp {
     links.appendChild(statisticsLink);
     links.appendChild(timelineLink);
     
+    aboutContent.appendChild(content);
+    aboutContent.appendChild(links);
+    
+    const techContent = document.createElement('div');
+    techContent.className = 'tab-content';
+    
+    const techList = document.createElement('div');
+    techList.className = 'tech-stack-list';
+    
+    const libraries = [
+      { name: 'Pixi.js', version: '8.0.0', desc: 'High-performance 2D renderer' },
+      { name: 'Tweakpane', version: '4.0.3', desc: 'Compact UI for parameters' },
+      { name: 'Vite', version: '5.0.8', desc: 'Next-generation frontend tool' },
+      { name: 'TypeScript', version: '5.3.3', desc: 'Type-safe JavaScript' },
+      { name: 'Vitest', version: '2.0.4', desc: 'Vite-native testing framework' },
+      { name: 'tsx', version: '4.21.0', desc: 'TypeScript execution environment' },
+    ];
+    
+    libraries.forEach(lib => {
+      const item = document.createElement('div');
+      item.className = 'tech-stack-item';
+      item.innerHTML = `
+        <div>
+          <div class="tech-stack-name">${lib.name}</div>
+          <div style="font-size: 11px; color: #aaa;">${lib.desc}</div>
+        </div>
+        <div class="tech-stack-version">${lib.version}</div>
+      `;
+      techList.appendChild(item);
+    });
+    
+    techContent.appendChild(techList);
+    
+    const switchTab = (tab: 'about' | 'tech') => {
+      if (tab === 'about') {
+        aboutTab.classList.add('active');
+        techTab.classList.remove('active');
+        aboutContent.classList.add('active');
+        techContent.classList.remove('active');
+      } else {
+        techTab.classList.add('active');
+        aboutTab.classList.remove('active');
+        techContent.classList.add('active');
+        aboutContent.classList.remove('active');
+      }
+    };
+    
+    aboutTab.onclick = () => switchTab('about');
+    techTab.onclick = () => switchTab('tech');
+    
     panel.appendChild(header);
-    panel.appendChild(content);
-    panel.appendChild(links);
+    panel.appendChild(tabsContainer);
+    panel.appendChild(aboutContent);
+    panel.appendChild(techContent);
     
     document.body.appendChild(panel);
   }
