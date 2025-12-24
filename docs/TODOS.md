@@ -30,7 +30,13 @@ Adapt the  project generation script to exclude all files that are in a folder n
 
 
 
+in public/project-history/git-timeline.json is a list of commits. Please create a timeline page (same principal layout as the page rendered by src/statistics.ts) that allows user to:
+* select a start date (defaults to date of the first commit in the timeline)
+* select an end date (defaults to date of the last commit)
+* drop down list display mode: for now this only contains "List"
+* search term: a text input that allows to filter for commits that contain the entered test (case insensitive)
 
+The page should use this information to show the list of the commits matching the entered criteria
 
 
 * instanced geometry

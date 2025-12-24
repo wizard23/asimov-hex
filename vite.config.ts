@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         statistics: resolve(__dirname, 'statistics.html'),
+        timeline: resolve(__dirname, 'timeline.html'),
       },
     },
   },
