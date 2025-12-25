@@ -861,11 +861,17 @@ class TileEditor {
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
     const fontSize = 12 / this.config.scale;
     const strokeWidth = Math.max(1 / this.config.scale, fontSize * 0.12);
+    const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    centroid.x /= points.length;
+    centroid.y /= points.length;
     points.forEach((point, index) => {
+      const dir = { x: point.x - centroid.x, y: point.y - centroid.y };
+      const len = Math.hypot(dir.x, dir.y) || 1;
+      const offset = { x: (dir.x / len) * fontSize, y: (dir.y / len) * fontSize };
       const label = new Graphics();
       this.drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
-      label.x = this.selectedPolygon!.x + point.x - fontSize * 0.5;
-      label.y = this.selectedPolygon!.y + point.y - fontSize * 0.5;
+      label.x = this.selectedPolygon!.x + point.x + offset.x - fontSize * 0.5;
+      label.y = this.selectedPolygon!.y + point.y + offset.y - fontSize * 0.5;
       this.labelContainer.addChild(label);
     });
   }
