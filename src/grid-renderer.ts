@@ -1,5 +1,5 @@
 import { Graphics, Container, Text } from 'pixi.js';
-import { EdgeInfo, CellInfo, Point } from './types';
+import { EdgeInfo, CellInfo, Point, ColorValue } from './types';
 import { colorToHex } from './color-utils';
 import { Grid } from './grid';
 
@@ -11,11 +11,11 @@ export class GridRenderer {
     height: number,
     grid: Grid,
     cellStates: number[][],
-    palette: Record<number, string>,
-    edgeColor: string,
+    palette: Record<number, ColorValue>,
+    edgeColor: ColorValue,
     edgeWidth: number,
     visualizeEdgeDelta: boolean,
-    edgePalette: Record<number, string>,
+    edgePalette: Record<number, ColorValue>,
     showCoordinates: boolean = false
   ) {
     container.removeChildren();
@@ -164,19 +164,19 @@ export class GridRenderer {
       return grid.getEdgesAtVertex(vertex, width, height);
   }
   
-  drawEdge(edgeInfo: EdgeInfo, color: string): Graphics {
+  drawEdge(edgeInfo: EdgeInfo, color: ColorValue): Graphics {
     const graphics = new Graphics();
     graphics.moveTo(edgeInfo.points[0].x, edgeInfo.points[0].y).lineTo(edgeInfo.points[1].x, edgeInfo.points[1].y).stroke({ color: colorToHex(color), width: 3 });
     return graphics;
   }
   
-  drawVertex(vertex: Point, color: string): Graphics {
+  drawVertex(vertex: Point, color: ColorValue): Graphics {
     const graphics = new Graphics();
     graphics.circle(vertex.x, vertex.y, 5).fill(colorToHex(color));
     return graphics;
   }
   
-  drawCellHighlight(cellInfo: CellInfo, grid: Grid, color: string): Graphics {
+  drawCellHighlight(cellInfo: CellInfo, grid: Grid, color: ColorValue): Graphics {
     const graphics = new Graphics();
     const poly = grid.getCellPolygon({ col: cellInfo.col, row: cellInfo.row });
     const shape = this.createPolygonShape(poly);

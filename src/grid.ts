@@ -1,4 +1,9 @@
 import { Point, EdgeInfo } from "./types";
+import {
+  distanceToLineSegment,
+  pointsClose,
+  removeDuplicateEdges,
+} from "./grid-utils";
 
 export interface Grid {
   pixelToCell(pixel: Point): { col: number; row: number } | null;
@@ -107,7 +112,7 @@ export class SquareGrid implements Grid {
       ) {
         const edges = this.getCellEdges({ col: c, row: r });
         for (const edge of edges) {
-          const dist = this.distanceToLineSegment(
+          const dist = distanceToLineSegment(
             pixel,
             edge.points[0],
             edge.points[1]
@@ -185,49 +190,15 @@ export class SquareGrid implements Grid {
         const cellEdges = this.getCellEdges({ col: c, row: r });
         for (const edge of cellEdges) {
           if (
-            this.pointsEqual(vertex, edge.points[0], epsilon) ||
-            this.pointsEqual(vertex, edge.points[1], epsilon)
+            pointsClose(vertex, edge.points[0], epsilon) ||
+            pointsClose(vertex, edge.points[1], epsilon)
           ) {
             edges.push(edge);
           }
         }
       }
     }
-    return this.removeDuplicateEdges(edges);
-  }
-
-  private distanceToLineSegment(p: Point, v: Point, w: Point): number {
-    const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
-    if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
-    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-    t = Math.max(0, Math.min(1, t));
-    return Math.sqrt(
-      (p.x - (v.x + t * (w.x - v.x))) ** 2 +
-        (p.y - (v.y + t * (w.y - v.y))) ** 2
-    );
-  }
-
-  private pointsEqual(p1: Point, p2: Point, epsilon: number): boolean {
-    return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
-  }
-
-  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
-    const unique: EdgeInfo[] = [];
-    const epsilon = 0.1;
-    for (const edge of edges) {
-      if (
-        !unique.some(
-          (u) =>
-            (this.pointsEqual(edge.points[0], u.points[0], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[1], epsilon)) ||
-            (this.pointsEqual(edge.points[0], u.points[1], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[0], epsilon))
-        )
-      ) {
-        unique.push(edge);
-      }
-    }
-    return unique;
+    return removeDuplicateEdges(edges);
   }
 }
 
@@ -344,7 +315,7 @@ export class HexagonGrid implements Grid {
       ) {
         const edges = this.getCellEdges({ col: c, row: r });
         for (const edge of edges) {
-          const dist = this.distanceToLineSegment(
+          const dist = distanceToLineSegment(
             pixel,
             edge.points[0],
             edge.points[1]
@@ -417,50 +388,17 @@ export class HexagonGrid implements Grid {
         const cellEdges = this.getCellEdges({ col: c, row: r });
         for (const edge of cellEdges) {
           if (
-            this.pointsEqual(vertex, edge.points[0], epsilon) ||
-            this.pointsEqual(vertex, edge.points[1], epsilon)
+            pointsClose(vertex, edge.points[0], epsilon) ||
+            pointsClose(vertex, edge.points[1], epsilon)
           ) {
             edges.push(edge);
           }
         }
       }
     }
-    return this.removeDuplicateEdges(edges);
+    return removeDuplicateEdges(edges);
   }
 
-  private distanceToLineSegment(p: Point, v: Point, w: Point): number {
-    const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
-    if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
-    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-    t = Math.max(0, Math.min(1, t));
-    return Math.sqrt(
-      (p.x - (v.x + t * (w.x - v.x))) ** 2 +
-        (p.y - (v.y + t * (w.y - v.y))) ** 2
-    );
-  }
-
-  private pointsEqual(p1: Point, p2: Point, epsilon: number): boolean {
-    return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
-  }
-
-  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
-    const unique: EdgeInfo[] = [];
-    const epsilon = 0.1;
-    for (const edge of edges) {
-      if (
-        !unique.some(
-          (u) =>
-            (this.pointsEqual(edge.points[0], u.points[0], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[1], epsilon)) ||
-            (this.pointsEqual(edge.points[0], u.points[1], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[0], epsilon))
-        )
-      ) {
-        unique.push(edge);
-      }
-    }
-    return unique;
-  }
 }
 
 export class TriangleGrid implements Grid {
@@ -608,7 +546,7 @@ export class TriangleGrid implements Grid {
         const edges = this.getCellEdges({ col: c, row: r });
 
         for (const edge of edges) {
-          const dist = this.distanceToLineSegment(
+          const dist = distanceToLineSegment(
             pixel,
             edge.points[0],
             edge.points[1]
@@ -696,8 +634,8 @@ export class TriangleGrid implements Grid {
 
         for (const edge of cellEdges) {
           if (
-            this.pointsEqual(vertex, edge.points[0], epsilon) ||
-            this.pointsEqual(vertex, edge.points[1], epsilon)
+            pointsClose(vertex, edge.points[0], epsilon) ||
+            pointsClose(vertex, edge.points[1], epsilon)
           ) {
             edges.push(edge);
           }
@@ -705,48 +643,7 @@ export class TriangleGrid implements Grid {
       }
     }
 
-    return this.removeDuplicateEdges(edges);
-  }
-
-  private distanceToLineSegment(p: Point, v: Point, w: Point): number {
-    const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
-
-    if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
-
-    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-
-    t = Math.max(0, Math.min(1, t));
-
-    return Math.sqrt(
-      (p.x - (v.x + t * (w.x - v.x))) ** 2 +
-        (p.y - (v.y + t * (w.y - v.y))) ** 2
-    );
-  }
-
-  private pointsEqual(p1: Point, p2: Point, epsilon: number): boolean {
-    return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
-  }
-
-  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
-    const unique: EdgeInfo[] = [];
-
-    const epsilon = 0.1;
-
-    for (const edge of edges) {
-      if (
-        !unique.some(
-          (u) =>
-            (this.pointsEqual(edge.points[0], u.points[0], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[1], epsilon)) ||
-            (this.pointsEqual(edge.points[0], u.points[1], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[0], epsilon))
-        )
-      ) {
-        unique.push(edge);
-      }
-    }
-
-    return unique;
+    return removeDuplicateEdges(edges);
   }
 }
 
@@ -933,7 +830,7 @@ export class CairoGrid implements Grid {
       ) {
         const edges = this.getCellEdges({ col: c, row: r });
         for (const edge of edges) {
-          const dist = this.distanceToLineSegment(
+          const dist = distanceToLineSegment(
             pixel,
             edge.points[0],
             edge.points[1]
@@ -1009,8 +906,8 @@ export class CairoGrid implements Grid {
         const cellEdges = this.getCellEdges({ col: c, row: r });
         for (const edge of cellEdges) {
           if (
-            this.pointsEqual(vertex, edge.points[0], epsilon) ||
-            this.pointsEqual(vertex, edge.points[1], epsilon)
+            pointsClose(vertex, edge.points[0], epsilon) ||
+            pointsClose(vertex, edge.points[1], epsilon)
           ) {
             edges.push(edge);
           }
@@ -1018,7 +915,7 @@ export class CairoGrid implements Grid {
       }
     }
 
-    return this.removeDuplicateEdges(edges);
+    return removeDuplicateEdges(edges);
   }
 
   private getAnchor(cell: { col: number; row: number }): Point {
@@ -1236,39 +1133,5 @@ export class CairoGrid implements Grid {
     const p1 = points[shortIndex];
     const p2 = points[(shortIndex + 1) % points.length];
     return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-  }
-
-  private distanceToLineSegment(p: Point, v: Point, w: Point): number {
-    const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
-    if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
-    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-    t = Math.max(0, Math.min(1, t));
-    return Math.sqrt(
-      (p.x - (v.x + t * (w.x - v.x))) ** 2 +
-        (p.y - (v.y + t * (w.y - v.y))) ** 2
-    );
-  }
-
-  private pointsEqual(p1: Point, p2: Point, epsilon: number): boolean {
-    return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
-  }
-
-  private removeDuplicateEdges(edges: EdgeInfo[]): EdgeInfo[] {
-    const unique: EdgeInfo[] = [];
-    const epsilon = 0.1;
-    for (const edge of edges) {
-      if (
-        !unique.some(
-          (u) =>
-            (this.pointsEqual(edge.points[0], u.points[0], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[1], epsilon)) ||
-            (this.pointsEqual(edge.points[0], u.points[1], epsilon) &&
-              this.pointsEqual(edge.points[1], u.points[0], epsilon))
-        )
-      ) {
-        unique.push(edge);
-      }
-    }
-    return unique;
   }
 }

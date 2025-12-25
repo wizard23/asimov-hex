@@ -1,13 +1,11 @@
 import { Application, Graphics, Container } from 'pixi.js';
 import { Pane } from 'tweakpane';
 import { GridRenderer } from './grid-renderer';
-import { GridType, EdgeSelectionRule } from './types';
+import { GridType, EdgeSelectionRule, ColorValue } from './types';
 import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
 import palettesData from './assets/palettes.json';
 import { ParticleSystem } from './particle-system';
 import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './grid';
-
-type ColorValue = string | { r: number; g: number; b: number; a?: number };
 
 interface PaletteData {
   name: string;
@@ -273,33 +271,31 @@ class GridApp {
     document.body.appendChild(panel);
   }
 
-  private applyPalette(paletteName: string) {
+  private applyPaletteToConfig(
+    paletteName: string,
+    target: Record<number, ColorValue>,
+    updateDrawState: boolean
+  ) {
     const palette = this.palettes.find(p => p.name === paletteName);
     if (!palette) return;
 
-    // Update palette in config
     Object.keys(palette.colors).forEach(key => {
-      this.config.palette[parseInt(key)] = palette.colors[key];
+      target[parseInt(key)] = palette.colors[key];
     });
 
-    // Update draw state blade to reflect new colors
-    this.updateDrawStateBlade();
-    
-    // Update grid rendering
+    if (updateDrawState) {
+      this.updateDrawStateBlade();
+    }
+
     this.updateGrid();
   }
 
-  private applyEdgePalette(paletteName: string) {
-    const palette = this.palettes.find(p => p.name === paletteName);
-    if (!palette) return;
+  private applyPalette(paletteName: string) {
+    this.applyPaletteToConfig(paletteName, this.config.palette, true);
+  }
 
-    // Update edge palette in config
-    Object.keys(palette.colors).forEach(key => {
-      this.config.edgePalette[parseInt(key)] = palette.colors[key];
-    });
-    
-    // Update grid rendering
-    this.updateGrid();
+  private applyEdgePalette(paletteName: string) {
+    this.applyPaletteToConfig(paletteName, this.config.edgePalette, false);
   }
 
   private async initPixi() {

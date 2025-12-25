@@ -145,19 +145,7 @@ export class ParticleSystem {
       // Filter out the edge we're currently on (the one we just arrived from)
       availableEdges = connectedEdges.filter(edge => {
         if (!particle.currentEdge) return true;
-        // Check if this edge is the same as the current edge we're on
-        const currentP1 = particle.currentEdge.points[0];
-        const currentP2 = particle.currentEdge.points[1];
-        const edgeP1 = edge.points[0];
-        const edgeP2 = edge.points[1];
-        
-        // Check if edges are the same (same two points, regardless of order)
-        const sameEdge = (
-          (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
-          (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
-        );
-        
-        return !sameEdge;
+        return !this.edgesEqual(particle.currentEdge, edge);
       });
       
       if (availableEdges.length === 0) {
@@ -231,17 +219,7 @@ export class ParticleSystem {
       // Filter out current edge for follow/avoid cursor rules
       const availableEdges = connectedEdges.filter(edge => {
         if (!particle.currentEdge) return true;
-        const currentP1 = particle.currentEdge.points[0];
-        const currentP2 = particle.currentEdge.points[1];
-        const edgeP1 = edge.points[0];
-        const edgeP2 = edge.points[1];
-        
-        const sameEdge = (
-          (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
-          (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
-        );
-        
-        return !sameEdge;
+        return !this.edgesEqual(particle.currentEdge, edge);
       });
       
       if (availableEdges.length === 0) {
@@ -305,6 +283,19 @@ export class ParticleSystem {
     return Math.abs(p1.x - p2.x) < epsilon && Math.abs(p1.y - p2.y) < epsilon;
   }
 
+  private edgesEqual(a: EdgeInfo, b: EdgeInfo): boolean {
+    return (
+      (this.pointsClose(a.points[0], b.points[0]) &&
+        this.pointsClose(a.points[1], b.points[1])) ||
+      (this.pointsClose(a.points[0], b.points[1]) &&
+        this.pointsClose(a.points[1], b.points[0]))
+    );
+  }
+
+  private getOtherPoint(edge: EdgeInfo, vertex: Point): Point {
+    return this.pointsClose(vertex, edge.points[0]) ? edge.points[1] : edge.points[0];
+  }
+
   private getEdgeDelta(edge: EdgeInfo, grid: Grid, cellStates: number[][], gridWidth: number, gridHeight: number): number {
     const p1 = edge.points[0];
     const p2 = edge.points[1];
@@ -354,11 +345,7 @@ export class ParticleSystem {
     clockwise: boolean
   ): EdgeInfo | null {
     // Calculate the angle of the incoming edge (from vertex, pointing away from vertex)
-    const currentP1 = currentEdge.points[0];
-    const currentP2 = currentEdge.points[1];
-    
-    // Find the other endpoint of the current edge (not the vertex)
-    const otherPoint = this.pointsClose(vertex, currentP1) ? currentP2 : currentP1;
+    const otherPoint = this.getOtherPoint(currentEdge, vertex);
     
     // Calculate angle of incoming edge (from vertex to other point)
     const incomingAngle = Math.atan2(otherPoint.y - vertex.y, otherPoint.x - vertex.x);
@@ -368,17 +355,12 @@ export class ParticleSystem {
     
     for (const edge of connectedEdges) {
       // Skip the current edge
-      const edgeP1 = edge.points[0];
-      const edgeP2 = edge.points[1];
-      const isCurrentEdge = (
-        (this.pointsClose(currentP1, edgeP1) && this.pointsClose(currentP2, edgeP2)) ||
-        (this.pointsClose(currentP1, edgeP2) && this.pointsClose(currentP2, edgeP1))
-      );
+      const isCurrentEdge = this.edgesEqual(currentEdge, edge);
       
       if (isCurrentEdge) continue;
       
       // Find the other endpoint (not the vertex)
-      const edgeOtherPoint = this.pointsClose(vertex, edgeP1) ? edgeP2 : edgeP1;
+      const edgeOtherPoint = this.getOtherPoint(edge, vertex);
       
       // Calculate angle from vertex to other point
       const angle = Math.atan2(edgeOtherPoint.y - vertex.y, edgeOtherPoint.x - vertex.x);
@@ -441,9 +423,7 @@ export class ParticleSystem {
     
     for (const edge of connectedEdges) {
       // Find the other endpoint of the edge (not the vertex)
-      const edgeP1 = edge.points[0];
-      const edgeP2 = edge.points[1];
-      const otherPoint = this.pointsClose(vertex, edgeP1) ? edgeP2 : edgeP1;
+      const otherPoint = this.getOtherPoint(edge, vertex);
       
       // Calculate distance from the other endpoint to cursor
       const distToCursor = Math.sqrt((mouseX - otherPoint.x) ** 2 + (mouseY - otherPoint.y) ** 2);
