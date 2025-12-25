@@ -2,7 +2,7 @@ import { Graphics, Container, Text } from 'pixi.js';
 import { EdgeInfo, CellInfo, Point, ColorValue } from '../../types';
 import { colorToHex } from '../utils/color-utils';
 import { pointsClose } from '../utils/geometry';
-import { getCellAtPixel, getEdgeAtPixel, getVertexAtPixel, Grid } from '../grid';
+import { Grid } from '../grid';
 
 export class GridRenderer {
   render(
@@ -139,20 +139,6 @@ export class GridRenderer {
     container.addChild(coordText);
   }
 
-  getCellAt(x: number, y: number, width: number, height: number, grid: Grid): CellInfo | null {
-    return getCellAtPixel(grid, width, height, x, y);
-  }
-  
-  getEdgeAt(x: number, y: number, width: number, height: number, grid: Grid): EdgeInfo | null {
-    // Threshold for edge selection (e.g. 10 pixels)
-    return getEdgeAtPixel(grid, width, height, x, y, 10);
-  }
-
-  getClosestVertex(x: number, y: number, width: number, height: number, grid: Grid): Point | null { 
-      // Threshold for vertex selection (e.g. 20 pixels)
-      return getVertexAtPixel(grid, width, height, x, y, 20);
-  }
-  
   getEdgesAtVertex(vertex: Point, width: number, height: number, grid: Grid): EdgeInfo[] {
       return grid.getEdgesAtVertex(vertex, width, height);
   }

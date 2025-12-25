@@ -8,5 +8,5 @@
 
   "npm.autoDetect": "on", // default is on but good to have
   "npm.enableRunFromFolder": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": false
 }
