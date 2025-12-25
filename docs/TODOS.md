@@ -194,14 +194,16 @@ Are there any unused function that don't gent called anywhere?
 
 
 
-In "Current Values" please remove:
+Restructure "Current Values":
+
+Please remove:
 * Scale
 * Number of Sides
 * Side Length
 * Edge Width
 * Closed Polygon Epsilon
 
-Then split the remaining fields in 4 columns containing:
+Split the remaining fields in 4 columns containing:
 * view offset and constants
 * info about polygon that is not in any other column
 * polygon side lengths

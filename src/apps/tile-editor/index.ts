@@ -263,35 +263,33 @@ class TileEditor {
     }
 
     const constantsDisplay = this.buildConstantsDisplay();
-    const polygonDisplay = this.selectedPolygon ? this.buildPolygonDisplay(this.selectedPolygon) : '';
+    const polygonInfoDisplay = this.selectedPolygon ? this.buildPolygonInfoDisplay(this.selectedPolygon) : '';
+    const polygonSidesDisplay = this.selectedPolygon ? this.buildPolygonSidesDisplay(this.selectedPolygon) : '';
+    const polygonAnglesDisplay = this.selectedPolygon ? this.buildPolygonAnglesDisplay(this.selectedPolygon) : '';
 
     this.displayContainer.innerHTML = `
-      <div class="value-row">
-        <div class="value-label">Scale</div>
-        <div class="value-content">${this.config.scale}</div>
+      <div class="values-grid">
+        <div class="values-column">
+          <div class="column-header">View & Constants</div>
+          <div class="value-row">
+            <div class="value-label">View Offset</div>
+            <div class="value-content">${this.config.viewOffset.x.toFixed(2)}, ${this.config.viewOffset.y.toFixed(2)}</div>
+          </div>
+          ${constantsDisplay}
+        </div>
+        <div class="values-column">
+          <div class="column-header">Polygon Info</div>
+          ${polygonInfoDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
+        </div>
+        <div class="values-column">
+          <div class="column-header">Side Lengths</div>
+          ${polygonSidesDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
+        </div>
+        <div class="values-column">
+          <div class="column-header">Angles</div>
+          ${polygonAnglesDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
+        </div>
       </div>
-      <div class="value-row">
-        <div class="value-label">Number of Sides</div>
-        <div class="value-content">${this.config.numSides}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Side Length</div>
-        <div class="value-content">${resultDisplay}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Edge Width</div>
-        <div class="value-content">${this.config.edgeWidth}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Closed Polygon Epsilon</div>
-        <div class="value-content">${this.config.closedPolygonEpsilon}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">View Offset</div>
-        <div class="value-content">${this.config.viewOffset.x.toFixed(2)}, ${this.config.viewOffset.y.toFixed(2)}</div>
-      </div>
-      ${constantsDisplay}
-      ${polygonDisplay}
     `;
   }
 
@@ -366,18 +364,10 @@ class TileEditor {
       .join('');
   }
 
-  private buildPolygonDisplay(poly: PolygonData): string {
+  private buildPolygonInfoDisplay(poly: PolygonData): string {
     const end = poly.points[poly.points.length - 1] ?? { x: 0, y: 0 };
     const divergence = Math.hypot(end.x, end.y);
     const angleSum = poly.interiorAngles.reduce((sum, angle) => sum + angle, 0);
-    const sideLabels = this.buildEdgeLabels(poly.sides);
-    const angleLabels = this.buildVertexLabels(poly.sides);
-    const sideValues = sideLabels
-      .map((label, i) => `${label}: ${this.formatNumber(poly.sideLengths[i] ?? 0)}`)
-      .join('<br />');
-    const angleValues = angleLabels
-      .map((label, i) => `${label}: ${this.formatNumber(poly.interiorAngles[i] ?? 0)}`)
-      .join('<br />');
 
     return `
       <div class="value-row">
@@ -400,15 +390,31 @@ class TileEditor {
         <div class="value-label">Sum of Angles</div>
         <div class="value-content">${this.formatNumber(angleSum)}</div>
       </div>
-      <div class="value-row">
-        <div class="value-label">Side Values</div>
-        <div class="value-content">${sideValues}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Angle Values</div>
-        <div class="value-content">${angleValues}</div>
-      </div>
     `;
+  }
+
+  private buildPolygonSidesDisplay(poly: PolygonData): string {
+    const sideLabels = this.buildEdgeLabels(poly.sides);
+    return sideLabels
+      .map((label, i) => `
+        <div class="value-row">
+          <div class="value-label">${label}</div>
+          <div class="value-content">${this.formatNumber(poly.sideLengths[i] ?? 0)}</div>
+        </div>
+      `)
+      .join('');
+  }
+
+  private buildPolygonAnglesDisplay(poly: PolygonData): string {
+    const angleLabels = this.buildVertexLabels(poly.sides);
+    return angleLabels
+      .map((label, i) => `
+        <div class="value-row">
+          <div class="value-label">${label}</div>
+          <div class="value-content">${this.formatNumber(poly.interiorAngles[i] ?? 0)}</div>
+        </div>
+      `)
+      .join('');
   }
 
   private formatNumber(value: number): string {
