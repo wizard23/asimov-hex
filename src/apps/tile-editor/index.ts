@@ -1,8 +1,11 @@
 import { Pane } from 'tweakpane';
 import { Application, Container, Graphics } from 'pixi.js';
-import { distanceToSegment, pointsCloseEuclidean } from '../../core/utils/geometry';
-
-type Point = { x: number; y: number };
+import { pointsCloseEuclidean } from '../../core/utils/geometry';
+import { ExpressionParser } from './expression-parser';
+import { pointInPolygon, pointNearPolyline, translatePoints } from './geometry-helpers';
+import { drawDashedPath, drawDottedConnection, drawLetter, drawPolygonPath } from './render-helpers';
+import { setupValuesToggle } from './ui-helpers';
+import { Point } from './types';
 
 interface EditorConfig {
   scale: number;
@@ -73,18 +76,7 @@ class TileEditor {
   private setupUI() {
     const toggleBtn = document.getElementById('toggle-values');
     const valuesDisplay = document.getElementById('values-display');
-    
-    if (toggleBtn && valuesDisplay) {
-      toggleBtn.onclick = () => {
-        valuesDisplay.classList.toggle('collapsed');
-        toggleBtn.classList.toggle('collapsed');
-        
-        // Force resize after transition
-        setTimeout(() => {
-          this.app.resize();
-        }, 350); // Slightly longer than CSS transition
-      };
-    }
+    setupValuesToggle(toggleBtn, valuesDisplay, () => this.app.resize());
   }
 
   private async initPixi() {
@@ -455,36 +447,38 @@ class TileEditor {
       const strokeColor = (poly.isHovered && !isSelected) ? 0xffd24d : baseStroke;
       const openStrokeColor = 0xff4d4d;
       
-      this.drawPolygonPath(
-          poly.graphics,
-          poly.points,
-          { x: poly.x, y: poly.y },
-          color,
-          alpha,
-          strokeColor,
-          this.getStrokeWidth()
+      drawPolygonPath(
+        poly.graphics,
+        poly.points,
+        { x: poly.x, y: poly.y },
+        color,
+        alpha,
+        strokeColor,
+        this.getStrokeWidth()
       );
 
       if (!poly.isClosed) {
-          this.drawDottedConnection(
-              poly.graphics,
-              { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
-              { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
-              openStrokeColor,
-              this.getStrokeWidth()
+          drawDottedConnection(
+            poly.graphics,
+            { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
+            { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
+            openStrokeColor,
+            this.getStrokeWidth(),
+            this.config.scale
           );
       }
 
       if (isSelected) {
-          this.drawDashedPath(
-              poly.graphics,
-              poly.points,
-              { x: poly.x, y: poly.y },
-              0x000000,
-              0xffffff,
-              this.getStrokeWidth(),
-              poly.isClosed,
-              this.dashOffset
+          drawDashedPath(
+            poly.graphics,
+            poly.points,
+            { x: poly.x, y: poly.y },
+            0x000000,
+            0xffffff,
+            this.getStrokeWidth(),
+            poly.isClosed,
+            this.dashOffset,
+            this.config.scale
           );
       }
   }
@@ -497,8 +491,8 @@ class TileEditor {
       // Reverse iterate to pick top-most
       for (let i = this.polygons.length - 1; i >= 0; i--) {
           const p = this.polygons[i];
-          const worldPoints = this.translatePoints(p.points, { x: p.x, y: p.y });
-          if (this.pointInPolygon({ x, y }, worldPoints) || this.pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance(), true)) {
+          const worldPoints = translatePoints(p.points, { x: p.x, y: p.y });
+          if (pointInPolygon({ x, y }, worldPoints) || pointNearPolyline({ x, y }, worldPoints, this.getHitTolerance(), true)) {
               return p;
           }
       }
@@ -532,162 +526,6 @@ class TileEditor {
 
   private getHitTolerance(): number {
     return Math.max(0.1, this.getStrokeWidth() * 2);
-  }
-
-  private drawPolygonPath(
-      g: Graphics,
-      points: Point[],
-      offset: Point,
-      color: number,
-      alpha: number,
-      strokeColor: number,
-      strokeWidth: number
-  ) {
-      g.clear();
-      if (points.length < 2) return;
-      g.moveTo(points[0].x + offset.x, points[0].y + offset.y);
-      for (let i = 1; i < points.length; i++) {
-          g.lineTo(points[i].x + offset.x, points[i].y + offset.y);
-      }
-      if (alpha > 0) {
-          g.fill({ color, alpha });
-      }
-      g.stroke({ color: strokeColor, width: strokeWidth });
-  }
-
-  private drawDottedConnection(g: Graphics, start: Point, end: Point, color: number, width: number) {
-      const dx = end.x - start.x;
-      const dy = end.y - start.y;
-      const length = Math.hypot(dx, dy);
-      if (length === 0) return;
-      const dashLength = Math.max(width * 2, 4 / this.config.scale);
-      const gapLength = dashLength;
-      const step = dashLength + gapLength;
-      const ux = dx / length;
-      const uy = dy / length;
-      for (let dist = 0; dist < length; dist += step) {
-          const segmentStart = dist;
-          const segmentEnd = Math.min(dist + dashLength, length);
-          g.moveTo(start.x + ux * segmentStart, start.y + uy * segmentStart);
-          g.lineTo(start.x + ux * segmentEnd, start.y + uy * segmentEnd);
-      }
-      g.stroke({ color, width });
-  }
-
-  private drawDashedPath(
-      g: Graphics,
-      points: Point[],
-      offset: Point,
-      primaryColor: number,
-      secondaryColor: number,
-      width: number,
-      closePath: boolean,
-      dashOffset: number
-  ) {
-      if (points.length < 2) return;
-      const dashLength = Math.max(width * 3, 6 / this.config.scale);
-      const gapLength = dashLength;
-      const pattern = dashLength + gapLength;
-      const offsetNorm = ((dashOffset % pattern) + pattern) % pattern;
-      let drawOn = offsetNorm < dashLength;
-      let remaining = drawOn ? dashLength - offsetNorm : pattern - offsetNorm;
-      const pathPoints = closePath ? [...points, points[0]] : points;
-
-      for (let i = 0; i < pathPoints.length - 1; i++) {
-          const start = { x: pathPoints[i].x + offset.x, y: pathPoints[i].y + offset.y };
-          const end = { x: pathPoints[i + 1].x + offset.x, y: pathPoints[i + 1].y + offset.y };
-          const dx = end.x - start.x;
-          const dy = end.y - start.y;
-          const segLen = Math.hypot(dx, dy);
-          if (segLen === 0) continue;
-          const ux = dx / segLen;
-          const uy = dy / segLen;
-          let segPos = 0;
-          while (segPos < segLen) {
-              const step = Math.min(remaining, segLen - segPos);
-              if (drawOn && step > 0) {
-                  const from = segPos;
-                  const to = segPos + step;
-                  g.moveTo(start.x + ux * from, start.y + uy * from);
-                  g.lineTo(start.x + ux * to, start.y + uy * to);
-              }
-              segPos += step;
-              remaining -= step;
-              if (remaining <= 1e-6) {
-                  drawOn = !drawOn;
-                  remaining = drawOn ? dashLength : gapLength;
-              }
-          }
-      }
-      g.stroke({ color: primaryColor, width });
-
-      const secondaryOffset = dashOffset + dashLength;
-      const secondaryNorm = ((secondaryOffset % pattern) + pattern) % pattern;
-      drawOn = secondaryNorm < dashLength;
-      remaining = drawOn ? dashLength - secondaryNorm : pattern - secondaryNorm;
-      for (let i = 0; i < pathPoints.length - 1; i++) {
-          const start = { x: pathPoints[i].x + offset.x, y: pathPoints[i].y + offset.y };
-          const end = { x: pathPoints[i + 1].x + offset.x, y: pathPoints[i + 1].y + offset.y };
-          const dx = end.x - start.x;
-          const dy = end.y - start.y;
-          const segLen = Math.hypot(dx, dy);
-          if (segLen === 0) continue;
-          const ux = dx / segLen;
-          const uy = dy / segLen;
-          let segPos = 0;
-          while (segPos < segLen) {
-              const step = Math.min(remaining, segLen - segPos);
-              if (drawOn && step > 0) {
-                  const from = segPos;
-                  const to = segPos + step;
-                  g.moveTo(start.x + ux * from, start.y + uy * from);
-                  g.lineTo(start.x + ux * to, start.y + uy * to);
-              }
-              segPos += step;
-              remaining -= step;
-              if (remaining <= 1e-6) {
-                  drawOn = !drawOn;
-                  remaining = drawOn ? dashLength : gapLength;
-              }
-          }
-      }
-      g.stroke({ color: secondaryColor, width });
-  }
-
-  private translatePoints(points: Point[], offset: Point): Point[] {
-      return points.map(p => ({ x: p.x + offset.x, y: p.y + offset.y }));
-  }
-
-  private pointInPolygon(point: Point, polygon: Point[]): boolean {
-      let inside = false;
-      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-          const xi = polygon[i].x;
-          const yi = polygon[i].y;
-          const xj = polygon[j].x;
-          const yj = polygon[j].y;
-          const intersect = ((yi > point.y) !== (yj > point.y))
-            && (point.x < (xj - xi) * (point.y - yi) / (yj - yi + Number.EPSILON) + xi);
-          if (intersect) inside = !inside;
-      }
-      return inside;
-  }
-
-  private pointNearPolyline(point: Point, polyline: Point[], threshold: number, closePath: boolean): boolean {
-      for (let i = 0; i < polyline.length - 1; i++) {
-          const a = polyline[i];
-          const b = polyline[i + 1];
-          if (distanceToSegment(point, a, b) <= threshold) {
-              return true;
-          }
-      }
-      if (closePath && polyline.length > 1) {
-          const a = polyline[polyline.length - 1];
-          const b = polyline[0];
-          if (distanceToSegment(point, a, b) <= threshold) {
-              return true;
-          }
-      }
-      return false;
   }
 
   private globalToWorld(point: { x: number; y: number }): Point {
@@ -840,278 +678,11 @@ class TileEditor {
       const len = Math.hypot(dir.x, dir.y) || 1;
       const offset = { x: (dir.x / len) * fontSize, y: (dir.y / len) * fontSize };
       const label = new Graphics();
-      this.drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
+      drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
       label.x = this.selectedPolygon!.x + point.x + offset.x - fontSize * 0.5;
       label.y = this.selectedPolygon!.y + point.y + offset.y - fontSize * 0.5;
       this.labelContainer.addChild(label);
     });
-  }
-
-  private drawLetter(g: Graphics, letter: string, size: number, color: number, width: number) {
-    const segments = this.getLetterSegments(letter);
-    if (!segments) return;
-    g.clear();
-    for (const [x1, y1, x2, y2] of segments) {
-      g.moveTo(x1 * size, y1 * size);
-      g.lineTo(x2 * size, y2 * size);
-    }
-    g.stroke({ color, width });
-  }
-
-  private getLetterSegments(letter: string): Array<[number, number, number, number]> | null {
-    const l = letter.toUpperCase();
-    const segments: Record<string, Array<[number, number, number, number]>> = {
-      A: [[0,1,0,0],[1,1,1,0],[0,0,1,0],[0,0.5,1,0.5]],
-      B: [
-        [0,0,0,1],
-        [0,0,0.7,0],
-        [0.7,0,0.85,0.2],
-        [0.85,0.2,0.85,0.4],
-        [0.85,0.4,0.7,0.5],
-        [0.7,0.5,0,0.5],
-        [0.7,0.5,0.85,0.6],
-        [0.85,0.6,0.85,0.85],
-        [0.85,0.85,0.7,1],
-        [0.7,1,0,1],
-      ],
-      C: [[1,0,0,0],[0,0,0,1],[0,1,1,1]],
-      D: [[0,0,0,1],[0,0,0.75,0],[0.75,0,1,0.2],[1,0.2,1,0.8],[1,0.8,0.75,1],[0.75,1,0,1]],
-      E: [[1,0,0,0],[0,0,0,1],[0,0.5,0.8,0.5],[0,1,1,1]],
-      F: [[0,0,0,1],[0,0,1,0],[0,0.5,0.8,0.5]],
-      G: [[1,0,0,0],[0,0,0,1],[0,1,1,1],[1,1,1,0.6],[1,0.6,0.6,0.6]],
-      H: [[0,0,0,1],[1,0,1,1],[0,0.5,1,0.5]],
-      I: [[0,0,1,0],[0.5,0,0.5,1],[0,1,1,1]],
-      J: [[1,0,1,1],[1,1,0,1],[0,1,0,0.7]],
-      K: [[0,0,0,1],[0,0.5,1,0],[0,0.5,1,1]],
-      L: [[0,0,0,1],[0,1,1,1]],
-      M: [[0,1,0,0],[1,1,1,0],[0,0,0.5,0.5],[0.5,0.5,1,0]],
-      N: [[0,1,0,0],[1,1,1,0],[0,0,1,1]],
-      O: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0]],
-      P: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5]],
-      Q: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0],[0.6,0.6,1,1]],
-      R: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5],[0,0.5,1,1]],
-      S: [[1,0,0,0],[0,0,0,0.5],[0,0.5,1,0.5],[1,0.5,1,1],[1,1,0,1]],
-      T: [[0,0,1,0],[0.5,0,0.5,1]],
-      U: [[0,0,0,1],[0,1,1,1],[1,1,1,0]],
-      V: [[0,0,0.5,1],[0.5,1,1,0]],
-      W: [[0,0,0.25,1],[0.25,1,0.5,0.5],[0.5,0.5,0.75,1],[0.75,1,1,0]],
-      X: [[0,0,1,1],[1,0,0,1]],
-      Y: [[0,0,0.5,0.5],[1,0,0.5,0.5],[0.5,0.5,0.5,1]],
-      Z: [[0,0,1,0],[1,0,0,1],[0,1,1,1]],
-    };
-    return segments[l] ?? null;
-  }
-}
-
-// --- Expression Parser ---
-
-class ExpressionParser {
-  private pos = 0;
-  private tokens: string[] = [];
-
-  constructor(private expression: string) {
-    this.tokenize();
-  }
-
-  private tokenize() {
-    // Regex for: functions/words, numbers, operators, parens, comma
-    const regex = /([a-z][a-z0-9]*)|([0-9]+(?:\.[0-9]+)?)|(\+|-|\*|\/|\^|\(|\)|,)|(\s+)/gi;
-    let match;
-    while ((match = regex.exec(this.expression)) !== null) {
-      // Group 1: Identifier
-      // Group 2: Number
-      // Group 3: Operator/Punctuation
-      // Group 4: Whitespace (skip)
-      if (match[4]) continue;
-      this.tokens.push(match[0]);
-    }
-  }
-
-  evaluate(): number {
-    this.pos = 0;
-    const result = this.parseExpression();
-    if (this.pos < this.tokens.length) {
-      throw new Error('Unexpected token at end of expression');
-    }
-    return result;
-  }
-
-  private parseExpression(): number {
-    let left = this.parseTerm();
-    while (this.match('+') || this.match('-')) {
-      const op = this.previous();
-      const right = this.parseTerm();
-      if (op === '+') left += right;
-      else left -= right;
-    }
-    return left;
-  }
-
-  private parseTerm(): number {
-    let left = this.parseFactor();
-    while (this.match('*') || this.match('/')) {
-      const op = this.previous();
-      const right = this.parseFactor();
-      if (op === '*') left *= right;
-      else {
-        if (right === 0) throw new Error('Division by zero');
-        left /= right;
-      }
-    }
-    return left;
-  }
-
-  private parseFactor(): number {
-    let left = this.parsePower();
-    return left; // Power handles its own precedence usually higher than mul/div?
-    // Actually standard precedence: ^ > * / > + -
-    // So parseFactor should call parsePower
-  }
-
-  private parsePower(): number {
-    let left = this.parsePrimary();
-    if (this.match('^')) {
-      const right = this.parsePower(); // Right associative? usually. 2^3^4 = 2^(3^4)
-      left = Math.pow(left, right);
-    }
-    return left;
-  }
-
-  private parsePrimary(): number {
-    if (this.match('(')) {
-      const expr = this.parseExpression();
-      if (!this.match(')')) throw new Error("Expected ')'");
-      return expr;
-    }
-
-    if (this.isNumber()) {
-      return parseFloat(this.advance());
-    }
-
-    if (this.isIdentifier()) {
-      const name = this.advance().toLowerCase();
-      if (this.match('(')) {
-        if (this.isTrigFunction(name)) {
-          return this.parseTrigCall(name);
-        }
-
-        const args: number[] = [];
-        if (!this.check(')')) {
-          do {
-            args.push(this.parseExpression());
-          } while (this.match(','));
-        }
-        if (!this.match(')')) throw new Error("Expected ')' after arguments");
-        return this.callFunction(name, args);
-      } else {
-        // Constants?
-        if (name === 'pi') return Math.PI;
-        if (name === 'e') return Math.E;
-        if (name === 'phi') return (1 + Math.sqrt(5)) / 2;
-        throw new Error(`Unknown variable or function: ${name}`);
-      }
-    }
-
-    if (this.match('-')) {
-      return -this.parsePrimary();
-    }
-    
-    if (this.match('+')) {
-      return this.parsePrimary();
-    }
-
-    throw new Error(`Unexpected token: ${this.peek()}`);
-  }
-
-  private callFunction(name: string, args: number[]): number {
-    switch (name) {
-      case 'sin': return Math.sin(this.checkArgs(name, args, 1));
-      case 'cos': return Math.cos(this.checkArgs(name, args, 1));
-      case 'tan': return Math.tan(this.checkArgs(name, args, 1));
-      case 'tanh': return Math.tanh(this.checkArgs(name, args, 1));
-      case 'tanh2': return Math.atan2(this.checkArgs(name, args, 2, 0), this.checkArgs(name, args, 2, 1));
-      case 'pow': return Math.pow(this.checkArgs(name, args, 2, 0), this.checkArgs(name, args, 2, 1));
-      case 'sqrt': return Math.sqrt(this.checkArgs(name, args, 1));
-      case 'cbrt': return Math.cbrt(this.checkArgs(name, args, 1));
-      case 'log': return Math.log(this.checkArgs(name, args, 2, 0)) / Math.log(this.checkArgs(name, args, 2, 1));
-      default: throw new Error(`Unknown function: ${name}`);
-    }
-  }
-
-  private parseTrigCall(name: string): number {
-    const angle = this.parseExpression();
-    let unit: 'rad' | 'deg' = 'rad';
-    if (this.match(',')) {
-      if (!this.isIdentifier()) throw new Error(`Expected angle unit for ${name}()`);
-      const token = this.advance().toLowerCase();
-      unit = this.parseAngleUnit(token);
-    }
-    if (!this.match(')')) throw new Error("Expected ')' after arguments");
-
-    const radians = unit === 'deg' ? (angle * Math.PI) / 180 : angle;
-    switch (name) {
-      case 'sin': return Math.sin(radians);
-      case 'cos': return Math.cos(radians);
-      case 'tan': return Math.tan(radians);
-      default: throw new Error(`Unknown trigonometric function: ${name}`);
-    }
-  }
-
-  private isTrigFunction(name: string): boolean {
-    return name === 'sin' || name === 'cos' || name === 'tan';
-  }
-
-  private parseAngleUnit(token: string): 'rad' | 'deg' {
-    if (token === 'd' || token === 'deg' || token === 'degree' || token === 'degrees') return 'deg';
-    if (token === 'r' || token === 'rad' || token === 'radian' || token === 'radians') return 'rad';
-    throw new Error(`Unknown angle unit: ${token}`);
-  }
-
-  private checkArgs(name: string, args: number[], count: number, index: number = 0): number {
-    if (args.length !== count) throw new Error(`Function '${name}' expects ${count} arguments`);
-    return args[index];
-  }
-
-  // --- Helpers ---
-
-  private peek(): string {
-    return this.tokens[this.pos];
-  }
-
-  private previous(): string {
-    return this.tokens[this.pos - 1];
-  }
-
-  private advance(): string {
-    if (!this.isAtEnd()) this.pos++;
-    return this.previous();
-  }
-
-  private isAtEnd(): boolean {
-    return this.pos >= this.tokens.length;
-  }
-
-  private match(expected: string): boolean {
-    if (this.check(expected)) {
-      this.advance();
-      return true;
-    }
-    return false;
-  }
-
-  private check(expected: string): boolean {
-    if (this.isAtEnd()) return false;
-    return this.peek() === expected;
-  }
-
-  private isNumber(): boolean {
-    if (this.isAtEnd()) return false;
-    return /^[0-9]+(\.[0-9]+)?$/.test(this.peek());
-  }
-
-  private isIdentifier(): boolean {
-    if (this.isAtEnd()) return false;
-    return /^[a-z][a-z0-9]*$/i.test(this.peek());
   }
 }
 

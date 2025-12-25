@@ -180,6 +180,17 @@ Then answer these questions:
 - is there any duplicated code?
 - any suggestions for refactoring?
 
+
+please look at the files in the cwd and in the src folder (). (ignore the directories ./docs, ./public ./scripts ./shell)
+
+* What is the the quality of the code?
+* Are there any layers of indirections that are unnecessary and are maybe a residue of past restructuring of the code?
+* Are there any very similar data structures that are duplicated at different locations in the code?
+* Assess the directory structure of the code?
+* Are there any parts that should be refactored or rewritten given that many features have been added.
+* Are there any architectural decisions that should be reevaluated?  
+
+
 ## FUTURE
 
 Add a center view button in the controls that adjusts scale and offset such that
