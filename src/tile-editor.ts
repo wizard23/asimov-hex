@@ -53,7 +53,6 @@ class TileEditor {
   // Interaction
   private draggedPolygon: PolygonData | null = null;
   private dragOffset = { x: 0, y: 0 };
-  private mousePosition = { x: 0, y: 0 };
   private worldMousePosition = { x: 0, y: 0 };
   private isViewDragging = false;
   private viewDragStart = { x: 0, y: 0 };
@@ -138,7 +137,6 @@ class TileEditor {
     this.app.stage.hitArea = this.app.screen;
     
     this.app.stage.on('pointermove', (e) => {
-      this.mousePosition = { x: e.global.x, y: e.global.y };
       this.worldMousePosition = this.globalToWorld(e.global);
       this.handlePointerMove(e);
     });
@@ -161,7 +159,7 @@ class TileEditor {
       const worldPos = this.globalToWorld(global);
       const sideLength = this.getEvaluatedSideLength();
       if (sideLength !== null && sideLength > 0) {
-        this.createPolygon(worldPos.x, worldPos.y, this.config.numSides, sideLength);
+        this.createPolygon(worldPos.x, worldPos.y, this.config.numSides);
       }
     });
 
@@ -276,11 +274,6 @@ class TileEditor {
       return typeof res === 'number' ? res : null;
   }
 
-  private calculateRadius(sideLength: number, numSides: number): number {
-      // s = 2 * r * sin(PI / n) => r = s / (2 * sin(PI / n))
-      return sideLength / (2 * Math.sin(Math.PI / numSides));
-  }
-
   private defaultInteriorAngleExpression(sides: number): string {
       return `(${sides - 2} / ${sides}) * PI`;
   }
@@ -360,17 +353,6 @@ class TileEditor {
       return { sideLengths, interiorAngles, points, isClosed };
   }
 
-  private drawPolygonShape(g: Graphics, x: number, y: number, sides: number, radius: number, color: number, alpha: number, strokeColor: number = 0xffffff, strokeWidth: number = 2) {
-      g.clear();
-      g.moveTo(x + radius, y); // Start at angle 0
-      for (let i = 1; i <= sides; i++) {
-          const angle = (i * 2 * Math.PI) / sides;
-          g.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
-      }
-      g.fill({ color, alpha });
-      g.stroke({ color: strokeColor, width: strokeWidth });
-  }
-
   private updatePreview() {
       if (!this.app) return;
       
@@ -432,7 +414,7 @@ class TileEditor {
       }
   }
 
-  private createPolygon(x: number, y: number, sides: number, sideLength: number) {
+  private createPolygon(x: number, y: number, sides: number) {
       const g = new Graphics();
       g.zIndex = 0;
       this.polygonContainer.addChild(g);
@@ -765,8 +747,8 @@ class TileEditor {
         view: 'text',
         label: 'Hint',
         value: "Double click anywhere in the 'Unit Cell Editor' to create a new polygon. Click on an existing polygon to edit it.",
-        parse: (value) => String(value),
-        format: (value) => String(value),
+        parse: (value: string) => String(value),
+        format: (value: string) => String(value),
       });
       return;
     }
