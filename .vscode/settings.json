@@ -1,10 +1,12 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
-  
+
   "editor.tabSize": 4,
   "editor.detectIndentation": false,
 
-  "npm.autoDetect": "on",          // default is on but good to have
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "npm.autoDetect": "on", // default is on but good to have
   "npm.enableRunFromFolder": true,
-//   "editor.formatOnSave": true,
+  "editor.formatOnSave": true
 }
