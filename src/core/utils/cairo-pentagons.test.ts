@@ -127,11 +127,9 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests", () =
       // all 5 interior angles
       { type: "interiorAngle", i: 0, angleRad: angles[0] },
       { type: "interiorAngle", i: 1, angleRad: angles[1] },
-
-      last 
-      //{ type: "interiorAngle", i: 2, angleRad: angles[2] },
-      //{ type: "interiorAngle", i: 3, angleRad: angles[3] },
-      //{ type: "interiorAngle", i: 4, angleRad: angles[4] },
+      { type: "interiorAngle", i: 2, angleRad: angles[2] },
+      { type: "interiorAngle", i: 3, angleRad: angles[3] },
+      { type: "interiorAngle", i: 4, angleRad: angles[4] },
     ];
 
     const result = solveSimpleCcwNgonFromLengthsAndAngles(
