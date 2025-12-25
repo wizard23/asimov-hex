@@ -1,7 +1,8 @@
 import { Point, EdgeInfo } from "../../types";
-import { distanceToLineSegment, pointsClose, removeDuplicateEdges } from "../utils/geometry";
+import { pointsClose, removeDuplicateEdges } from "../utils/geometry";
 import { Grid } from "./grid";
 import { scanCellWindow } from "./grid-scan";
+import { findClosestEdgeInWindow, findClosestVertexInWindow } from "./grid-search";
 
 export class TriangleGrid implements Grid {
   private triWidth: number;
@@ -127,33 +128,20 @@ export class TriangleGrid implements Grid {
     gridWidth: number,
     gridHeight: number
   ): EdgeInfo | null {
-    let minDist = Infinity;
-
-    let closestEdge: EdgeInfo | null = null;
-
     const approxRow = Math.floor(pixel.y / this.triHeight);
 
     const approxCol = Math.floor(pixel.x / (this.triWidth * 0.5));
-
-    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 2, 2, (c, r) => {
-      const edges = this.getCellEdges({ col: c, row: r });
-
-      for (const edge of edges) {
-        const dist = distanceToLineSegment(
-          pixel,
-          edge.points[0],
-          edge.points[1]
-        );
-
-        if (dist < minDist) {
-          minDist = dist;
-
-          closestEdge = edge;
-        }
-      }
-    });
-
-    return closestEdge && minDist < threshold ? closestEdge : null;
+    return findClosestEdgeInWindow(
+      pixel,
+      threshold,
+      gridWidth,
+      gridHeight,
+      approxCol,
+      approxRow,
+      2,
+      2,
+      (cell) => this.getCellEdges(cell)
+    );
   }
 
   getVertexAt(
@@ -162,31 +150,20 @@ export class TriangleGrid implements Grid {
     gridWidth: number,
     gridHeight: number
   ): Point | null {
-    let minDistSq = Infinity;
-
-    let closestVertex: Point | null = null;
-
     const approxRow = Math.floor(pixel.y / this.triHeight);
 
     const approxCol = Math.floor(pixel.x / (this.triWidth * 0.5));
-
-    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 2, 2, (c, r) => {
-      const poly = this.getCellPolygon({ col: c, row: r });
-
-      for (const v of poly) {
-        const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
-
-        if (distSq < minDistSq) {
-          minDistSq = distSq;
-
-          closestVertex = v;
-        }
-      }
-    });
-
-    return closestVertex && Math.sqrt(minDistSq) < threshold
-      ? closestVertex
-      : null;
+    return findClosestVertexInWindow(
+      pixel,
+      threshold,
+      gridWidth,
+      gridHeight,
+      approxCol,
+      approxRow,
+      2,
+      2,
+      (cell) => this.getCellPolygon(cell)
+    );
   }
 
   getEdgesAtVertex(
