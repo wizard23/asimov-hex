@@ -166,7 +166,11 @@ something is still of about the positioning of the vertex labels. Depending on t
 
 this does not work. please draw the letters with lines and revert to the old positioning scheme before these attempts to change the positioning because of the anti aliased font
 
-please look at the structure of the code in src and suggest a directory layout for the code
+please look at the files in the cwd and in the src folder (). (ignore the directories ./docs, ./public ./scripts ./shell)
+
+- what is the quality of the code?
+- is there any duplicated code?
+- any suggestions for refactoring?
 
 Please look at the src/tile-editor.ts , tile-editor.html and vite.config.ts and analyze the functionality of the "Tile Editor".
 Then answer these questions:
