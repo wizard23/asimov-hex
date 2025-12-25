@@ -191,6 +191,14 @@ please fix these bugs:
 * highlighting when hovering over a non closed polygon still shows the implied part in yellow (but it should be in red just as it is already working for the marching ant highlighting)
 
 
+the labels for the vertices get rendered in a nice and readable font now, but he positioning is weird.
+but they are not anchored to the polygon vertices anymore but now they ar far far off to the bottom left corner of the window.
+
+
+something is still of about the positioning of the vertex labels. Depending on the view offset the texts are all over the place. If viewOffset is half of the canvas size znd scale is set to 1 the labels appear positioned correctly. When I channge scale or viewOffset the labels wander around.
+
+
+this does not work. please draw the letters with lines and revert to the old positioning scheme before these attempts to change the positioning because of the anti aliased font
 
 
 Please add a multi line text box in the "Editor Controls" for constants that will be available for expressions in all fields that allow expressions. Constants are calculated line by line and expressions defining constants can use all constants that have been defined before

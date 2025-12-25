@@ -1,5 +1,5 @@
 import { Pane } from 'tweakpane';
-import { Application, Container, Graphics, Text } from 'pixi.js';
+import { Application, Container, Graphics } from 'pixi.js';
 
 type Point = { x: number; y: number };
 
@@ -125,7 +125,7 @@ class TileEditor {
 
     this.labelContainer = new Container();
     this.labelContainer.zIndex = 2;
-    this.app.stage.addChild(this.labelContainer);
+    this.polygonContainer.addChild(this.labelContainer);
 
     this.previewGraphics = new Graphics();
     this.previewGraphics.zIndex = 1;
@@ -171,7 +171,6 @@ class TileEditor {
       this.updatePreview();
       if (this.selectedPolygon) {
         this.drawPolygonInstance(this.selectedPolygon);
-        this.updateSelectedLabelPositions();
       }
     });
   }
@@ -409,7 +408,7 @@ class TileEditor {
           this.draggedPolygon.y = worldPos.y + this.dragOffset.y;
           this.drawPolygonInstance(this.draggedPolygon);
           if (this.selectedPolygon === this.draggedPolygon) {
-            this.updateSelectedLabelPositions();
+            this.updateSelectedLabels();
           }
       } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
@@ -420,7 +419,6 @@ class TileEditor {
           };
           this.updateDisplay();
           this.updateViewportCenter();
-          this.updateSelectedLabelPositions();
       }
 
       this.updateHoverState();
@@ -731,7 +729,6 @@ class TileEditor {
     if (!this.polygonContainer) return;
     this.polygonContainer.scale.set(this.config.scale);
     this.updateViewportCenter();
-    this.updateSelectedLabelPositions();
   }
 
   private updateViewportCenter() {
@@ -742,7 +739,6 @@ class TileEditor {
     const offsetY = this.config.viewOffset.y * this.config.scale;
     this.polygonContainer.position.set(centerX + offsetX, centerY + offsetY);
     this.polygonContainer.pivot.set(0, 0);
-    this.updateSelectedLabelPositions();
   }
 
   private clamp(value: number, min: number, max: number): number {
@@ -863,31 +859,59 @@ class TileEditor {
     if (!this.selectedPolygon) return;
     const labels = this.buildVertexLabels(this.selectedPolygon.sides);
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
-    const fontSize = 12;
+    const fontSize = 12 / this.config.scale;
+    const strokeWidth = Math.max(1 / this.config.scale, fontSize * 0.12);
     points.forEach((point, index) => {
-      const label = new Text({
-        text: `${labels[index]}`,
-        style: {
-          fill: 0xffd24d,
-          fontSize,
-        },
-      });
-      label.anchor.set(0.5, 0.5);
+      const label = new Graphics();
+      this.drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
+      label.x = this.selectedPolygon!.x + point.x - fontSize * 0.5;
+      label.y = this.selectedPolygon!.y + point.y - fontSize * 0.5;
       this.labelContainer.addChild(label);
     });
-    this.updateSelectedLabelPositions();
   }
 
-  private updateSelectedLabelPositions() {
-    if (!this.selectedPolygon || !this.polygonContainer) return;
-    const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.sides);
-    this.labelContainer.children.forEach((child, index) => {
-      const point = points[index];
-      if (!point) return;
-      const world = { x: this.selectedPolygon!.x + point.x, y: this.selectedPolygon!.y + point.y };
-      const global = this.polygonContainer.toGlobal(world);
-      child.position.set(global.x, global.y);
-    });
+  private drawLetter(g: Graphics, letter: string, size: number, color: number, width: number) {
+    const segments = this.getLetterSegments(letter);
+    if (!segments) return;
+    g.clear();
+    for (const [x1, y1, x2, y2] of segments) {
+      g.moveTo(x1 * size, y1 * size);
+      g.lineTo(x2 * size, y2 * size);
+    }
+    g.stroke({ color, width });
+  }
+
+  private getLetterSegments(letter: string): Array<[number, number, number, number]> | null {
+    const l = letter.toUpperCase();
+    const segments: Record<string, Array<[number, number, number, number]>> = {
+      A: [[0,1,0,0],[1,1,1,0],[0,0,1,0],[0,0.5,1,0.5]],
+      B: [[0,0,0,1],[0,0,0.8,0],[0.8,0,0.8,0.5],[0.8,0.5,0,0.5],[0.8,0.5,0.8,1],[0,1,0.8,1]],
+      C: [[1,0,0,0],[0,0,0,1],[0,1,1,1]],
+      D: [[0,0,0,1],[0,0,0.8,0],[0.8,0,0.8,1],[0.8,1,0,1]],
+      E: [[1,0,0,0],[0,0,0,1],[0,0.5,0.8,0.5],[0,1,1,1]],
+      F: [[0,0,0,1],[0,0,1,0],[0,0.5,0.8,0.5]],
+      G: [[1,0,0,0],[0,0,0,1],[0,1,1,1],[1,1,1,0.6],[1,0.6,0.6,0.6]],
+      H: [[0,0,0,1],[1,0,1,1],[0,0.5,1,0.5]],
+      I: [[0,0,1,0],[0.5,0,0.5,1],[0,1,1,1]],
+      J: [[1,0,1,1],[1,1,0,1],[0,1,0,0.7]],
+      K: [[0,0,0,1],[0,0.5,1,0],[0,0.5,1,1]],
+      L: [[0,0,0,1],[0,1,1,1]],
+      M: [[0,1,0,0],[1,1,1,0],[0,0,0.5,0.5],[0.5,0.5,1,0]],
+      N: [[0,1,0,0],[1,1,1,0],[0,0,1,1]],
+      O: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0]],
+      P: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5]],
+      Q: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0],[0.6,0.6,1,1]],
+      R: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5],[0,0.5,1,1]],
+      S: [[1,0,0,0],[0,0,0,0.5],[0,0.5,1,0.5],[1,0.5,1,1],[1,1,0,1]],
+      T: [[0,0,1,0],[0.5,0,0.5,1]],
+      U: [[0,0,0,1],[0,1,1,1],[1,1,1,0]],
+      V: [[0,0,0.5,1],[0.5,1,1,0]],
+      W: [[0,0,0.25,1],[0.25,1,0.5,0.5],[0.5,0.5,0.75,1],[0.75,1,1,0]],
+      X: [[0,0,1,1],[1,0,0,1]],
+      Y: [[0,0,0.5,0.5],[1,0,0.5,0.5],[0.5,0.5,0.5,1]],
+      Z: [[0,0,1,0],[1,0,0,1],[0,1,1,1]],
+    };
+    return segments[l] ?? null;
   }
 }
 
