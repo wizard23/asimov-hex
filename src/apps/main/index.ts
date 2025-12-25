@@ -5,7 +5,16 @@ import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../draw-state-blade';
 import palettesData from '../../assets/palettes.json';
 import { ParticleSystem } from '../../core/particles/particle-system';
-import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from '../../core/grid';
+import {
+  Grid,
+  SquareGrid,
+  HexagonGrid,
+  TriangleGrid,
+  CairoGrid,
+  getCellAtPixel,
+  getEdgeAtPixel,
+  getVertexAtPixel,
+} from '../../core/grid';
 
 interface PaletteData {
   name: string;
@@ -768,11 +777,12 @@ class GridApp {
 
     if (this.config.leftClickMode === 'draw') {
       // Highlight cell
-      const cellInfo = this.gridRenderer.getCellAt(
-        x, y,
+      const cellInfo = getCellAtPixel(
+        this.grid,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.grid // Pass grid
+        x,
+        y
       );
 
       if (cellInfo) {
@@ -788,11 +798,13 @@ class GridApp {
       }
     } else {
       // Highlight edge and closest vertex
-      const edgeInfo = this.gridRenderer.getEdgeAt(
-        x, y,
+      const edgeInfo = getEdgeAtPixel(
+        this.grid,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.grid // Pass grid
+        x,
+        y,
+        10
       );
 
       if (edgeInfo) {
@@ -803,11 +815,13 @@ class GridApp {
         this.edgeContainer.addChild(this.highlightedEdge);
 
         // Find and highlight closest vertex
-        const closestVertex = this.gridRenderer.getClosestVertex(
-          x, y,
+        const closestVertex = getVertexAtPixel(
+          this.grid,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.grid // Pass grid
+          x,
+          y,
+          20
         );
 
         if (closestVertex) {
@@ -837,11 +851,13 @@ class GridApp {
         const edgeX = e.clientX - rect.left - this.edgeContainer.x;
         const edgeY = e.clientY - rect.top - this.edgeContainer.y;
         
-        const edgeInfo = this.gridRenderer.getEdgeAt(
-          edgeX, edgeY,
+        const edgeInfo = getEdgeAtPixel(
+          this.grid,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.grid // Pass grid
+          edgeX,
+          edgeY,
+          10
         );
 
         if (edgeInfo) {
@@ -856,11 +872,12 @@ class GridApp {
         const x = e.clientX - rect.left - this.gridContainer.x;
         const y = e.clientY - rect.top - this.gridContainer.y;
 
-        const cellInfo = this.gridRenderer.getCellAt(
-          x, y,
+        const cellInfo = getCellAtPixel(
+          this.grid,
           this.config.gridWidth,
           this.config.gridHeight,
-          this.grid // Pass grid
+          x,
+          y
         );
 
         if (cellInfo) {
@@ -873,11 +890,12 @@ class GridApp {
       const x = e.clientX - rect.left - this.gridContainer.x;
       const y = e.clientY - rect.top - this.gridContainer.y;
 
-      const cellInfo = this.gridRenderer.getCellAt(
-        x, y,
+      const cellInfo = getCellAtPixel(
+        this.grid,
         this.config.gridWidth,
         this.config.gridHeight,
-        this.grid // Pass grid
+        x,
+        y
       );
 
       if (cellInfo) {

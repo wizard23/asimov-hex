@@ -1,6 +1,5 @@
 import { Point, EdgeInfo } from "../../types";
-import { distanceToLineSegment, pointsClose } from "../utils/geometry";
-import { removeDuplicateEdges } from "../utils/grid-utils";
+import { distanceToLineSegment, pointsClose, removeDuplicateEdges } from "../utils/geometry";
 import { CairoGridOptions, Grid } from "./grid";
 import { scanCellWindow } from "./grid-scan";
 

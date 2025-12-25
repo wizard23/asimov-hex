@@ -44,3 +44,24 @@ export function getOtherPoint(
 ): Point {
   return pointsClose(vertex, edge.points[0], epsilon) ? edge.points[1] : edge.points[0];
 }
+
+export function removeDuplicateEdges(
+  edges: EdgeInfo[],
+  epsilon: number = 0.1
+): EdgeInfo[] {
+  const unique: EdgeInfo[] = [];
+  for (const edge of edges) {
+    if (
+      !unique.some(
+        (u) =>
+          (pointsClose(edge.points[0], u.points[0], epsilon) &&
+            pointsClose(edge.points[1], u.points[1], epsilon)) ||
+          (pointsClose(edge.points[0], u.points[1], epsilon) &&
+            pointsClose(edge.points[1], u.points[0], epsilon))
+      )
+    ) {
+      unique.push(edge);
+    }
+  }
+  return unique;
+}
