@@ -253,15 +253,6 @@ class TileEditor {
   }
 
   private updateDisplay() {
-    const expressionResult = this.evaluateExpression(this.config.sideLengthExpression);
-    
-    let resultDisplay = '';
-    if (typeof expressionResult === 'number') {
-      resultDisplay = this.formatNumber(expressionResult);
-    } else {
-      resultDisplay = `<span class="error">${expressionResult}</span>`;
-    }
-
     const constantsDisplay = this.buildConstantsDisplay();
     const polygonInfoDisplay = this.selectedPolygon ? this.buildPolygonInfoDisplay(this.selectedPolygon) : '';
     const polygonSidesDisplay = this.selectedPolygon ? this.buildPolygonSidesDisplay(this.selectedPolygon) : '';
@@ -368,6 +359,15 @@ class TileEditor {
     const end = poly.points[poly.points.length - 1] ?? { x: 0, y: 0 };
     const divergence = Math.hypot(end.x, end.y);
     const angleSum = poly.interiorAngles.reduce((sum, angle) => sum + angle, 0);
+    const expectedAngleSum = (poly.sides - 2) * Math.PI;
+    const expectedAngleRow = poly.isClosed
+      ? ''
+      : `
+        <div class="value-row">
+          <div class="value-label">Expected Angle Sum</div>
+          <div class="value-content">${this.formatAngle(expectedAngleSum)}</div>
+        </div>
+      `;
 
     return `
       <div class="value-row">
@@ -388,8 +388,9 @@ class TileEditor {
       </div>
       <div class="value-row">
         <div class="value-label">Sum of Angles</div>
-        <div class="value-content">${this.formatNumber(angleSum)}</div>
+        <div class="value-content">${this.formatAngle(angleSum)}</div>
       </div>
+      ${expectedAngleRow}
     `;
   }
 
@@ -411,10 +412,15 @@ class TileEditor {
       .map((label, i) => `
         <div class="value-row">
           <div class="value-label">${label}</div>
-          <div class="value-content">${this.formatNumber(poly.interiorAngles[i] ?? 0)}</div>
+          <div class="value-content">${this.formatAngle(poly.interiorAngles[i] ?? 0)}</div>
         </div>
       `)
       .join('');
+  }
+
+  private formatAngle(radians: number): string {
+    const degrees = (radians * 180) / Math.PI;
+    return `${this.formatNumber(radians)} rad / ${this.formatNumber(degrees)}°`;
   }
 
   private formatNumber(value: number): string {
@@ -742,6 +748,15 @@ class TileEditor {
       });
       return;
     }
+
+    const positionState = { position: { x: poly.x, y: poly.y } };
+    this.editPane.addBinding(positionState, 'position', { label: 'Position' }).on('change', () => {
+      poly.x = positionState.position.x;
+      poly.y = positionState.position.y;
+      this.drawPolygonInstance(poly);
+      this.updateSelectedLabels();
+      this.updateDisplay();
+    });
 
     const editState: Record<string, string> = {};
     const sideLabels = this.buildEdgeLabels(poly.sides);

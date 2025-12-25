@@ -210,6 +210,11 @@ Split the remaining fields in 4 columns containing:
 * polygon angles
 
 
+Make the view offset of the currently selected polygon editable in the tweakpane.
+In the current values: All angles should be shown as radians and degrees with the correct unit symbols
+If polygon is not closed show expected sum of angles in the "Polygon Info" column
+
+
 
 
 
