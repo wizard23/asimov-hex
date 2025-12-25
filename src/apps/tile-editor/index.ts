@@ -1,5 +1,6 @@
 import { Pane } from 'tweakpane';
 import { Application, Container, Graphics } from 'pixi.js';
+import { distanceToSegment, pointsCloseEuclidean } from '../../core/utils/geometry';
 
 type Point = { x: number; y: number };
 
@@ -348,7 +349,7 @@ class TileEditor {
 
       const points = this.buildPolygonPoints(sideLengths, interiorAngles);
       const end = points[points.length - 1];
-      const isClosed = this.pointsClose(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
+      const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
 
       return { sideLengths, interiorAngles, points, isClosed };
   }
@@ -675,30 +676,18 @@ class TileEditor {
       for (let i = 0; i < polyline.length - 1; i++) {
           const a = polyline[i];
           const b = polyline[i + 1];
-          if (this.distanceToSegment(point, a, b) <= threshold) {
+          if (distanceToSegment(point, a, b) <= threshold) {
               return true;
           }
       }
       if (closePath && polyline.length > 1) {
           const a = polyline[polyline.length - 1];
           const b = polyline[0];
-          if (this.distanceToSegment(point, a, b) <= threshold) {
+          if (distanceToSegment(point, a, b) <= threshold) {
               return true;
           }
       }
       return false;
-  }
-
-  private distanceToSegment(p: Point, a: Point, b: Point): number {
-      const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
-      if (l2 === 0) return Math.hypot(p.x - a.x, p.y - a.y);
-      let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
-      t = Math.max(0, Math.min(1, t));
-      return Math.hypot(p.x - (a.x + t * (b.x - a.x)), p.y - (a.y + t * (b.y - a.y)));
-  }
-
-  private pointsClose(a: Point, b: Point, epsilon: number): boolean {
-      return Math.hypot(a.x - b.x, a.y - b.y) <= epsilon;
   }
 
   private globalToWorld(point: { x: number; y: number }): Point {

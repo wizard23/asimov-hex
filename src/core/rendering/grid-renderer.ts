@@ -1,6 +1,7 @@
 import { Graphics, Container, Text } from 'pixi.js';
 import { EdgeInfo, CellInfo, Point, ColorValue } from '../../types';
 import { colorToHex } from '../utils/color-utils';
+import { pointsClose } from '../utils/geometry';
 import { Grid } from '../grid';
 
 export class GridRenderer {
@@ -111,16 +112,12 @@ export class GridRenderer {
           const v1 = poly[i];
           const v2 = poly[(i + 1) % poly.length];
           // Check if segment (v1, v2) is same as (p1, p2) or (p2, p1)
-          if ((this.pointsClose(v1, p1, epsilon) && this.pointsClose(v2, p2, epsilon)) ||
-              (this.pointsClose(v1, p2, epsilon) && this.pointsClose(v2, p1, epsilon))) {
+          if ((pointsClose(v1, p1, epsilon) && pointsClose(v2, p2, epsilon)) ||
+              (pointsClose(v1, p2, epsilon) && pointsClose(v2, p1, epsilon))) {
               return true;
           }
       }
       return false;
-  }
-
-  private pointsClose(a: Point, b: Point, epsilon: number): boolean {
-      return Math.abs(a.x - b.x) < epsilon && Math.abs(a.y - b.y) < epsilon;
   }
 
   private createPolygonShape(points: Point[]): Graphics {

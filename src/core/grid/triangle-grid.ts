@@ -1,9 +1,6 @@
 import { Point, EdgeInfo } from "../../types";
-import {
-  distanceToLineSegment,
-  pointsClose,
-  removeDuplicateEdges,
-} from "../utils/grid-utils";
+import { distanceToLineSegment, pointsClose } from "../utils/geometry";
+import { removeDuplicateEdges } from "../utils/grid-utils";
 import { Grid } from "./grid";
 
 export class TriangleGrid implements Grid {
