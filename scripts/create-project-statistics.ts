@@ -49,11 +49,11 @@ function generateStatistics(): ProjectStatistics {
   const allFiles = getGitTrackedFiles();
   const excludedFolders = [
     'docs',
-    'public/project-history',
-    'public/project-statistics'
+    'public',
   ];
   const excludedFiles = [
-    'TODOS.md'
+    'TODOS.md',
+    'package-lock.json'
   ];
 
   const files = allFiles.filter(file => 
