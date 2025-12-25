@@ -2,6 +2,7 @@ import { Point, EdgeInfo } from "../../types";
 import { distanceToLineSegment, pointsClose } from "../utils/geometry";
 import { removeDuplicateEdges } from "../utils/grid-utils";
 import { Grid } from "./grid";
+import { scanCellWindow } from "./grid-scan";
 
 export class TriangleGrid implements Grid {
   private triWidth: number;
@@ -135,33 +136,23 @@ export class TriangleGrid implements Grid {
 
     const approxCol = Math.floor(pixel.x / (this.triWidth * 0.5));
 
-    for (
-      let r = Math.max(0, approxRow - 2);
-      r < Math.min(gridHeight, approxRow + 3);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 2);
-        c < Math.min(gridWidth, approxCol + 3);
-        c++
-      ) {
-        const edges = this.getCellEdges({ col: c, row: r });
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 2, 2, (c, r) => {
+      const edges = this.getCellEdges({ col: c, row: r });
 
-        for (const edge of edges) {
-          const dist = distanceToLineSegment(
-            pixel,
-            edge.points[0],
-            edge.points[1]
-          );
+      for (const edge of edges) {
+        const dist = distanceToLineSegment(
+          pixel,
+          edge.points[0],
+          edge.points[1]
+        );
 
-          if (dist < minDist) {
-            minDist = dist;
+        if (dist < minDist) {
+          minDist = dist;
 
-            closestEdge = edge;
-          }
+          closestEdge = edge;
         }
       }
-    }
+    });
 
     return closestEdge && minDist < threshold ? closestEdge : null;
   }
@@ -180,29 +171,19 @@ export class TriangleGrid implements Grid {
 
     const approxCol = Math.floor(pixel.x / (this.triWidth * 0.5));
 
-    for (
-      let r = Math.max(0, approxRow - 2);
-      r < Math.min(gridHeight, approxRow + 3);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 2);
-        c < Math.min(gridWidth, approxCol + 3);
-        c++
-      ) {
-        const poly = this.getCellPolygon({ col: c, row: r });
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 2, 2, (c, r) => {
+      const poly = this.getCellPolygon({ col: c, row: r });
 
-        for (const v of poly) {
-          const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
+      for (const v of poly) {
+        const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
 
-          if (distSq < minDistSq) {
-            minDistSq = distSq;
+        if (distSq < minDistSq) {
+          minDistSq = distSq;
 
-            closestVertex = v;
-          }
+          closestVertex = v;
         }
       }
-    }
+    });
 
     return closestVertex && Math.sqrt(minDistSq) < threshold
       ? closestVertex
@@ -222,28 +203,18 @@ export class TriangleGrid implements Grid {
 
     const approxCol = Math.floor(vertex.x / (this.triWidth * 0.5));
 
-    for (
-      let r = Math.max(0, approxRow - 2);
-      r < Math.min(gridHeight, approxRow + 3);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 2);
-        c < Math.min(gridWidth, approxCol + 3);
-        c++
-      ) {
-        const cellEdges = this.getCellEdges({ col: c, row: r });
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 2, 2, (c, r) => {
+      const cellEdges = this.getCellEdges({ col: c, row: r });
 
-        for (const edge of cellEdges) {
-          if (
-            pointsClose(vertex, edge.points[0], epsilon) ||
-            pointsClose(vertex, edge.points[1], epsilon)
-          ) {
-            edges.push(edge);
-          }
+      for (const edge of cellEdges) {
+        if (
+          pointsClose(vertex, edge.points[0], epsilon) ||
+          pointsClose(vertex, edge.points[1], epsilon)
+        ) {
+          edges.push(edge);
         }
       }
-    }
+    });
 
     return removeDuplicateEdges(edges);
   }

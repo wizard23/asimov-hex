@@ -2,6 +2,7 @@ import { Point, EdgeInfo } from "../../types";
 import { distanceToLineSegment, pointsClose } from "../utils/geometry";
 import { removeDuplicateEdges } from "../utils/grid-utils";
 import { CairoGridOptions, Grid } from "./grid";
+import { scanCellWindow } from "./grid-scan";
 
 export class CairoGrid implements Grid {
   private readonly options: CairoGridOptions;
@@ -174,30 +175,20 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(pixel.x / this.stepX);
     const approxRow = Math.floor(pixel.y / this.stepY);
 
-    for (
-      let r = Math.max(0, approxRow - 4);
-      r <= Math.min(gridHeight - 1, approxRow + 4);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 4);
-        c <= Math.min(gridWidth - 1, approxCol + 4);
-        c++
-      ) {
-        const edges = this.getCellEdges({ col: c, row: r });
-        for (const edge of edges) {
-          const dist = distanceToLineSegment(
-            pixel,
-            edge.points[0],
-            edge.points[1]
-          );
-          if (dist < minDist) {
-            minDist = dist;
-            closestEdge = edge;
-          }
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 4, 4, (c, r) => {
+      const edges = this.getCellEdges({ col: c, row: r });
+      for (const edge of edges) {
+        const dist = distanceToLineSegment(
+          pixel,
+          edge.points[0],
+          edge.points[1]
+        );
+        if (dist < minDist) {
+          minDist = dist;
+          closestEdge = edge;
         }
       }
-    }
+    });
 
     return closestEdge && minDist < threshold ? closestEdge : null;
   }
@@ -213,26 +204,16 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(pixel.x / this.stepX);
     const approxRow = Math.floor(pixel.y / this.stepY);
 
-    for (
-      let r = Math.max(0, approxRow - 4);
-      r <= Math.min(gridHeight - 1, approxRow + 4);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 4);
-        c <= Math.min(gridWidth - 1, approxCol + 4);
-        c++
-      ) {
-        const poly = this.getCellPolygon({ col: c, row: r });
-        for (const v of poly) {
-          const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
-          if (distSq < minDistSq) {
-            minDistSq = distSq;
-            closestVertex = v;
-          }
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 4, 4, (c, r) => {
+      const poly = this.getCellPolygon({ col: c, row: r });
+      for (const v of poly) {
+        const distSq = (pixel.x - v.x) ** 2 + (pixel.y - v.y) ** 2;
+        if (distSq < minDistSq) {
+          minDistSq = distSq;
+          closestVertex = v;
         }
       }
-    }
+    });
 
     return closestVertex && Math.sqrt(minDistSq) < threshold
       ? closestVertex
@@ -249,27 +230,17 @@ export class CairoGrid implements Grid {
     const approxCol = Math.floor(vertex.x / this.stepX);
     const approxRow = Math.floor(vertex.y / this.stepY);
 
-    for (
-      let r = Math.max(0, approxRow - 4);
-      r <= Math.min(gridHeight - 1, approxRow + 4);
-      r++
-    ) {
-      for (
-        let c = Math.max(0, approxCol - 4);
-        c <= Math.min(gridWidth - 1, approxCol + 4);
-        c++
-      ) {
-        const cellEdges = this.getCellEdges({ col: c, row: r });
-        for (const edge of cellEdges) {
-          if (
-            pointsClose(vertex, edge.points[0], epsilon) ||
-            pointsClose(vertex, edge.points[1], epsilon)
-          ) {
-            edges.push(edge);
-          }
+    scanCellWindow(gridWidth, gridHeight, approxCol, approxRow, 4, 4, (c, r) => {
+      const cellEdges = this.getCellEdges({ col: c, row: r });
+      for (const edge of cellEdges) {
+        if (
+          pointsClose(vertex, edge.points[0], epsilon) ||
+          pointsClose(vertex, edge.points[1], epsilon)
+        ) {
+          edges.push(edge);
         }
       }
-    }
+    });
 
     return removeDuplicateEdges(edges);
   }
