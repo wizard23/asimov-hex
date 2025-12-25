@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './core/grid/grid';
+import { SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './core/grid';
 
 describe('SquareGrid', () => {
   const grid = new SquareGrid(10);

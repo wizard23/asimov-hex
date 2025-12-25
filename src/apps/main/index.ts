@@ -5,7 +5,7 @@ import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../draw-state-blade';
 import palettesData from '../../assets/palettes.json';
 import { ParticleSystem } from '../../core/particles/particle-system';
-import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from '../../core/grid/grid';
+import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from '../../core/grid';
 
 interface PaletteData {
   name: string;

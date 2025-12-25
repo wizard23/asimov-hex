@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ParticleSystem, Particle } from './core/particles/particle-system';
-import { TriangleGrid } from './core/grid/grid';
+import { TriangleGrid } from './core/grid';
 import { Container } from 'pixi.js';
 
 // Mock PIXI.js
