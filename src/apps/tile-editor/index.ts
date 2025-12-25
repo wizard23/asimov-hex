@@ -360,14 +360,24 @@ class TileEditor {
     const divergence = Math.hypot(end.x, end.y);
     const angleSum = poly.interiorAngles.reduce((sum, angle) => sum + angle, 0);
     const expectedAngleSum = (poly.sides - 2) * Math.PI;
-    const expectedAngleRow = poly.isClosed
+    const expectedAngleDiff = Math.abs(expectedAngleSum - angleSum);
+    const showExpectedAngleRow = !poly.isClosed && expectedAngleDiff > this.config.closedPolygonEpsilon;
+    const divergenceRow = poly.isClosed
       ? ''
       : `
         <div class="value-row">
-          <div class="value-label">Expected Angle Sum</div>
-          <div class="value-content">${this.formatAngle(expectedAngleSum)}</div>
+          <div class="value-label">Start/End Divergence</div>
+          <div class="value-content"><span class="error">${this.formatNumber(divergence)}</span></div>
         </div>
       `;
+    const expectedAngleRow = showExpectedAngleRow
+      ? `
+        <div class="value-row">
+          <div class="value-label">Expected Angle Sum</div>
+          <div class="value-content"><span class="error">${this.formatAngle(expectedAngleSum)}</span></div>
+        </div>
+      `
+      : '';
 
     return `
       <div class="value-row">
@@ -379,18 +389,11 @@ class TileEditor {
         <div class="value-content">${poly.sides}</div>
       </div>
       <div class="value-row">
-        <div class="value-label">Poly Closed</div>
-        <div class="value-content">${poly.isClosed ? 'Yes' : 'No'}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Start/End Divergence</div>
-        <div class="value-content">${this.formatNumber(divergence)}</div>
-      </div>
-      <div class="value-row">
-        <div class="value-label">Sum of Angles</div>
+        <div class="value-label">Angle Sum</div>
         <div class="value-content">${this.formatAngle(angleSum)}</div>
       </div>
       ${expectedAngleRow}
+      ${divergenceRow}
     `;
   }
 
