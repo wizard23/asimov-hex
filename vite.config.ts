@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
+  test: {
+    include: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'test/**/*.test.ts', 'test/**/*.spec.ts'],
+    exclude: ['**/docs/**', '**/public/**', '**/scripts/**', '**/shell/**', '**/node_modules/**', '**/dist/**'],
+  },
   build: {
     rollupOptions: {
       input: {
@@ -17,4 +21,3 @@ export default defineConfig({
     open: true
   }
 });
-
