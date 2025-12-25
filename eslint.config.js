@@ -14,12 +14,22 @@ export default tseslint.config(
     ],
   },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
+    ...config,
+    files: ["**/*.ts"],
+  })),
   {
     files: ["**/*.ts"],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "off",
     },
   }
 );
