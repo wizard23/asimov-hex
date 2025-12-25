@@ -1,9 +1,9 @@
-import { Point, EdgeInfo } from "./types";
+import { Point, EdgeInfo } from "../../types";
 import {
   distanceToLineSegment,
   pointsClose,
   removeDuplicateEdges,
-} from "./grid-utils";
+} from "../utils/grid-utils";
 
 export interface Grid {
   pixelToCell(pixel: Point): { col: number; row: number } | null;

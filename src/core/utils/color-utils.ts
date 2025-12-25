@@ -1,7 +1,7 @@
 /**
  * Converts a color value from Tweakpane (which can be string or object) to a numeric color value for PixiJS
  */
-import { ColorValue } from './types';
+import { ColorValue } from '../../types';
 
 export function colorToHex(color: ColorValue): number {
   if (typeof color === 'string') {

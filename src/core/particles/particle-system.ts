@@ -1,6 +1,6 @@
 import { Graphics, Container } from 'pixi.js';
-import { Point, EdgeInfo, EdgeSelectionRule } from './types';
-import { Grid } from './grid';
+import { Point, EdgeInfo, EdgeSelectionRule } from '../../types';
+import { Grid } from '../grid/grid';
 
 export interface Particle {
   x: number;

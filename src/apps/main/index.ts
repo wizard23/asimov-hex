@@ -1,11 +1,11 @@
 import { Application, Graphics, Container } from 'pixi.js';
 import { Pane } from 'tweakpane';
-import { GridRenderer } from './grid-renderer';
-import { GridType, EdgeSelectionRule, ColorValue } from './types';
-import { createDrawStateBlade, DrawStateBladeApi } from './draw-state-blade';
-import palettesData from './assets/palettes.json';
-import { ParticleSystem } from './particle-system';
-import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from './grid';
+import { GridRenderer } from '../../core/rendering/grid-renderer';
+import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
+import { createDrawStateBlade, DrawStateBladeApi } from '../../draw-state-blade';
+import palettesData from '../../assets/palettes.json';
+import { ParticleSystem } from '../../core/particles/particle-system';
+import { Grid, SquareGrid, HexagonGrid, TriangleGrid, CairoGrid } from '../../core/grid/grid';
 
 interface PaletteData {
   name: string;

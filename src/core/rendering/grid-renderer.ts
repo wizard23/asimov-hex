@@ -1,7 +1,7 @@
 import { Graphics, Container, Text } from 'pixi.js';
-import { EdgeInfo, CellInfo, Point, ColorValue } from './types';
-import { colorToHex } from './color-utils';
-import { Grid } from './grid';
+import { EdgeInfo, CellInfo, Point, ColorValue } from '../../types';
+import { colorToHex } from '../utils/color-utils';
+import { Grid } from '../grid/grid';
 
 export class GridRenderer {
   render(

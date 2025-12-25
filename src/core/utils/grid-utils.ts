@@ -1,4 +1,4 @@
-import { Point, EdgeInfo } from './types';
+import { Point, EdgeInfo } from '../../types';
 
 export function distanceToLineSegment(p: Point, v: Point, w: Point): number {
   const l2 = (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
