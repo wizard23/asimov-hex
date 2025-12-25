@@ -42,3 +42,17 @@ export function getVertexAtPixel(
 ): Point | null {
   return grid.getVertexAt({ x, y }, threshold, width, height);
 }
+
+export function filterInBounds(
+  cells: Array<{ col: number; row: number }>,
+  width: number,
+  height: number
+): Array<{ col: number; row: number }> {
+  return cells.filter(
+    (cell) =>
+      cell.col >= 0 &&
+      cell.col < width &&
+      cell.row >= 0 &&
+      cell.row < height
+  );
+}

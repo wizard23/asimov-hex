@@ -2,7 +2,7 @@ import { Graphics, Container, Text } from 'pixi.js';
 import { EdgeInfo, CellInfo, Point, ColorValue } from '../../types';
 import { colorToHex } from '../utils/color-utils';
 import { pointsClose } from '../utils/geometry';
-import { Grid } from '../grid';
+import { filterInBounds, Grid } from '../grid';
 
 export class GridRenderer {
   render(
@@ -43,7 +43,11 @@ export class GridRenderer {
 
         if (visualizeEdgeDelta) {
             const edges = grid.getCellEdges({ col, row });
-            const neighbors = grid.getNeighbors({ col, row });
+            const neighbors = filterInBounds(
+              grid.getNeighbors({ col, row }),
+              width,
+              height
+            );
             
             // We need to match edges to neighbors.
             // Since getCellEdges and getNeighbors order is consistent in our implementations (usually CCW or CW),
@@ -67,22 +71,12 @@ export class GridRenderer {
 
                 // Find neighbor sharing this edge
                 for (const n of neighbors) {
-                    // Check bounds for neighbor
-                    // Note: Grid.getNeighbors doesn't check bounds, so we must check if n is within grid limits
-                    // However, we don't have grid limits here easily accessible except width/height.
-                    // Assuming row/col are within 0..height-1 and 0..width-1.
-                    // But TriangleGrid/HexagonGrid might return neighbors outside.
-                    // We must filter them.
-                    
-                    // Actually, let's just check if n is in cellStates.
-                    if (n.row >= 0 && n.row < height && n.col >= 0 && n.col < width) {
-                         const nPoly = grid.getCellPolygon(n);
-                         // Check if nPoly has edge matching p1, p2 (order reversed or same)
-                         if (this.hasEdge(nPoly, p1, p2)) {
-                             const nState = cellStates[n.row][n.col];
-                             delta = Math.abs(state - nState);
-                             break;
-                         }
+                    const nPoly = grid.getCellPolygon(n);
+                    // Check if nPoly has edge matching p1, p2 (order reversed or same)
+                    if (this.hasEdge(nPoly, p1, p2)) {
+                        const nState = cellStates[n.row][n.col];
+                        delta = Math.abs(state - nState);
+                        break;
                     }
                 }
                 
