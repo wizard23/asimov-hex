@@ -838,15 +838,9 @@ class GridApp {
     const canvas = this.app.canvas;
     const rect = canvas.getBoundingClientRect();
 
-    console.log("leftClickMode", this.config.leftClickMode);
-    
     if (e.button === 0) {
-      console.log("left click");
-
       // Left click
       if (this.config.leftClickMode === 'spawnParticle') {
-        console.log("spawn branch");
-
         // Check for edge click for particle spawning
         const edgeX = e.clientX - rect.left - this.edgeContainer.x;
         const edgeY = e.clientY - rect.top - this.edgeContainer.y;
@@ -866,8 +860,6 @@ class GridApp {
           return;
         }
       } else {
-        console.log("draw branch");
-        
         // Draw mode - check for cell click
         const x = e.clientX - rect.left - this.gridContainer.x;
         const y = e.clientY - rect.top - this.gridContainer.y;

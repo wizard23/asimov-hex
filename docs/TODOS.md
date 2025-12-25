@@ -190,6 +190,8 @@ please look at the files in the cwd and in the src folder (). (ignore the direct
 * Are there any parts that should be refactored or rewritten given that many features have been added.
 * Are there any architectural decisions that should be reevaluated?  
 
+Are there any unused function that don't gent called anywhere?
+
 
 ## FUTURE
 

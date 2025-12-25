@@ -133,9 +133,10 @@ export class GridRenderer {
     container.addChild(coordText);
   }
 
-  getEdgesAtVertex(vertex: Point, width: number, height: number, grid: Grid): EdgeInfo[] {
-      return grid.getEdgesAtVertex(vertex, width, height);
-  }
+  // unused?
+//   getEdgesAtVertex(vertex: Point, width: number, height: number, grid: Grid): EdgeInfo[] {
+//       return grid.getEdgesAtVertex(vertex, width, height);
+//   }
   
   drawEdge(edgeInfo: EdgeInfo, color: ColorValue): Graphics {
     const graphics = new Graphics();
