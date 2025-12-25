@@ -158,7 +158,9 @@ describe('TriangleGrid Particle Bug', () => {
       // ...
       
       // Setup cellStates
-      const cellStates = Array(5).fill(0).map(() => Array(5).fill(0));
+      const cellStates = Array(5)
+        .fill(0)
+        .map(() => Array(5).fill(0) as number[]);
       cellStates[0][1] = 10; // Cell(1,0) has state 10
       // All others 0.
       

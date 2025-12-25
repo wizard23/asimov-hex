@@ -413,8 +413,8 @@ class TileEditor {
       g.zIndex = 0;
       this.polygonContainer.addChild(g);
       this.polygonContainer.addChild(this.labelContainer);
-      const sideLengthExpressions = Array(sides).fill(this.config.sideLengthExpression);
-      const interiorAngleExpressions = Array(sides).fill(this.defaultInteriorAngleExpression(sides));
+      const sideLengthExpressions = (Array(sides) as string[]).fill(this.config.sideLengthExpression);
+      const interiorAngleExpressions = (Array(sides) as string[]).fill(this.defaultInteriorAngleExpression(sides));
       const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, true);
       if (!evaluated || !evaluated.isClosed) {
           alert('Polygon is not closed with the current parameters.');

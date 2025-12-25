@@ -594,7 +594,7 @@ class GridApp {
           // Initialize cell states array
           this.cellStates = Array(this.config.gridHeight)
             .fill(0)
-            .map(() => Array(this.config.gridWidth).fill(0));
+            .map(() => Array(this.config.gridWidth).fill(0) as number[]);
 
           // Convert grayscale back to states
           for (let row = 0; row < this.config.gridHeight; row++) {
@@ -665,7 +665,7 @@ class GridApp {
         this.cellStates[0]?.length !== this.config.gridWidth) {
       this.cellStates = Array(this.config.gridHeight)
         .fill(0)
-        .map(() => Array(this.config.gridWidth).fill(0));
+        .map(() => Array(this.config.gridWidth).fill(0) as number[]);
     }
 
     // Clear existing graphics (but keep particles)
