@@ -215,9 +215,15 @@ In the current values: All angles should be shown as radians and degrees with th
 If polygon is not closed show expected sum of angles in the "Polygon Info" column
 
 
+In the "Tile Editor" in the "Editor Controls" please add a center view button that adjusts scale and view offset such that all polygons are in the viewable area.
 
+
+In the "Polygon Editor" allow "?" in the formulas. If any of the formulas for the sides or the interior angles is "?" then please use the polygon solver in src/core/utils/solver.ts to calculate the missing values. The return type of the solver should match the needed data for the PolygonData data structure in src/apps/tile-editor/index.ts exactly. If this assumption of mine is not correct then please report back to me.  
+
+There are test cases for the solver in case the usage and return values are unclear in:
+src/core/utils/solver-cairo-pentagons-unsorted.test.ts
+
+If anything is unclear please just ask.
 
 
 ## FUTURE
-
-Add a center view button in the controls that adjusts scale and offset such that

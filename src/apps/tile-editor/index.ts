@@ -233,6 +233,12 @@ class TileEditor {
         this.updateViewportCenter();
     });
 
+    this.pane.addButton({
+      title: 'Center View',
+    }).on('click', () => {
+      this.centerViewToPolygons();
+    });
+
     const constantsBlock = document.createElement('div');
     constantsBlock.className = 'constants-block';
     const constantsLabel = document.createElement('label');
@@ -720,6 +726,56 @@ class TileEditor {
     const offsetY = this.config.viewOffset.y * this.config.scale;
     this.polygonContainer.position.set(centerX + offsetX, centerY + offsetY);
     this.polygonContainer.pivot.set(0, 0);
+  }
+
+  private centerViewToPolygons() {
+    if (!this.app || !this.polygonContainer || this.polygons.length === 0) return;
+    const bounds = this.getPolygonsBounds();
+    if (!bounds) return;
+
+    const padding = 40;
+    const availableWidth = Math.max(1, this.app.screen.width - padding * 2);
+    const availableHeight = Math.max(1, this.app.screen.height - padding * 2);
+    const boundsWidth = Math.max(1e-6, bounds.maxX - bounds.minX);
+    const boundsHeight = Math.max(1e-6, bounds.maxY - bounds.minY);
+
+    const scaleX = availableWidth / boundsWidth;
+    const scaleY = availableHeight / boundsHeight;
+    const nextScale = this.clamp(Math.min(scaleX, scaleY), this.scaleBounds.min, this.scaleBounds.max);
+
+    const centerX = (bounds.minX + bounds.maxX) / 2;
+    const centerY = (bounds.minY + bounds.maxY) / 2;
+
+    this.config.scale = nextScale;
+    this.config.viewOffset = { x: -centerX, y: -centerY };
+    this.updateDisplay();
+    this.updateScale();
+    this.redrawPolygons();
+    this.pane.refresh();
+  }
+
+  private getPolygonsBounds(): { minX: number; minY: number; maxX: number; maxY: number } | null {
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+
+    for (const poly of this.polygons) {
+      for (const point of poly.points) {
+        const x = poly.x + point.x;
+        const y = poly.y + point.y;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+      return null;
+    }
+
+    return { minX, minY, maxX, maxY };
   }
 
   private clamp(value: number, min: number, max: number): number {
