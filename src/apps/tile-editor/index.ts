@@ -12,6 +12,7 @@ interface EditorConfig {
   scale: number;
   numSides: number;
   sideLengthExpression: string;
+  constantsText: string;
   edgeWidth: number;
   closedPolygonEpsilon: number;
   viewOffset: { x: number; y: number };
@@ -31,6 +32,12 @@ interface PolygonData {
   isHovered: boolean;
 }
 
+interface ConstantEntry {
+  name: string;
+  value?: number;
+  error?: string;
+}
+
 class TileEditor {
   private pane!: Pane;
   private editPane: Pane | null = null;
@@ -40,11 +47,14 @@ class TileEditor {
     scale: 100,
     numSides: 4,
     sideLengthExpression: '1',
+    constantsText: '',
     edgeWidth: 2,
     closedPolygonEpsilon: 1e-4,
     viewOffset: { x: 0, y: 0 },
   };
   private displayContainer: HTMLElement;
+  private constants: Record<string, number> = {};
+  private constantEntries: ConstantEntry[] = [];
   
   // Pixi
   private app!: Application;
@@ -223,6 +233,23 @@ class TileEditor {
         this.updateViewportCenter();
     });
 
+    const constantsBlock = document.createElement('div');
+    constantsBlock.className = 'constants-block';
+    const constantsLabel = document.createElement('label');
+    constantsLabel.className = 'constants-label';
+    constantsLabel.textContent = 'Constants';
+    const constantsInput = document.createElement('textarea');
+    constantsInput.className = 'constants-input';
+    constantsInput.rows = 6;
+    constantsInput.placeholder = 'NAME=EXPR';
+    constantsInput.value = this.config.constantsText;
+    constantsInput.addEventListener('input', () => {
+      this.config.constantsText = constantsInput.value;
+      this.applyConstantsChange();
+    });
+    constantsBlock.append(constantsLabel, constantsInput);
+    this.pane.element.appendChild(constantsBlock);
+    this.refreshConstants();
   }
 
   private updateDisplay() {
@@ -230,10 +257,13 @@ class TileEditor {
     
     let resultDisplay = '';
     if (typeof expressionResult === 'number') {
-      resultDisplay = expressionResult.toString();
+      resultDisplay = this.formatNumber(expressionResult);
     } else {
       resultDisplay = `<span class="error">${expressionResult}</span>`;
     }
+
+    const constantsDisplay = this.buildConstantsDisplay();
+    const polygonDisplay = this.selectedPolygon ? this.buildPolygonDisplay(this.selectedPolygon) : '';
 
     this.displayContainer.innerHTML = `
       <div class="value-row">
@@ -260,7 +290,130 @@ class TileEditor {
         <div class="value-label">View Offset</div>
         <div class="value-content">${this.config.viewOffset.x.toFixed(2)}, ${this.config.viewOffset.y.toFixed(2)}</div>
       </div>
+      ${constantsDisplay}
+      ${polygonDisplay}
     `;
+  }
+
+  private applyConstantsChange() {
+    this.refreshConstants();
+    this.polygons.forEach((poly) => {
+      this.tryApplyPolygonExpressions(poly, false, false);
+    });
+    if (this.selectedPolygon) {
+      this.updateSelectedLabels();
+    }
+    this.updateDisplay();
+  }
+
+  private refreshConstants() {
+    const values: Record<string, number> = {};
+    const entries: ConstantEntry[] = [];
+    const lines = this.config.constantsText.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const eqIndex = trimmed.indexOf('=');
+      if (eqIndex === -1) {
+        entries.push({ name: trimmed, error: 'Expected NAME=EXPR' });
+        continue;
+      }
+      const rawName = trimmed.slice(0, eqIndex).trim();
+      const expr = trimmed.slice(eqIndex + 1).trim();
+      if (!rawName) {
+        entries.push({ name: '(unnamed)', error: 'Missing constant name' });
+        continue;
+      }
+      if (!/^[a-z][a-z0-9]*$/i.test(rawName)) {
+        entries.push({ name: rawName, error: 'Invalid constant name' });
+        continue;
+      }
+      const evaluated = this.evaluateExpression(expr, values);
+      if (typeof evaluated === 'number') {
+        values[rawName.toLowerCase()] = evaluated;
+        entries.push({ name: rawName, value: evaluated });
+      } else {
+        entries.push({ name: rawName, error: evaluated });
+      }
+    }
+
+    this.constants = values;
+    this.constantEntries = entries;
+  }
+
+  private buildConstantsDisplay(): string {
+    if (this.constantEntries.length === 0) {
+      return `
+        <div class="value-row">
+          <div class="value-label">Constants</div>
+          <div class="value-content">None</div>
+        </div>
+      `;
+    }
+
+    return this.constantEntries
+      .map((entry) => {
+        const value = entry.error
+          ? `<span class="error">${entry.error}</span>`
+          : this.formatNumber(entry.value ?? 0);
+        return `
+          <div class="value-row">
+            <div class="value-label">Const ${entry.name}</div>
+            <div class="value-content">${value}</div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  private buildPolygonDisplay(poly: PolygonData): string {
+    const end = poly.points[poly.points.length - 1] ?? { x: 0, y: 0 };
+    const divergence = Math.hypot(end.x, end.y);
+    const angleSum = poly.interiorAngles.reduce((sum, angle) => sum + angle, 0);
+    const sideLabels = this.buildEdgeLabels(poly.sides);
+    const angleLabels = this.buildVertexLabels(poly.sides);
+    const sideValues = sideLabels
+      .map((label, i) => `${label}: ${this.formatNumber(poly.sideLengths[i] ?? 0)}`)
+      .join('<br />');
+    const angleValues = angleLabels
+      .map((label, i) => `${label}: ${this.formatNumber(poly.interiorAngles[i] ?? 0)}`)
+      .join('<br />');
+
+    return `
+      <div class="value-row">
+        <div class="value-label">Poly Position</div>
+        <div class="value-content">${poly.x.toFixed(2)}, ${poly.y.toFixed(2)}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Poly Sides</div>
+        <div class="value-content">${poly.sides}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Poly Closed</div>
+        <div class="value-content">${poly.isClosed ? 'Yes' : 'No'}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Start/End Divergence</div>
+        <div class="value-content">${this.formatNumber(divergence)}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Sum of Angles</div>
+        <div class="value-content">${this.formatNumber(angleSum)}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Side Values</div>
+        <div class="value-content">${sideValues}</div>
+      </div>
+      <div class="value-row">
+        <div class="value-label">Angle Values</div>
+        <div class="value-content">${angleValues}</div>
+      </div>
+    `;
+  }
+
+  private formatNumber(value: number): string {
+    const fixed = value.toFixed(6);
+    return fixed.replace(/\.?0+$/, '');
   }
 
   private getEvaluatedSideLength(): number | null {
@@ -360,6 +513,7 @@ class TileEditor {
           this.selectedPolygon = clickedPoly;
           this.buildEditPane(clickedPoly);
           this.updateSelectedLabels();
+          this.updateDisplay();
           this.redrawPolygons();
           this.draggedPolygon = clickedPoly;
           this.dragOffset = {
@@ -370,6 +524,7 @@ class TileEditor {
           this.selectedPolygon = null;
           this.buildEditPane(null);
           this.updateSelectedLabels();
+          this.updateDisplay();
           this.redrawPolygons();
           this.isViewDragging = true;
           this.viewDragStart = { x: e.global.x, y: e.global.y };
@@ -385,6 +540,7 @@ class TileEditor {
           this.drawPolygonInstance(this.draggedPolygon);
           if (this.selectedPolygon === this.draggedPolygon) {
             this.updateSelectedLabels();
+            this.updateDisplay();
           }
       } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
@@ -513,9 +669,9 @@ class TileEditor {
       });
   }
 
-  private evaluateExpression(expr: string): number | string {
+  private evaluateExpression(expr: string, variables: Record<string, number> = this.constants): number | string {
     try {
-      return new ExpressionParser(expr).evaluate();
+      return new ExpressionParser(expr, variables).evaluate();
     } catch (e) {
       return e instanceof Error ? e.message : 'Error';
     }
@@ -621,8 +777,12 @@ class TileEditor {
     });
   }
 
-  private tryApplyPolygonExpressions(poly: PolygonData): boolean {
-    const evaluated = this.evaluatePolygonExpressions(poly.sideLengthExpressions, poly.interiorAngleExpressions, true);
+  private tryApplyPolygonExpressions(
+    poly: PolygonData,
+    alertOnError: boolean = true,
+    refreshDisplay: boolean = true
+  ): boolean {
+    const evaluated = this.evaluatePolygonExpressions(poly.sideLengthExpressions, poly.interiorAngleExpressions, alertOnError);
     if (!evaluated) {
       return false;
     }
@@ -634,6 +794,9 @@ class TileEditor {
     this.drawPolygonInstance(poly);
     if (this.selectedPolygon === poly) {
       this.updateSelectedLabels();
+    }
+    if (refreshDisplay) {
+      this.updateDisplay();
     }
     return true;
   }

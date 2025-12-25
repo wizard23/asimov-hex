@@ -193,16 +193,24 @@ please look at the files in the cwd and in the src folder (). (ignore the direct
 Are there any unused function that don't gent called anywhere?
 
 
+
+In "Current Values" please remove:
+* Scale
+* Number of Sides
+* Side Length
+* Edge Width
+* Closed Polygon Epsilon
+
+Then split the remaining fields in 4 columns containing:
+* view offset and constants
+* info about polygon that is not in any other column
+* polygon side lengths
+* polygon angles
+
+
+
+
+
 ## FUTURE
 
 Add a center view button in the controls that adjusts scale and offset such that
-
-Please add a multi line text box in the "Editor Controls" for constants that will be available for expressions in all fields that allow expressions. Constants are calculated line by line and expressions defining constants can use all constants that have been defined before
-
-Example of a constants block:
-
-TEST=12
-X=TEST/3
-Y=X+sin(PI/4)
-
-If anything is unclear please just ask.

@@ -26,4 +26,9 @@ describe("ExpressionParser", () => {
     const parser = new ExpressionParser("pow(2,3) + log(8,2)");
     expect(parser.evaluate()).toBe(11);
   });
+
+  it("supports custom variables", () => {
+    const parser = new ExpressionParser("a + b * 2", { a: 3, b: 4 });
+    expect(parser.evaluate()).toBe(11);
+  });
 });

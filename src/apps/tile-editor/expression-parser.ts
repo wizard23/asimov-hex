@@ -1,8 +1,13 @@
 export class ExpressionParser {
   private pos = 0;
   private tokens: string[] = [];
+  private variables: Record<string, number>;
 
-  constructor(private expression: string) {
+  constructor(private expression: string, variables: Record<string, number> = {}) {
+    this.variables = {};
+    for (const [key, value] of Object.entries(variables)) {
+      this.variables[key.toLowerCase()] = value;
+    }
     this.tokenize();
   }
 
@@ -96,6 +101,9 @@ export class ExpressionParser {
         if (!this.match(")")) throw new Error("Expected ')' after arguments");
         return this.callFunction(name, args);
       } else {
+        if (Object.prototype.hasOwnProperty.call(this.variables, name)) {
+          return this.variables[name];
+        }
         // Constants
         if (name === "pi") return Math.PI;
         if (name === "e") return Math.E;
