@@ -48,7 +48,7 @@ class StatisticsViewer {
       if (!indexResponse.ok) {
         throw new Error(`Failed to fetch index.json (status: ${indexResponse.status})`);
       }
-      const index = await indexResponse.json();
+      const index = (await indexResponse.json()) as { files?: string[] };
       this.availableFiles = index.files || [];
 
       if (this.availableFiles.length > 0) {
@@ -134,7 +134,7 @@ class StatisticsViewer {
         throw new Error(`Failed to load ${filename}`);
       }
 
-      const data: ProjectStatistics = await response.json();
+      const data = (await response.json()) as ProjectStatistics;
       this.currentStatistics = data;
       this.displayStatistics(data);
     } catch (error) {

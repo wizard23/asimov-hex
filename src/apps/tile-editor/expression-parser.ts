@@ -55,8 +55,7 @@ export class ExpressionParser {
   }
 
   private parseFactor(): number {
-    let left = this.parsePower();
-    return left;
+    return this.parsePower();
     // Power handles its own precedence usually higher than mul/div.
     // Standard precedence: ^ > * / > + -
   }

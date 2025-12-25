@@ -103,7 +103,7 @@ export class DrawStateBladeApi extends BladeApi<DrawStateBladeController> {
   }
 
   public update(config: DrawStateBladeConfig) {
-    (this.controller.view as DrawStateBladeView).update(config);
+    this.controller.view.update(config);
   }
 }
 

@@ -43,7 +43,7 @@ class TimelineViewer {
       if (!response.ok) {
         throw new Error(`Failed to fetch timeline data (status: ${response.status})`);
       }
-      this.commits = await response.json();
+      this.commits = (await response.json()) as Commit[];
       
       // Sort commits by timestamp descending (newest first)
       this.commits.sort((a, b) => b.timestamp - a.timestamp);

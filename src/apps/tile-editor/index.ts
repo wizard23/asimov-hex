@@ -1,5 +1,6 @@
 import { Pane } from 'tweakpane';
 import { Application, Container, Graphics } from 'pixi.js';
+import type { FederatedPointerEvent } from 'pixi.js';
 import { pointsCloseEuclidean } from '../../core/utils/geometry';
 import { ExpressionParser } from './expression-parser';
 import { pointInPolygon, pointNearPolyline, translatePoints } from './geometry-helpers';
@@ -129,21 +130,21 @@ class TileEditor {
     this.app.stage.eventMode = 'static';
     this.app.stage.hitArea = this.app.screen;
     
-    this.app.stage.on('pointermove', (e) => {
+    this.app.stage.on('pointermove', (e: FederatedPointerEvent) => {
       this.worldMousePosition = this.globalToWorld(e.global);
       this.handlePointerMove(e);
     });
     
-    this.app.stage.on('pointerdown', (e) => {
+    this.app.stage.on('pointerdown', (e: FederatedPointerEvent) => {
       this.handlePointerDown(e);
     });
     
-    this.app.stage.on('pointerup', (e) => {
-      this.handlePointerUp(e);
+    this.app.stage.on('pointerup', () => {
+      this.handlePointerUp();
     });
     
-    this.app.stage.on('pointerupoutside', (e) => {
-      this.handlePointerUp(e);
+    this.app.stage.on('pointerupoutside', () => {
+      this.handlePointerUp();
     });
 
     this.app.canvas.addEventListener('dblclick', (e) => {
@@ -352,7 +353,7 @@ class TileEditor {
       this.previewGraphics.clear();
   }
 
-  private handlePointerDown(e: any) {
+  private handlePointerDown(e: FederatedPointerEvent) {
       const worldPos = this.globalToWorld(e.global);
       const clickedPoly = this.getPolygonAt(worldPos.x, worldPos.y);
       if (clickedPoly) {
@@ -376,7 +377,7 @@ class TileEditor {
       }
   }
 
-  private handlePointerMove(e: any) {
+  private handlePointerMove(e: FederatedPointerEvent) {
       if (this.draggedPolygon) {
           const worldPos = this.globalToWorld(e.global);
           this.draggedPolygon.x = worldPos.x + this.dragOffset.x;
@@ -399,7 +400,7 @@ class TileEditor {
       this.updateHoverState();
   }
 
-  private handlePointerUp(_e: any) {
+  private handlePointerUp() {
       this.draggedPolygon = null;
       if (this.isViewDragging) {
         this.isViewDragging = false;

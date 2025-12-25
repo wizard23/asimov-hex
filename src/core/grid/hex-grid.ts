@@ -31,7 +31,7 @@ export class HexagonGrid implements Grid {
   } {
     let q = Math.round(frac.q);
     let r = Math.round(frac.r);
-    let s = Math.round(frac.s);
+    const s = Math.round(frac.s);
     const q_diff = Math.abs(q - frac.q);
     const r_diff = Math.abs(r - frac.r);
     const s_diff = Math.abs(s - frac.s);

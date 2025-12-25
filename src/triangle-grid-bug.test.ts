@@ -3,6 +3,27 @@ import { ParticleSystem, Particle } from './core/particles/particle-system';
 import { TriangleGrid } from './core/grid';
 import { Container } from 'pixi.js';
 
+type ParticleSystemPrivate = {
+  handleVertexArrival(
+    particle: Particle,
+    vertex: { x: number; y: number },
+    grid: TriangleGrid,
+    gridWidth: number,
+    gridHeight: number,
+    edgeSelectionRule: 'highestEdgeDelta',
+    mouseX: number,
+    mouseY: number,
+    cellStates: number[][]
+  ): void;
+  getEdgeDelta(
+    edge: { type: 'edge'; points: Array<{ x: number; y: number }> },
+    grid: TriangleGrid,
+    cellStates: number[][],
+    gridWidth: number,
+    gridHeight: number
+  ): number;
+};
+
 // Mock PIXI.js
 vi.mock('pixi.js', () => {
   return {
@@ -144,6 +165,7 @@ describe('TriangleGrid Particle Bug', () => {
       // We expect E2 to be chosen. E2 is shared by (1,0) and (2,0).
       // E2 connects V(100, 86.6) and (150, 0).
       
+      const systemPrivate = system as unknown as ParticleSystemPrivate;
       for (let i = 0; i < 100; i++) {
         const particle: Particle = {
           x: V.x,
@@ -155,7 +177,7 @@ describe('TriangleGrid Particle Bug', () => {
         };
         
         // Call private method handleVertexArrival
-        (system as any).handleVertexArrival(
+        systemPrivate.handleVertexArrival(
           particle,
           V,
           grid,
@@ -177,7 +199,7 @@ describe('TriangleGrid Particle Bug', () => {
         );
         
         if (!isE2) {
-            const delta = (system as any).getEdgeDelta(newEdge, grid, cellStates, 5, 5);
+            const delta = systemPrivate.getEdgeDelta(newEdge, grid, cellStates, 5, 5);
             throw new Error(`Iteration ${i}: Wrong edge chosen. Points: (${p1.x},${p1.y})-(${p2.x},${p2.y}), Delta: ${delta}`);
         }
       }
