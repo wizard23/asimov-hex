@@ -7,6 +7,8 @@ import { pointInPolygon, pointNearPolyline, translatePoints } from './geometry-h
 import { drawDashedPath, drawDottedConnection, drawLetter, drawPolygonPath } from './render-helpers';
 import { setupValuesToggle } from './ui-helpers';
 import { Point } from './types';
+import { solveSimpleNgonFromLengthsAndAngles } from '../../core/utils/solver';
+import type { PolygonConstraint, VertexKinds } from '../../core/utils/solver-types';
 
 interface EditorConfig {
   scale: number;
@@ -490,6 +492,12 @@ class TileEditor {
       interiorAngleExpressions: string[],
       alertOnError: boolean
   ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
+      const hasUnknownSides = sideLengthExpressions.some((expr) => expr.trim() === '?');
+      const hasUnknownAngles = interiorAngleExpressions.some((expr) => expr.trim() === '?');
+      if (hasUnknownSides || hasUnknownAngles) {
+          return this.solvePolygonWithUnknowns(sideLengthExpressions, interiorAngleExpressions, alertOnError);
+      }
+
       const sideLengths: number[] = [];
       for (const expr of sideLengthExpressions) {
           const value = this.evaluateSideLengthExpression(expr);
@@ -519,6 +527,71 @@ class TileEditor {
       const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
 
       return { sideLengths, interiorAngles, points, isClosed };
+  }
+
+  private solvePolygonWithUnknowns(
+      sideLengthExpressions: string[],
+      interiorAngleExpressions: string[],
+      alertOnError: boolean
+  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
+      const constraints: PolygonConstraint[] = [];
+      const sideLengths: number[] = [];
+      const interiorAngles: number[] = [];
+      const vertexKinds: VertexKinds = new Array(sideLengthExpressions.length).fill('convex');
+
+      for (let i = 0; i < sideLengthExpressions.length; i++) {
+          const expr = sideLengthExpressions[i].trim();
+          if (expr === '?') {
+              sideLengths[i] = NaN;
+              continue;
+          }
+          const value = this.evaluateSideLengthExpression(expr);
+          if (typeof value !== 'number') {
+              if (alertOnError) {
+                  alert(`Side length error: ${value}`);
+              }
+              return null;
+          }
+          sideLengths[i] = value;
+          constraints.push({ type: 'length', i, j: (i + 1) % sideLengthExpressions.length, length: value });
+      }
+
+      for (let i = 0; i < interiorAngleExpressions.length; i++) {
+          const expr = interiorAngleExpressions[i].trim();
+          if (expr === '?') {
+              interiorAngles[i] = NaN;
+              continue;
+          }
+          const value = this.evaluateAngleExpression(expr);
+          if (typeof value !== 'number') {
+              if (alertOnError) {
+                  alert(`Angle error: ${value}`);
+              }
+              return null;
+          }
+          interiorAngles[i] = value;
+          constraints.push({ type: 'interiorAngle', i, angleRad: value });
+          vertexKinds[i] = value > Math.PI ? 'reflex' : 'convex';
+      }
+
+      const result = solveSimpleNgonFromLengthsAndAngles(
+          sideLengthExpressions.length,
+          vertexKinds,
+          constraints,
+          { diagnostics: 'none' }
+      );
+
+      if ('kind' in result) {
+          if (alertOnError) {
+              alert(`Solver error: ${result.message}`);
+          }
+          return null;
+      }
+
+      const points = this.buildPolygonPoints(result.sideLengths, result.interiorAngles);
+      const end = points[points.length - 1];
+      const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
+      return { sideLengths: result.sideLengths, interiorAngles: result.interiorAngles, points, isClosed };
   }
 
   private updatePreview() {
