@@ -53,8 +53,7 @@ export type SolverError = {
     | "Infeasible"
     | "DidNotConverge"
     | "Degenerate"
-    | "NotSimple"
-    | "WrongOrientation";
+    | "NotSimple";
   message: string;
   details?: Record<string, unknown>;
 };

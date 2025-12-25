@@ -399,7 +399,7 @@ function finiteDiffJacobian(
 
 // ---------- public solver ----------
 
-export function solveSimpleCcwNgonFromLengthsAndAngles(
+export function solveSimpleNgonFromLengthsAndAngles(
   vertexCount: number,
   vertexKinds: VertexKinds,
   constraints: readonly PolygonConstraint[],
@@ -608,7 +608,6 @@ function runLM(
     }
 
     if (cfg.diagnostics === "verbose" && iter % 25 === 0) {
-      // eslint-disable-next-line no-console
       console.log(
         `[iter ${iter}] cost=${cost.toExponential(3)} hardMax=${hardMax.toExponential(3)} penMax=${penMax.toExponential(3)} lambda=${lambda.toExponential(2)}`
       );

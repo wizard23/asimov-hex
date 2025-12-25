@@ -31,7 +31,7 @@ import type {
   VertexKinds,
   SimplePolygonSolveOptions,
 } from "./solver-types";
-import { solveSimpleCcwNgonFromLengthsAndAngles } from "./solver";
+import { solveSimpleNgonFromLengthsAndAngles } from "./solver";
 
 type PolygonData = {
   sides: number;
@@ -84,7 +84,7 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests", () =
       { type: "interiorAngle", i: 2, angleRad: Math.PI / 2 },
     ];
 
-    const result = solveSimpleCcwNgonFromLengthsAndAngles(
+    const result = solveSimpleNgonFromLengthsAndAngles(
       5,
       allConvex,
       constraints,
@@ -132,7 +132,7 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests", () =
       { type: "interiorAngle", i: 4, angleRad: angles[4] },
     ];
 
-    const result = solveSimpleCcwNgonFromLengthsAndAngles(
+    const result = solveSimpleNgonFromLengthsAndAngles(
       5,
       allConvex,
       constraints,
@@ -172,7 +172,7 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests", () =
       { type: "interiorAngle", i: 2, angleRad: Math.PI / 2 },
     ];
 
-    const result = solveSimpleCcwNgonFromLengthsAndAngles(
+    const result = solveSimpleNgonFromLengthsAndAngles(
       5,
       allConvex,
       constraints,
