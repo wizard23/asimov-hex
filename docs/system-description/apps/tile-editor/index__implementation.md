@@ -27,6 +27,7 @@ Back to ["Tile Editor"](./index.md).
 - Saved tilings are JSON with a `version` field (currently `1`).
 - The file stores editor defaults, polygon descriptions (type expressions), and instances (position + rotation expression).
 - On load, scale and view offset are not restored; the app runs the same logic as "Center View" to fit the content.
+- The editor tracks whether the current tiling has been saved and warns on unload/load when unsaved polygons exist.
 
 ## Rendering pipeline
 - Pixi.js `Graphics` instances draw each polygon.

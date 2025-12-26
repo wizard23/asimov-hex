@@ -76,6 +76,7 @@ class TileEditor {
   private editPane: Pane | null = null;
   private editPaneContainer!: HTMLElement;
   private constantsInput: HTMLTextAreaElement | null = null;
+  private hasSavedState = true;
   private readonly scaleBounds = { min: 1, max: 200 };
   private config: EditorConfig = {
     scale: 100,
@@ -116,6 +117,11 @@ class TileEditor {
     this.setupUI();
     this.showEditPane(true);
     this.buildEditPane(null);
+    window.addEventListener('beforeunload', (event) => {
+      if (!this.shouldWarnOnUnload()) return;
+      event.preventDefault();
+      event.returnValue = '';
+    });
   }
 
   private setupUI() {
@@ -282,12 +288,12 @@ class TileEditor {
     saveLoadRow.className = 'constants-block';
     const saveButton = document.createElement('button');
     saveButton.textContent = 'Save Tiling';
-    saveButton.className = 'constants-input';
+    saveButton.className = 'constants-button';
     saveButton.style.cursor = 'pointer';
     saveButton.addEventListener('click', () => this.saveTiling());
     const loadButton = document.createElement('button');
     loadButton.textContent = 'Load Tiling';
-    loadButton.className = 'constants-input';
+    loadButton.className = 'constants-button';
     loadButton.style.cursor = 'pointer';
     loadButton.addEventListener('click', () => this.triggerLoadTiling());
     saveLoadRow.append(saveButton, loadButton);
@@ -351,6 +357,7 @@ class TileEditor {
     descriptions.forEach((description) => {
       this.tryApplyDescriptionExpressions(description, false, false);
     });
+    this.markUnsaved();
     if (this.selectedPolygon) {
       this.updateSelectedLabels();
     }
@@ -412,9 +419,14 @@ class TileEditor {
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+    this.hasSavedState = true;
   }
 
   private triggerLoadTiling() {
+    if (this.shouldWarnOnUnload()) {
+      const proceed = confirm('Unsaved polygons will be lost. Continue?');
+      if (!proceed) return;
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'application/json';
@@ -513,12 +525,22 @@ class TileEditor {
     this.pane.refresh();
     this.centerViewToPolygons();
     this.updateDisplay();
+    this.hasSavedState = true;
   }
 
   private clearPolygons() {
     this.polygons.forEach((poly) => poly.graphics.destroy());
     this.polygons = [];
     this.labelContainer.removeChildren().forEach((child) => child.destroy());
+  }
+
+  private markUnsaved() {
+    if (this.polygons.length === 0) return;
+    this.hasSavedState = false;
+  }
+
+  private shouldWarnOnUnload(): boolean {
+    return this.polygons.length > 0 && !this.hasSavedState;
   }
 
   private refreshConstants() {
@@ -891,6 +913,7 @@ class TileEditor {
             this.updateSelectedLabels();
             this.updateDisplay();
           }
+          this.markUnsaved();
       } else if (this.isViewDragging) {
           const deltaX = (e.global.x - this.viewDragStart.x) / this.config.scale;
           const deltaY = (e.global.y - this.viewDragStart.y) / this.config.scale;
@@ -958,6 +981,7 @@ class TileEditor {
       
       this.polygons.push(poly);
       this.drawPolygonInstance(poly);
+      this.markUnsaved();
   }
 
   private drawPolygonInstance(poly: PolygonData) {
@@ -1058,6 +1082,7 @@ class TileEditor {
 
       this.polygons.push(clone);
       this.updateInstanceFromDescription(clone);
+      this.markUnsaved();
   }
 
   private updateHoverState() {
@@ -1263,6 +1288,7 @@ class TileEditor {
       this.drawPolygonInstance(poly);
       this.updateSelectedLabels();
       this.updateDisplay();
+      this.markUnsaved();
     });
 
     instanceFolder.addBinding(editState, 'rotation', {
@@ -1286,6 +1312,7 @@ class TileEditor {
         instanceFolder.refresh();
       } else {
         this.updateDisplay();
+        this.markUnsaved();
       }
     });
 
@@ -1299,6 +1326,8 @@ class TileEditor {
             poly.description.sideLengthExpressions[i] = previous;
             editState[`side_${label}`] = previous;
             typeFolder.refresh();
+          } else {
+            this.markUnsaved();
           }
       });
     });
@@ -1313,6 +1342,8 @@ class TileEditor {
             poly.description.interiorAngleExpressions[i] = previous;
             editState[`angle_${label}`] = previous;
             typeFolder.refresh();
+          } else {
+            this.markUnsaved();
           }
       });
     });

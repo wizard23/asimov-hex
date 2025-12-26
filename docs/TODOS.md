@@ -272,6 +272,12 @@ If anything is unclear please just ask.
 
 
 
+When saving a tiling set a flag so that the app knows that the current state was saved. If anything relevant is modified like the position of a polygon reset this flag. Just changing "Scaling" should not reset this flag of course. When loading a tiling or when navigating away or closing the window warn the user that the polygons the user created will be lost if they are not saved. If there are no polygons then it is not necessary to warn the user.
+
+Please also try to reduce the size of the load and save buttons if possible. They are quite large now. 
+
+
+
 
 
 ## FUTURE

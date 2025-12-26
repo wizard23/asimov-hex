@@ -12,6 +12,7 @@ Back to ["Tile Editor"](./index.md).
 - "Center View" button to fit all polygons into the visible area.
 - "Save Tiling" downloads a JSON snapshot of the current tiling.
 - "Load Tiling" restores a saved tiling and recenters the view.
+- Save state tracking triggers warnings when leaving or loading if unsaved polygons exist.
 
 ## Developer notes
 - Implemented via Tweakpane in `src/apps/tile-editor/index.ts`.
