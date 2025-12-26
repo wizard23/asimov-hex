@@ -1278,8 +1278,8 @@ class TileEditor {
       editState[`angle_${angleLabels[i]}`] = expr;
     });
 
-    const instanceFolder = this.editPane!.addFolder({ title: 'Instance Values' });
-    const typeFolder = this.editPane!.addFolder({ title: 'Type Values' });
+    const instanceFolder = this.editPane.addFolder({ title: 'Instance Values' });
+    const typeFolder = this.editPane.addFolder({ title: 'Type Values' });
 
     const positionState = { position: { x: poly.x, y: poly.y } };
     instanceFolder.addBinding(positionState, 'position', { label: 'Position' }).on('change', () => {
