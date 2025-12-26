@@ -757,9 +757,9 @@ class TileEditor {
       errorType: 'expression' | 'solver',
       errorMessage?: string
   ): DescriptionEvaluation {
-      const sideLengths = new Array(sides).fill(1);
+      const sideLengths = new Array<number>(sides).fill(1);
       const interiorAngle = ((sides - 2) / sides) * Math.PI;
-      const interiorAngles = new Array(sides).fill(interiorAngle);
+      const interiorAngles = new Array<number>(sides).fill(interiorAngle);
       const points = this.buildRegularNgonPoints(sides, 1);
       return {
           sideLengths,
@@ -833,8 +833,8 @@ class TileEditor {
   ): DescriptionEvaluation {
       const hasUnknownSides = sideLengthExpressions.some((expr) => expr.trim() === '?');
       const hasUnknownAngles = interiorAngleExpressions.some((expr) => expr.trim() === '?');
-      const invalidSideExpressions = new Array(sideLengthExpressions.length).fill(false);
-      const invalidAngleExpressions = new Array(interiorAngleExpressions.length).fill(false);
+      const invalidSideExpressions = new Array<boolean>(sideLengthExpressions.length).fill(false);
+      const invalidAngleExpressions = new Array<boolean>(interiorAngleExpressions.length).fill(false);
       const sideLengths: number[] = [];
       let expressionError: string | null = null;
       for (const expr of sideLengthExpressions) {
@@ -920,7 +920,7 @@ class TileEditor {
       const constraints: PolygonConstraint[] = [];
       const sideLengths: number[] = [];
       const interiorAngles: number[] = [];
-      const vertexKinds: VertexKind[] = new Array(sideLengthExpressions.length).fill('convex') as VertexKind[];
+      const vertexKinds: VertexKind[] = new Array<VertexKind>(sideLengthExpressions.length).fill('convex');
 
       for (let i = 0; i < sideLengthExpressions.length; i++) {
           const expr = sideLengthExpressions[i].trim();
@@ -933,7 +933,13 @@ class TileEditor {
               if (alertOnError) {
                   alert(`Side length error: ${value}`);
               }
-              return null;
+              return this.buildDummyEvaluation(
+                  sideLengthExpressions.length,
+                  new Array<boolean>(sideLengthExpressions.length).fill(false),
+                  new Array<boolean>(interiorAngleExpressions.length).fill(false),
+                  'expression',
+                  `Side length error: ${value}`
+              );
           }
           sideLengths[i] = value;
           constraints.push({ type: 'length', seg: {i, j: (i + 1) % sideLengthExpressions.length }, length: value });
@@ -950,7 +956,13 @@ class TileEditor {
               if (alertOnError) {
                   alert(`Angle error: ${value}`);
               }
-              return null;
+              return this.buildDummyEvaluation(
+                  sideLengthExpressions.length,
+                  new Array<boolean>(sideLengthExpressions.length).fill(false),
+                  new Array<boolean>(interiorAngleExpressions.length).fill(false),
+                  'expression',
+                  `Angle error: ${value}`
+              );
           }
           interiorAngles[i] = value;
           constraints.push({ type: 'interiorAngle', i, angleRad: value });
@@ -970,8 +982,8 @@ class TileEditor {
           }
           return this.buildDummyEvaluation(
               sideLengthExpressions.length,
-              new Array(sideLengthExpressions.length).fill(false),
-              new Array(interiorAngleExpressions.length).fill(false),
+              new Array<boolean>(sideLengthExpressions.length).fill(false),
+              new Array<boolean>(interiorAngleExpressions.length).fill(false),
               'solver',
               result.message
           );
@@ -988,8 +1000,8 @@ class TileEditor {
           isClosed,
           hasError: false,
           errorType: null,
-          invalidSideExpressions: new Array(sideLengthExpressions.length).fill(false),
-          invalidAngleExpressions: new Array(interiorAngleExpressions.length).fill(false),
+          invalidSideExpressions: new Array<boolean>(sideLengthExpressions.length).fill(false),
+          invalidAngleExpressions: new Array<boolean>(interiorAngleExpressions.length).fill(false),
       };
   }
 
