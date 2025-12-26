@@ -413,5 +413,10 @@ If the checkbox is checked:
 
 
 
+There seems to be a bug: I can see the labels X and Y at the correct position but I can't see the two lines.
+
+
+
+
 
 ## FUTURE

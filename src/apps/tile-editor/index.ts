@@ -1051,11 +1051,11 @@ class TileEditor {
       const xAxisDisplay = { x: xAxisEnd.x, y: -xAxisEnd.y };
       const yAxisDisplay = { x: yAxisEnd.x, y: -yAxisEnd.y };
 
-      this.previewGraphics.stroke({ color: colorValue, width });
       this.previewGraphics.moveTo(0, 0);
       this.previewGraphics.lineTo(xAxisDisplay.x, xAxisDisplay.y);
       this.previewGraphics.moveTo(0, 0);
       this.previewGraphics.lineTo(yAxisDisplay.x, yAxisDisplay.y);
+      this.previewGraphics.stroke({ color: colorValue, width });
 
       const labelX = new Graphics();
       const labelY = new Graphics();
