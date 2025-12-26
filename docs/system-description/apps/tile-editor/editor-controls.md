@@ -2,6 +2,8 @@
 
 "Editor Controls" provides global controls for the Tile Editor.
 
+Back to ["Tile Editor"](./index.md).
+
 ## User-facing behavior
 - Scale zoom control for the canvas.
 - Number of sides and default side-length expression for new polygons.

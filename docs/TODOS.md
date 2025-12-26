@@ -254,7 +254,7 @@ This file is also the main entry pont for the documentation.
 Please read the instructions and then create the documentation. 
 
 
-I updated the instructions for the documentation in: docs/system-description/apps/tile-editor/index.md 
+I've updated the instructions for the documentation in: docs/system-description/apps/tile-editor/index.md 
 Please read the instructions and then make the necessary changes to the documentation. 
 
 

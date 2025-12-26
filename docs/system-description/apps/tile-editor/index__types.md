@@ -1,5 +1,7 @@
 # "Tile Editor" Types
 
+Back to ["Tile Editor"](./index.md).
+
 ## Shared Types
 - `Point`: `{ x: number; y: number }`
 

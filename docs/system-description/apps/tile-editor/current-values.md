@@ -2,6 +2,8 @@
 
 "Current Values" is a read-only view of the current editor state.
 
+Back to ["Tile Editor"](./index.md).
+
 ## Contents
 - View offset.
 - Constants and their evaluated values (or errors).

@@ -55,10 +55,10 @@ The Tile Editor is a browser-based tool for creating and editing polygon instanc
 - Polygon types (shared geometry definitions) and instances (position + rotation) are separate.
 
 ## Core sub-apps
-- "Editor Controls" for global editing inputs like scale, view offset, constants, and centering.
-- "Polygon Editor" for selected polygon instance and type editing.
-- "Current Values" for live summaries of view, constants, and polygon geometry.
-- "Unit Cell Editor" for interactive canvas editing and polygon visualization.
+- ["Editor Controls"](./editor-controls.md) for global editing inputs like scale, view offset, constants, and centering.
+- ["Polygon Editor"](./polygon-editor.md) for selected polygon instance and type editing.
+- ["Current Values"](./current-values.md) for live summaries of view, constants, and polygon geometry.
+- ["Unit Cell Editor"](./unit-cell-editor.md) for interactive canvas editing and polygon visualization.
 
 ## Data flow summary
 1. A polygon type stores side/angle expressions and cached evaluated geometry.
@@ -66,4 +66,6 @@ The Tile Editor is a browser-based tool for creating and editing polygon instanc
 3. When type expressions change, all referencing instances recompute their rotated points.
 4. The render layer draws instances from cached points and style state.
 
-See `docs/system-description/apps/tile-editor/index__types.md` and `docs/system-description/apps/tile-editor/index__implementation.md` for detail.
+## Related documentation
+- ["Tile Editor" Types](./index__types.md)
+- ["Tile Editor" Implementation Notes](./index__implementation.md)

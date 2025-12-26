@@ -1,5 +1,7 @@
 # "Tile Editor" Implementation Notes
 
+Back to ["Tile Editor"](./index.md).
+
 ## Expression evaluation
 - Expressions are parsed by `ExpressionParser`.
 - A multiline constants block defines named values; each line is evaluated in order and can reference earlier constants.
