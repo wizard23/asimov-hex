@@ -249,10 +249,10 @@ If anything is unclear please just ask.
 
 
 
-1. Calculate the direction from the center of the polygon to the mouse position.
-2. Use this direction to extend a line from the center outwards.
-3. Find the first edge of the polygon that intersects this line. This is the X edge
-4. Extend the line in the opposite direction 
-2. Use this direction to position the cloned copy exactly 
+
+
+
+
+
 
 ## FUTURE
