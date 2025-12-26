@@ -279,5 +279,9 @@ Please also try to reduce the size of the load and save buttons if possible. The
 
 
 
+In the timeline window where it says "Timeline (<number> commits)":
+please adapt the text if the user entered a "Search" filter so that it is clear that the commits are filtered by that phrase. When no search filter is entered the text can stay as it is now.  
+
+
 
 ## FUTURE
