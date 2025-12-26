@@ -41,6 +41,13 @@ Back to ["Tile Editor"](./index.md).
   - `value?`: number
   - `error?`: string
 
+## Saved Tiling Format
+- `SavedTilingV1`
+  - `version`: `1`
+  - `config`: editor defaults to restore (except scale/view offset)
+  - `descriptions`: polygon type definitions (expressions only)
+  - `instances`: polygon instance data (position + rotation expression)
+
 ## Solver Types (used when expressions contain "?")
 Imported from `src/core/utils/solver-types.ts`:
 - `PolygonConstraint`

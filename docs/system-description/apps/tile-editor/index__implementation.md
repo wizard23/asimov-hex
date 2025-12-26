@@ -23,6 +23,11 @@ Back to ["Tile Editor"](./index.md).
 - A ray intersection test finds the furthest edge intersection along that direction.
 - The clone is placed at twice the center-to-intersection distance in that direction.
 
+## Save/load format
+- Saved tilings are JSON with a `version` field (currently `1`).
+- The file stores editor defaults, polygon descriptions (type expressions), and instances (position + rotation expression).
+- On load, scale and view offset are not restored; the app runs the same logic as "Center View" to fit the content.
+
 ## Rendering pipeline
 - Pixi.js `Graphics` instances draw each polygon.
 - Selection and hover state update stroke/outline styling.

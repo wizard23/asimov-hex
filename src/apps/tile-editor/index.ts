@@ -48,10 +48,34 @@ interface ConstantEntry {
   error?: string;
 }
 
+interface SavedTilingV1 {
+  version: 1;
+  config: {
+    numSides: number;
+    sideLengthExpression: string;
+    edgeWidth: number;
+    closedPolygonEpsilon: number;
+    constantsText: string;
+  };
+  descriptions: Array<{
+    id: string;
+    sides: number;
+    sideLengthExpressions: string[];
+    interiorAngleExpressions: string[];
+  }>;
+  instances: Array<{
+    descriptionId: string;
+    x: number;
+    y: number;
+    rotationExpression: string;
+  }>;
+}
+
 class TileEditor {
   private pane!: Pane;
   private editPane: Pane | null = null;
   private editPaneContainer!: HTMLElement;
+  private constantsInput: HTMLTextAreaElement | null = null;
   private readonly scaleBounds = { min: 1, max: 200 };
   private config: EditorConfig = {
     scale: 100,
@@ -254,6 +278,21 @@ class TileEditor {
       this.centerViewToPolygons();
     });
 
+    const saveLoadRow = document.createElement('div');
+    saveLoadRow.className = 'constants-block';
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save Tiling';
+    saveButton.className = 'constants-input';
+    saveButton.style.cursor = 'pointer';
+    saveButton.addEventListener('click', () => this.saveTiling());
+    const loadButton = document.createElement('button');
+    loadButton.textContent = 'Load Tiling';
+    loadButton.className = 'constants-input';
+    loadButton.style.cursor = 'pointer';
+    loadButton.addEventListener('click', () => this.triggerLoadTiling());
+    saveLoadRow.append(saveButton, loadButton);
+    this.pane.element.appendChild(saveLoadRow);
+
     const constantsBlock = document.createElement('div');
     constantsBlock.className = 'constants-block';
     const constantsLabel = document.createElement('label');
@@ -268,6 +307,7 @@ class TileEditor {
       this.config.constantsText = constantsInput.value;
       this.applyConstantsChange();
     });
+    this.constantsInput = constantsInput;
     constantsBlock.append(constantsLabel, constantsInput);
     this.pane.element.appendChild(constantsBlock);
     this.refreshConstants();
@@ -327,6 +367,158 @@ class TileEditor {
       }
     }
     return descriptions;
+  }
+
+  private saveTiling() {
+    const descriptions = this.getUniqueDescriptions();
+    const descriptionIds = new Map<PolygonDescription, string>();
+    const descriptionData = descriptions.map((description, index) => {
+      const id = `desc_${index + 1}`;
+      descriptionIds.set(description, id);
+      return {
+        id,
+        sides: description.sides,
+        sideLengthExpressions: description.sideLengthExpressions,
+        interiorAngleExpressions: description.interiorAngleExpressions,
+      };
+    });
+
+    const instances = this.polygons.map((poly) => ({
+      descriptionId: descriptionIds.get(poly.description) ?? 'unknown',
+      x: poly.x,
+      y: poly.y,
+      rotationExpression: poly.rotationExpression,
+    }));
+
+    const payload: SavedTilingV1 = {
+      version: 1,
+      config: {
+        numSides: this.config.numSides,
+        sideLengthExpression: this.config.sideLengthExpression,
+        edgeWidth: this.config.edgeWidth,
+        closedPolygonEpsilon: this.config.closedPolygonEpsilon,
+        constantsText: this.config.constantsText,
+      },
+      descriptions: descriptionData,
+      instances,
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'tile-editor-tiling.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  private triggerLoadTiling() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result !== 'string') return;
+        this.loadTilingFromString(reader.result);
+      };
+      reader.readAsText(file);
+    });
+    input.click();
+  }
+
+  private loadTilingFromString(raw: string) {
+    try {
+      const parsed = JSON.parse(raw) as SavedTilingV1;
+      if (!parsed || parsed.version !== 1) {
+        alert('Unsupported tiling format version.');
+        return;
+      }
+      this.applyLoadedTiling(parsed);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown load error';
+      alert(`Failed to load tiling: ${message}`);
+    }
+  }
+
+  private applyLoadedTiling(data: SavedTilingV1) {
+    this.clearPolygons();
+    this.selectedPolygon = null;
+    this.buildEditPane(null);
+
+    this.config.numSides = data.config.numSides;
+    this.config.sideLengthExpression = data.config.sideLengthExpression;
+    this.config.edgeWidth = data.config.edgeWidth;
+    this.config.closedPolygonEpsilon = data.config.closedPolygonEpsilon;
+    this.config.constantsText = data.config.constantsText;
+    if (this.constantsInput) {
+      this.constantsInput.value = data.config.constantsText;
+    }
+    this.refreshConstants();
+
+    const descriptions = new Map<string, PolygonDescription>();
+    for (const desc of data.descriptions) {
+      const evaluated = this.evaluateDescriptionExpressions(
+        desc.sideLengthExpressions,
+        desc.interiorAngleExpressions,
+        true
+      );
+      if (!evaluated) {
+        alert(`Failed to load description ${desc.id}`);
+        return;
+      }
+      descriptions.set(desc.id, {
+        sides: desc.sides,
+        sideLengthExpressions: desc.sideLengthExpressions,
+        interiorAngleExpressions: desc.interiorAngleExpressions,
+        sideLengths: evaluated.sideLengths,
+        interiorAngles: evaluated.interiorAngles,
+        points: evaluated.points,
+        isClosed: evaluated.isClosed,
+      });
+    }
+
+    for (const instance of data.instances) {
+      const description = descriptions.get(instance.descriptionId);
+      if (!description) continue;
+      const rotationValue = this.evaluateRotationExpression(instance.rotationExpression);
+      if (typeof rotationValue !== 'number') {
+        alert(`Rotation error: ${rotationValue}`);
+        continue;
+      }
+      const g = new Graphics();
+      g.zIndex = 0;
+      this.polygonContainer.addChild(g);
+      this.polygonContainer.addChild(this.labelContainer);
+
+      const poly: PolygonData = {
+        x: instance.x,
+        y: instance.y,
+        rotationExpression: instance.rotationExpression,
+        rotation: rotationValue,
+        description,
+        points: [],
+        isClosed: description.isClosed,
+        graphics: g,
+        isHovered: false,
+      };
+      this.polygons.push(poly);
+      this.updateInstanceFromDescription(poly);
+    }
+
+    this.pane.refresh();
+    this.centerViewToPolygons();
+    this.updateDisplay();
+  }
+
+  private clearPolygons() {
+    this.polygons.forEach((poly) => poly.graphics.destroy());
+    this.polygons = [];
+    this.labelContainer.removeChildren().forEach((child) => child.destroy());
   }
 
   private refreshConstants() {

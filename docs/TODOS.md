@@ -260,6 +260,18 @@ Please read the instructions and then make the necessary changes to the document
 
 
 
+Please add "Save Tiling" and "Load Tiling" buttons to the "Editor Controls" in the "Tile Editor". Saving should download a JSON file with all relevant information to faithfully recreate the app state. Don't include unnecessary details but also don't leave anything out that is needed to recreate the saved state. 
+
+When a tiling is loaded by selecting a file from disk the Tile Editor state should be recreated as it was when the tiling got exported except for the "View Offset" and the "Scale" which should be initialized like they would be if the user clicked the "Center View" button.
+
+Please add a versioning scheme so that changes to the data format can be easily implemented.
+
+Then please update the documentation for this app accordingly.
+
+If anything is unclear please just ask.
+
+
+
 
 
 ## FUTURE

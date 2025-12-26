@@ -47,6 +47,7 @@ The Tile Editor is a browser-based tool for creating and editing polygon instanc
 - Double-click a polygon to clone it along a ray defined by the click direction.
 - Enter math expressions for side lengths and angles; use "?" for solver-assisted unknowns.
 - Define constants once and reuse them across all expressions.
+- Save and load tilings via JSON; loading recenters the view.
 
 ## Developer-facing overview
 - The app is a single-page entry in `tile-editor.html` and `src/apps/tile-editor/index.ts`.
