@@ -113,7 +113,7 @@ class TileEditor {
     constantsText: '',
     edgeWidth: 2,
     drawAxes: true,
-    axesColor: '#ff6b6b',
+    axesColor: '#444444',
     axesLineWidth: 1,
     closedPolygonEpsilon: 1e-4,
     viewOffset: { x: 0, y: 0 },
@@ -531,7 +531,7 @@ class TileEditor {
     this.config.closedPolygonEpsilon = data.config.closedPolygonEpsilon;
     this.config.constantsText = data.config.constantsText;
     this.config.drawAxes = data.config.drawAxes ?? true;
-    this.config.axesColor = data.config.axesColor ?? '#ff6b6b';
+    this.config.axesColor = data.config.axesColor ?? '#444444';
     this.config.axesLineWidth = data.config.axesLineWidth ?? 1;
     if (this.constantsInput) {
       this.constantsInput.value = data.config.constantsText;
@@ -1066,7 +1066,7 @@ class TileEditor {
       labelX.x = xAxisDisplay.x + fontSize * 0.2;
       labelX.y = xAxisDisplay.y - fontSize * 0.6;
       labelY.x = yAxisDisplay.x - fontSize * 0.6;
-      labelY.y = yAxisDisplay.y + fontSize * 0.2;
+      labelY.y = yAxisDisplay.y - fontSize * 1.2;
       this.previewGraphics.addChild(labelX);
       this.previewGraphics.addChild(labelY);
   }
