@@ -224,11 +224,11 @@ class TimelineViewer {
         if (!command) return;
         navigator.clipboard.writeText(command)
           .then(() => {
-            showToast(`Copied: ${command}`);
+            showToast(`Copied: ${command}`, { type: 'success' });
           })
           .catch(() => {
             this.copyToClipboardFallback(command);
-            showToast(`Copied: ${command}`);
+            showToast(`Copied: ${command}`, { type: 'success' });
           });
       };
     });

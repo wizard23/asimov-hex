@@ -877,7 +877,7 @@ class TileEditor {
 
       if (expressionError) {
           if (alertOnError) {
-              showToast(expressionError);
+              showToast(expressionError, { type: 'error' });
           }
           return this.buildDummyEvaluation(
               sideLengthExpressions.length,
@@ -932,7 +932,7 @@ class TileEditor {
           const value = this.evaluateSideLengthExpression(expr);
           if (typeof value !== 'number') {
               if (alertOnError) {
-                  showToast(`Side length error: ${value}`);
+                  showToast(`Side length error: ${value}`, { type: 'error' });
               }
               return this.buildDummyEvaluation(
                   sideLengthExpressions.length,
@@ -955,7 +955,7 @@ class TileEditor {
           const value = this.evaluateAngleExpression(expr);
           if (typeof value !== 'number') {
               if (alertOnError) {
-                  showToast(`Angle error: ${value}`);
+                  showToast(`Angle error: ${value}`, { type: 'error' });
               }
               return this.buildDummyEvaluation(
                   sideLengthExpressions.length,
@@ -979,7 +979,7 @@ class TileEditor {
 
       if ('kind' in result) {
           if (alertOnError) {
-              showToast(`Solver error: ${result.message}`);
+              showToast(`Solver error: ${result.message}`, { type: 'warning' });
           }
           return this.buildDummyEvaluation(
               sideLengthExpressions.length,

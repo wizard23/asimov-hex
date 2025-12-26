@@ -311,6 +311,20 @@ Just for clarification:
 If anything is unclear please just ask.
 
 
+Now let's fix the UX for the toasts:
+* Toasts should be shown in the upper right corner of the browser window.
+* When multiple toasts are shown they should not overlap each other but should be stacked vertically. 
+* When one toast disappears the other toasts should move up to fill the now empty space.
+* Fade out the toasts gradually instead of just disappearing instantly 
+* Please make the toasts a bit larger.
+* Add an optional toast options parameter with the following optional fields:
+  * timeout in ms: how long the toast should be displayed before starting to fade away (defaults to 5000 just like now)
+  * fadeout time in ms: time from when the toasts begin to fade to the time they are removed completely and the other toasts move up (defaults to 2000).
+  * type of toast: for now there should be the following types: errors (in red) warnings in yellow, success (in green), messages (in blue) (default is message)
+  * all types have a suitable icon (for now just use emojis for that) 
+
+If anything is unclear please just ask.
+
 
 
 ## FUTURE
