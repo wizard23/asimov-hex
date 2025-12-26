@@ -17,13 +17,15 @@ class TimelineViewer {
   private timelinePanel: HTMLElement;
   private commits: Commit[] = [];
   private filteredCommits: Commit[] = [];
+  private startDateElement: HTMLElement | null = null;
+  private endDateElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
     endDate: '',
     displayMode: 'List' as DisplayMode,
     searchTerm: '',
-    enableDateFilter: true,
+    enableDateFilter: false,
   };
 
   constructor() {
@@ -90,14 +92,29 @@ class TimelineViewer {
     // but string binding works for YYYY-MM-DD.
     // Alternatively, we could inject actual HTML inputs if we wanted, but text input is simplest.
     
-    this.pane.addBinding(this.config, 'startDate', {
+    this.pane.addBinding(this.config, 'searchTerm', {
+      label: 'Search',
+    }).on('change', () => {
+      this.filterCommits();
+      this.render();
+    });
+
+    this.pane.addBinding(this.config, 'enableDateFilter', {
+      label: 'Enable Date Filter',
+    }).on('change', () => {
+      this.updateDateFilterVisibility();
+      this.filterCommits();
+      this.render();
+    });
+
+    const startDateBinding = this.pane.addBinding(this.config, 'startDate', {
       label: 'Start Date',
     }).on('change', () => {
       this.filterCommits();
       this.render();
     });
 
-    this.pane.addBinding(this.config, 'endDate', {
+    const endDateBinding = this.pane.addBinding(this.config, 'endDate', {
       label: 'End Date',
     }).on('change', () => {
       this.filterCommits();
@@ -120,12 +137,9 @@ class TimelineViewer {
       this.render();
     });
 
-    this.pane.addBinding(this.config, 'searchTerm', {
-      label: 'Search',
-    }).on('change', () => {
-      this.filterCommits();
-      this.render();
-    });
+    this.startDateElement = startDateBinding.element;
+    this.endDateElement = endDateBinding.element;
+    this.updateDateFilterVisibility();
   }
 
   private filterCommits() {
@@ -155,6 +169,12 @@ class TimelineViewer {
 
       return true;
     });
+  }
+
+  private updateDateFilterVisibility() {
+    const display = this.config.enableDateFilter ? '' : 'none';
+    if (this.startDateElement) this.startDateElement.style.display = display;
+    if (this.endDateElement) this.endDateElement.style.display = display;
   }
 
   private render() {
