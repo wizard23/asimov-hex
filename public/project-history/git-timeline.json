@@ -1,5 +1,788 @@
 [
   {
+    "hash": "c5acd8df150d8c5bcd1bc55694e8a1508d24c8e8",
+    "timestamp": 1766763321,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added save-state tracking with unload/load warnings (only when polygons exist), and shrunk the Save/Load buttons.",
+    "addedLines": 52,
+    "removedLines": 2
+  },
+  {
+    "hash": "785f141cb96f8430f257bdfb4949152b49484acc",
+    "timestamp": 1766762813,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added “Save Tiling” and “Load Tiling” to Editor Controls and implemented JSON export/import with versioning.",
+    "addedLines": 219,
+    "removedLines": 0
+  },
+  {
+    "hash": "81a41d064f29af8e495ecd1e3d126739b4c3f311",
+    "timestamp": 1766761258,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the documentation to follow the new linking requirements. All files now link from index.md, and each sub-page links back to it so nothing is orphaned.",
+    "addedLines": 20,
+    "removedLines": 6
+  },
+  {
+    "hash": "7926f29c2724966c8289179883549cfa4a7ff8cd",
+    "timestamp": 1766760969,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add instructions for linking documentation files :)",
+    "addedLines": 10,
+    "removedLines": 3
+  },
+  {
+    "hash": "6943e246e4b7e9d1f8b85724ca37f0257468a83c",
+    "timestamp": 1766759726,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Documentation created per the instructions.",
+    "addedLines": 159,
+    "removedLines": 3
+  },
+  {
+    "hash": "f69c1692668c148c299d0d6fc3fb76ba172999dd",
+    "timestamp": 1766759185,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: refining documentation instructions",
+    "addedLines": 5,
+    "removedLines": 1
+  },
+  {
+    "hash": "3acd8f70331b4622905749c61ef498bce271aa2d",
+    "timestamp": 1766758786,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: refining documentation instructions",
+    "addedLines": 7,
+    "removedLines": 7
+  },
+  {
+    "hash": "bd24a7aa18bc85d92f7f282b4f5c3801bc394dbc",
+    "timestamp": 1766758779,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: refining documentation instructions",
+    "addedLines": 20,
+    "removedLines": 14
+  },
+  {
+    "hash": "d8dab3c07f577f4ba385200c6def361296a6fc9f",
+    "timestamp": 1766758385,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: refining documentation instructions",
+    "addedLines": 19,
+    "removedLines": 6
+  },
+  {
+    "hash": "9ca079164e5909c9e80c7389ec8bba39d58126d0",
+    "timestamp": 1766756867,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: drafting system documentation structure and flow.",
+    "addedLines": 42,
+    "removedLines": 5
+  },
+  {
+    "hash": "8735a41f837f33f51065af7469a403cf33463ed1",
+    "timestamp": 1766755130,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented polygon “type” sharing + cloning by double‑click, and split Polygon Editor into Instance/Type sections. (huge feature with lots of code restructuring in one go)",
+    "addedLines": 233,
+    "removedLines": 74
+  },
+  {
+    "hash": "cc92a1c356a3e88df6a150775a7f1e4810d2884a",
+    "timestamp": 1766747606,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix bug showing divergence for rotated polygons",
+    "addedLines": 6,
+    "removedLines": 3
+  },
+  {
+    "hash": "1100a6196f776a35925ac5b147a8c5f0ef007e67",
+    "timestamp": 1766747581,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "rotation around center",
+    "addedLines": 24,
+    "removedLines": 4
+  },
+  {
+    "hash": "2db6b4d1509301b9150d54eded675cf317bd406d",
+    "timestamp": 1766746846,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add rotation (but it does not rotate around the center but A vertex)",
+    "addedLines": 65,
+    "removedLines": 5
+  },
+  {
+    "hash": "10df05f23876827facaaeb5bb05928d8427cc0e7",
+    "timestamp": 1766713205,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "requirements for solver",
+    "addedLines": 275,
+    "removedLines": 0
+  },
+  {
+    "hash": "e9d311b3d00147368935fa01b9e8c8ae56baf5f0",
+    "timestamp": 1766710805,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: use new solver interface; removed readonly weirdness from solver",
+    "addedLines": 47,
+    "removedLines": 48
+  },
+  {
+    "hash": "0528b13df7c143916fd206d6b4c57e6556f018bf",
+    "timestamp": 1766707611,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "delete temp solver files",
+    "addedLines": 0,
+    "removedLines": 1028
+  },
+  {
+    "hash": "70f051837c0f74dc3d136efbbb039fb4bb15f1c0",
+    "timestamp": 1766707588,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "use new solver interface step 1",
+    "addedLines": 415,
+    "removedLines": 297
+  },
+  {
+    "hash": "05773679afc5c82fe8ebdb8412b526cfb8005862",
+    "timestamp": 1766706548,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "new and improved solver version by chatgpt",
+    "addedLines": 1028,
+    "removedLines": 0
+  },
+  {
+    "hash": "4fe771ed8f1abf950d78abf3c42c920cb3189ccf",
+    "timestamp": 1766706526,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: more tests for solver",
+    "addedLines": 147,
+    "removedLines": 0
+  },
+  {
+    "hash": "7b06b2d3a8f2c2c08c48f638883c92f043606428",
+    "timestamp": 1766706465,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "first draft of solver usage with ? in tile editor",
+    "addedLines": 73,
+    "removedLines": 0
+  },
+  {
+    "hash": "03aa8537059cbb614095dc4733c74345f63d85d7",
+    "timestamp": 1766697777,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added a “Center View” button to Editor Controls",
+    "addedLines": 64,
+    "removedLines": 2
+  },
+  {
+    "hash": "ef075c21bca26eeb96649e8e0a8d3591bff4a8f1",
+    "timestamp": 1766696248,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "exclude solver from linter",
+    "addedLines": 4,
+    "removedLines": 1
+  },
+  {
+    "hash": "fa7f2a49d5bb96fa00e9db105f938843cc13c299",
+    "timestamp": 1766695913,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: added sorted test from chatgpt",
+    "addedLines": 210,
+    "removedLines": 0
+  },
+  {
+    "hash": "bf6bcc30eb5f2eaf4cc51d8d81e6e170b2f0a8ff",
+    "timestamp": 1766695448,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: rename solver tests",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "bc922ecb4c7932aa9a73b3a55497bff86c7948ef",
+    "timestamp": 1766695351,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: cleanup of solver (it's not dependent on the fact that the polygon is counter clockwise orientated since we use an output format that is independent of orientation :)",
+    "addedLines": 6,
+    "removedLines": 8
+  },
+  {
+    "hash": "e730c97d52191bb0b72304281485d8701069cef4",
+    "timestamp": 1766687001,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human chatgpt interaction to create polygon solver: solveSimpleCcwNgonFromLengthsAndAngles",
+    "addedLines": 718,
+    "removedLines": 5
+  },
+  {
+    "hash": "a1f75e96c6b17d5d6eb04e691ab7ed01caf8954b",
+    "timestamp": 1766686431,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the lint error by adding vite.config.ts to tsconfig.json include list.",
+    "addedLines": 1,
+    "removedLines": 2
+  },
+  {
+    "hash": "4de46fa7995b11c1a691628b0e1587cefa1379bb",
+    "timestamp": 1766685354,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: lint . instead of just src",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "9ba9b9d7847fbf3241f0f41879003c25c0bed59b",
+    "timestamp": 1766685252,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated Vitest config to only include tests under src or test, and explicitly exclude anything under docs (plus other common folders).",
+    "addedLines": 4,
+    "removedLines": 1
+  },
+  {
+    "hash": "23e8c95aa4bc8ef20a801cb6b69fa5c6b1a9fed7",
+    "timestamp": 1766684928,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: reasearch with chatgpt about solver for general polygon constraints :)",
+    "addedLines": 889,
+    "removedLines": 0
+  },
+  {
+    "hash": "673add2f483a8c3c7794d5e35dc132a4a131d398",
+    "timestamp": 1766677754,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the label to “Angle Sum” and fixed Expected Angle Sum to only render when it differs from the Angle Sum.",
+    "addedLines": 17,
+    "removedLines": 12
+  },
+  {
+    "hash": "5615cde7450eabee8d9fdd55c8f1fd8e2f9c1013",
+    "timestamp": 1766669947,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "show randians and degrees for angles; make position of polygon editable",
+    "addedLines": 31,
+    "removedLines": 11
+  },
+  {
+    "hash": "db795e6d30f261d2a2a9f404229b7b543cec7a52",
+    "timestamp": 1766669457,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Removed the five fields and rebuilt the Current Values panel into four columns: View & Constants, Polygon Info, Side Lengths, and Angles.",
+    "addedLines": 86,
+    "removedLines": 45
+  },
+  {
+    "hash": "fb6466fbc2403c9035ed7525a69b24d4235364f4",
+    "timestamp": 1766669068,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "constants in tile editor",
+    "addedLines": 227,
+    "removedLines": 14
+  },
+  {
+    "hash": "0a2c24167833ae59e42233b41f8ceb0d02dab631",
+    "timestamp": 1766667810,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: exclude package-lock,json from statistics; better codex logging script that does not clutter git status",
+    "addedLines": 178,
+    "removedLines": 5
+  },
+  {
+    "hash": "95326f50eb6acc1cfbf5baacc00cf8e71bdbdff7",
+    "timestamp": 1766665878,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixed the remaining lint errors using local type assertions",
+    "addedLines": 7,
+    "removedLines": 5
+  },
+  {
+    "hash": "b78a9ce65fa659f7252e51d6fa176a02148428d9",
+    "timestamp": 1766665257,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix linting errors",
+    "addedLines": 40,
+    "removedLines": 18
+  },
+  {
+    "hash": "29628feba2938bc993cab44e24fb92d110638e15",
+    "timestamp": 1766661462,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "linter type awareness; Turned off @typescript-eslint/no-floating-promises in the ESLint config",
+    "addedLines": 12,
+    "removedLines": 2
+  },
+  {
+    "hash": "3f4fc1c6bcbacabd294b734bec9419f2efcfebf9",
+    "timestamp": 1766660573,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add basic linting",
+    "addedLines": 1440,
+    "removedLines": 27
+  },
+  {
+    "hash": "63c02d9a8dbda40cd238e360d762d7283988497b",
+    "timestamp": 1766660416,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human cleanup; architecture assessment",
+    "addedLines": 135,
+    "removedLines": 12
+  },
+  {
+    "hash": "3ac6c88c5333d7654368ba4db475ea721bf4cdb6",
+    "timestamp": 1766635484,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added unit tests for the tile editor parser and geometry helpers",
+    "addedLines": 7076,
+    "removedLines": 0
+  },
+  {
+    "hash": "44f352fa92dbc043ddebedd801711c36e29558d1",
+    "timestamp": 1766635313,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Split src/apps/tile-editor/index.ts into smaller modules for parser, geometry, rendering, and UI helpers",
+    "addedLines": 584,
+    "removedLines": 464
+  },
+  {
+    "hash": "11fc709fbb4687e66c85bf0083767198c088e399",
+    "timestamp": 1766634596,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added shared helpers for closest edge/vertex selection and refactored each grid to use them, reducing repeated selection logic",
+    "addedLines": 156,
+    "removedLines": 156
+  },
+  {
+    "hash": "1b68646417e6b3a91e3f1dcade92a1986bdf7cf9",
+    "timestamp": 1766633942,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup",
+    "addedLines": 27,
+    "removedLines": 18
+  },
+  {
+    "hash": "a7f85b7b916fc946e937c67d4475fe9a6993c054",
+    "timestamp": 1766633656,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup",
+    "addedLines": 62,
+    "removedLines": 50
+  },
+  {
+    "hash": "0fce343df84904882eab9186877560859d2955d8",
+    "timestamp": 1766632937,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "remove redundant code",
+    "addedLines": 2,
+    "removedLines": 16
+  },
+  {
+    "hash": "c10a2c315fe510d722c28feb4396301296009fe8",
+    "timestamp": 1766632506,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "shared selection helpers for consumers",
+    "addedLines": 50,
+    "removedLines": 8
+  },
+  {
+    "hash": "edbafb831aae92c6d46053752867109338edee85",
+    "timestamp": 1766631864,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "dedupe grid scan helpers",
+    "addedLines": 148,
+    "removedLines": 243
+  },
+  {
+    "hash": "4c0cfef74b2b597fed730f85dd04ab30fd505f00",
+    "timestamp": 1766631141,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Extract shared geometry helpers",
+    "addedLines": 125,
+    "removedLines": 82
+  },
+  {
+    "hash": "a647f88249c784e5744d4b00fb30b89dd87359d9",
+    "timestamp": 1766630629,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "split each grid implementation into single files",
+    "addedLines": 1187,
+    "removedLines": 1106
+  },
+  {
+    "hash": "0f82ec00a984f4403f1492e0e48f5816085abde8",
+    "timestamp": 1766630414,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactoring",
+    "addedLines": 25,
+    "removedLines": 26
+  },
+  {
+    "hash": "90192a18ac15d5d3f581eb1c6db87284112934e6",
+    "timestamp": 1766629190,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactoring: cleanup duplicated code",
+    "addedLines": 203,
+    "removedLines": 282
+  },
+  {
+    "hash": "6aa6a95d20c0097b9836abf7e49668e517c6f8ee",
+    "timestamp": 1766628240,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "project statistic before the refactoring",
+    "addedLines": 61,
+    "removedLines": 2
+  },
+  {
+    "hash": "565194ac1c710587f1044c6576e4b158a80946d0",
+    "timestamp": 1766626969,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "cleanup tile editor",
+    "addedLines": 455,
+    "removedLines": 22
+  },
+  {
+    "hash": "cbfb531683b40adfbfbf3ed220414537c231e091",
+    "timestamp": 1766625898,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "script for capturing codex session; reformat code; update project statistics",
+    "addedLines": 662,
+    "removedLines": 447
+  },
+  {
+    "hash": "dbb16231de4116b6cfec1cd36716a3359d2a0455",
+    "timestamp": 1766623218,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "update statistics",
+    "addedLines": 2941,
+    "removedLines": 0
+  },
+  {
+    "hash": "5fcda9f14e953395adeb7f6a379a44a85c1bec7f",
+    "timestamp": 1766622464,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "make vector font more readable",
+    "addedLines": 13,
+    "removedLines": 2
+  },
+  {
+    "hash": "1d12b9f4be5b5d1a266ed9c1371aeffac460a24f",
+    "timestamp": 1766622152,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "move label outwards",
+    "addedLines": 8,
+    "removedLines": 2
+  },
+  {
+    "hash": "886842982c62f52a33b2fabc979e12e98b853ab8",
+    "timestamp": 1766622002,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "vector font because we could not get pixi js positioning to work and without this it gets anti aliased to death when using scaling :(",
+    "addedLines": 59,
+    "removedLines": 27
+  },
+  {
+    "hash": "d95809c6368027b504f398705c83cfc1086c08c2",
+    "timestamp": 1766620384,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "still fiddling with selection non closed polygons; text labels for vertices look good now but they aefar off to the bottom right corner.",
+    "addedLines": 28,
+    "removedLines": 6
+  },
+  {
+    "hash": "08b281c05a782e55ae8971f92ea69737e188598c",
+    "timestamp": 1766619297,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "slower marching ants in black/white",
+    "addedLines": 43,
+    "removedLines": 6
+  },
+  {
+    "hash": "50c7023e9fa1573048f57b4e317d3d794c414852",
+    "timestamp": 1766618809,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "moving ants :) and scaled down vertex labes (but now they are way too small)",
+    "addedLines": 100,
+    "removedLines": 4
+  },
+  {
+    "hash": "64f346dc3c28805a828db8940a903b0621ea0239",
+    "timestamp": 1766617555,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "better handling of open polygons (use implied missing edge); label vertices while editing polygon",
+    "addedLines": 82,
+    "removedLines": 8
+  },
+  {
+    "hash": "80258a0731434fbfa3f803163e1b87a6d92117eb",
+    "timestamp": 1766616820,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "keep edit pane open; better highlighting; fix bug that prevents open polygons from being moved or edited.",
+    "addedLines": 45,
+    "removedLines": 36
+  },
+  {
+    "hash": "f8ecd54e23fbe639532e132f348105e5fedfd856",
+    "timestamp": 1766615096,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "get rid of tools and allow all \"tools\" at any time",
+    "addedLines": 61,
+    "removedLines": 83
+  },
+  {
+    "hash": "261d07313805ac50072fb45a0948d99394d47003",
+    "timestamp": 1766612920,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "allow open plygons and just visually show the user",
+    "addedLines": 42,
+    "removedLines": 11
+  },
+  {
+    "hash": "6db5c319d419ed35a79cb2d5bacb83fef4a33791",
+    "timestamp": 1766606639,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "closed polygon editor with expressions for side lengts and angles :)",
+    "addedLines": 333,
+    "removedLines": 24
+  },
+  {
+    "hash": "c07df6153124a5e4c7aaaf1a85513a7f9a5991f8",
+    "timestamp": 1766604335,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "extend expressions: sqrt, cbrt, constants and degrees support for trig functions",
+    "addedLines": 36,
+    "removedLines": 0
+  },
+  {
+    "hash": "fba60d348c2c12983800923ab6b669804f84e549",
+    "timestamp": 1766602811,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "viewOffset and View dragging tool",
+    "addedLines": 40,
+    "removedLines": 2
+  },
+  {
+    "hash": "9bbda06c8b918637257ac3f34dc569a8db66ec6f",
+    "timestamp": 1766587691,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix edge width; allow mouse wheel scrolling",
+    "addedLines": 26,
+    "removedLines": 4
+  },
+  {
+    "hash": "89ffa5fc997848db3256c83289a9622d22d4124a",
+    "timestamp": 1766587230,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add edge with parameter; fix scaling from center",
+    "addedLines": 42,
+    "removedLines": 2
+  },
+  {
+    "hash": "cb6720a15d135ed186902847e6533fd4f4797489",
+    "timestamp": 1766586075,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "gemini failed to do anything so codex saves the day and fixes scaling bug :))",
+    "addedLines": 48,
+    "removedLines": 25
+  },
+  {
+    "hash": "a831fce714d7080aa40b69425261a9d7073e6023",
+    "timestamp": 1766584286,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix unit cell editor height",
+    "addedLines": 82,
+    "removedLines": 6
+  },
+  {
+    "hash": "bb4631fd8a45cb3950048e78601b15dd9d3f6ccd",
+    "timestamp": 1766583012,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixc build errors",
+    "addedLines": 7,
+    "removedLines": 8
+  },
+  {
+    "hash": "62100b20e08410ae917360e5caa5963aeb8914e7",
+    "timestamp": 1766582768,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "first draft of create polygon tool",
+    "addedLines": 251,
+    "removedLines": 3
+  },
+  {
+    "hash": "83b0d22ca27b33233bf5f636c3cfd3b8c327770c",
+    "timestamp": 1766581768,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add link to tile editor",
+    "addedLines": 5,
+    "removedLines": 0
+  },
+  {
+    "hash": "0b0334549b949a3316d1e955cb1ae107e07e9ffd",
+    "timestamp": 1766581620,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tile editor mockup with formula parser: perfect right from a single prompt :)",
+    "addedLines": 397,
+    "removedLines": 2
+  },
+  {
+    "hash": "8784104af4dcad9e69f6cf46995f5ae53ed4c415",
+    "timestamp": 1766580828,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix minimizing info panel bug interaction with tabs",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "c1b4d333b3e0aea9569aaf8521c2dff41cef030b",
+    "timestamp": 1766580810,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: drafting prompt for tile editor :))",
+    "addedLines": 24,
+    "removedLines": 0
+  },
+  {
+    "hash": "71ef43bb788be210db1b1df2047b618f999866f0",
+    "timestamp": 1766579857,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tech stack tab in info panel",
+    "addedLines": 119,
+    "removedLines": 2
+  },
+  {
+    "hash": "cd8cb05ee45ce3d1138c775ce03eeb97289304a3",
+    "timestamp": 1766579802,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: gemini transcripts",
+    "addedLines": 6599,
+    "removedLines": 0
+  },
+  {
+    "hash": "08d674117ff97d9b56b2166a68065bc09c935055",
+    "timestamp": 1766572187,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: cleanup statistics",
+    "addedLines": 55,
+    "removedLines": 1
+  },
+  {
+    "hash": "169897c88c06b367180a95bda28a372edf8c7a63",
+    "timestamp": 1766548481,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "default palettes; vscode setings",
+    "addedLines": 25,
+    "removedLines": 9
+  },
+  {
+    "hash": "e40c1a832566e062c32efd537e7398d4e1c53733",
+    "timestamp": 1766546203,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "timeline page",
+    "addedLines": 318,
+    "removedLines": 0
+  },
+  {
+    "hash": "053848ec9af5e92a4fd0b55c9b2711796ad59eb7",
+    "timestamp": 1766545045,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: git timeline create script",
+    "addedLines": 1072,
+    "removedLines": 1
+  },
+  {
+    "hash": "881c0a2a63049e337a699cdb49a746837ba2b161",
+    "timestamp": 1766544944,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: idea for universal periodic tiling editor :) cleanup",
+    "addedLines": 21,
+    "removedLines": 4
+  },
+  {
     "hash": "18634bcafba5eb3b2d599a748b7d03dd3bd72181",
     "timestamp": 1766539361,
     "authorName": "Philipp Tiefenbacher",

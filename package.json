@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "create-project-statistics": "tsx scripts/create-project-statistics.ts"
+    "create-project-statistics": "tsx scripts/create-project-statistics.ts",
+    "re-create-git-timeline": "tsx scripts/re-create-git-timeline.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
