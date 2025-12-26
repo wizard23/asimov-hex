@@ -25,6 +25,12 @@ The naming scheme for documenting the sub-apps of this app goes like this:
 * any specific typescript types/interfaces/data structures/etc. should be documented in editor-controls__types.md (only create this file if it is really needed. Some sub-apps might not have any special types).
 * any specific implementation detail that is not trivial should be documented in editor-controls__implementation.md (only create this file if it is really needed. Some sub-apps might not have any non trivial implementation details worth mentioning).
 
+## Links between Files
+When referencing something that is described in another file please create links to the referenced file like this:
+["Editor Controls"](./editor-controls.md)
+
+Use a clear and consistent linking scheme. All separate files in the documentation must be reachable via links. So please ensure that no file is orphaned. Also ensure that it is always possible to get back to where one came from via clicking a link. So there must not be any dead ends in the navigation between files. It is not necessarily required to be able to reach every file from every other file so please only link what is relevant.
+
 ## FAQ for the AI
 * If anything is unclear please just ask.
 * Please keep these instructions as they are and only make changes below the line that follows. Don't use any lines in the documentation except to keep the instructions for the AI separated from the documentation itself.
