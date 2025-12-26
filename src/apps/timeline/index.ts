@@ -121,13 +121,6 @@ class TimelineViewer {
       this.render();
     });
 
-    this.pane.addBinding(this.config, 'enableDateFilter', {
-      label: 'Enable Date Filter',
-    }).on('change', () => {
-      this.filterCommits();
-      this.render();
-    });
-
     this.pane.addBinding(this.config, 'displayMode', {
       options: {
         'List': 'List',
