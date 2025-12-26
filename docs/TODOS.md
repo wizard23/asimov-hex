@@ -415,6 +415,11 @@ If the checkbox is checked:
 
 There seems to be a bug: I can see the labels X and Y at the correct position but I can't see the two lines.
 
+I manually adapted the positioning of the "Y". Now it appears visually consistent with the positioning of the "X" label. Before my manual changes the "Y" was colliding with the Y axes line. Please explain why that is.
+
+
+Detailed instructions about the scope and the structure of the documentation are in docs/system-description/apps/tile-editor/index.md
+Please read these instructions and then update the existing documentation to reflect the current implementation. 
 
 
 

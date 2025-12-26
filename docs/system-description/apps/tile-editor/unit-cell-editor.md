@@ -10,3 +10,4 @@ Back to ["Tile Editor"](./index.md).
 - Click to select a polygon instance for editing.
 - Drag a polygon to move it; drag the background to pan.
 - Scroll to zoom.
+- Optional axes render at the origin to show the coordinate orientation.

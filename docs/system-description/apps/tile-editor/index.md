@@ -48,12 +48,14 @@ The Tile Editor is a browser-based tool for creating and editing polygon instanc
 - Enter math expressions for side lengths and angles; use "?" for solver-assisted unknowns.
 - Define constants once and reuse them across all expressions.
 - Save and load tilings via JSON; loading recenters the view.
+- Optionally draw unit-length axes at the origin to see the coordinate orientation.
 
 ## Developer-facing overview
 - The app is a single-page entry in `tile-editor.html` and `src/apps/tile-editor/index.ts`.
 - Rendering is handled by Pixi.js. UI controls are built with Tweakpane.
 - Geometry expressions are parsed by `ExpressionParser` and evaluated against a constants map.
 - Polygon types (shared geometry definitions) and instances (position + rotation) are separate.
+- Instance position represents the polygon center; geometry is centered before rotation.
 
 ## Core sub-apps
 - ["Editor Controls"](./editor-controls.md) for global editing inputs like scale, view offset, constants, and centering.
@@ -63,7 +65,7 @@ The Tile Editor is a browser-based tool for creating and editing polygon instanc
 
 ## Data flow summary
 1. A polygon type stores side/angle expressions and cached evaluated geometry.
-2. Polygon instances reference a type and store position and rotation.
+2. Polygon instances reference a type and store center position and rotation.
 3. When type expressions change, all referencing instances recompute their rotated points.
 4. The render layer draws instances from cached points and style state.
 

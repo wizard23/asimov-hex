@@ -12,6 +12,9 @@ Back to ["Tile Editor"](./index.md).
   - `sideLengthExpression`: string
   - `constantsText`: string
   - `edgeWidth`: number
+  - `drawAxes`: boolean
+  - `axesColor`: string
+  - `axesLineWidth`: number
   - `closedPolygonEpsilon`: number
   - `viewOffset`: `{ x: number; y: number }`
 
@@ -24,10 +27,14 @@ Back to ["Tile Editor"](./index.md).
   - `interiorAngles`: number[] (evaluated, radians)
   - `points`: `Point[]` (evaluated, unrotated)
   - `isClosed`: boolean
+  - `hasError`: boolean
+  - `errorType`: `'expression' | 'solver' | null`
+  - `invalidSideExpressions`: boolean[]
+  - `invalidAngleExpressions`: boolean[]
 
 - `PolygonData`
   - Purpose: an instance of a polygon type.
-  - `x`, `y`: number (instance position)
+  - `x`, `y`: number (instance center position)
   - `rotationExpression`: string (instance-level expression)
   - `rotation`: number (evaluated, radians)
   - `description`: `PolygonDescription`
@@ -44,7 +51,7 @@ Back to ["Tile Editor"](./index.md).
 ## Saved Tiling Format
 - `SavedTilingV1`
   - `version`: `1`
-  - `config`: editor defaults to restore (except scale/view offset)
+  - `config`: editor defaults to restore (except scale/view offset), includes axes settings
   - `descriptions`: polygon type definitions (expressions only)
   - `instances`: polygon instance data (position + rotation expression)
 
