@@ -181,8 +181,11 @@ class TimelineViewer {
       `;
     }).join('');
 
+    const searchSuffix = this.config.searchTerm.trim()
+      ? ` (filtered by "${this.escapeHtml(this.config.searchTerm.trim())}")`
+      : '';
     this.timelinePanel.innerHTML = `
-      <h2>Timeline (${this.filteredCommits.length} commits)</h2>
+      <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}</h2>
       ${html}
     `;
 
