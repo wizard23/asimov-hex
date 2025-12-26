@@ -7,8 +7,8 @@ import { pointInPolygon, pointNearPolyline, translatePoints } from './geometry-h
 import { drawDashedPath, drawDottedConnection, drawLetter, drawPolygonPath } from './render-helpers';
 import { setupValuesToggle } from './ui-helpers';
 import { Point } from './types';
-import { solveSimpleNgonFromLengthsAndAngles } from '../../core/utils/solver';
-import type { PolygonConstraint, VertexKinds } from '../../core/utils/solver-types';
+import { solveSimpleNgon } from '../../core/utils/solver';
+import type { PolygonConstraint, VertexKind } from '../../core/utils/solver-types';
 
 interface EditorConfig {
   scale: number;
@@ -537,7 +537,7 @@ class TileEditor {
       const constraints: PolygonConstraint[] = [];
       const sideLengths: number[] = [];
       const interiorAngles: number[] = [];
-      const vertexKinds: VertexKinds = new Array(sideLengthExpressions.length).fill('convex');
+      const vertexKinds: VertexKind[] = new Array(sideLengthExpressions.length).fill('convex') as VertexKind[];
 
       for (let i = 0; i < sideLengthExpressions.length; i++) {
           const expr = sideLengthExpressions[i].trim();
@@ -553,7 +553,7 @@ class TileEditor {
               return null;
           }
           sideLengths[i] = value;
-          constraints.push({ type: 'length', i, j: (i + 1) % sideLengthExpressions.length, length: value });
+          constraints.push({ type: 'length', seg: {i, j: (i + 1) % sideLengthExpressions.length }, length: value });
       }
 
       for (let i = 0; i < interiorAngleExpressions.length; i++) {
@@ -574,7 +574,7 @@ class TileEditor {
           vertexKinds[i] = value > Math.PI ? 'reflex' : 'convex';
       }
 
-      const result = solveSimpleNgonFromLengthsAndAngles(
+      const result = solveSimpleNgon(
           sideLengthExpressions.length,
           vertexKinds,
           constraints,

@@ -16,7 +16,7 @@ import { describe, it, expect } from "vitest";
 
 import type {
   PolygonConstraint,
-  VertexKinds,
+  VertexKind,
   SimplePolygonSolveOptions,
 } from "./solver-types";
 import { solveSimpleNgon } from "./solver";
@@ -49,7 +49,7 @@ const opts: SimplePolygonSolveOptions = {
   restarts: 5,
 };
 
-const allConvex: VertexKinds = ["convex", "convex", "convex", "convex", "convex"];
+const allConvex: VertexKind[] = ["convex", "convex", "convex", "convex", "convex"];
 
 describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests (indexed)", () => {
   it("1) Equilateral Cairo pentagon (minimal constraints): all sides 1, right angles at 0 and 2", () => {

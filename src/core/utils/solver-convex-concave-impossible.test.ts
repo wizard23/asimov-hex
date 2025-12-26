@@ -12,7 +12,7 @@ import { describe, it, expect } from "vitest";
 
 import type {
   PolygonConstraint,
-  VertexKinds,
+  VertexKind,
   SimplePolygonSolveOptions,
 } from "./solver-types";
 import { solveSimpleNgon } from "./solver";
@@ -26,7 +26,7 @@ type PolygonData = {
 type SolverError = { message?: string; kind?: string };
 
 function isSolverError(x: unknown): x is SolverError {
-  return typeof x === "object" && x !== null && !("sides" in (x as any));
+  return typeof x === "object" && x !== null && !("sides" in x);
 }
 
 function expectClose(actual: number, expected: number, eps = 1e-8) {
@@ -54,8 +54,8 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
       { type: "length", seg: { i: 3, j: 0 }, length: shortSide }, // DA
     ];
 
-    const convexKinds: VertexKinds = ["convex", "convex", "convex", "convex"];
-    const concaveKindsAt1: VertexKinds = [
+    const convexKinds: VertexKind[] = ["convex", "convex", "convex", "convex"];
+    const concaveKindsAt1: VertexKind[] = [
       "convex",
       "convex",
       "convex",
@@ -133,7 +133,7 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
       { type: "length", seg: { i: 1, j: 2 }, length: 1 },
       { type: "length", seg: { i: 2, j: 0 }, length: 1 },
     ];
-    const kinds: VertexKinds = ["convex", "convex", "convex"];
+    const kinds: VertexKind[] = ["convex", "convex", "convex"];
 
     const result = solveSimpleNgon(
       3,

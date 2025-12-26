@@ -2,7 +2,7 @@
 
 import type {
   PolygonConstraint,
-  VertexKinds,
+  VertexKind,
   SimplePolygonSolveOptions,
   PolygonData,
   SolverError,
@@ -220,8 +220,8 @@ type ResidualBuild = {
 
 function buildResiduals(
   pts: Pt[],
-  vertexKinds: VertexKinds,
-  constraints: readonly PolygonConstraint[],
+  vertexKinds: VertexKind[],
+  constraints: PolygonConstraint[],
   simplicityEps: number
 ): ResidualBuild {
   const N = pts.length;
@@ -452,8 +452,8 @@ function buildPolygonData(pts: Pt[]): PolygonData {
 
 function runLM(
   N: number,
-  vertexKinds: VertexKinds,
-  constraints: readonly PolygonConstraint[],
+  vertexKinds: VertexKind[],
+  constraints: PolygonConstraint[],
   x0: number[],
   cfg: {
     maxIterations: number;
@@ -536,8 +536,8 @@ function runLM(
 // to allow both orientations, remove the area penalty and add an option.
 export function solveSimpleNgon(
   vertexCount: number,
-  vertexKinds: VertexKinds,
-  constraints: readonly PolygonConstraint[],
+  vertexKinds: VertexKind[],
+  constraints: PolygonConstraint[],
   options?: SimplePolygonSolveOptions
 ): PolygonData | SolverError {
   if (!Number.isInteger(vertexCount) || vertexCount < 3) {

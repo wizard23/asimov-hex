@@ -28,7 +28,7 @@ import { describe, it, expect } from "vitest";
 
 import type {
   PolygonConstraint,
-  VertexKinds,
+  VertexKind,
   SimplePolygonSolveOptions,
 } from "./solver-types";
 import { solveSimpleNgon } from "./solver";
@@ -53,7 +53,7 @@ const opts: SimplePolygonSolveOptions = {
   restarts: 5,
 };
 
-const allConvex: VertexKinds = [
+const allConvex: VertexKind[] = [
   "convex",
   "convex",
   "convex",
