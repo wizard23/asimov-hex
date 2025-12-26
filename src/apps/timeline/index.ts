@@ -162,6 +162,7 @@ class TimelineViewer {
   private renderList() {
     const html = this.filteredCommits.map(commit => {
       const date = new Date(commit.timestamp * 1000).toLocaleString();
+      const checkoutCommand = `git checkout ${commit.hash}`;
       return `
         <div class="commit-item">
           <div class="commit-header">
@@ -173,6 +174,7 @@ class TimelineViewer {
           <div class="commit-stats">
             <span class="added">+${commit.addedLines}</span>
             <span class="removed">-${commit.removedLines}</span>
+            <button class="checkout-button" data-checkout="${this.escapeHtml(checkoutCommand)}">git checkout</button>
           </div>
         </div>
       `;
@@ -182,6 +184,33 @@ class TimelineViewer {
       <h2>Timeline (${this.filteredCommits.length} commits)</h2>
       ${html}
     `;
+
+    this.bindCheckoutButtons();
+  }
+
+  private bindCheckoutButtons() {
+    const buttons = this.timelinePanel.querySelectorAll<HTMLButtonElement>('.checkout-button');
+    buttons.forEach(button => {
+      button.onclick = () => {
+        const command = button.dataset.checkout;
+        if (!command) return;
+        navigator.clipboard.writeText(command).catch(() => {
+          this.copyToClipboardFallback(command);
+        });
+      };
+    });
+  }
+
+  private copyToClipboardFallback(text: string) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
   }
 
   private escapeHtml(unsafe: string): string {
