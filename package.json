@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
+    "verify": "npm run test && npm run lint && npm run build && echo 'Verification was successful :)'",
     "create-project-statistics": "tsx scripts/create-project-statistics.ts",
     "re-create-git-timeline": "tsx scripts/re-create-git-timeline.ts"
   },
