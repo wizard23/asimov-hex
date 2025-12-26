@@ -1,0 +1,14 @@
+# "Editor Controls"
+
+"Editor Controls" provides global controls for the Tile Editor.
+
+## User-facing behavior
+- Scale zoom control for the canvas.
+- Number of sides and default side-length expression for new polygons.
+- Edge width, closure epsilon, and view offset controls.
+- Constants text area for defining named values used in expressions.
+- "Center View" button to fit all polygons into the visible area.
+
+## Developer notes
+- Implemented via Tweakpane in `src/apps/tile-editor/index.ts`.
+- The constants textarea is appended directly to the pane container to support multiline input.

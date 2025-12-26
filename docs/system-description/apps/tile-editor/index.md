@@ -31,4 +31,33 @@ The naming scheme for documenting the sub-apps of this app goes like this:
 ---
 
 # "Tile Editor"
-Modify this section please.
+The Tile Editor is a browser-based tool for creating and editing polygon instances on a 2D canvas. Users place polygons, edit their geometry through expressions (including constants), and clone instances to build tiled layouts. Developers interact with a Pixi.js canvas and a Tweakpane-driven UI that keeps polygon types and instances in sync.
+
+## User-facing overview
+- Create a new polygon by double-clicking empty canvas space.
+- Select a polygon by clicking it to edit instance and type values.
+- Drag polygons to move them; drag the background to pan the view.
+- Scroll to zoom; use the "Center View" button to fit all polygons.
+- Double-click a polygon to clone it along a ray defined by the click direction.
+- Enter math expressions for side lengths and angles; use "?" for solver-assisted unknowns.
+- Define constants once and reuse them across all expressions.
+
+## Developer-facing overview
+- The app is a single-page entry in `tile-editor.html` and `src/apps/tile-editor/index.ts`.
+- Rendering is handled by Pixi.js. UI controls are built with Tweakpane.
+- Geometry expressions are parsed by `ExpressionParser` and evaluated against a constants map.
+- Polygon types (shared geometry definitions) and instances (position + rotation) are separate.
+
+## Core sub-apps
+- "Editor Controls" for global editing inputs like scale, view offset, constants, and centering.
+- "Polygon Editor" for selected polygon instance and type editing.
+- "Current Values" for live summaries of view, constants, and polygon geometry.
+- "Unit Cell Editor" for interactive canvas editing and polygon visualization.
+
+## Data flow summary
+1. A polygon type stores side/angle expressions and cached evaluated geometry.
+2. Polygon instances reference a type and store position and rotation.
+3. When type expressions change, all referencing instances recompute their rotated points.
+4. The render layer draws instances from cached points and style state.
+
+See `docs/system-description/apps/tile-editor/index__types.md` and `docs/system-description/apps/tile-editor/index__implementation.md` for detail.
