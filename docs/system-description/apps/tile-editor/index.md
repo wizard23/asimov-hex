@@ -15,20 +15,20 @@ Please document the types|interfaces|data structures|etc. in index__types.md and
 ## Documenting Sub-Apps
 The following section is about how sub-apps of the app described in this document ought to be documented. It uses the sub-app "Editor Controls" as a specific example but it is, of course, meant to describe the general way for documenting sub-apps:
 
-To ensure this document is well structured and does not loose focus by describing small details please use separate files to describe the sub-apps. This way it is enough to just reference the sub-apps in this and other documents. Referencing a sub-app should be done like this: 
+To ensure this document is well structured and does not loose focus by describing small details please use separate files to describe the sub-apps. This way it is enough to just reference the sub-apps in this and other documents. Referencing a sub-app should be done like this:
 
-"Editor Controls" (put the name of the sub-app in quotation marks to clearly distinguish between normal text and a reference to a specific sub-app)
+"Editor Controls" (put the name of the sub-app in quotation marks to clearly distinguish between normal text and a references to a specific sub-app)
 
-The naming scheme for documenting the sub-apps of the "Tile Editor" goes like this: 
+The naming scheme for documenting the sub-apps of this app goes like this: 
 
 * the current functionality of the sub-app should be documented in editor-controls.md
-* any specific typescript types/interfaces/data structures/etc. should be documented in editor-controls__types.md (only create this file if it is really needed. Some sub-apps might not need any special types)
-* any specific implementation detail that is not trivial should be documented in editor-controls__implementation.md (only create this file if it is really needed. Some sub-apps might have any non trivial implementation details worth mentioning)
+* any specific typescript types/interfaces/data structures/etc. should be documented in editor-controls__types.md (only create this file if it is really needed. Some sub-apps might not have any special types).
+* any specific implementation detail that is not trivial should be documented in editor-controls__implementation.md (only create this file if it is really needed. Some sub-apps might not have any non trivial implementation details worth mentioning).
 
 ## FAQ for the AI
 * If anything is unclear please just ask.
-* Please keep these instructions as they are and only make changes below the line that follows. Don't use any lines in this documentation except to separate these instructions for the AI from the documentation itself.
+* Please keep these instructions as they are and only make changes below the line that follows. Don't use any lines in the documentation except to keep the instructions for the AI separated from the documentation itself.
 ---
 
 # "Tile Editor"
-Modify this section and below please 
+Modify this section please.
