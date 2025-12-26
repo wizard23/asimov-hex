@@ -9,6 +9,7 @@ import { setupValuesToggle } from './ui-helpers';
 import { Point } from './types';
 import { solveSimpleNgon } from '../../core/utils/solver';
 import type { PolygonConstraint, VertexKind } from '../../core/utils/solver-types';
+import { showToast } from '../../core/utils/toast';
 
 interface EditorConfig {
   scale: number;
@@ -876,7 +877,7 @@ class TileEditor {
 
       if (expressionError) {
           if (alertOnError) {
-              alert(expressionError);
+              showToast(expressionError);
           }
           return this.buildDummyEvaluation(
               sideLengthExpressions.length,
@@ -931,7 +932,7 @@ class TileEditor {
           const value = this.evaluateSideLengthExpression(expr);
           if (typeof value !== 'number') {
               if (alertOnError) {
-                  alert(`Side length error: ${value}`);
+                  showToast(`Side length error: ${value}`);
               }
               return this.buildDummyEvaluation(
                   sideLengthExpressions.length,
@@ -954,7 +955,7 @@ class TileEditor {
           const value = this.evaluateAngleExpression(expr);
           if (typeof value !== 'number') {
               if (alertOnError) {
-                  alert(`Angle error: ${value}`);
+                  showToast(`Angle error: ${value}`);
               }
               return this.buildDummyEvaluation(
                   sideLengthExpressions.length,
@@ -978,7 +979,7 @@ class TileEditor {
 
       if ('kind' in result) {
           if (alertOnError) {
-              alert(`Solver error: ${result.message}`);
+              showToast(`Solver error: ${result.message}`);
           }
           return this.buildDummyEvaluation(
               sideLengthExpressions.length,

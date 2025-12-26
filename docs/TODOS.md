@@ -294,8 +294,23 @@ If anything is unclear please just ask.
 
 
 
- show a toast (please use a toast with the same styling as in: src/apps/timeline/index.ts)
-* create extract a core library function for showing toasts that we can reuse in all apps if needed.
-* use this library function in src/apps/timeline/index.ts and the "Tile Editor" for showing the user the syntax error in the expression
+
+Let's improve the usability of the "Type Values" even more: Please show a toast when an expression is invalid or the solver failed instead of an alert.
+
+For the toasts:
+* please use a toast with the same styling and functionality as in: src/apps/timeline/index.ts
+* to avoid duplicated code:
+  * extract a library function for showing toasts that we can reuse in all apps that need toasts.
+  * put this new library function in a suitable named file placed somewhere under src/
+  * use this library function in src/apps/timeline/index.ts where toasts where used before and in the "Tile Editor" in the cases described above. 
+
+Just for clarification:
+* Please don't change the way errors are handled in the rotation expression for the instances. 
+* Please don't change anything else in src/apps/timeline/index.ts apart from the necessary modifications for the extraction of the toast functionality.
+
+If anything is unclear please just ask.
+
+
+
 
 ## FUTURE
