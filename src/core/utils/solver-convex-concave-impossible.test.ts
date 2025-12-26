@@ -15,7 +15,7 @@ import type {
   VertexKinds,
   SimplePolygonSolveOptions,
 } from "./solver-types";
-import { solveSimpleNgonFromLengthsAndAngles } from "./solver";
+import { solveSimpleNgon } from "./solver";
 
 type PolygonData = {
   sides: number;
@@ -47,11 +47,11 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
     const shortSide = 0.8; // approx of Math.sqrt(2)/2 + 0.1;
 
     const constraints: PolygonConstraint[] = [
-      { type: "length", i: 0, j: 1, length: 1 }, // AB
+      { type: "length", seg: { i: 0, j: 1 }, length: 1 }, // AB
       { type: "interiorAngle", i: 1, angleRad: Math.PI/2}, // angle at B
-      { type: "length", i: 1, j: 2, length: 1 }, // BC
-      { type: "length", i: 2, j: 3, length: shortSide }, // CD
-      { type: "length", i: 3, j: 0, length: shortSide }, // DA
+      { type: "length", seg: { i: 1, j: 2 }, length: 1 }, // BC
+      { type: "length", seg: { i: 2, j: 3 }, length: shortSide }, // CD
+      { type: "length", seg: { i: 3, j: 0 }, length: shortSide }, // DA
     ];
 
     const convexKinds: VertexKinds = ["convex", "convex", "convex", "convex"];
@@ -63,7 +63,7 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
     ];
 
     // ---- (a) convex solution ----
-    const r1 = solveSimpleNgonFromLengthsAndAngles(
+    const r1 = solveSimpleNgon(
       4,
       convexKinds,
       constraints,
@@ -94,7 +94,7 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
     expect(poly1.interiorAngles[3]).toBeLessThan(Math.PI);
 
     // ---- (b) concave solution (vertex 1 reflex) ----
-    const r2 = solveSimpleNgonFromLengthsAndAngles(
+    const r2 = solveSimpleNgon(
       4,
       concaveKindsAt1,
       constraints,
@@ -129,13 +129,13 @@ describe("solveSimpleNgonFromLengthsAndAngles — ambiguity + infeasible", () =>
   it("5) Impossible triangle: sides (10, 1, 1) violates triangle inequality => must fail", () => {
     // N=3 => 2N-3 = 3 numeric constraints (just the 3 side lengths).
     const constraints: PolygonConstraint[] = [
-      { type: "length", i: 0, j: 1, length: 10 },
-      { type: "length", i: 1, j: 2, length: 1 },
-      { type: "length", i: 2, j: 0, length: 1 },
+      { type: "length", seg: { i: 0, j: 1 }, length: 10 },
+      { type: "length", seg: { i: 1, j: 2 }, length: 1 },
+      { type: "length", seg: { i: 2, j: 0 }, length: 1 },
     ];
     const kinds: VertexKinds = ["convex", "convex", "convex"];
 
-    const result = solveSimpleNgonFromLengthsAndAngles(
+    const result = solveSimpleNgon(
       3,
       kinds,
       constraints,

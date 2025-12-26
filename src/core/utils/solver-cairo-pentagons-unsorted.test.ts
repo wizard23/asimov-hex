@@ -19,7 +19,7 @@ import type {
   VertexKinds,
   SimplePolygonSolveOptions,
 } from "./solver-types";
-import { solveSimpleNgonFromLengthsAndAngles } from "./solver";
+import { solveSimpleNgon } from "./solver";
 
 type PolygonData = {
   sides: number;
@@ -57,17 +57,17 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests (index
     // - 5 edge lengths = 1
     // - 2 non-adjacent right angles at vertices 0 and 2
     const constraints: PolygonConstraint[] = [
-      { type: "length", i: 0, j: 1, length: 1 },
-      { type: "length", i: 1, j: 2, length: 1 },
-      { type: "length", i: 2, j: 3, length: 1 },
-      { type: "length", i: 3, j: 4, length: 1 },
-      { type: "length", i: 4, j: 0, length: 1 },
+      { type: "length", seg: { i: 0, j: 1 }, length: 1 },
+      { type: "length", seg: { i: 1, j: 2 }, length: 1 },
+      { type: "length", seg: { i: 2, j: 3 }, length: 1 },
+      { type: "length", seg: { i: 3, j: 4 }, length: 1 },
+      { type: "length", seg: { i: 4, j: 0 }, length: 1 },
 
       { type: "interiorAngle", i: 0, angleRad: Math.PI / 2 },
       { type: "interiorAngle", i: 2, angleRad: Math.PI / 2 },
     ];
 
-    const result = solveSimpleNgonFromLengthsAndAngles(
+    const result = solveSimpleNgon(
       5,
       allConvex,
       constraints,
@@ -116,11 +116,11 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests (index
     // and fail only if inconsistent.
     const constraints: PolygonConstraint[] = [
       // edge lengths in order: (0-1),(1-2),(2-3),(3-4),(4-0)
-      { type: "length", i: 0, j: 1, length: lengths[0] },
-      { type: "length", i: 1, j: 2, length: lengths[1] },
-      { type: "length", i: 2, j: 3, length: lengths[2] },
-      { type: "length", i: 3, j: 4, length: lengths[3] },
-      { type: "length", i: 4, j: 0, length: lengths[4] },
+      { type: "length", seg: { i: 0, j: 1 }, length: lengths[0] },
+      { type: "length", seg: { i: 1, j: 2 }, length: lengths[1] },
+      { type: "length", seg: { i: 2, j: 3 }, length: lengths[2] },
+      { type: "length", seg: { i: 3, j: 4 }, length: lengths[3] },
+      { type: "length", seg: { i: 4, j: 0 }, length: lengths[4] },
 
       // angles in order at vertices 0..4
       { type: "interiorAngle", i: 0, angleRad: angles[0] },
@@ -130,7 +130,7 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests (index
       { type: "interiorAngle", i: 4, angleRad: angles[4] },
     ];
 
-    const result = solveSimpleNgonFromLengthsAndAngles(
+    const result = solveSimpleNgon(
       5,
       allConvex,
       constraints,
@@ -167,17 +167,17 @@ describe("solveSimpleCcwNgonFromLengthsAndAngles — Cairo pentagon tests (index
     // - 5 edge lengths (one short: edge 4->0)
     // - 2 non-adjacent right angles at vertices 0 and 2
     const constraints: PolygonConstraint[] = [
-      { type: "length", i: 0, j: 1, length: 1 },
-      { type: "length", i: 1, j: 2, length: 1 },
-      { type: "length", i: 2, j: 3, length: 1 },
-      { type: "length", i: 3, j: 4, length: 1 },
-      { type: "length", i: 4, j: 0, length: short },
+      { type: "length", seg: { i: 0, j: 1 }, length: 1 },
+      { type: "length", seg: { i: 1, j: 2 }, length: 1 },
+      { type: "length", seg: { i: 2, j: 3 }, length: 1 },
+      { type: "length", seg: { i: 3, j: 4 }, length: 1 },
+      { type: "length", seg: { i: 4, j: 0 }, length: short },
 
       { type: "interiorAngle", i: 0, angleRad: Math.PI / 2 },
       { type: "interiorAngle", i: 2, angleRad: Math.PI / 2 },
     ];
 
-    const result = solveSimpleNgonFromLengthsAndAngles(
+    const result = solveSimpleNgon(
       5,
       allConvex,
       constraints,

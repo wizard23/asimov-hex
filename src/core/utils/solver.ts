@@ -6,11 +6,16 @@ import type {
   SimplePolygonSolveOptions,
   PolygonData,
   SolverError,
+  SegmentRef,
 } from "./solver-types";
 
 type Pt = { x: number; y: number };
 
-function err(kind: SolverError["kind"], message: string, details?: Record<string, unknown>): SolverError {
+function err(
+  kind: SolverError["kind"],
+  message: string,
+  details?: Record<string, unknown>
+): SolverError {
   return { kind, message, details };
 }
 
@@ -45,15 +50,12 @@ function signedTurn(prev: Pt, cur: Pt, next: Pt): number {
   return Math.atan2(cross(e1, e2), dot(e1, e2));
 }
 
-// Interior angle in (0, 2π) for CCW polygon can be computed from signed turn:
-// interior = π - turn
+// Interior angle in (0, 2π): interior = π - turn (for CCW simple polygons)
 function interiorAngle(prev: Pt, cur: Pt, next: Pt): number {
-  const turn = signedTurn(prev, cur, next); // (-π, π]
-  const ang = Math.PI - turn; // (0, 2π)
-  // Normalize to (0,2π)
+  const turn = signedTurn(prev, cur, next);
+  const ang = Math.PI - turn;
   const twoPi = 2 * Math.PI;
-  const norm = ((ang % twoPi) + twoPi) % twoPi;
-  return norm;
+  return ((ang % twoPi) + twoPi) % twoPi;
 }
 
 function pointSegmentDistance(p: Pt, a: Pt, b: Pt): number {
@@ -68,7 +70,6 @@ function pointSegmentDistance(p: Pt, a: Pt, b: Pt): number {
 }
 
 function segmentsProperlyIntersect(a: Pt, b: Pt, c: Pt, d: Pt): boolean {
-  // Standard orientation test, excluding collinear overlaps (we treat those as "bad" via distance penalty)
   const ab = sub(b, a);
   const ac = sub(c, a);
   const ad = sub(d, a);
@@ -81,15 +82,18 @@ function segmentsProperlyIntersect(a: Pt, b: Pt, c: Pt, d: Pt): boolean {
   const o3 = Math.sign(cross(cd, ca));
   const o4 = Math.sign(cross(cd, cb));
 
-  // Proper intersection if orientations differ strictly
-  return o1 !== 0 && o2 !== 0 && o3 !== 0 && o4 !== 0 && o1 !== o2 && o3 !== o4;
+  return (
+    o1 !== 0 &&
+    o2 !== 0 &&
+    o3 !== 0 &&
+    o4 !== 0 &&
+    o1 !== o2 &&
+    o3 !== o4
+  );
 }
 
 function segmentSegmentDistance(a: Pt, b: Pt, c: Pt, d: Pt): number {
-  // If proper intersection, distance is 0
   if (segmentsProperlyIntersect(a, b, c, d)) return 0;
-
-  // Otherwise min of endpoint-to-segment distances
   return Math.min(
     pointSegmentDistance(a, c, d),
     pointSegmentDistance(b, c, d),
@@ -98,16 +102,35 @@ function segmentSegmentDistance(a: Pt, b: Pt, c: Pt, d: Pt): number {
   );
 }
 
+// ---------- segment helpers (edges + diagonals) ----------
+
+function normalizeSegment(seg: SegmentRef): SegmentRef {
+  return seg.i < seg.j ? seg : { i: seg.j, j: seg.i };
+}
+function segmentKey(seg: SegmentRef): string {
+  const s = normalizeSegment(seg);
+  return `${s.i}-${s.j}`;
+}
+function segmentVec(pts: Pt[], seg: SegmentRef): Pt {
+  return { x: pts[seg.j].x - pts[seg.i].x, y: pts[seg.j].y - pts[seg.i].y };
+}
+function vecLen(v: Pt): number {
+  return Math.hypot(v.x, v.y);
+}
+// Undirected angle between vectors in [0, π]
+function undirectedAngleBetween(u: Pt, v: Pt): number {
+  return Math.atan2(Math.abs(cross(u, v)), dot(u, v));
+}
+
 // ---------- variable packing/unpacking (gauge fixing) ----------
 //
-// We fix:
-//   p0 = (0,0)          -> removes translation (2 DOF)
-//   p1.y = 0            -> removes rotation (1 DOF)
-// Keep p1.x as variable -> keeps scale free
+// Fix:
+//   p0 = (0,0)
+//   p1.y = 0
 //
-// Variables vector x has length (2N - 3):
+// Variables x length = 2N-3:
 //   x[0] = p1.x
-//   for i=2..N-1: x[...] = pi.x, pi.y
+//   then for i=2..N-1: (xi, yi)
 
 function unpackVars(N: number, x: number[]): Pt[] {
   const pts: Pt[] = new Array(N);
@@ -134,20 +157,6 @@ function packVars(pts: Pt[]): number[] {
   return x;
 }
 
-// ---------- initialization ----------
-
-function regularNgonInit(N: number): Pt[] {
-  // CCW regular N-gon, roughly unit scale
-  const R = 1;
-  const pts: Pt[] = [];
-  for (let i = 0; i < N; i++) {
-    const t = (2 * Math.PI * i) / N;
-    pts.push({ x: R * Math.cos(t), y: R * Math.sin(t) });
-  }
-  // gauge: translate so p0 = (0,0), rotate so p1.y=0, keep p1.x positive
-  return gaugeFix(pts);
-}
-
 function gaugeFix(pts: Pt[]): Pt[] {
   const N = pts.length;
 
@@ -155,23 +164,31 @@ function gaugeFix(pts: Pt[]): Pt[] {
   const t = { x: pts[0].x, y: pts[0].y };
   const p = pts.map((q) => ({ x: q.x - t.x, y: q.y - t.y }));
 
-  // rotate so p1 lies on +x axis (y=0)
+  // rotate so p1 lies on +x axis
   const p1 = p[1];
   const ang = Math.atan2(p1.y, p1.x);
   const c = Math.cos(-ang);
   const s = Math.sin(-ang);
   const r = p.map((q) => ({ x: c * q.x - s * q.y, y: s * q.x + c * q.y }));
 
-  // ensure p1.x positive (avoid flipping)
+  // ensure p1.x positive
   if (r[1].x < 0) {
     for (let i = 0; i < N; i++) r[i] = { x: -r[i].x, y: -r[i].y };
   }
 
-  // enforce p1.y exactly 0 numerically
   r[1].y = 0;
   r[0] = { x: 0, y: 0 };
-
   return r;
+}
+
+function regularNgonInit(N: number): Pt[] {
+  const R = 1;
+  const pts: Pt[] = [];
+  for (let i = 0; i < N; i++) {
+    const t = (2 * Math.PI * i) / N;
+    pts.push({ x: R * Math.cos(t), y: R * Math.sin(t) });
+  }
+  return gaugeFix(pts);
 }
 
 function mulberry32(seed: number): () => number {
@@ -196,9 +213,9 @@ function jitter(pts: Pt[], rng: () => number, scale = 0.05): Pt[] {
 // ---------- residual building ----------
 
 type ResidualBuild = {
-  residuals: number[]; // includes hard constraints + penalties
+  residuals: number[]; // hard + weighted penalties
   hardResiduals: number[]; // only numeric constraints
-  penaltyResiduals: number[]; // only penalties
+  penaltyResiduals: number[]; // only penalties before weighting
 };
 
 function buildResiduals(
@@ -213,61 +230,77 @@ function buildResiduals(
   // hard numeric constraints
   for (const c of constraints) {
     if (c.type === "length") {
-      const i = c.i;
-      const j = c.j;
-      hard.push(dist(pts[i], pts[j]) - c.length);
-    } else {
+      const seg = normalizeSegment(c.seg);
+      hard.push(vecLen(segmentVec(pts, seg)) - c.length);
+    } else if (c.type === "interiorAngle") {
       const i = c.i;
       const prev = pts[(i + N - 1) % N];
       const cur = pts[i];
       const next = pts[(i + 1) % N];
-      const ang = interiorAngle(prev, cur, next);
-      hard.push(ang - c.angleRad);
+      hard.push(interiorAngle(prev, cur, next) - c.angleRad);
+    } else if (c.type === "segmentLengthRatio") {
+      const sx = normalizeSegment(c.segX);
+      const sy = normalizeSegment(c.segY);
+      const lx = vecLen(segmentVec(pts, sx));
+      const ly = vecLen(segmentVec(pts, sy));
+      hard.push(lx - c.factor * ly);
+    } else {
+      // segmentRelativeAngle
+      const sa = normalizeSegment(c.segA);
+      const sb = normalizeSegment(c.segB);
+      const ua = segmentVec(pts, sa);
+      const ub = segmentVec(pts, sb);
+      const la = vecLen(ua);
+      const lb = vecLen(ub);
+      const minLen = 1e-12;
+      if (la < minLen || lb < minLen) {
+        hard.push(1e3);
+      } else {
+        hard.push(undirectedAngleBetween(ua, ub) - c.angleRad);
+      }
     }
   }
 
-  // penalties (inequalities)
+  // penalties (inequalities / geometry validity)
   const pen: number[] = [];
 
-  // CCW: signed area must be > 0; use hinge penalty if <= eps
+  // CCW area margin (this solver is still "SimpleNgon" but enforces CCW)
   const area = signedArea(pts);
-  const areaMin = 1e-8; // small positive area margin to avoid degeneracy
-  if (area < areaMin) {
-    pen.push(areaMin - area);
-  } else {
-    pen.push(0);
-  }
+  const areaMin = 1e-8;
+  pen.push(area < areaMin ? areaMin - area : 0);
 
-  // vertexKinds: convex => signedTurn > +turnEps, reflex => signedTurn < -turnEps
+  // vertexKinds enforcement
   const turnEps = 1e-6;
   for (let i = 0; i < N; i++) {
     const prev = pts[(i + N - 1) % N];
     const cur = pts[i];
     const next = pts[(i + 1) % N];
     const t = signedTurn(prev, cur, next);
-    if (vertexKinds[i] === "convex") {
+
+    const kind = vertexKinds[i];
+    if (kind === "convex") {
       pen.push(Math.max(0, turnEps - t));
-    } else {
+    } else if (kind === "reflex") {
       pen.push(Math.max(0, t + turnEps));
+    } else {
+      // straight: |turn| <= eps
+      pen.push(Math.max(0, Math.abs(t) - turnEps));
     }
   }
 
   // simplicity: penalize non-adjacent edge pairs that are too close/intersect
-  // edges are (i,i+1)
   for (let i = 0; i < N; i++) {
     const a = pts[i];
     const b = pts[(i + 1) % N];
 
     for (let j = i + 1; j < N; j++) {
-      // Edge j is (j, j+1)
       const k = (j + 1) % N;
 
-      // Skip same edge and adjacent edges (sharing a vertex)
+      // skip same/adjacent edges (sharing a vertex)
       if (j === i) continue;
       if (j === (i + 1) % N) continue;
       if (i === (j + 1) % N) continue;
 
-      // Also skip the pair (0,N-1) adjacency already covered by modulo logic above
       const c = pts[j];
       const d = pts[k];
 
@@ -276,9 +309,7 @@ function buildResiduals(
     }
   }
 
-  // Combine: scale penalties to act "hard-ish" but keep numerics stable
-  // (Still feasibility: we require penalties near 0 to accept.)
-  const penaltyWeight = 100; // increases enforcement strength
+  const penaltyWeight = 100;
   const residuals = hard.concat(pen.map((v) => penaltyWeight * v));
 
   return { residuals, hardResiduals: hard, penaltyResiduals: pen };
@@ -299,7 +330,6 @@ function matMulAtA(J: number[][], lambda: number): number[][] {
       }
     }
   }
-  // symmetrize and add lambda
   for (let a = 0; a < n; a++) {
     for (let b = 0; b < a; b++) A[b][a] = A[a][b];
     A[a][a] += lambda;
@@ -326,7 +356,6 @@ function solveLinearSystem(Ain: number[][], bin: number[]): number[] | null {
   const b = bin.slice();
 
   for (let i = 0; i < n; i++) {
-    // pivot
     let piv = i;
     let best = Math.abs(A[i][i]);
     for (let r = i + 1; r < n; r++) {
@@ -342,7 +371,6 @@ function solveLinearSystem(Ain: number[][], bin: number[]): number[] | null {
       [b[i], b[piv]] = [b[piv], b[i]];
     }
 
-    // eliminate
     const diag = A[i][i];
     for (let r = i + 1; r < n; r++) {
       const f = A[r][i] / diag;
@@ -352,7 +380,6 @@ function solveLinearSystem(Ain: number[][], bin: number[]): number[] | null {
     }
   }
 
-  // back-substitution
   const x = new Array(n).fill(0);
   for (let i = n - 1; i >= 0; i--) {
     let s = b[i];
@@ -362,12 +389,16 @@ function solveLinearSystem(Ain: number[][], bin: number[]): number[] | null {
   return x;
 }
 
+function dotVec(a: number[], b: number[]): number {
+  let s = 0;
+  for (let i = 0; i < a.length; i++) s += a[i] * b[i];
+  return s;
+}
 function norm2(v: number[]): number {
   let s = 0;
   for (const x of v) s += x * x;
   return Math.sqrt(s);
 }
-
 function maxAbs(v: number[]): number {
   let m = 0;
   for (const x of v) m = Math.max(m, Math.abs(x));
@@ -397,243 +428,7 @@ function finiteDiffJacobian(
   return J;
 }
 
-// ---------- public solver ----------
-
-export function solveSimpleNgonFromLengthsAndAngles(
-  vertexCount: number,
-  vertexKinds: VertexKinds,
-  constraints: readonly PolygonConstraint[],
-  options?: SimplePolygonSolveOptions
-): PolygonData | SolverError {
-  // ---- validation ----
-  if (!Number.isInteger(vertexCount) || vertexCount < 3) {
-    return err("InvalidInput", "vertexCount must be an integer >= 3", { vertexCount });
-  }
-  const N = vertexCount;
-
-  if (vertexKinds.length !== N) {
-    return err("InvalidInput", "vertexKinds must have length N", {
-      expected: N,
-      got: vertexKinds.length,
-    });
-  }
-  for (let i = 0; i < N; i++) {
-    const k = vertexKinds[i];
-    if (k !== "convex" && k !== "reflex") {
-      return err("InvalidInput", `vertexKinds[${i}] must be "convex" or "reflex"`, { value: k });
-    }
-  }
-
-  // constraints: allow overconstraints, but must be valid
-  if (constraints.length === 0) {
-    return err("InvalidInput", "At least one constraint is required");
-  }
-  let hasLength = false;
-
-  // dedupe lengths by unordered pair
-  const lengthPairs = new Set<string>();
-
-  for (let idx = 0; idx < constraints.length; idx++) {
-    const c = constraints[idx];
-    if (c.type === "length") {
-      hasLength = true;
-      const { i, j, length } = c;
-      if (!Number.isInteger(i) || i < 0 || i >= N || !Number.isInteger(j) || j < 0 || j >= N) {
-        return err("InvalidInput", `Invalid vertex index in length constraint at ${idx}`, { c });
-      }
-      if (i === j) return err("InvalidInput", `length constraint at ${idx} has i === j`, { c });
-      if (!(length > 0) || !Number.isFinite(length)) {
-        return err("InvalidInput", `length constraint at ${idx} must have length > 0`, { c });
-      }
-      const a = Math.min(i, j);
-      const b = Math.max(i, j);
-      const key = `${a}-${b}`;
-      if (lengthPairs.has(key)) {
-        return err("InvalidInput", `duplicate length constraint for segment (${a},${b})`, { c });
-      }
-      lengthPairs.add(key);
-    } else {
-      const { i, angleRad } = c;
-      if (!Number.isInteger(i) || i < 0 || i >= N) {
-        return err("InvalidInput", `Invalid vertex index in angle constraint at ${idx}`, { c });
-      }
-      if (!Number.isFinite(angleRad) || !(angleRad > 0) || !(angleRad < 2 * Math.PI) || angleRad === Math.PI) {
-        return err("InvalidInput", `angleRad at ${idx} must satisfy 0 < angleRad < 2π and angleRad != π`, { c });
-      }
-      // Must be consistent with vertexKinds (convex/reflex)
-      if (vertexKinds[i] === "convex" && !(angleRad < Math.PI)) {
-        return err("InvalidInput", `angle constraint at ${idx} conflicts with vertexKinds[${i}] === "convex"`, { c });
-      }
-      if (vertexKinds[i] === "reflex" && !(angleRad > Math.PI)) {
-        return err("InvalidInput", `angle constraint at ${idx} conflicts with vertexKinds[${i}] === "reflex"`, { c });
-      }
-    }
-  }
-  if (!hasLength) {
-    return err("InvalidInput", "At least one length constraint is required to fix scale");
-  }
-
-  const maxIterations = options?.maxIterations ?? 3000;
-  const tol = options?.tolerance ?? 1e-10;
-  const simplicityEps = options?.simplicityEpsilon ?? 1e-6;
-  const restarts = options?.restarts ?? 0;
-  const diag = options?.diagnostics ?? "none";
-
-  // ---- initialization ----
-  let initPts: Pt[];
-  const init = options?.initialization ?? { kind: "regularNgon" as const };
-  if (init.kind === "custom") {
-    if (init.initialVertices.length !== N) {
-      return err("InvalidInput", "custom initialization must provide N vertices", {
-        expected: N,
-        got: init.initialVertices.length,
-      });
-    }
-    initPts = gaugeFix(init.initialVertices.map((p) => ({ x: p.x, y: p.y })));
-  } else {
-    initPts = regularNgonInit(N);
-  }
-
-  // multi-start: try base + jittered variants
-  const seed = (options?.randomSeed ?? 123456789) | 0;
-  const rng = mulberry32(seed);
-
-  let best: { x: number[]; pts: Pt[]; hardMax: number; penMax: number; hardNorm: number } | null = null;
-
-  const trials = 1 + Math.max(0, restarts);
-  for (let trial = 0; trial < trials; trial++) {
-    const startPts = trial === 0 ? initPts : jitter(initPts, rng, 0.15);
-    const startX = packVars(startPts);
-
-    const res = runLM(N, vertexKinds, constraints, startX, {
-      maxIterations,
-      tol,
-      simplicityEps,
-      diagnostics: diag,
-    });
-
-    if (res.ok) {
-      // perfect: return immediately
-      return res.value;
-    }
-
-    // keep best attempt (smallest hard residual max, then penalties)
-    const attempt = res.attempt;
-    if (attempt) {
-      if (
-        !best ||
-        attempt.hardMax < best.hardMax - 1e-15 ||
-        (Math.abs(attempt.hardMax - best.hardMax) < 1e-15 && attempt.penMax < best.penMax)
-      ) {
-        best = attempt;
-      }
-    }
-  }
-
-  // final failure message
-  if (best) {
-    return err(
-      "Infeasible",
-      "Could not satisfy constraints and geometric requirements within tolerance",
-      {
-        bestHardMaxResidual: best.hardMax,
-        bestPenaltyMax: best.penMax,
-        bestHardNorm: best.hardNorm,
-      }
-    );
-  }
-  return err("DidNotConverge", "Solver failed without producing a candidate");
-}
-
-function runLM(
-  N: number,
-  vertexKinds: VertexKinds,
-  constraints: readonly PolygonConstraint[],
-  x0: number[],
-  cfg: { maxIterations: number; tol: number; simplicityEps: number; diagnostics: "none" | "basic" | "verbose" }
-): { ok: true; value: PolygonData } | { ok: false; attempt?: { x: number[]; pts: Pt[]; hardMax: number; penMax: number; hardNorm: number } } {
-  let x = x0.slice();
-  let lambda = 1e-3;
-
-  const f = (xx: number[]) => {
-    const pts = unpackVars(N, xx);
-    const { residuals } = buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps);
-    return residuals;
-  };
-
-  let r = f(x);
-  let cost = 0.5 * dotVec(r, r);
-
-  for (let iter = 0; iter < cfg.maxIterations; iter++) {
-    const pts = unpackVars(N, x);
-    const built = buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps);
-
-    const hardMax = maxAbs(built.hardResiduals);
-    const penMax = maxAbs(built.penaltyResiduals);
-    const hardNorm = norm2(built.hardResiduals);
-
-    // acceptance criteria (feasibility)
-    const okHard = hardMax <= cfg.tol;
-    const okPen = penMax <= 1e-9; // penalties are hinge distances; require essentially 0
-    if (okHard && okPen) {
-      // Build PolygonData from pts
-      const poly = buildPolygonData(pts);
-      return { ok: true, value: poly };
-    }
-
-    // Jacobian
-    const J = finiteDiffJacobian(f, x, r);
-    const A = matMulAtA(J, lambda);
-    const g = matMulAtR(J, r); // J^T r
-
-    // Solve (A) dx = -g
-    const dx = solveLinearSystem(A, g.map((v) => -v));
-    if (!dx) {
-      return { ok: false, attempt: { x, pts, hardMax, penMax, hardNorm } };
-    }
-
-    const xNew = x.map((v, i) => v + dx[i]);
-    const rNew = f(xNew);
-    const costNew = 0.5 * dotVec(rNew, rNew);
-
-    if (costNew < cost) {
-      // accept
-      x = xNew;
-      r = rNew;
-      cost = costNew;
-      lambda = Math.max(1e-12, lambda * 0.33);
-    } else {
-      // reject, increase damping
-      lambda = Math.min(1e12, lambda * 3.0);
-    }
-
-    if (cfg.diagnostics === "verbose" && iter % 25 === 0) {
-      console.log(
-        `[iter ${iter}] cost=${cost.toExponential(3)} hardMax=${hardMax.toExponential(3)} penMax=${penMax.toExponential(3)} lambda=${lambda.toExponential(2)}`
-      );
-    }
-  }
-
-  // final attempt stats
-  const pts = unpackVars(N, x);
-  const built = buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps);
-  return {
-    ok: false,
-    attempt: {
-      x,
-      pts,
-      hardMax: maxAbs(built.hardResiduals),
-      penMax: maxAbs(built.penaltyResiduals),
-      hardNorm: norm2(built.hardResiduals),
-    },
-  };
-}
-
-function dotVec(a: number[], b: number[]): number {
-  let s = 0;
-  for (let i = 0; i < a.length; i++) s += a[i] * b[i];
-  return s;
-}
+// ---------- output ----------
 
 function buildPolygonData(pts: Pt[]): PolygonData {
   const N = pts.length;
@@ -651,4 +446,303 @@ function buildPolygonData(pts: Pt[]): PolygonData {
   }
 
   return { sides: N, sideLengths, interiorAngles };
+}
+
+// ---------- LM run ----------
+
+function runLM(
+  N: number,
+  vertexKinds: VertexKinds,
+  constraints: readonly PolygonConstraint[],
+  x0: number[],
+  cfg: {
+    maxIterations: number;
+    tol: number;
+    simplicityEps: number;
+    diagnostics: "none" | "basic" | "verbose";
+  }
+):
+  | { ok: true; value: PolygonData }
+  | { ok: false; attempt?: { hardMax: number; penMax: number; hardNorm: number } } {
+  let x = x0.slice();
+  let lambda = 1e-3;
+
+  const f = (xx: number[]) => {
+    const pts = unpackVars(N, xx);
+    return buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps)
+      .residuals;
+  };
+
+  let r = f(x);
+  let cost = 0.5 * dotVec(r, r);
+
+  for (let iter = 0; iter < cfg.maxIterations; iter++) {
+    const pts = unpackVars(N, x);
+    const built = buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps);
+
+    const hardMax = maxAbs(built.hardResiduals);
+    const penMax = maxAbs(built.penaltyResiduals);
+    const hardNorm = norm2(built.hardResiduals);
+
+    if (hardMax <= cfg.tol && penMax <= 1e-9) {
+      return { ok: true, value: buildPolygonData(pts) };
+    }
+
+    const J = finiteDiffJacobian(f, x, r);
+    const A = matMulAtA(J, lambda);
+    const g = matMulAtR(J, r);
+
+    const dx = solveLinearSystem(A, g.map((v) => -v));
+    if (!dx) return { ok: false, attempt: { hardMax, penMax, hardNorm } };
+
+    const xNew = x.map((v, i) => v + dx[i]);
+    const rNew = f(xNew);
+    const costNew = 0.5 * dotVec(rNew, rNew);
+
+    if (costNew < cost) {
+      x = xNew;
+      r = rNew;
+      cost = costNew;
+      lambda = Math.max(1e-12, lambda * 0.33);
+    } else {
+      lambda = Math.min(1e12, lambda * 3.0);
+    }
+
+    if (cfg.diagnostics === "verbose" && iter % 25 === 0) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[iter ${iter}] cost=${cost.toExponential(3)} hardMax=${hardMax.toExponential(
+          3
+        )} penMax=${penMax.toExponential(3)} lambda=${lambda.toExponential(2)}`
+      );
+    }
+  }
+
+  const pts = unpackVars(N, x);
+  const built = buildResiduals(pts, vertexKinds, constraints, cfg.simplicityEps);
+  return {
+    ok: false,
+    attempt: {
+      hardMax: maxAbs(built.hardResiduals),
+      penMax: maxAbs(built.penaltyResiduals),
+      hardNorm: norm2(built.hardResiduals),
+    },
+  };
+}
+
+// ---------- public solver ----------
+//
+// NOTE: Despite the name, this enforces CCW via a penalty. If you later want
+// to allow both orientations, remove the area penalty and add an option.
+export function solveSimpleNgon(
+  vertexCount: number,
+  vertexKinds: VertexKinds,
+  constraints: readonly PolygonConstraint[],
+  options?: SimplePolygonSolveOptions
+): PolygonData | SolverError {
+  if (!Number.isInteger(vertexCount) || vertexCount < 3) {
+    return err("InvalidInput", "vertexCount must be an integer >= 3", {
+      vertexCount,
+    });
+  }
+  const N = vertexCount;
+
+  if (vertexKinds.length !== N) {
+    return err("InvalidInput", "vertexKinds must have length N", {
+      expected: N,
+      got: vertexKinds.length,
+    });
+  }
+  for (let i = 0; i < N; i++) {
+    const k = vertexKinds[i];
+    if (k !== "convex" && k !== "reflex" && k !== "straight") {
+      return err(
+        "InvalidInput",
+        `vertexKinds[${i}] must be "convex", "reflex", or "straight"`,
+        { value: k }
+      );
+    }
+  }
+
+  if (constraints.length === 0) {
+    return err("InvalidInput", "At least one constraint is required");
+  }
+
+  // Validate constraints
+  const absoluteLengthSegs = new Set<string>();
+  const ratioKeys = new Set<string>();
+  const relAngleKeys = new Set<string>();
+  let hasAbsoluteLength = false;
+
+  for (let idx = 0; idx < constraints.length; idx++) {
+    const c = constraints[idx];
+
+    if (c.type === "length") {
+      hasAbsoluteLength = true;
+
+      const seg = normalizeSegment(c.seg);
+      if (
+        !Number.isInteger(seg.i) ||
+        seg.i < 0 ||
+        seg.i >= N ||
+        !Number.isInteger(seg.j) ||
+        seg.j < 0 ||
+        seg.j >= N
+      ) {
+        return err("InvalidInput", `Invalid vertex index in length at ${idx}`, {
+          c,
+        });
+      }
+      if (seg.i === seg.j) {
+        return err("InvalidInput", `length.seg at ${idx} has i === j`, { c });
+      }
+      if (!(c.length > 0) || !Number.isFinite(c.length)) {
+        return err("InvalidInput", `length.length at ${idx} must be > 0`, {
+          c,
+        });
+      }
+      const key = segmentKey(seg);
+      if (absoluteLengthSegs.has(key)) {
+        return err("InvalidInput", `duplicate length constraint for segment ${key}`, { c });
+      }
+      absoluteLengthSegs.add(key);
+    }
+
+    else if (c.type === "interiorAngle") {
+      const { i, angleRad } = c;
+      if (!Number.isInteger(i) || i < 0 || i >= N) {
+        return err("InvalidInput", `Invalid vertex index in interiorAngle at ${idx}`, { c });
+      }
+      if (!Number.isFinite(angleRad) || !(angleRad > 0) || !(angleRad < 2 * Math.PI)) {
+        return err("InvalidInput", `interiorAngle.angleRad at ${idx} must satisfy 0 < angleRad < 2π (π allowed)`, { c });
+      }
+
+      const kind = vertexKinds[i];
+      if (kind === "convex" && !(angleRad < Math.PI)) {
+        return err("InvalidInput", `interiorAngle at ${idx} conflicts with vertexKinds[${i}] === "convex"`, { c });
+      }
+      if (kind === "reflex" && !(angleRad > Math.PI)) {
+        return err("InvalidInput", `interiorAngle at ${idx} conflicts with vertexKinds[${i}] === "reflex"`, { c });
+      }
+      if (kind === "straight" && angleRad !== Math.PI) {
+        return err("InvalidInput", `interiorAngle at ${idx} conflicts with vertexKinds[${i}] === "straight" (must be π)`, { c });
+      }
+    }
+
+    else if (c.type === "segmentLengthRatio") {
+      const sx = normalizeSegment(c.segX);
+      const sy = normalizeSegment(c.segY);
+
+      for (const [name, s] of [["segX", sx], ["segY", sy]] as const) {
+        if (
+          !Number.isInteger(s.i) ||
+          s.i < 0 ||
+          s.i >= N ||
+          !Number.isInteger(s.j) ||
+          s.j < 0 ||
+          s.j >= N
+        ) {
+          return err("InvalidInput", `Invalid vertex index in segmentLengthRatio.${name} at ${idx}`, { c });
+        }
+        if (s.i === s.j) return err("InvalidInput", `segmentLengthRatio.${name} at ${idx} has i === j`, { c });
+      }
+      if (!Number.isFinite(c.factor) || !(c.factor > 0)) {
+        return err("InvalidInput", `segmentLengthRatio.factor at ${idx} must be > 0`, { c });
+      }
+
+      const key = `${segmentKey(sx)}=${c.factor}*${segmentKey(sy)}`;
+      if (ratioKeys.has(key)) return err("InvalidInput", `Duplicate segmentLengthRatio constraint`, { c });
+      ratioKeys.add(key);
+    }
+
+    else {
+      // segmentRelativeAngle
+      const sa = normalizeSegment(c.segA);
+      const sb = normalizeSegment(c.segB);
+
+      for (const [name, s] of [["segA", sa], ["segB", sb]] as const) {
+        if (
+          !Number.isInteger(s.i) ||
+          s.i < 0 ||
+          s.i >= N ||
+          !Number.isInteger(s.j) ||
+          s.j < 0 ||
+          s.j >= N
+        ) {
+          return err("InvalidInput", `Invalid vertex index in segmentRelativeAngle.${name} at ${idx}`, { c });
+        }
+        if (s.i === s.j) return err("InvalidInput", `segmentRelativeAngle.${name} at ${idx} has i === j`, { c });
+      }
+      if (!Number.isFinite(c.angleRad) || c.angleRad < 0 || c.angleRad > Math.PI) {
+        return err("InvalidInput", `segmentRelativeAngle.angleRad at ${idx} must satisfy 0 <= angleRad <= π`, { c });
+      }
+
+      const key = `angle(${segmentKey(sa)},${segmentKey(sb)})=${c.angleRad}`;
+      if (relAngleKeys.has(key)) return err("InvalidInput", `Duplicate segmentRelativeAngle constraint`, { c });
+      relAngleKeys.add(key);
+    }
+  }
+
+  // Fix global scale: need at least one absolute length.
+  if (!hasAbsoluteLength) {
+    return err("InvalidInput", "At least one absolute 'length' constraint is required to fix global scale");
+  }
+
+  const maxIterations = options?.maxIterations ?? 3000;
+  const tol = options?.tolerance ?? 1e-10;
+  const simplicityEps = options?.simplicityEpsilon ?? 1e-6;
+  const restarts = options?.restarts ?? 0;
+  const diag = options?.diagnostics ?? "none";
+
+  // init
+  let initPts: Pt[];
+  const init = options?.initialization ?? ({ kind: "regularNgon" } as const);
+  if (init.kind === "custom") {
+    if (init.initialVertices.length !== N) {
+      return err("InvalidInput", "custom initialization must provide N vertices", {
+        expected: N,
+        got: init.initialVertices.length,
+      });
+    }
+    initPts = gaugeFix(init.initialVertices.map((p) => ({ x: p.x, y: p.y })));
+  } else {
+    initPts = regularNgonInit(N);
+  }
+
+  const seed = (options?.randomSeed ?? 123456789) | 0;
+  const rng = mulberry32(seed);
+
+  let best: { hardMax: number; penMax: number; hardNorm: number } | null = null;
+
+  const trials = 1 + Math.max(0, restarts);
+  for (let trial = 0; trial < trials; trial++) {
+    const startPts = trial === 0 ? initPts : jitter(initPts, rng, 0.15);
+    const startX = packVars(startPts);
+
+    const res = runLM(N, vertexKinds, constraints, startX, {
+      maxIterations,
+      tol,
+      simplicityEps,
+      diagnostics: diag,
+    });
+
+    if (res.ok) return res.value;
+
+    if (res.attempt) {
+      const a = res.attempt;
+      if (
+        !best ||
+        a.hardMax < best.hardMax ||
+        (a.hardMax === best.hardMax && a.penMax < best.penMax)
+      ) {
+        best = a;
+      }
+    }
+  }
+
+  return err(
+    "Infeasible",
+    "Could not satisfy constraints and geometric requirements within tolerance",
+    best ?? undefined
+  );
 }
