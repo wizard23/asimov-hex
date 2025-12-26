@@ -16,3 +16,5 @@ Back to ["Tile Editor"](./index.md).
 ## Behavior
 - Invalid expressions trigger an alert and revert to the last valid value.
 - Changes to type values propagate to all instances that share the same description.
+- Invalid type expressions show a toast and keep the expression; invalid inputs are highlighted in red and dummy geometry is used for interaction.
+- Solver failures also show a toast and keep the expression while switching to dummy geometry.
