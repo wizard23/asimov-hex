@@ -379,4 +379,25 @@ If everything is clear please start with the code changes. Otherwise report back
 
 
 
+No there must be some misunderstanding somewhere in your reasoning. With the code as it is atm a triangle for example appears as it is in a textbook: the A vertex is close to the bottom left corner of the browser window. The B vertex is near the bottom right corner of the browser window and vertex C is on top. 
+Please verify your assumptions about pixi and the browser coordinate systems and report your findings.
+
+
+Thanks for double checking. To make it clear for users of the app what coordinate system is used please add an option to draw a coordinate system at the origin.
+
+
+The coordinate system should use the following new parameters from the "Editor Controls"
+  * a checkbox that toggles whether the coordinate system should be drawn (checked by default)
+  * a coordinate system color
+  * a coordinate system line width
+
+If the checkbox is checked:
+* the coordinate system should consist of two lines of unit length
+* One line extends from (0,0) to (1,0)  next to the (1, 0) end point of the line show the text "X".
+* The other line extends from (0,0) to (0,1)  next to the (0, 1) end point of the line show the text "Y".
+
+
+
+
+
 ## FUTURE

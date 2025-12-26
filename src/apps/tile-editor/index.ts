@@ -733,7 +733,7 @@ class TileEditor {
 
           if (i < sideLengths.length - 1) {
               const nextAngle = interiorAngles[(i + 1) % interiorAngles.length];
-              angle -= Math.PI - nextAngle;
+              angle += Math.PI - nextAngle;
           }
       }
 
