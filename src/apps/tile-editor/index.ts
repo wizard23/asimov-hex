@@ -367,7 +367,8 @@ class TileEditor {
 
   private buildPolygonInfoDisplay(poly: PolygonData): string {
     const end = poly.points[poly.points.length - 1] ?? { x: 0, y: 0 };
-    const divergence = Math.hypot(end.x, end.y);
+    const start = poly.points[0] ?? { x: 0, y: 0 };
+    const divergence = Math.hypot(end.x - start.x, end.y - start.y);
     const angleSum = poly.interiorAngles.reduce((sum, angle) => sum + angle, 0);
     const expectedAngleSum = (poly.sides - 2) * Math.PI;
     const expectedAngleDiff = Math.abs(expectedAngleSum - angleSum);
@@ -557,7 +558,8 @@ class TileEditor {
 
       const points = this.rotatePoints(this.buildPolygonPoints(sideLengths, interiorAngles), rotation);
       const end = points[points.length - 1];
-      const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
+      const start = points[0];
+      const isClosed = pointsCloseEuclidean(end, start, this.config.closedPolygonEpsilon);
 
       return { sideLengths, interiorAngles, points, isClosed };
   }
@@ -624,7 +626,8 @@ class TileEditor {
 
       const points = this.rotatePoints(this.buildPolygonPoints(result.sideLengths, result.interiorAngles), rotation);
       const end = points[points.length - 1];
-      const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
+      const start = points[0];
+      const isClosed = pointsCloseEuclidean(end, start, this.config.closedPolygonEpsilon);
       return { sideLengths: result.sideLengths, interiorAngles: result.interiorAngles, points, isClosed };
   }
 
