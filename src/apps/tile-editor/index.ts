@@ -28,6 +28,10 @@ interface PolygonDescription {
   interiorAngles: number[];
   points: Point[];
   isClosed: boolean;
+  hasError: boolean;
+  errorType: 'expression' | 'solver' | null;
+  invalidSideExpressions: boolean[];
+  invalidAngleExpressions: boolean[];
 }
 
 interface PolygonData {
@@ -46,6 +50,18 @@ interface ConstantEntry {
   name: string;
   value?: number;
   error?: string;
+}
+
+interface DescriptionEvaluation {
+  sideLengths: number[];
+  interiorAngles: number[];
+  points: Point[];
+  isClosed: boolean;
+  hasError: boolean;
+  errorType: 'expression' | 'solver' | null;
+  errorMessage?: string;
+  invalidSideExpressions: boolean[];
+  invalidAngleExpressions: boolean[];
 }
 
 interface SavedTilingV1 {
@@ -77,6 +93,11 @@ class TileEditor {
   private editPaneContainer!: HTMLElement;
   private constantsInput: HTMLTextAreaElement | null = null;
   private hasSavedState = true;
+  private typeExpressionBindings: {
+    description: PolygonDescription | null;
+    side: HTMLElement[];
+    angle: HTMLElement[];
+  } = { description: null, side: [], angle: [] };
   private readonly scaleBounds = { min: 1, max: 200 };
   private config: EditorConfig = {
     scale: 100,
@@ -487,10 +508,6 @@ class TileEditor {
         desc.interiorAngleExpressions,
         true
       );
-      if (!evaluated) {
-        alert(`Failed to load description ${desc.id}`);
-        return;
-      }
       descriptions.set(desc.id, {
         sides: desc.sides,
         sideLengthExpressions: desc.sideLengthExpressions,
@@ -499,6 +516,10 @@ class TileEditor {
         interiorAngles: evaluated.interiorAngles,
         points: evaluated.points,
         isClosed: evaluated.isClosed,
+        hasError: evaluated.hasError,
+        errorType: evaluated.errorType,
+        invalidSideExpressions: evaluated.invalidSideExpressions,
+        invalidAngleExpressions: evaluated.invalidAngleExpressions,
       });
     }
 
@@ -718,6 +739,41 @@ class TileEditor {
       return points;
   }
 
+  private buildRegularNgonPoints(sides: number, sideLength: number): Point[] {
+      const radius = sideLength / (2 * Math.sin(Math.PI / sides));
+      const points: Point[] = [];
+      for (let i = 0; i < sides; i++) {
+          const angle = (2 * Math.PI * i) / sides;
+          points.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
+      }
+      points.push({ ...points[0] });
+      return points;
+  }
+
+  private buildDummyEvaluation(
+      sides: number,
+      invalidSideExpressions: boolean[],
+      invalidAngleExpressions: boolean[],
+      errorType: 'expression' | 'solver',
+      errorMessage?: string
+  ): DescriptionEvaluation {
+      const sideLengths = new Array(sides).fill(1);
+      const interiorAngle = ((sides - 2) / sides) * Math.PI;
+      const interiorAngles = new Array(sides).fill(interiorAngle);
+      const points = this.buildRegularNgonPoints(sides, 1);
+      return {
+          sideLengths,
+          interiorAngles,
+          points,
+          isClosed: false,
+          hasError: true,
+          errorType,
+          errorMessage,
+          invalidSideExpressions,
+          invalidAngleExpressions,
+      };
+  }
+
   private rotatePoints(points: Point[], rotation: number): Point[] {
       if (rotation === 0) return points;
       const cos = Math.cos(rotation);
@@ -774,35 +830,69 @@ class TileEditor {
       sideLengthExpressions: string[],
       interiorAngleExpressions: string[],
       alertOnError: boolean
-  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
+  ): DescriptionEvaluation {
       const hasUnknownSides = sideLengthExpressions.some((expr) => expr.trim() === '?');
       const hasUnknownAngles = interiorAngleExpressions.some((expr) => expr.trim() === '?');
-      if (hasUnknownSides || hasUnknownAngles) {
-          return this.solvePolygonWithUnknowns(sideLengthExpressions, interiorAngleExpressions, alertOnError);
-      }
-
+      const invalidSideExpressions = new Array(sideLengthExpressions.length).fill(false);
+      const invalidAngleExpressions = new Array(interiorAngleExpressions.length).fill(false);
       const sideLengths: number[] = [];
+      let expressionError: string | null = null;
       for (const expr of sideLengthExpressions) {
+          const trimmed = expr.trim();
+          if (trimmed === '?') {
+              sideLengths.push(NaN);
+              continue;
+          }
           const value = this.evaluateSideLengthExpression(expr);
           if (typeof value !== 'number') {
-              if (alertOnError) {
-                  alert(`Side length error: ${value}`);
+              if (!expressionError) {
+                  expressionError = `Side length error: ${value}`;
               }
-              return null;
+              invalidSideExpressions[sideLengths.length] = true;
+              sideLengths.push(NaN);
+              continue;
           }
           sideLengths.push(value);
       }
 
       const interiorAngles: number[] = [];
       for (const expr of interiorAngleExpressions) {
+          const trimmed = expr.trim();
+          if (trimmed === '?') {
+              interiorAngles.push(NaN);
+              continue;
+          }
           const value = this.evaluateAngleExpression(expr);
           if (typeof value !== 'number') {
-              if (alertOnError) {
-                  alert(`Angle error: ${value}`);
+              if (!expressionError) {
+                  expressionError = `Angle error: ${value}`;
               }
-              return null;
+              invalidAngleExpressions[interiorAngles.length] = true;
+              interiorAngles.push(NaN);
+              continue;
           }
           interiorAngles.push(value);
+      }
+
+      if (expressionError) {
+          if (alertOnError) {
+              alert(expressionError);
+          }
+          return this.buildDummyEvaluation(
+              sideLengthExpressions.length,
+              invalidSideExpressions,
+              invalidAngleExpressions,
+              'expression',
+              expressionError
+          );
+      }
+
+      if (hasUnknownSides || hasUnknownAngles) {
+          return this.solvePolygonWithUnknowns(
+              sideLengthExpressions,
+              interiorAngleExpressions,
+              alertOnError
+          );
       }
 
       const points = this.buildPolygonPoints(sideLengths, interiorAngles);
@@ -810,14 +900,23 @@ class TileEditor {
       const start = points[0];
       const isClosed = pointsCloseEuclidean(end, start, this.config.closedPolygonEpsilon);
 
-      return { sideLengths, interiorAngles, points, isClosed };
+      return {
+          sideLengths,
+          interiorAngles,
+          points,
+          isClosed,
+          hasError: false,
+          errorType: null,
+          invalidSideExpressions,
+          invalidAngleExpressions,
+      };
   }
 
   private solvePolygonWithUnknowns(
       sideLengthExpressions: string[],
       interiorAngleExpressions: string[],
       alertOnError: boolean
-  ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
+  ): DescriptionEvaluation {
       const constraints: PolygonConstraint[] = [];
       const sideLengths: number[] = [];
       const interiorAngles: number[] = [];
@@ -869,14 +968,29 @@ class TileEditor {
           if (alertOnError) {
               alert(`Solver error: ${result.message}`);
           }
-          return null;
+          return this.buildDummyEvaluation(
+              sideLengthExpressions.length,
+              new Array(sideLengthExpressions.length).fill(false),
+              new Array(interiorAngleExpressions.length).fill(false),
+              'solver',
+              result.message
+          );
       }
 
       const points = this.buildPolygonPoints(result.sideLengths, result.interiorAngles);
       const end = points[points.length - 1];
       const start = points[0];
       const isClosed = pointsCloseEuclidean(end, start, this.config.closedPolygonEpsilon);
-      return { sideLengths: result.sideLengths, interiorAngles: result.interiorAngles, points, isClosed };
+      return {
+          sideLengths: result.sideLengths,
+          interiorAngles: result.interiorAngles,
+          points,
+          isClosed,
+          hasError: false,
+          errorType: null,
+          invalidSideExpressions: new Array(sideLengthExpressions.length).fill(false),
+          invalidAngleExpressions: new Array(interiorAngleExpressions.length).fill(false),
+      };
   }
 
   private updatePreview() {
@@ -959,7 +1073,7 @@ class TileEditor {
           return;
       }
       const evaluated = this.evaluateDescriptionExpressions(sideLengthExpressions, interiorAngleExpressions, true);
-      if (!evaluated || !evaluated.isClosed) {
+      if (!evaluated.isClosed && !evaluated.hasError) {
           alert('Polygon is not closed with the current parameters.');
           g.destroy();
           return;
@@ -973,6 +1087,10 @@ class TileEditor {
           interiorAngles: evaluated.interiorAngles,
           points: evaluated.points,
           isClosed: evaluated.isClosed,
+          hasError: evaluated.hasError,
+          errorType: evaluated.errorType,
+          invalidSideExpressions: evaluated.invalidSideExpressions,
+          invalidAngleExpressions: evaluated.invalidAngleExpressions,
       };
 
       const poly: PolygonData = {
@@ -994,9 +1112,10 @@ class TileEditor {
 
   private drawPolygonInstance(poly: PolygonData) {
       const isSelected = this.selectedPolygon === poly;
-      const color = poly.isHovered ? 0x4a9eff : 0x444444;
-      const alpha = poly.isClosed ? 0.8 : 0;
-      const baseStroke = poly.isClosed ? 0xffffff : 0xff4d4d;
+      const hasError = poly.description.hasError;
+      const color = poly.isHovered ? 0x4a9eff : hasError ? 0x661111 : 0x444444;
+      const alpha = poly.isClosed && !hasError ? 0.8 : 0;
+      const baseStroke = hasError ? 0xff4d4d : poly.isClosed ? 0xffffff : 0xff4d4d;
       const strokeColor = (poly.isHovered && !isSelected) ? 0xffd24d : baseStroke;
       const openStrokeColor = 0xff4d4d;
       
@@ -1010,7 +1129,7 @@ class TileEditor {
         this.getStrokeWidth()
       );
 
-      if (!poly.isClosed) {
+      if (!poly.isClosed || hasError) {
           drawDottedConnection(
             poly.graphics,
             { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
@@ -1019,6 +1138,10 @@ class TileEditor {
             this.getStrokeWidth(),
             this.config.scale
           );
+      }
+
+      if (hasError) {
+          this.drawErrorDiagonals(poly, openStrokeColor);
       }
 
       if (isSelected) {
@@ -1109,6 +1232,27 @@ class TileEditor {
   private getPolygonWorldVertices(poly: PolygonData): Point[] {
     const vertices = poly.points.slice(0, poly.description.sides);
     return vertices.map((point) => ({ x: point.x + poly.x, y: point.y + poly.y }));
+  }
+
+  private drawErrorDiagonals(poly: PolygonData, color: number) {
+    const vertices = poly.points.slice(0, poly.description.sides);
+    const count = vertices.length;
+    for (let i = 0; i < count; i++) {
+      for (let j = i + 1; j < count; j++) {
+        const adjacent = j === i + 1 || (i === 0 && j === count - 1);
+        if (adjacent) continue;
+        const start = { x: vertices[i].x + poly.x, y: vertices[i].y + poly.y };
+        const end = { x: vertices[j].x + poly.x, y: vertices[j].y + poly.y };
+        drawDottedConnection(
+          poly.graphics,
+          start,
+          end,
+          color,
+          this.getStrokeWidth(),
+          this.config.scale
+        );
+      }
+    }
   }
 
   private getPolygonWorldCenter(poly: PolygonData): Point {
@@ -1288,6 +1432,8 @@ class TileEditor {
 
     const instanceFolder = this.editPane.addFolder({ title: 'Instance Values' });
     const typeFolder = this.editPane.addFolder({ title: 'Type Values' });
+    const sideBindings: HTMLElement[] = [];
+    const angleBindings: HTMLElement[] = [];
 
     const positionState = { position: { x: poly.x, y: poly.y } };
     instanceFolder.addBinding(positionState, 'position', { label: 'Position' }).on('change', () => {
@@ -1328,36 +1474,49 @@ class TileEditor {
     });
 
     sideLabels.forEach((label, i) => {
-      typeFolder.addBinding(editState, `side_${label}`, {
+      const binding = typeFolder.addBinding(editState, `side_${label}`, {
         label: `Side Length Expression ${label}`,
-      }).on('change', (event) => {
+      });
+      sideBindings[i] = binding.element;
+      binding.on('change', (event) => {
         const previous = poly.description.sideLengthExpressions[i];
-          poly.description.sideLengthExpressions[i] = event.value;
-          if (!this.tryApplyDescriptionExpressions(poly.description)) {
-            poly.description.sideLengthExpressions[i] = previous;
-            editState[`side_${label}`] = previous;
-            typeFolder.refresh();
-          } else {
-            this.markUnsaved();
-          }
+        poly.description.sideLengthExpressions[i] = event.value;
+        const ok = this.tryApplyDescriptionExpressions(poly.description);
+        this.updateTypeExpressionStyles();
+        if (!ok && event.value !== previous) {
+          typeFolder.refresh();
+        }
+        if (event.value !== previous) {
+          this.markUnsaved();
+        }
       });
     });
 
     angleLabels.forEach((label, i) => {
-      typeFolder.addBinding(editState, `angle_${label}`, {
+      const binding = typeFolder.addBinding(editState, `angle_${label}`, {
         label: `Angle Expression ${label}`,
-      }).on('change', (event) => {
+      });
+      angleBindings[i] = binding.element;
+      binding.on('change', (event) => {
         const previous = poly.description.interiorAngleExpressions[i];
-          poly.description.interiorAngleExpressions[i] = event.value;
-          if (!this.tryApplyDescriptionExpressions(poly.description)) {
-            poly.description.interiorAngleExpressions[i] = previous;
-            editState[`angle_${label}`] = previous;
-            typeFolder.refresh();
-          } else {
-            this.markUnsaved();
-          }
+        poly.description.interiorAngleExpressions[i] = event.value;
+        const ok = this.tryApplyDescriptionExpressions(poly.description);
+        this.updateTypeExpressionStyles();
+        if (!ok && event.value !== previous) {
+          typeFolder.refresh();
+        }
+        if (event.value !== previous) {
+          this.markUnsaved();
+        }
       });
     });
+
+    this.typeExpressionBindings = {
+      description: poly.description,
+      side: sideBindings,
+      angle: angleBindings,
+    };
+    this.updateTypeExpressionStyles();
   }
 
   private tryApplyDescriptionExpressions(
@@ -1370,14 +1529,15 @@ class TileEditor {
       description.interiorAngleExpressions,
       alertOnError
     );
-    if (!evaluated) {
-      return false;
-    }
 
     description.sideLengths = evaluated.sideLengths;
     description.interiorAngles = evaluated.interiorAngles;
     description.points = evaluated.points;
     description.isClosed = evaluated.isClosed;
+    description.hasError = evaluated.hasError;
+    description.errorType = evaluated.errorType;
+    description.invalidSideExpressions = evaluated.invalidSideExpressions;
+    description.invalidAngleExpressions = evaluated.invalidAngleExpressions;
 
     this.polygons.forEach((poly) => {
       if (poly.description === description) {
@@ -1385,10 +1545,12 @@ class TileEditor {
       }
     });
 
+    this.updateTypeExpressionStyles();
+
     if (refreshDisplay) {
       this.updateDisplay();
     }
-    return true;
+    return !evaluated.hasError;
   }
 
   private updateInstanceFromDescription(poly: PolygonData): boolean {
@@ -1399,6 +1561,25 @@ class TileEditor {
       this.updateSelectedLabels();
     }
     return true;
+  }
+
+  private updateTypeExpressionStyles() {
+    const { description, side, angle } = this.typeExpressionBindings;
+    if (!description) return;
+    if (this.selectedPolygon?.description !== description) return;
+    side.forEach((element, index) => {
+      const isInvalid = description.invalidSideExpressions[index];
+      this.setBindingInvalid(element, isInvalid);
+    });
+    angle.forEach((element, index) => {
+      const isInvalid = description.invalidAngleExpressions[index];
+      this.setBindingInvalid(element, isInvalid);
+    });
+  }
+
+  private setBindingInvalid(element: HTMLElement | undefined, invalid: boolean) {
+    if (!element) return;
+    element.classList.toggle('expression-invalid', invalid);
   }
 
   private buildVertexLabels(sides: number): string[] {

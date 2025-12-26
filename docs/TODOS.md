@@ -284,4 +284,18 @@ please adapt the text if the user entered a "Search" filter so that it is clear 
 
 
 
+Let's fix some usability issues in the "Tile Editor". Specifically in the "Polygon Editor":
+
+When an expression contains any error (like a syntax error, unknown function or variable) please don't revert the users change but just show the error and after the user acknowledging the error please show the invalid expression in red. In this case use a regular n-gon with side length 1 as dummy geometry for all user interactions. A very similar technique is used to allow open polygons. Please follow the approach for open polygons for dealing with polygons where at least one expression is invalid. Draw this dummy polygon in red and connect all diagonals with all other diagonals with the same dashed red line that we use for non closed polygons to connect the diverging endpoints.
+
+If the expression can be parsed and evaluated but the polygon could not be solved by the solver: Don't revert the expression that triggered the solver error but just show the error and then keep the expression as is (just to be clear: the expression is shown in the normal color because the solver error is not caused by the expression being invalid) and use the same dummy geometry described above. 
+
+If anything is unclear please just ask.
+
+
+
+ show a toast (please use a toast with the same styling as in: src/apps/timeline/index.ts)
+* create extract a core library function for showing toasts that we can reuse in all apps if needed.
+* use this library function in src/apps/timeline/index.ts and the "Tile Editor" for showing the user the syntax error in the expression
+
 ## FUTURE
