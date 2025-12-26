@@ -383,18 +383,32 @@ No there must be some misunderstanding somewhere in your reasoning. With the cod
 Please verify your assumptions about pixi and the browser coordinate systems and report your findings.
 
 
-Thanks for double checking. To make it clear for users of the app what coordinate system is used please add an option to draw a coordinate system at the origin.
+Thanks for double checking. To make it clear for users of the app what coordinate system is used please add an option to draw the two axes at the origin.
 
-
-The coordinate system should use the following new parameters from the "Editor Controls"
-  * a checkbox that toggles whether the coordinate system should be drawn (checked by default)
-  * a coordinate system color
-  * a coordinate system line width
+The base vectors should use the following new parameters from the "Editor Controls"
+  * a checkbox that toggles whether the axes should be drawn (checked by default labeled "Draw Axes")
+  * a axes color
+  * a axes width
 
 If the checkbox is checked:
-* the coordinate system should consist of two lines of unit length
-* One line extends from (0,0) to (1,0)  next to the (1, 0) end point of the line show the text "X".
-* The other line extends from (0,0) to (0,1)  next to the (0, 1) end point of the line show the text "Y".
+* the axes should consist of two lines of unit length
+* One line extends from (0,0) to (1,0). Next to the (1, 0) end point of the line show the text "X".
+* The other line extends from (0,0) to (0,1). Next to the (0, 1) end point of the line show the text "Y".
+
+
+
+
+Thanks for double-checking. To make it clear to users which coordinate system is being used, please add an option to draw the coordinate axes at the origin.
+
+The coordinate axes should use the following new parameters from the Editor Controls:
+* a checkbox that toggles whether the axes are drawn (checked by default, labeled “Draw Axes”)
+* an axis color
+* an axis line width
+
+If the checkbox is checked:
+* The axes should consist of two lines of unit length.
+* One line should extend from (0, 0) to (1, 0). Display the label “X” next to the endpoint at (1, 0).
+* The other line should extend from (0, 0) to (0, 1). Display the label “Y” next to the endpoint at (0, 1).
 
 
 

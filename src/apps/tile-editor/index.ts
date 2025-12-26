@@ -17,6 +17,9 @@ interface EditorConfig {
   sideLengthExpression: string;
   constantsText: string;
   edgeWidth: number;
+  drawAxes: boolean;
+  axesColor: string;
+  axesLineWidth: number;
   closedPolygonEpsilon: number;
   viewOffset: { x: number; y: number };
 }
@@ -73,6 +76,9 @@ interface SavedTilingV1 {
     edgeWidth: number;
     closedPolygonEpsilon: number;
     constantsText: string;
+    drawAxes?: boolean;
+    axesColor?: string;
+    axesLineWidth?: number;
   };
   descriptions: Array<{
     id: string;
@@ -106,6 +112,9 @@ class TileEditor {
     sideLengthExpression: '1',
     constantsText: '',
     edgeWidth: 2,
+    drawAxes: true,
+    axesColor: '#ff6b6b',
+    axesLineWidth: 1,
     closedPolygonEpsilon: 1e-4,
     viewOffset: { x: 0, y: 0 },
   };
@@ -292,6 +301,27 @@ class TileEditor {
         this.redrawPolygons();
     });
 
+    this.pane.addBinding(this.config, 'drawAxes', {
+      label: 'Draw Axes',
+    }).on('change', () => {
+      this.updatePreview();
+    });
+
+    this.pane.addBinding(this.config, 'axesColor', {
+      label: 'Axes Color',
+    }).on('change', () => {
+      this.updatePreview();
+    });
+
+    this.pane.addBinding(this.config, 'axesLineWidth', {
+      min: 1,
+      max: 6,
+      step: 1,
+      label: 'Axes Line Width',
+    }).on('change', () => {
+      this.updatePreview();
+    });
+
     this.pane.addBinding(this.config, 'closedPolygonEpsilon', {
       min: 1e-6,
       max: 1e-2,
@@ -435,6 +465,9 @@ class TileEditor {
         edgeWidth: this.config.edgeWidth,
         closedPolygonEpsilon: this.config.closedPolygonEpsilon,
         constantsText: this.config.constantsText,
+        drawAxes: this.config.drawAxes,
+        axesColor: this.config.axesColor,
+        axesLineWidth: this.config.axesLineWidth,
       },
       descriptions: descriptionData,
       instances,
@@ -497,6 +530,9 @@ class TileEditor {
     this.config.edgeWidth = data.config.edgeWidth;
     this.config.closedPolygonEpsilon = data.config.closedPolygonEpsilon;
     this.config.constantsText = data.config.constantsText;
+    this.config.drawAxes = data.config.drawAxes ?? true;
+    this.config.axesColor = data.config.axesColor ?? '#ff6b6b';
+    this.config.axesLineWidth = data.config.axesLineWidth ?? 1;
     if (this.constantsInput) {
       this.constantsInput.value = data.config.constantsText;
     }
@@ -1001,6 +1037,38 @@ class TileEditor {
       if (!this.app) return;
       
       this.previewGraphics.clear();
+      this.previewGraphics.removeChildren().forEach((child) => child.destroy());
+
+      if (!this.config.drawAxes) {
+        return;
+      }
+
+      const colorValue = Number.parseInt(this.config.axesColor.replace('#', ''), 16);
+      const width = this.config.axesLineWidth / this.config.scale;
+
+      const xAxisEnd = { x: 1, y: 0 };
+      const yAxisEnd = { x: 0, y: 1 };
+      const xAxisDisplay = { x: xAxisEnd.x, y: -xAxisEnd.y };
+      const yAxisDisplay = { x: yAxisEnd.x, y: -yAxisEnd.y };
+
+      this.previewGraphics.stroke({ color: colorValue, width });
+      this.previewGraphics.moveTo(0, 0);
+      this.previewGraphics.lineTo(xAxisDisplay.x, xAxisDisplay.y);
+      this.previewGraphics.moveTo(0, 0);
+      this.previewGraphics.lineTo(yAxisDisplay.x, yAxisDisplay.y);
+
+      const labelX = new Graphics();
+      const labelY = new Graphics();
+      const fontSize = 12 / this.config.scale;
+      const strokeWidth = Math.max(1 / this.config.scale, fontSize * 0.12);
+      drawLetter(labelX, 'X', fontSize, colorValue, strokeWidth);
+      drawLetter(labelY, 'Y', fontSize, colorValue, strokeWidth);
+      labelX.x = xAxisDisplay.x + fontSize * 0.2;
+      labelX.y = xAxisDisplay.y - fontSize * 0.6;
+      labelY.x = yAxisDisplay.x - fontSize * 0.6;
+      labelY.y = yAxisDisplay.y + fontSize * 0.2;
+      this.previewGraphics.addChild(labelX);
+      this.previewGraphics.addChild(labelY);
   }
 
   private handlePointerDown(e: FederatedPointerEvent) {
