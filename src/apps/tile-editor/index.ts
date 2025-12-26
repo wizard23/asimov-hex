@@ -109,8 +109,16 @@ class TileEditor {
   private viewOffsetStart = { x: 0, y: 0 };
 
   constructor() {
-    this.displayContainer = document.getElementById('values-display')!;
-    this.editPaneContainer = document.getElementById('editpane-container')!;
+    const displayContainer = document.getElementById('values-display');
+    if (!displayContainer) {
+      throw new Error('Missing #values-display');
+    }
+    const editPaneContainer = document.getElementById('editpane-container');
+    if (!editPaneContainer) {
+      throw new Error('Missing #editpane-container');
+    }
+    this.displayContainer = displayContainer;
+    this.editPaneContainer = editPaneContainer;
     this.initTweakpane();
     this.initPixi();
     this.updateDisplay();
