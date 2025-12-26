@@ -1308,7 +1308,10 @@ class TileEditor {
       if (typeof evaluated !== 'number') {
         alert(`Rotation error: ${evaluated}`);
         editState.rotation = previous;
-        this.editPane!.refresh();
+        if (!this.editPane) {
+          throw new Error('Polygon editor pane missing while reverting rotation.');
+        }
+        this.editPane.refresh();
         return;
       }
       poly.rotationExpression = event.value;
@@ -1440,8 +1443,11 @@ class TileEditor {
       const offset = { x: (dir.x / len) * fontSize, y: (dir.y / len) * fontSize };
       const label = new Graphics();
       drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
-      label.x = this.selectedPolygon!.x + point.x + offset.x - fontSize * 0.5;
-      label.y = this.selectedPolygon!.y + point.y + offset.y - fontSize * 0.5;
+      if (!this.selectedPolygon) {
+        throw new Error('Selected polygon missing while updating labels.');
+      }
+      label.x = this.selectedPolygon.x + point.x + offset.x - fontSize * 0.5;
+      label.y = this.selectedPolygon.y + point.y + offset.y - fontSize * 0.5;
       this.labelContainer.addChild(label);
     });
   }
