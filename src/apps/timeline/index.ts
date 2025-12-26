@@ -23,6 +23,7 @@ class TimelineViewer {
     endDate: '',
     displayMode: 'List' as DisplayMode,
     searchTerm: '',
+    enableDateFilter: true,
   };
 
   constructor() {
@@ -103,6 +104,13 @@ class TimelineViewer {
       this.render();
     });
 
+    this.pane.addBinding(this.config, 'enableDateFilter', {
+      label: 'Enable Date Filter',
+    }).on('change', () => {
+      this.filterCommits();
+      this.render();
+    });
+
     this.pane.addBinding(this.config, 'displayMode', {
       options: {
         'List': 'List',
@@ -125,7 +133,6 @@ class TimelineViewer {
     // End date should include the full day, so add 24 hours (roughly) or set to end of day
     // Simple way: treat input as midnight UTC or Local? Date.parse handles local.
     // Let's assume user input YYYY-MM-DD means "from the start of this day" to "end of that day"
-    
     const endDateObj = new Date(this.config.endDate);
     endDateObj.setHours(23, 59, 59, 999);
     const end = endDateObj.getTime() / 1000;
@@ -133,10 +140,12 @@ class TimelineViewer {
     const term = this.config.searchTerm.toLowerCase();
 
     this.filteredCommits = this.commits.filter(commit => {
-      // Date filter
-      // Check if valid dates provided
-      if (!isNaN(start) && commit.timestamp < start) return false;
-      if (!isNaN(end) && commit.timestamp > end) return false;
+      // Date filter (optional)
+      if (this.config.enableDateFilter) {
+        // Check if valid dates provided
+        if (!isNaN(start) && commit.timestamp < start) return false;
+        if (!isNaN(end) && commit.timestamp > end) return false;
+      }
 
       // Search filter
       if (term) {
@@ -184,8 +193,9 @@ class TimelineViewer {
     const searchSuffix = this.config.searchTerm.trim()
       ? ` (filtered by "${this.escapeHtml(this.config.searchTerm.trim())}")`
       : '';
+    const dateSuffix = this.config.enableDateFilter ? ' (date filter enabled)' : '';
     this.timelinePanel.innerHTML = `
-      <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}</h2>
+      <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}${dateSuffix}</h2>
       ${html}
     `;
 
