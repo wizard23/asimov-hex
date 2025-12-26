@@ -226,4 +226,8 @@ src/core/utils/solver-cairo-pentagons-unsorted.test.ts
 If anything is unclear please just ask.
 
 
+
+Please add a rotationExpression to PolygoData in src/apps/tile-editor. This expression can be edited in the Polygon Editor and the default is "0". The expression is cached in PolygonData.rotation and is evaluated whenever the expression is modified. If the expression fails to evaluate then an alert is displayed and the last valid value is used just like with the polygon angles and sideLength expressions.
+
+
 ## FUTURE

@@ -475,10 +475,26 @@ class TileEditor {
       if (rotation === 0) return points;
       const cos = Math.cos(rotation);
       const sin = Math.sin(rotation);
-      return points.map((point) => ({
-          x: point.x * cos - point.y * sin,
-          y: point.x * sin + point.y * cos,
-      }));
+      const center = this.getPolygonCenter(points);
+      return points.map((point) => {
+          const dx = point.x - center.x;
+          const dy = point.y - center.y;
+          return {
+              x: center.x + dx * cos - dy * sin,
+              y: center.y + dx * sin + dy * cos,
+          };
+      });
+  }
+
+  private getPolygonCenter(points: Point[]): Point {
+      const count = Math.max(1, points.length - 1);
+      let sumX = 0;
+      let sumY = 0;
+      for (let i = 0; i < count; i++) {
+          sumX += points[i].x;
+          sumY += points[i].y;
+      }
+      return { x: sumX / count, y: sumY / count };
   }
 
   private evaluateSideLengthExpression(expr: string): number | string {
