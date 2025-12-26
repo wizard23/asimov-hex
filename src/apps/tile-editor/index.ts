@@ -28,6 +28,8 @@ interface PolygonData {
   sideLengths: number[];
   interiorAngleExpressions: string[];
   interiorAngles: number[];
+  rotationExpression: string;
+  rotation: number;
   points: Point[];
   isClosed: boolean;
   graphics: Graphics;
@@ -469,6 +471,16 @@ class TileEditor {
       return points;
   }
 
+  private rotatePoints(points: Point[], rotation: number): Point[] {
+      if (rotation === 0) return points;
+      const cos = Math.cos(rotation);
+      const sin = Math.sin(rotation);
+      return points.map((point) => ({
+          x: point.x * cos - point.y * sin,
+          y: point.x * sin + point.y * cos,
+      }));
+  }
+
   private evaluateSideLengthExpression(expr: string): number | string {
       return this.evaluateExpression(expr);
   }
@@ -487,15 +499,20 @@ class TileEditor {
       }
   }
 
+  private evaluateRotationExpression(expr: string): number | string {
+      return this.evaluateAngleExpression(expr);
+  }
+
   private evaluatePolygonExpressions(
       sideLengthExpressions: string[],
       interiorAngleExpressions: string[],
+      rotation: number,
       alertOnError: boolean
   ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
       const hasUnknownSides = sideLengthExpressions.some((expr) => expr.trim() === '?');
       const hasUnknownAngles = interiorAngleExpressions.some((expr) => expr.trim() === '?');
       if (hasUnknownSides || hasUnknownAngles) {
-          return this.solvePolygonWithUnknowns(sideLengthExpressions, interiorAngleExpressions, alertOnError);
+          return this.solvePolygonWithUnknowns(sideLengthExpressions, interiorAngleExpressions, rotation, alertOnError);
       }
 
       const sideLengths: number[] = [];
@@ -522,7 +539,7 @@ class TileEditor {
           interiorAngles.push(value);
       }
 
-      const points = this.buildPolygonPoints(sideLengths, interiorAngles);
+      const points = this.rotatePoints(this.buildPolygonPoints(sideLengths, interiorAngles), rotation);
       const end = points[points.length - 1];
       const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
 
@@ -532,6 +549,7 @@ class TileEditor {
   private solvePolygonWithUnknowns(
       sideLengthExpressions: string[],
       interiorAngleExpressions: string[],
+      rotation: number,
       alertOnError: boolean
   ): { sideLengths: number[]; interiorAngles: number[]; points: Point[]; isClosed: boolean } | null {
       const constraints: PolygonConstraint[] = [];
@@ -588,7 +606,7 @@ class TileEditor {
           return null;
       }
 
-      const points = this.buildPolygonPoints(result.sideLengths, result.interiorAngles);
+      const points = this.rotatePoints(this.buildPolygonPoints(result.sideLengths, result.interiorAngles), rotation);
       const end = points[points.length - 1];
       const isClosed = pointsCloseEuclidean(end, { x: 0, y: 0 }, this.config.closedPolygonEpsilon);
       return { sideLengths: result.sideLengths, interiorAngles: result.interiorAngles, points, isClosed };
@@ -665,7 +683,19 @@ class TileEditor {
       this.polygonContainer.addChild(this.labelContainer);
       const sideLengthExpressions = (Array(sides) as string[]).fill(this.config.sideLengthExpression);
       const interiorAngleExpressions = (Array(sides) as string[]).fill(this.defaultInteriorAngleExpression(sides));
-      const evaluated = this.evaluatePolygonExpressions(sideLengthExpressions, interiorAngleExpressions, true);
+      const rotationExpression = '0';
+      const rotationValue = this.evaluateRotationExpression(rotationExpression);
+      if (typeof rotationValue !== 'number') {
+          alert(`Rotation error: ${rotationValue}`);
+          g.destroy();
+          return;
+      }
+      const evaluated = this.evaluatePolygonExpressions(
+          sideLengthExpressions,
+          interiorAngleExpressions,
+          rotationValue,
+          true
+      );
       if (!evaluated || !evaluated.isClosed) {
           alert('Polygon is not closed with the current parameters.');
           g.destroy();
@@ -680,6 +710,8 @@ class TileEditor {
           sideLengths: evaluated.sideLengths,
           interiorAngleExpressions,
           interiorAngles: evaluated.interiorAngles,
+          rotationExpression,
+          rotation: rotationValue,
           points: evaluated.points,
           isClosed: evaluated.isClosed,
           graphics: g,
@@ -894,11 +926,34 @@ class TileEditor {
     const sideLabels = this.buildEdgeLabels(poly.sides);
     const angleLabels = this.buildVertexLabels(poly.sides);
 
+    editState.rotation = poly.rotationExpression;
     poly.sideLengthExpressions.forEach((expr, i) => {
       editState[`side_${sideLabels[i]}`] = expr;
     });
     poly.interiorAngleExpressions.forEach((expr, i) => {
       editState[`angle_${angleLabels[i]}`] = expr;
+    });
+
+    this.editPane!.addBinding(editState, 'rotation', {
+      label: 'Rotation Expression',
+    }).on('change', (event) => {
+      const previous = poly.rotationExpression;
+      const previousValue = poly.rotation;
+      const evaluated = this.evaluateRotationExpression(event.value);
+      if (typeof evaluated !== 'number') {
+        alert(`Rotation error: ${evaluated}`);
+        editState.rotation = previous;
+        this.editPane!.refresh();
+        return;
+      }
+      poly.rotationExpression = event.value;
+      poly.rotation = evaluated;
+      if (!this.tryApplyPolygonExpressions(poly)) {
+        poly.rotationExpression = previous;
+        poly.rotation = previousValue;
+        editState.rotation = previous;
+        this.editPane!.refresh();
+      }
     });
 
     sideLabels.forEach((label, i) => {
@@ -935,7 +990,12 @@ class TileEditor {
     alertOnError: boolean = true,
     refreshDisplay: boolean = true
   ): boolean {
-    const evaluated = this.evaluatePolygonExpressions(poly.sideLengthExpressions, poly.interiorAngleExpressions, alertOnError);
+    const evaluated = this.evaluatePolygonExpressions(
+      poly.sideLengthExpressions,
+      poly.interiorAngleExpressions,
+      poly.rotation,
+      alertOnError
+    );
     if (!evaluated) {
       return false;
     }
