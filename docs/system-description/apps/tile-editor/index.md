@@ -1,6 +1,6 @@
 # Instructions for the AI
 ## Scope and Purpose of this Documentation
-Please document the current functionality of the "Tile Editor" here. This document should strictly document the current functionality as it is implemented now. Don't include any planned features or possible new features.
+Please document the current functionality and architecture of the "Tile Editor" app here. This document should strictly document the current functionality of the app as it is implemented now. Don't include any planned features or possible new features.
 
 Since this is the page describing the app itself it is called index.md. All relevant, non trial sub-apps or sub components of this app have their own naming scheme described below. 
 
