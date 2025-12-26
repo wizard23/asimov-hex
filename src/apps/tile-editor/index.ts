@@ -733,22 +733,16 @@ class TileEditor {
 
           if (i < sideLengths.length - 1) {
               const nextAngle = interiorAngles[(i + 1) % interiorAngles.length];
-              angle += Math.PI - nextAngle;
+              angle -= Math.PI - nextAngle;
           }
       }
 
-      return points;
-  }
-
-  private buildRegularNgonPoints(sides: number, sideLength: number): Point[] {
-      const radius = sideLength / (2 * Math.sin(Math.PI / sides));
-      const points: Point[] = [];
-      for (let i = 0; i < sides; i++) {
-          const angle = (2 * Math.PI * i) / sides;
-          points.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
-      }
-      points.push({ ...points[0] });
-      return points;
+      const center = this.getPolygonCenter(points);
+      const centered = points.map((point) => ({
+          x: point.x - center.x,
+          y: point.y - center.y,
+      }));
+      return centered.map((point) => ({ x: point.x, y: -point.y }));
   }
 
   private buildDummyEvaluation(
@@ -761,7 +755,7 @@ class TileEditor {
       const sideLengths = new Array<number>(sides).fill(1);
       const interiorAngle = ((sides - 2) / sides) * Math.PI;
       const interiorAngles = new Array<number>(sides).fill(interiorAngle);
-      const points = this.buildRegularNgonPoints(sides, 1);
+      const points = this.buildPolygonPoints(sideLengths, interiorAngles);
       return {
           sideLengths,
           interiorAngles,
@@ -779,13 +773,10 @@ class TileEditor {
       if (rotation === 0) return points;
       const cos = Math.cos(rotation);
       const sin = Math.sin(rotation);
-      const center = this.getPolygonCenter(points);
       return points.map((point) => {
-          const dx = point.x - center.x;
-          const dy = point.y - center.y;
           return {
-              x: center.x + dx * cos - dy * sin,
-              y: center.y + dx * sin + dy * cos,
+              x: point.x * cos - point.y * sin,
+              y: point.x * sin + point.y * cos,
           };
       });
   }

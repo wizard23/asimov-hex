@@ -327,4 +327,56 @@ If anything is unclear please just ask.
 
 
 
+Pleas don't modify any code but just answer my request/question stated below:
+
+For the polygons I describe below I always used polygons with a rotation expression of "0".
+
+I noticed that polygons with a successful geometry have their A vertex positioned in the top left corner and the first edge is horizontal pointing right. 
+Dummy geometries resulting from solver errors or expression errors have the A vertex on the right side and the first edge is pointing to the bottom left.
+Dummy geometries resulting from a non closed polygon are oriented the same way that successful geometries are shown.
+Please analyze the tile editor code and explain in detail why this happens.
+
+
+Pleas don't modify any code but just answer my request/question stated below:
+
+Please explain what kind of centering we use in the tile editor in the different code paths. Also explain what code paths use centering versus what code paths don't use centering.
+
+
+
+It should not matter if the geometry is a dummy geometry or a valid geometry resulting from the solver or just from the expressions.
+
+How is the "center" calculated for each of these cases? I ask because I want to exactly understand the algorithm to compute the center.
+
+
+
+Let's use this opportunity to fix and unify the way polygons are positioned and oriented in general. Let's use a consistent positioning and orientation scheme:
+* all code paths should use the same code path for constructing the geometry from a list of real valued edge lengths and real valued angles no matter if it is a valid geometry or a dummy geometry. 
+* please change the orientation for all polygons to counter clockwise with the first edge horizontally pointing to the right. I think that's the standard textbook convention (please correct my assumption if this is wrong).
+* polygons should always be centered. That means the instance value "Position" describes the center not the position of the first vertex. I think this would mean that it would behave a bit like the error geometries resulting from invalid expressions now (please correct my assumption if this is wrong)
+* center is always calculated with the getPolygonCenter function just as it done now.
+* the getPolygonCenter is good the way it is now and does not need any changes.
+
+Before starting with the changes please use your common sense to critically review my request and if the changes seem unreasonable or you find any inconsistencies in my descriptions just tell me what I got wrong or recap my request. Either way don't modify any code yet. 
+
+If anything is unclear please just ask.
+
+1. Yes your reinterpretation is correct: Please use synthetic values for the dummy geometry needed in these cases.
+2. I mean CCW orientation in the way a mathematically defined CCw polygon would appear in most math textbooks and the way the user sees them on the screen. The pixi/screen space should be treated as an implementation detail.
+3. Yes "always centered" implies a shift after construction.
+4. Yes keep angle = 0 at start. Then center afterwards. Just to clarify: after it is centered when getPolygonCenter is called again (for rotation if i understood it correctly but please correct me if this is wrong) it should return 0/0 apart from numerical errors.
+
+Before starting with the changes please critically review my answers and assumptions in them and report back to me.
+
+
+
+
+1. For CCW handling: Flip the y coordinate for displaying the polygon on the screen.
+2. Great! If it will be stable then please don't recenter the polygon again before applying the rotation to keep numerical drift minimal.
+3. Great!
+4. Great!
+
+If everything is clear please start with the code changes. Otherwise report back to me for clarification. 
+
+
+
 ## FUTURE
