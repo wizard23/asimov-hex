@@ -292,6 +292,7 @@ class TimelineViewer {
     });
 
     container.appendChild(this.timelineApp.canvas);
+    this.timelineApp.stage.sortableChildren = true;
     this.timelineApp.stage.eventMode = 'static';
     this.timelineApp.stage.hitArea = this.timelineApp.screen;
 
@@ -299,6 +300,11 @@ class TimelineViewer {
     this.timelineGraphics = new Graphics();
     this.timelineHoverGraphics = new Graphics();
     this.timelineTextContainer = new Container();
+
+    this.timelineScaleGraphics.zIndex = 1;
+    this.timelineGraphics.zIndex = 2;
+    this.timelineHoverGraphics.zIndex = 3;
+    this.timelineTextContainer.zIndex = 4;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
@@ -319,6 +325,8 @@ class TimelineViewer {
     });
 
     this.timelineApp.canvas.addEventListener('wheel', this.handleTimelineWheel, { passive: false });
+    this.timelineApp.canvas.addEventListener('mousemove', this.handleTimelineMouseMove);
+    this.timelineApp.canvas.addEventListener('mouseleave', this.handleTimelineMouseLeave);
 
     this.timelineResizeObserver = new ResizeObserver(() => {
       if (!this.timelineApp) return;
@@ -341,6 +349,8 @@ class TimelineViewer {
     }
     if (this.timelineApp) {
       this.timelineApp.canvas.removeEventListener('wheel', this.handleTimelineWheel);
+      this.timelineApp.canvas.removeEventListener('mousemove', this.handleTimelineMouseMove);
+      this.timelineApp.canvas.removeEventListener('mouseleave', this.handleTimelineMouseLeave);
       this.timelineApp.destroy(true);
       this.timelineApp = null;
     }
@@ -464,6 +474,21 @@ class TimelineViewer {
     this.drawTimeline();
   };
 
+  private handleTimelineMouseMove = (e: MouseEvent) => {
+    if (!this.timelineApp || this.timelineDragging) return;
+    const rect = this.timelineApp.canvas.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+    this.updateHoverCommit(screenX, screenY);
+  };
+
+  private handleTimelineMouseLeave = () => {
+    if (!this.hoveredCommit) return;
+    this.hoveredCommit = null;
+    this.updateTimelineInfo();
+    this.drawHoverCommit();
+  };
+
   private updateHoverCommit(screenX: number, screenY: number) {
     const radius = 10;
     let nextCommit: Commit | null = null;
@@ -555,13 +580,13 @@ class TimelineViewer {
     const pxPerSecond = this.timelineScale;
 
     this.timelineScaleGraphics.clear();
-    this.timelineScaleGraphics.lineStyle(1, 0x4f4f4f, 0.8);
+    this.timelineScaleGraphics.lineStyle(1, 0x7a7a7a, 0.9);
     this.timelineScaleGraphics.moveTo(0, scaleHeight);
     this.timelineScaleGraphics.lineTo(this.timelineApp.screen.width, scaleHeight);
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
-    const minorStyle = new TextStyle({ fill: 0x9c9c9c, fontSize: 10 });
+    const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 10 });
 
     this.timelineTextContainer.removeChildren().forEach(child => child.destroy());
 
