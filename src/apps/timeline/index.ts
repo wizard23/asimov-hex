@@ -615,28 +615,12 @@ class TimelineViewer {
     this.timelineScaleGraphics.moveTo(0, scaleHeight);
     this.timelineScaleGraphics.lineTo(this.timelineApp.screen.width, scaleHeight);
     this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
-    this.timelineScaleGraphics.rect(10, 10, 6, 6);
-    this.timelineScaleGraphics.fill({ color: 0xff3333, alpha: 1 });
-    this.timelineScaleGraphics.moveTo(80, 0);
-    this.timelineScaleGraphics.lineTo(80, scaleHeight);
-    this.timelineScaleGraphics.stroke({ color: 0x00ff6a, width: 1, alpha: 1 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
     const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 10 });
 
     this.timelineTextContainer.removeChildren().forEach(child => child.destroy());
-    const debugLabel = new Text('SCALE', new TextStyle({ fill: 0xffcc66, fontSize: 11 }));
-    debugLabel.x = 22;
-    debugLabel.y = 6;
-    this.timelineTextContainer.addChild(debugLabel);
-    const debugInfo = new Text(
-      `units: ${unitSelection.major}${unitSelection.minor ? `/${unitSelection.minor}` : ''}`,
-      new TextStyle({ fill: 0x9ad7ff, fontSize: 10 })
-    );
-    debugInfo.x = 22;
-    debugInfo.y = 22;
-    this.timelineTextContainer.addChild(debugInfo);
 
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
@@ -687,8 +671,9 @@ class TimelineViewer {
 
       if (screenX - lastLabelX >= minLabelSpacing) {
         const label = new Text(this.formatScaleLabel(date, unit), style);
+        label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
-        label.y = 4;
+        label.y = scaleHeight - 4;
         this.timelineTextContainer.addChild(label);
         lastLabelX = screenX;
       }
@@ -723,15 +708,15 @@ class TimelineViewer {
 
   private pickScaleUnits(pxPerSecond: number): { major: ScaleUnit; minor: ScaleUnit | null } {
     const units: Array<{ unit: ScaleUnit; seconds: number }> = [
-      { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
-      { unit: 'year', seconds: 365.25 * 24 * 3600 },
-      { unit: 'month', seconds: 30 * 24 * 3600 },
-      { unit: 'day', seconds: 24 * 3600 },
-      { unit: 'hour', seconds: 3600 },
       { unit: 'minute', seconds: 60 },
+      { unit: 'hour', seconds: 3600 },
+      { unit: 'day', seconds: 24 * 3600 },
+      { unit: 'month', seconds: 30 * 24 * 3600 },
+      { unit: 'year', seconds: 365.25 * 24 * 3600 },
+      { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
     ];
 
-    let major = units[0].unit;
+    let major = units[units.length - 1].unit;
     for (const entry of units) {
       if (pxPerSecond * entry.seconds >= 120) {
         major = entry.unit;
@@ -741,7 +726,7 @@ class TimelineViewer {
 
     const majorIndex = units.findIndex(entry => entry.unit === major);
     let minor: ScaleUnit | null = null;
-    for (let i = majorIndex + 1; i < units.length; i += 1) {
+    for (let i = majorIndex - 1; i >= 0; i -= 1) {
       if (pxPerSecond * units[i].seconds >= 60) {
         minor = units[i].unit;
         break;
