@@ -167,5 +167,16 @@ I don't see:
 
 No I don't see tick marks on the scale line. I don't see any labels near the top. Visually it looks identical to how it looked before your most recent changes.
 
-Yes! I see a small red square and i see the yellow label reading "SCALE"
+
+
+
+Yes! I see the small red square and i see the yellow label "SCALE" in the top left corner of the canvas.
+
+
+
+
+Yes I see the green tick a little bit to the right of the "SCALE" text.
+The units label says: "units: decade/year"
+
+Just in case that's relevant: the commits I use span a time interval of just 5 days.
 

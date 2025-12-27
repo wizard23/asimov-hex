@@ -617,6 +617,9 @@ class TimelineViewer {
     this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
     this.timelineScaleGraphics.rect(10, 10, 6, 6);
     this.timelineScaleGraphics.fill({ color: 0xff3333, alpha: 1 });
+    this.timelineScaleGraphics.moveTo(80, 0);
+    this.timelineScaleGraphics.lineTo(80, scaleHeight);
+    this.timelineScaleGraphics.stroke({ color: 0x00ff6a, width: 1, alpha: 1 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
@@ -627,6 +630,13 @@ class TimelineViewer {
     debugLabel.x = 22;
     debugLabel.y = 6;
     this.timelineTextContainer.addChild(debugLabel);
+    const debugInfo = new Text(
+      `units: ${unitSelection.major}${unitSelection.minor ? `/${unitSelection.minor}` : ''}`,
+      new TextStyle({ fill: 0x9ad7ff, fontSize: 10 })
+    );
+    debugInfo.x = 22;
+    debugInfo.y = 22;
+    this.timelineTextContainer.addChild(debugInfo);
 
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
