@@ -560,6 +560,14 @@ class TimelineViewer {
     this.timelineGraphics.moveTo(startX, lineY);
     this.timelineGraphics.lineTo(endX, lineY);
 
+    this.timelineGraphics.lineStyle(1, 0xffd84a, 0.9);
+    this.timelineGraphics.moveTo(startX, lineY - 12);
+    this.timelineGraphics.lineTo(endX, lineY - 12);
+
+    this.timelineGraphics.lineStyle(1, 0xff5bb3, 0.9);
+    this.timelineGraphics.moveTo(startX, lineY + 12);
+    this.timelineGraphics.lineTo(endX, lineY + 12);
+
     const dotRadius = 5;
     this.timelineCommitPoints = [];
     for (const commit of this.filteredCommits) {

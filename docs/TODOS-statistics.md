@@ -132,3 +132,20 @@ Please show a statically positioned html element in the top left corner of the s
 
 
 when i zoom in with the mouse over a commit the commit is highlighted in white but the hoverDebugElement always just shows 'not hovering over a commit'. How can that be? Why is the commit drawn in white but the hash of the commit does not show?
+
+
+
+
+
+Great! Hovering works now! commits are highlighted correctly and the details of the commit get correctly displayed at the bottom :)
+Now please try to fix the issue with the scale not sowing up at all. 
+
+Let's systematically debug this by just drawing 2 lines with the same lengths as the timeline parallel to the timeline. 
+
+one of these lines should be slightly above the timeline and appear yellow
+and one of them should be slightly below the timeline and appear pink.
+
+
+This yielded some very interesting debugging info: Both lines get drawn but they all have a pinkish color. Also the timeline itself and the outlines of the commits are drawn with the same pink color. The disks of the commits still appear in blue.
+
+Let's debug further by just trying to get the colors I suggested correct first and also ensure that the timeline itself is drawn in blue.
