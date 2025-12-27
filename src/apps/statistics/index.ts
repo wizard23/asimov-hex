@@ -175,7 +175,7 @@ class StatisticsViewer {
           </div>
           <div class="stat-item">
             <div class="stat-item-label">Total Bytes</div>
-            <div class="stat-item-value">${data.totals.bytes !== undefined ? data.totals.bytes.toLocaleString() : '?'}</div>
+            <div class="stat-item-value">${data.totals.bytes !== undefined ? data.totals.bytes.toLocaleString() : 'unknown'}</div>
           </div>
           <div class="stat-item">
             <div class="stat-item-label">Generated</div>
@@ -285,8 +285,12 @@ export function formatIsoTimestampLocal(iso: string): string {
     ].join(":");
 }
 
-function renderExcludedList(items: string[]): string {
-  if (!items || items.length === 0) {
+function renderExcludedList(items?: string[]): string {
+  if (!items) {
+    return `<div class="excluded-empty">unknown</div>`;
+  }
+
+  if (items.length === 0) {
     return `<div class="excluded-empty">(none)</div>`;
   }
 
