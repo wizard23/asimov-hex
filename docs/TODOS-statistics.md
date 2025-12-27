@@ -11,3 +11,6 @@ The intended logic is this:
 * Include all files that are not ignored by git. So it should not make any difference if they are untracked or tracked.
 * keep handling of excludedFolders/excludedFiles just like it is 
 
+
+
+Please make the "Project Statistics" more compact such that it does not take up so much screen height
