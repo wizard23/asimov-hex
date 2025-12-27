@@ -432,12 +432,21 @@ Then please report the following items to me:
 * Identify all hardcoded values|colors|etc that are used to determine how anything is drawn in the "Unit Cell Editor". Give me a list of all these hardcoded values with a short description of their use and the current hardcoded value. 
 * Identify all duplicated or very similar hardcoded values that appear at multiple spots in the code.
 
+
+Yes please extract them into a shared config but please don't change anything about these:
+  * the letter glyphs
+  * axes endpoints
+  * Dash toggle epsilon
+
 Very good. Please also include:
 * min|max|step for all slider controls in the EditorControls
 * axes endpoints
 * dash animation speed
 * dash toggle epsilon
 * letter glyphs
+
+
+
 
 At the moment we have controls in the "Editor Controls" to configure|change some of these values while most are hardcoded. 
 For the vast majority we don't need controls but conceptually I want them all to be configurable at runtime and handled the same way. 
@@ -455,8 +464,6 @@ I want them grouped into three groups
   * 
 These 
 
-
-
 Examples for
 
 I want to change that in a structured way such that all of the All of these hardcoded values should come from one central place.
@@ -468,41 +475,18 @@ Yes please extract them into a shared config but please don't change anything ab
 * Dash toggle epsilon
 
 
-Group the rest of the values int 
-
-
-
-  - Canvas background: #1a1a1a sets Pixi background color for the Unit Cell Editor canvas. src/apps/tile-editor/index.ts:178
-  - Default scale: scale: 100 initial zoom used for all drawing sizes. src/apps/tile-editor/index.ts:110
-  - Scale bounds: min: 1, max: 200 clamp zoom for drawing. src/apps/tile-editor/index.ts:108
-  - Default edge width: edgeWidth: 2 base line width (scaled). src/apps/tile-editor/index.ts:114
-  - Default axes color: axesColor: '#444444' unit axes stroke color. src/apps/tile-editor/index.ts:116
-  - Default axes line width: axesLineWidth: 1 base axes line width (scaled). src/apps/tile-editor/index.ts:117
-  - Closed polygon epsilon: closedPolygonEpsilon: 1e-4 affects “closed” detection, which drives fill alpha/stroke behavior. src/apps/tile-editor/index.ts:118
-  - Dash animation speed: dashOffset += 0.4 / scale controls selection dash motion. src/apps/tile-editor/index.ts:256
-  - Axes endpoints: xAxisEnd {1,0}, yAxisEnd {0,1} draw unit-length axes. src/apps/tile-editor/index.ts:1049
-  - Axes label font size: 12 / scale size for X/Y letters. src/apps/tile-editor/index.ts:1062
-  - Axes label stroke width: max(1/scale, fontSize * 0.12) thickness for X/Y letters. src/apps/tile-editor/index.ts:1063
-  - Axes label offsets: +0.2, -0.6, -1.2 multiplied by font size to position X/Y letters. src/apps/tile-editor/index.ts:1066
-  - Polygon fill colors: hover 0x4a9eff, error 0x661111, normal 0x444444. src/apps/tile-editor/index.ts:1188
-  - Polygon fill alpha: 0.8 for closed, error-free polygons; 0 otherwise. src/apps/tile-editor/index.ts:1189
-  - Polygon stroke colors: error/open 0xff4d4d, closed 0xffffff, hover stroke 0xffd24d. src/apps/tile-editor/index.ts:1190
-  - Selection dashed outline colors: primary 0x000000, secondary 0xffffff. src/apps/tile-editor/index.ts:1226
-  - Dotted connection gap size: gapLength = dashLength (equal on/off pattern). src/apps/tile-editor/render-helpers.ts:38
-  - Dashed path dash size: max(width * 3, 6 / scale) for selection outline. src/apps/tile-editor/render-helpers.ts:63
-  - Dashed path gap size: gapLength = dashLength (equal on/off pattern). src/apps/tile-editor/render-helpers.ts:64
-  - Dash toggle epsilon: remaining <= 1e-6 controls dash phase flips. src/apps/tile-editor/render-helpers.ts:91
-  - Hardcoded letter glyph segments (normalized 0–1 coords) used to draw axis/vertex letters: src/apps/tile-editor/render-helpers.ts:153
-
-
-
-
-
-
-
-
-
 Please Identify any other hardcoded values that determine how anything appears to the user anywhere in the "Tile Editor"
+
+
+
+
+
+
+
+
+
+
+
 
 ## FUTURE
 Please read the high level system description in docs/system-description/apps/tile-editor

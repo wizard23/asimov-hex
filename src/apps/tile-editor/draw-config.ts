@@ -3,7 +3,6 @@ export type LetterSegments = Array<[number, number, number, number]>;
 export const DRAW_CONFIG = {
   backgroundColor: '#1a1a1a',
   defaultScale: 100,
-  scaleBounds: { min: 1, max: 200 },
   editorControls: {
     scale: { min: 1, max: 200 },
     numSides: { min: 3, max: 20, step: 1 },

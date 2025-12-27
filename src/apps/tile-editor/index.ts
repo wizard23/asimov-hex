@@ -106,7 +106,7 @@ class TileEditor {
     side: HTMLElement[];
     angle: HTMLElement[];
   } = { description: null, side: [], angle: [] };
-  private readonly scaleBounds = { ...DRAW_CONFIG.scaleBounds };
+  private readonly scaleBounds = { ...DRAW_CONFIG.editorControls.scale };
   private config: EditorConfig = {
     scale: DRAW_CONFIG.defaultScale,
     numSides: 4,
