@@ -178,8 +178,8 @@ class StatisticsViewer {
             <div class="stat-item-value">${data.totals.bytes !== undefined ? data.totals.bytes.toLocaleString() : 'unknown'}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-item-label">Generated</div>
-            <div class="stat-item-value" style="font-size: 14px;">${timestamp}</div>
+            <div class="stat-item-label">Date</div>
+            <div class="stat-item-value left">${timestamp}</div>
           </div>
         </div>
       </div>
@@ -190,20 +190,20 @@ class StatisticsViewer {
           <thead>
             <tr>
               <th>File Type</th>
-              <th>Count</th>
-              <th>Lines</th>
-              <th>Words</th>
-              <th>Bytes</th>
+              <th class="num">Count</th>
+              <th class="num">Lines</th>
+              <th class="num">Words</th>
+              <th class="num">Bytes</th>
             </tr>
           </thead>
           <tbody>
             ${data.fileTypes.map(ft => `
               <tr>
                 <td class="file-type">${ft.fileType || '(no extension)'}</td>
-                <td>${ft.count.toLocaleString()}</td>
-                <td>${ft.totalLines.toLocaleString()}</td>
-                <td>${ft.totalWords.toLocaleString()}</td>
-                <td>${ft.totalBytes !== undefined ? ft.totalBytes.toLocaleString() : '?'}</td>
+                <td class="num">${ft.count.toLocaleString()}</td>
+                <td class="num">${ft.totalLines.toLocaleString()}</td>
+                <td class="num">${ft.totalWords.toLocaleString()}</td>
+                <td class="num">${ft.totalBytes !== undefined ? ft.totalBytes.toLocaleString() : 'unknown'}</td>
               </tr>
             `).join('')}
           </tbody>
