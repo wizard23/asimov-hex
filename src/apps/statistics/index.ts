@@ -158,7 +158,7 @@ class StatisticsViewer {
       : formatIsoTimestampLocal(data.timestamp);
 
     this.statisticsPanel.innerHTML = `
-      <h2>Project Statistics</h2>
+      <h2>Project Statistics — ${timestamp}</h2>
       
       <div class="stat-section">
         <h3>Overview</h3>
@@ -194,10 +194,6 @@ class StatisticsViewer {
           <div class="stat-item">
             <div class="stat-item-label">Tracked Content Bytes</div>
             <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.trackedContentBytes)}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-item-label">Date</div>
-            <div class="stat-item-value left">${timestamp}</div>
           </div>
         </div>
       </div>

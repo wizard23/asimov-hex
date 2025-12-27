@@ -49,3 +49,35 @@ Sort the Top Level Directories and the largest blobs by size (desc)
 
 Please move the date from the overview to the header like so: Project Statistics — 2025/12/27 20:08:50
 
+
+
+
+Now please add a new feature to the Project Timeline page.
+
+First please look at the existing code in src/apps/timeline and timeline.html
+
+Since the feature uses pixi js and similar user interactions as an existing app please look at src/apps/tile-editor as an example of 
+* how to deal with hardcoded values used for determining how the pixi window is rendered 
+* zoom interaction with a pixi window
+* pan interaction with a pixi window
+
+
+Then create a new "Display Mode" in src/apps/timeline called "Timeline". When it is selected the filtered commits should be displayed on an actual line rendered in a pixi js window. The selected date range is used to create the line spanning the whole Timeline Window. Each commit is represented by a small disk. 
+
+When the user hovers over the disk representing the commit the same kind of info box for the commit is shown (at the bottom of the screen) that is now used in the "List" "Display Mode".
+
+The user can zoom into the timeline and pan the timeline by dragging the window anywhere.
+
+At the top of the window show a scale with subdivisions and labels (vertical) at:
+* decades
+* years
+* months
+* days
+* hours
+* minutes
+
+depending on the zoom level only a maximum of 2 different subdivision types should be shown.
+
+If anything is unclear please just ask.
+
+
