@@ -127,4 +127,8 @@ Don't make any changes in the code please but just report your detailed analysis
 
 
 
-It still does not work. I think the bug is the result of not refreshing the view when hovering is detected since it works when I zoom in or out which probably triggers a Let's debug this systematically.
+It still does not work. I think the bug is the result of not refreshing the view when hovering is detected since it works when I zoom in or out which probably triggers a redraw. Let's debug this systematically.
+Please show a statically positioned html element in the top left corner of the screen containing either the hash of the commit if hovering over a commit or the text "not hovering over a commit" when not hovering over a commit.
+
+
+when i zoom in with the mouse over a commit the commit is highlighted in white but the hoverDebugElement always just shows 'not hovering over a commit'. How can that be? Why is the commit drawn in white but the hash of the commit does not show?

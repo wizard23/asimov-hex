@@ -41,6 +41,7 @@ class TimelineViewer {
   private timelineRange = { startMs: 0, endMs: 0 };
   private timelineInfoContainer: HTMLElement | null = null;
   private hoveredCommit: Commit | null = null;
+  private hoverDebugElement: HTMLElement | null = null;
   private readonly timelineScaleHeight = 50;
   private readonly timelineLineOffset = 40;
   
@@ -54,6 +55,7 @@ class TimelineViewer {
 
   constructor() {
     this.timelinePanel = document.getElementById('timeline-panel')!;
+    this.hoverDebugElement = document.getElementById('hover-debug');
     this.init();
   }
 
@@ -514,6 +516,16 @@ class TimelineViewer {
   }
 
   private updateTimelineInfo() {
+    if (!this.timelineInfoContainer) {
+      this.timelineInfoContainer = document.getElementById('timeline-info');
+    }
+
+    if (this.hoverDebugElement) {
+      this.hoverDebugElement.textContent = this.hoveredCommit
+        ? this.hoveredCommit.hash
+        : 'not hovering over a commit';
+    }
+
     if (!this.timelineInfoContainer) return;
     this.timelineInfoContainer.innerHTML = this.renderCommitInfo(this.hoveredCommit);
     if (this.hoveredCommit) {
