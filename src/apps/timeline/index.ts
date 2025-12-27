@@ -657,19 +657,22 @@ class TimelineViewer {
       if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
         continue;
       }
+      const tickColor = isMajor ? 0x777777 : 0x4b4b4b;
+      const tickAlpha = isMajor ? 0.9 : 0.7;
       this.timelineScaleGraphics.moveTo(screenX, 0);
       this.timelineScaleGraphics.lineTo(screenX, lineHeight);
       this.timelineScaleGraphics.stroke({
-        color: isMajor ? 0x777777 : 0x4b4b4b,
+        color: tickColor,
         width: 1,
-        alpha: isMajor ? 0.9 : 0.7,
+        alpha: tickAlpha,
       });
+      this.timelineScaleGraphics.rect(screenX - 0.5, 0, 1, lineHeight);
+      this.timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
         const label = new Text(this.formatScaleLabel(date, unit), style);
-        label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
-        label.y = scaleHeight - 4;
+        label.y = 4;
         this.timelineTextContainer.addChild(label);
         lastLabelX = screenX;
       }

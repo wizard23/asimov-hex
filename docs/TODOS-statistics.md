@@ -154,13 +154,16 @@ Let's debug further by just trying to get the colors I suggested correct first a
 This again yielded some very interesting debugging info: Now no lines are visible at all! Only the disks of the commits show up! This probably also explains why the scale is not visible.
 
 
-Very good! I now see all 4 lines (from tob to bottom):
+Very good! I now see all 4 lines (from top to bottom):
 * gray scale line
 * yellow line
-* blue timeline
+* blue timeline with commits
 * pink line
 
 I don't see:
 * scale labels
 * subdivisions on the scale line
+
+
+No 
 
