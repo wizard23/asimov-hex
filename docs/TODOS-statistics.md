@@ -149,3 +149,18 @@ and one of them should be slightly below the timeline and appear pink.
 This yielded some very interesting debugging info: Both lines get drawn but they all have a pinkish color. Also the timeline itself and the outlines of the commits are drawn with the same pink color. The disks of the commits still appear in blue.
 
 Let's debug further by just trying to get the colors I suggested correct first and also ensure that the timeline itself is drawn in blue.
+
+
+This again yielded some very interesting debugging info: Now no lines are visible at all! Only the disks of the commits show up! This probably also explains why the scale is not visible.
+
+
+Very good! I now see all 4 lines (from tob to bottom):
+* gray scale line
+* yellow line
+* blue timeline
+* pink line
+
+I don't see:
+* scale labels
+* subdivisions on the scale line
+

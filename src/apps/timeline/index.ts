@@ -566,17 +566,17 @@ class TimelineViewer {
     const endX = this.worldToScreen(rangeSeconds, 0).x;
 
     this.timelineLineGraphics.clear();
-    this.timelineLineGraphics.lineStyle(2, 0x6b9cff, 0.9);
     this.timelineLineGraphics.moveTo(startX, lineY);
     this.timelineLineGraphics.lineTo(endX, lineY);
+    this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
 
     this.timelineDebugGraphics.clear();
-    this.timelineDebugGraphics.lineStyle(1, 0xffd84a, 1);
     this.timelineDebugGraphics.moveTo(startX, lineY - 12);
     this.timelineDebugGraphics.lineTo(endX, lineY - 12);
-    this.timelineDebugGraphics.lineStyle(1, 0xff5bb3, 1);
+    this.timelineDebugGraphics.stroke({ color: 0xffd84a, width: 1, alpha: 1 });
     this.timelineDebugGraphics.moveTo(startX, lineY + 12);
     this.timelineDebugGraphics.lineTo(endX, lineY + 12);
+    this.timelineDebugGraphics.stroke({ color: 0xff5bb3, width: 1, alpha: 1 });
 
     this.timelineGraphics.clear();
 
@@ -612,9 +612,9 @@ class TimelineViewer {
     const pxPerSecond = this.timelineScale;
 
     this.timelineScaleGraphics.clear();
-    this.timelineScaleGraphics.lineStyle(1, 0x7a7a7a, 0.9);
     this.timelineScaleGraphics.moveTo(0, scaleHeight);
     this.timelineScaleGraphics.lineTo(this.timelineApp.screen.width, scaleHeight);
+    this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
@@ -657,9 +657,13 @@ class TimelineViewer {
       if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
         continue;
       }
-      this.timelineScaleGraphics.lineStyle(1, isMajor ? 0x777777 : 0x4b4b4b, isMajor ? 0.9 : 0.7);
       this.timelineScaleGraphics.moveTo(screenX, 0);
       this.timelineScaleGraphics.lineTo(screenX, lineHeight);
+      this.timelineScaleGraphics.stroke({
+        color: isMajor ? 0x777777 : 0x4b4b4b,
+        width: 1,
+        alpha: isMajor ? 0.9 : 0.7,
+      });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
         const label = new Text(this.formatScaleLabel(date, unit), style);
