@@ -1,5 +1,401 @@
 [
   {
+    "hash": "438908d7ca877ff8014f474a5094365cffbf9c7c",
+    "timestamp": 1766868206,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented the new Timeline display mode with a Pixi timeline view, zoom/pan, still has bugs: hover details, and a time scale don't work yet",
+    "addedLines": 574,
+    "removedLines": 21
+  },
+  {
+    "hash": "284a19c386bfe49ccca607493c60a6a59d4081e4",
+    "timestamp": 1766867475,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "move date to header",
+    "addedLines": 33,
+    "removedLines": 5
+  },
+  {
+    "hash": "3edb5b02ca8fc2fff479730523cb62013ba69bc5",
+    "timestamp": 1766864881,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added the requested repo metrics to the Overview (with unknown when missing) and sorted Largest Blobs / Top Level Directories by size descending",
+    "addedLines": 43,
+    "removedLines": 3
+  },
+  {
+    "hash": "795658ed660a1d6f4693ba6a36c7b23e08c186f0",
+    "timestamp": 1766863941,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Wired the new repo statistics script; the generator parses the structured output; UI renders it",
+    "addedLines": 588,
+    "removedLines": 7
+  },
+  {
+    "hash": "0e132b47fa25bb0a6e02bd18430da532680797cd",
+    "timestamp": 1766861744,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: repo-statistics.sh in coop with chatgpt plus types",
+    "addedLines": 125,
+    "removedLines": 1
+  },
+  {
+    "hash": "2c31365e462cfe6072df35beb55d5b12bfa4d0e3",
+    "timestamp": 1766857948,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Aligned numeric values to the right; fix date font size",
+    "addedLines": 17,
+    "removedLines": 10
+  },
+  {
+    "hash": "7b142d08e7bccec35bf5e906df26a3b37e521e1e",
+    "timestamp": 1766857499,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Tightened the statistics layout so it uses less vertical space by reducing padding, margins, and font sizes.",
+    "addedLines": 18,
+    "removedLines": 15
+  },
+  {
+    "hash": "e195c071d084f5ef1cbf55266c3a2011bbbba826",
+    "timestamp": 1766837216,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the generator to include all files that are not ignored by git, regardless of tracked/untracked status. It now uses git ls-files --cached --others --exclude-standard, so untracked but not ignored files are included, and ignored files are excluded. Excluded folders/files handling stays the same.",
+    "addedLines": 5,
+    "removedLines": 5
+  },
+  {
+    "hash": "bb58726b4bc97d4833f9500d64d83f3f61f3be9f",
+    "timestamp": 1766836951,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the UI to treat missing fields as “unknown”",
+    "addedLines": 12,
+    "removedLines": 3
+  },
+  {
+    "hash": "85b6328d6ac20e623a2f46fd01e75dfc8f9ddfc8",
+    "timestamp": 1766836467,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added excluded path metadata to the generated statistics JSON and surfaced it in the statistics UI so users can see what’s omitted.",
+    "addedLines": 179,
+    "removedLines": 2
+  },
+  {
+    "hash": "d9f620821304184ed14ffb11ef354c4337eb6e86",
+    "timestamp": 1766835875,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update project statistics",
+    "addedLines": 61,
+    "removedLines": 0
+  },
+  {
+    "hash": "a47449851a5e47a4c4fea9464ae5bcdbf8bb21c9",
+    "timestamp": 1766835761,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Removed the unused .constants-* CSS rules from tile-editor.html.",
+    "addedLines": 0,
+    "removedLines": 25
+  },
+  {
+    "hash": "0f18da294db33a854e9bcdb8aaabe7190814c510",
+    "timestamp": 1766835604,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Hooked up the textarea plugin and switched the constants binding to view: 'textarea' with rows and placeholder.",
+    "addedLines": 52,
+    "removedLines": 19
+  },
+  {
+    "hash": "0be60f9c9fd37d63303af1d5f18f69617e43dce0",
+    "timestamp": 1766833348,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Grouped the Editor Controls into folders",
+    "addedLines": 62,
+    "removedLines": 48
+  },
+  {
+    "hash": "5d021a0e3ccebd052896760b434faaff9b2d4007",
+    "timestamp": 1766831943,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Swapped Save/Load over to Tweakpane buttons so they match Center View; removed unused css",
+    "addedLines": 39,
+    "removedLines": 28
+  },
+  {
+    "hash": "4ce512bbc7b2e2a6c318a15a5d12ae822eb9be4d",
+    "timestamp": 1766826182,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Removed the duplicate scale bounds by switching to the editor control scale bounds",
+    "addedLines": 72,
+    "removedLines": 28
+  },
+  {
+    "hash": "3f6db78320a4f4695b58328a9fa02eb4b0818a8a",
+    "timestamp": 1766798336,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "centralized more hardcoded values in the shared config",
+    "addedLines": 82,
+    "removedLines": 59
+  },
+  {
+    "hash": "f04b0f67af2c93eb6c131e68cb8e2420a01cbc53",
+    "timestamp": 1766798100,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Pulled the Unit Cell Editor draw constants into a shared config",
+    "addedLines": 201,
+    "removedLines": 28
+  },
+  {
+    "hash": "ee9fcc017c4ab34c810a1023d48d132b2b6b9582",
+    "timestamp": 1766789829,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add stats script to package.json",
+    "addedLines": 1,
+    "removedLines": 0
+  },
+  {
+    "hash": "9c8e001d68661620a406ac3f774c97e3a6371d3a",
+    "timestamp": 1766788791,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: hack.sh script to setup hacking environment :)",
+    "addedLines": 19,
+    "removedLines": 0
+  },
+  {
+    "hash": "0e3804fa929441271660c29167add36a96132993",
+    "timestamp": 1766788485,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add latest session transcript",
+    "addedLines": 4470,
+    "removedLines": 0
+  },
+  {
+    "hash": "932fec97423afad142d26e9a8e277447efcc5800",
+    "timestamp": 1766788443,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: found a way to record codex session without git status clutter :)",
+    "addedLines": 1424,
+    "removedLines": 2
+  },
+  {
+    "hash": "0678911be08975a69217ae1cea30c627f17acc7d",
+    "timestamp": 1766783638,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the Tile Editor documentation to reflect the current implementation",
+    "addedLines": 38,
+    "removedLines": 6
+  },
+  {
+    "hash": "a292bcab4db9c22e063b0a5287b91633e6c3ec36",
+    "timestamp": 1766782091,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: fix positioning of Y in coordinate axes; dark gray default color",
+    "addedLines": 3,
+    "removedLines": 3
+  },
+  {
+    "hash": "fee60361b35a17967bea4aa2c67eced733d6969b",
+    "timestamp": 1766781620,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix bug in coordinate axes",
+    "addedLines": 6,
+    "removedLines": 1
+  },
+  {
+    "hash": "d99fb87d9fe1dc7d586b77a9b85299758414053f",
+    "timestamp": 1766781421,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add coordinate axes (still has bug: X/Y is shown but lines don't show)",
+    "addedLines": 91,
+    "removedLines": 8
+  },
+  {
+    "hash": "ad52bb121e609071b894f6a9eabddadd6adcfe4f",
+    "timestamp": 1766780566,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: flipping the way the angles are added up to make polygons appear like in a textbook (for a triangle: vertex A is bottom left; B vertex bottom right; C is on top)",
+    "addedLines": 22,
+    "removedLines": 1
+  },
+  {
+    "hash": "82dbc2a1b034d80a502e281e2d3a004ebf6d470f",
+    "timestamp": 1766778998,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented the unified construction + centering + CCW visual orientation",
+    "addedLines": 62,
+    "removedLines": 19
+  },
+  {
+    "hash": "8dde97fda5170587fa436e2c3084eef4d2705b4a",
+    "timestamp": 1766774154,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Updated the toast utility to support top‑right stacking, fadeout, sizing, and type options with emoji icons. Also wired types in Timeline and Tile Editor.",
+    "addedLines": 94,
+    "removedLines": 21
+  },
+  {
+    "hash": "ce4e39a6e59b6cba7b8fd8c15ab53e75c65c2d2c",
+    "timestamp": 1766772930,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "update documentation",
+    "addedLines": 2,
+    "removedLines": 0
+  },
+  {
+    "hash": "eae5b8ad1a29cc74973c2fa741a76c5af9e635c1",
+    "timestamp": 1766772861,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": " Added reusable toast helper: src/core/utils/toast.ts extracted from src/apps/timeline/index.ts",
+    "addedLines": 46,
+    "removedLines": 30
+  },
+  {
+    "hash": "3aae90e26395499261cf822bc76e404a8fe571fb",
+    "timestamp": 1766771913,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the lint and build errors",
+    "addedLines": 23,
+    "removedLines": 11
+  },
+  {
+    "hash": "95bf5eec78af65cf24f1304a63a7dbdd8fda61e2",
+    "timestamp": 1766771675,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add verification script to package.json",
+    "addedLines": 1,
+    "removedLines": 0
+  },
+  {
+    "hash": "ed97bbe212507014d586633e2768ecb141eaba70",
+    "timestamp": 1766770985,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented the new error-handling UX for Type Values without touching rotation logic.",
+    "addedLines": 248,
+    "removedLines": 48
+  },
+  {
+    "hash": "35c03ca96117e7bfb8db77cfe2ce0d998420e87a",
+    "timestamp": 1766767186,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added explicit runtime checks and fail‑fast errors",
+    "addedLines": 9,
+    "removedLines": 3
+  },
+  {
+    "hash": "2f43355e0d76427cd093062d4cfc8bad3913a458",
+    "timestamp": 1766766994,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "strict checks instead of asserting",
+    "addedLines": 10,
+    "removedLines": 2
+  },
+  {
+    "hash": "f6026ae570c8e7aceab74877a19d085f514524ab",
+    "timestamp": 1766766893,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix linter errors",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "3d5a27ef37232d0e41fce8ae1336f5fc03f93c7e",
+    "timestamp": 1766766031,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": " Removed the redundant “Enable Date Filter” checkbox binding.",
+    "addedLines": 0,
+    "removedLines": 7
+  },
+  {
+    "hash": "052209becd69a9d31b14a749a6c59c6da03ab45b",
+    "timestamp": 1766765815,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Reordered the Timeline Controls and set the date filter checkbox to unchecked by default. The date fields now only show when the checkbox is enabled. (has bug)",
+    "addedLines": 29,
+    "removedLines": 9
+  },
+  {
+    "hash": "80339f87eb9764138cc1ccf224939fc5faea71b4",
+    "timestamp": 1766765799,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "date filter checkbox",
+    "addedLines": 16,
+    "removedLines": 6
+  },
+  {
+    "hash": "3c8acce8f90110241958f82739311e749c98ea51",
+    "timestamp": 1766765297,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "make filtering explicit",
+    "addedLines": 4,
+    "removedLines": 1
+  },
+  {
+    "hash": "233ec2b2f5c9e2d6750ea2f5242ede2ca4f3f3a7",
+    "timestamp": 1766765187,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added a toast and hover tooltip for the git checkout button. The toast appears on copy and auto-dismisses after 5 seconds; the tooltip shows the exact command.",
+    "addedLines": 35,
+    "removedLines": 4
+  },
+  {
+    "hash": "be38eb2baeef385af279ea764d700917f25e4a40",
+    "timestamp": 1766764426,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added a “git checkout” button to each commit row and wired it to copy git checkout <hash> to the clipboard, with a DOM fallback for older clipboard support.",
+    "addedLines": 29,
+    "removedLines": 0
+  },
+  {
+    "hash": "0d51280cc7afac64df92bdb94f4ffb5914148a31",
+    "timestamp": 1766764371,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add re-create-git-timeline script to package.json",
+    "addedLines": 785,
+    "removedLines": 1
+  },
+  {
     "hash": "c5acd8df150d8c5bcd1bc55694e8a1508d24c8e8",
     "timestamp": 1766763321,
     "authorName": "Philipp Tiefenbacher",

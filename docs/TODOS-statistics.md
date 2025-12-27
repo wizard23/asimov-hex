@@ -81,3 +81,21 @@ depending on the zoom level only a maximum of 2 different subdivision types shou
 If anything is unclear please just ask.
 
 
+
+That's already very good but it has some bugs and usability issues:
+* panning should be restricted to the time axis (x axis in the window) there is no need to be able to pan the timeline up and down
+* the timescale seems to be missing. I don't see it anywhere on the screen
+* the timeline should be positioned a fixed distance below the timeline.
+* hovering does not seem to work. No matter what I do I don't see a window with the commit details.
+* the hovered commit should be highlighted.
+
+
+Still some bugs but at least hovering/highlighting works a little but now :)
+What I mean with "a little bit" is this: Hovering does not work when I move the mouse cursor on top of the commit, but when I zoom in or out while the mouse is over a commit or when I press a mouse button while over a commit it gets highlighted. Tut the highlighting does not get removed when I move the mouse away.
+
+There are some other bugs still as well but lets get highlighting to work first please.
+
+The other bugs are:
+* scale is still not visible anywhere on the screen
+* details of the highlighted commit are not shown anywhere on the screen
+

@@ -41,6 +41,8 @@ class TimelineViewer {
   private timelineRange = { startMs: 0, endMs: 0 };
   private timelineInfoContainer: HTMLElement | null = null;
   private hoveredCommit: Commit | null = null;
+  private readonly timelineScaleHeight = 50;
+  private readonly timelineLineOffset = 40;
   
   private config = {
     startDate: '',
@@ -321,12 +323,15 @@ class TimelineViewer {
     this.timelineResizeObserver = new ResizeObserver(() => {
       if (!this.timelineApp) return;
       this.timelineApp.resize();
+      this.timelineApp.stage.hitArea = this.timelineApp.screen;
       this.updateTimelineViewport();
+      this.updateTimelineVerticalOffset();
       this.drawTimeline();
     });
     this.timelineResizeObserver.observe(container);
 
     this.updateTimelineViewport();
+    this.updateTimelineVerticalOffset();
   }
 
   private destroyTimelinePixi() {
@@ -354,6 +359,12 @@ class TimelineViewer {
       x: this.timelineApp.screen.width / 2,
       y: this.timelineApp.screen.height / 2,
     };
+  }
+
+  private updateTimelineVerticalOffset() {
+    if (!this.timelineApp) return;
+    const lineY = this.timelineScaleHeight + this.timelineLineOffset;
+    this.timelineViewOffset.y = lineY - this.timelineViewportCenter.y;
   }
 
   private updateTimelineData() {
@@ -403,8 +414,9 @@ class TimelineViewer {
     };
     this.timelineViewOffset = {
       x: padding - this.timelineViewportCenter.x,
-      y: 0,
+      y: this.timelineViewOffset.y,
     };
+    this.updateTimelineVerticalOffset();
   }
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
@@ -417,10 +429,9 @@ class TimelineViewer {
   private handleTimelinePointerMove(e: FederatedPointerEvent) {
     if (this.timelineDragging) {
       const dx = e.global.x - this.timelineDragStart.x;
-      const dy = e.global.y - this.timelineDragStart.y;
       this.timelineViewOffset = {
         x: this.timelineViewOffsetStart.x + dx,
-        y: this.timelineViewOffsetStart.y + dy,
+        y: this.timelineViewOffsetStart.y,
       };
       this.drawTimeline();
       return;
@@ -449,12 +460,12 @@ class TimelineViewer {
     this.timelineScale = nextScale;
     const nextScreen = this.worldToScreen(worldPos.x, worldPos.y);
     this.timelineViewOffset.x += screenX - nextScreen.x;
-    this.timelineViewOffset.y += screenY - nextScreen.y;
+    this.updateTimelineVerticalOffset();
     this.drawTimeline();
   };
 
   private updateHoverCommit(screenX: number, screenY: number) {
-    const radius = 8;
+    const radius = 10;
     let nextCommit: Commit | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
 
@@ -483,6 +494,7 @@ class TimelineViewer {
     if (this.hoveredCommit) {
       this.bindCheckoutButtons();
     }
+    this.drawTimeline();
   }
 
   private drawHoverCommit() {
@@ -500,6 +512,7 @@ class TimelineViewer {
       return;
     }
 
+    this.updateTimelineVerticalOffset();
     const rangeSeconds = (this.timelineRange.endMs - this.timelineRange.startMs) / 1000;
     const lineY = this.worldToScreen(0, 0).y;
     const startX = this.worldToScreen(0, 0).x;
@@ -519,7 +532,8 @@ class TimelineViewer {
       if (screen.x < -50 || screen.x > this.timelineApp.screen.width + 50) {
         continue;
       }
-      this.timelineGraphics.beginFill(0x4a9eff, 0.95);
+      const isHovered = this.hoveredCommit?.hash === commit.hash;
+      this.timelineGraphics.beginFill(isHovered ? 0xffffff : 0x4a9eff, isHovered ? 1 : 0.95);
       this.timelineGraphics.drawCircle(screen.x, screen.y, dotRadius);
       this.timelineGraphics.endFill();
       this.timelineCommitPoints.push({
@@ -535,7 +549,7 @@ class TimelineViewer {
 
   private drawScale() {
     if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
-    const scaleHeight = 50;
+    const scaleHeight = this.timelineScaleHeight;
     const { startMs, endMs } = this.timelineRange;
     const visibleRange = this.getVisibleTimelineRange();
     const pxPerSecond = this.timelineScale;
