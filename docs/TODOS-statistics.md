@@ -190,3 +190,6 @@ the red line represents lines removed and points down
 
 Use a logarithmic scale for these lines and also show a scale for these on the right side of the screen.
 
+
+please put the timeline in the center of the window.
+

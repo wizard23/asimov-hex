@@ -46,7 +46,6 @@ class TimelineViewer {
   private timelineInfoContainer: HTMLElement | null = null;
   private hoveredCommit: Commit | null = null;
   private readonly timelineScaleHeight = 50;
-  private readonly timelineLineOffset = 40;
   private readonly timelineChangeMaxHeight = 80;
   private readonly timelineChangeScaleRightPadding = 24;
   
@@ -395,7 +394,7 @@ class TimelineViewer {
 
   private updateTimelineVerticalOffset() {
     if (!this.timelineApp) return;
-    const lineY = this.timelineScaleHeight + this.timelineLineOffset;
+    const lineY = this.timelineApp.screen.height / 2;
     this.timelineViewOffset.y = lineY - this.timelineViewportCenter.y;
   }
 
