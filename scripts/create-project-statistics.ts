@@ -37,18 +37,18 @@ function countLinesAndWords(content: string): { lines: number; words: number } {
   return { lines, words };
 }
 
-function getGitTrackedFiles(): string[] {
+function getGitIncludedFiles(): string[] {
   try {
-    const output = execSync('git ls-files', { encoding: 'utf-8' });
+    const output = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf-8' });
     return output.trim().split('\n').filter(line => line.length > 0);
   } catch (error) {
-    console.error('Error getting git tracked files:', error);
+    console.error('Error getting git included files:', error);
     return [];
   }
 }
 
 function generateStatistics(): ProjectStatistics {
-  const allFiles = getGitTrackedFiles();
+  const allFiles = getGitIncludedFiles();
   const excludedFolders = [
     'docs',
     'public',

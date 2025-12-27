@@ -8,6 +8,6 @@ then please also include the excludedFolders and excludedFiles in the generated 
 
 
 The intended logic is this:
-* Include all files that are not ignored by git. So it should not make any difference if
+* Include all files that are not ignored by git. So it should not make any difference if they are untracked or tracked.
 * keep handling of excludedFolders/excludedFiles just like it is 
 
