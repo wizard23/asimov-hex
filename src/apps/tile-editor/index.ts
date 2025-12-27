@@ -254,7 +254,7 @@ class TileEditor {
 
     // Update loop
     this.app.ticker.add(() => {
-      this.dashOffset += 0.4 / this.config.scale;
+      this.dashOffset += DRAW_CONFIG.dashAnimationSpeed / this.config.scale;
       this.updatePreview();
       if (this.selectedPolygon) {
         this.drawPolygonInstance(this.selectedPolygon);
@@ -272,8 +272,8 @@ class TileEditor {
     });
 
     this.pane.addBinding(this.config, 'scale', {
-      min: this.scaleBounds.min,
-      max: this.scaleBounds.max,
+      min: DRAW_CONFIG.editorControls.scale.min,
+      max: DRAW_CONFIG.editorControls.scale.max,
       label: 'Scale',
     }).on('change', () => {
         this.updateDisplay();
@@ -282,9 +282,9 @@ class TileEditor {
     });
 
     this.pane.addBinding(this.config, 'numSides', {
-      min: 3,
-      max: 20,
-      step: 1,
+      min: DRAW_CONFIG.editorControls.numSides.min,
+      max: DRAW_CONFIG.editorControls.numSides.max,
+      step: DRAW_CONFIG.editorControls.numSides.step,
       label: 'Number of Sides',
     }).on('change', () => this.updateDisplay());
 
@@ -293,9 +293,9 @@ class TileEditor {
     }).on('change', () => this.updateDisplay());
 
     this.pane.addBinding(this.config, 'edgeWidth', {
-      min: 1,
-      max: 12,
-      step: 1,
+      min: DRAW_CONFIG.editorControls.edgeWidth.min,
+      max: DRAW_CONFIG.editorControls.edgeWidth.max,
+      step: DRAW_CONFIG.editorControls.edgeWidth.step,
       label: 'Edge Width',
     }).on('change', () => {
         this.updateDisplay();
@@ -315,18 +315,18 @@ class TileEditor {
     });
 
     this.pane.addBinding(this.config, 'axesLineWidth', {
-      min: 1,
-      max: 6,
-      step: 1,
+      min: DRAW_CONFIG.editorControls.axesLineWidth.min,
+      max: DRAW_CONFIG.editorControls.axesLineWidth.max,
+      step: DRAW_CONFIG.editorControls.axesLineWidth.step,
       label: 'Axes Line Width',
     }).on('change', () => {
       this.updatePreview();
     });
 
     this.pane.addBinding(this.config, 'closedPolygonEpsilon', {
-      min: 1e-6,
-      max: 1e-2,
-      step: 1e-6,
+      min: DRAW_CONFIG.editorControls.closedPolygonEpsilon.min,
+      max: DRAW_CONFIG.editorControls.closedPolygonEpsilon.max,
+      step: DRAW_CONFIG.editorControls.closedPolygonEpsilon.step,
       label: 'Closed Polygon Epsilon',
     }).on('change', () => {
         this.updateDisplay();
@@ -1047,8 +1047,8 @@ class TileEditor {
       const colorValue = Number.parseInt(this.config.axesColor.replace('#', ''), 16);
       const width = this.config.axesLineWidth / this.config.scale;
 
-      const xAxisEnd = { x: 1, y: 0 };
-      const yAxisEnd = { x: 0, y: 1 };
+      const xAxisEnd = DRAW_CONFIG.axesEndpoints.x;
+      const yAxisEnd = DRAW_CONFIG.axesEndpoints.y;
       const xAxisDisplay = { x: xAxisEnd.x, y: -xAxisEnd.y };
       const yAxisDisplay = { x: yAxisEnd.x, y: -yAxisEnd.y };
 

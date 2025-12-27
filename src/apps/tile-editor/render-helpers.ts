@@ -1,5 +1,5 @@
 import { Graphics } from "pixi.js";
-import { DRAW_CONFIG } from "./draw-config";
+import { DRAW_CONFIG, LetterSegments } from "./draw-config";
 import { Point } from "./types";
 
 export function drawPolygonPath(
@@ -89,7 +89,7 @@ export function drawDashedPath(
       }
       segPos += step;
       remaining -= step;
-      if (remaining <= 1e-6) {
+      if (remaining <= DRAW_CONFIG.dashToggleEpsilon) {
         drawOn = !drawOn;
         remaining = drawOn ? dashLength : gapLength;
       }
@@ -121,7 +121,7 @@ export function drawDashedPath(
       }
       segPos += step;
       remaining -= step;
-      if (remaining <= 1e-6) {
+      if (remaining <= DRAW_CONFIG.dashToggleEpsilon) {
         drawOn = !drawOn;
         remaining = drawOn ? dashLength : gapLength;
       }
@@ -151,44 +151,6 @@ export function getLetterSegments(
   letter: string
 ): Array<[number, number, number, number]> | null {
   const l = letter.toUpperCase();
-  const segments: Record<string, Array<[number, number, number, number]>> = {
-    A: [[0,1,0,0],[1,1,1,0],[0,0,1,0],[0,0.5,1,0.5]],
-    B: [
-      [0,0,0,1],
-      [0,0,0.7,0],
-      [0.7,0,0.85,0.2],
-      [0.85,0.2,0.85,0.4],
-      [0.85,0.4,0.7,0.5],
-      [0.7,0.5,0,0.5],
-      [0.7,0.5,0.85,0.6],
-      [0.85,0.6,0.85,0.85],
-      [0.85,0.85,0.7,1],
-      [0.7,1,0,1],
-    ],
-    C: [[1,0,0,0],[0,0,0,1],[0,1,1,1]],
-    D: [[0,0,0,1],[0,0,0.75,0],[0.75,0,1,0.2],[1,0.2,1,0.8],[1,0.8,0.75,1],[0.75,1,0,1]],
-    E: [[1,0,0,0],[0,0,0,1],[0,0.5,0.8,0.5],[0,1,1,1]],
-    F: [[0,0,0,1],[0,0,1,0],[0,0.5,0.8,0.5]],
-    G: [[1,0,0,0],[0,0,0,1],[0,1,1,1],[1,1,1,0.6],[1,0.6,0.6,0.6]],
-    H: [[0,0,0,1],[1,0,1,1],[0,0.5,1,0.5]],
-    I: [[0,0,1,0],[0.5,0,0.5,1],[0,1,1,1]],
-    J: [[1,0,1,1],[1,1,0,1],[0,1,0,0.7]],
-    K: [[0,0,0,1],[0,0.5,1,0],[0,0.5,1,1]],
-    L: [[0,0,0,1],[0,1,1,1]],
-    M: [[0,1,0,0],[1,1,1,0],[0,0,0.5,0.5],[0.5,0.5,1,0]],
-    N: [[0,1,0,0],[1,1,1,0],[0,0,1,1]],
-    O: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0]],
-    P: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5]],
-    Q: [[0,0,1,0],[1,0,1,1],[1,1,0,1],[0,1,0,0],[0.6,0.6,1,1]],
-    R: [[0,0,0,1],[0,0,1,0],[1,0,1,0.5],[1,0.5,0,0.5],[0,0.5,1,1]],
-    S: [[1,0,0,0],[0,0,0,0.5],[0,0.5,1,0.5],[1,0.5,1,1],[1,1,0,1]],
-    T: [[0,0,1,0],[0.5,0,0.5,1]],
-    U: [[0,0,0,1],[0,1,1,1],[1,1,1,0]],
-    V: [[0,0,0.5,1],[0.5,1,1,0]],
-    W: [[0,0,0.25,1],[0.25,1,0.5,0.5],[0.5,0.5,0.75,1],[0.75,1,1,0]],
-    X: [[0,0,1,1],[1,0,0,1]],
-    Y: [[0,0,0.5,0.5],[1,0,0.5,0.5],[0.5,0.5,0.5,1]],
-    Z: [[0,0,1,0],[1,0,0,1],[0,1,1,1]],
-  };
+  const segments: Record<string, LetterSegments> = DRAW_CONFIG.letterGlyphs;
   return segments[l] ?? null;
 }

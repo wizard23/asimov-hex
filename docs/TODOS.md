@@ -432,6 +432,13 @@ Then please report the following items to me:
 * Identify all hardcoded values|colors|etc that are used to determine how anything is drawn in the "Unit Cell Editor". Give me a list of all these hardcoded values with a short description of their use and the current hardcoded value. 
 * Identify all duplicated or very similar hardcoded values that appear at multiple spots in the code.
 
+Very good. Please also include:
+* min|max|step for all slider controls in the EditorControls
+* axes endpoints
+* dash animation speed
+* dash toggle epsilon
+* letter glyphs
+
 At the moment we have controls in the "Editor Controls" to configure|change some of these values while most are hardcoded. 
 For the vast majority we don't need controls but conceptually I want them all to be configurable at runtime and handled the same way. 
 Also they should all be defined in one central place.
