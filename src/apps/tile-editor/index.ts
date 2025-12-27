@@ -1,4 +1,5 @@
 import { Pane } from 'tweakpane';
+import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin';
 import { Application, Container, Graphics } from 'pixi.js';
 import type { FederatedPointerEvent } from 'pixi.js';
 import { pointsCloseEuclidean } from '../../core/utils/geometry';
@@ -99,7 +100,6 @@ class TileEditor {
   private pane!: Pane;
   private editPane: Pane | null = null;
   private editPaneContainer!: HTMLElement;
-  private constantsInput: HTMLTextAreaElement | null = null;
   private hasSavedState = true;
   private typeExpressionBindings: {
     description: PolygonDescription | null;
@@ -270,6 +270,7 @@ class TileEditor {
       title: 'Editor Controls',
       container: container,
     });
+    this.pane.registerPlugin(TextareaPlugin);
 
     const commandsFolder = this.pane.addFolder({ title: 'Commands' });
     const tilingFolder = this.pane.addFolder({ title: 'Tiling' });
@@ -359,23 +360,14 @@ class TileEditor {
         this.updateDisplay();
     });
 
-    const constantsBlock = document.createElement('div');
-    constantsBlock.className = 'constants-block';
-    const constantsLabel = document.createElement('label');
-    constantsLabel.className = 'constants-label';
-    constantsLabel.textContent = 'Constants';
-    const constantsInput = document.createElement('textarea');
-    constantsInput.className = 'constants-input';
-    constantsInput.rows = 6;
-    constantsInput.placeholder = 'NAME=EXPR';
-    constantsInput.value = this.config.constantsText;
-    constantsInput.addEventListener('input', () => {
-      this.config.constantsText = constantsInput.value;
+    tilingFolder.addBinding(this.config, 'constantsText', {
+      label: 'Constants',
+      view: 'textarea',
+      rows: 6,
+      placeholder: 'NAME=EXPR',
+    }).on('change', () => {
       this.applyConstantsChange();
     });
-    this.constantsInput = constantsInput;
-    constantsBlock.append(constantsLabel, constantsInput);
-    tilingFolder.element.appendChild(constantsBlock);
     this.refreshConstants();
   }
 
@@ -533,9 +525,6 @@ class TileEditor {
     this.config.drawAxes = data.config.drawAxes ?? true;
     this.config.axesColor = data.config.axesColor ?? '#444444';
     this.config.axesLineWidth = data.config.axesLineWidth ?? 1;
-    if (this.constantsInput) {
-      this.constantsInput.value = data.config.constantsText;
-    }
     this.refreshConstants();
 
     const descriptions = new Map<string, PolygonDescription>();

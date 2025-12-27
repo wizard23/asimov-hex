@@ -25,6 +25,7 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
+    "@pangenerator/tweakpane-textarea-plugin": "^2.0.0",
     "pixi.js": "^8.0.0",
     "tweakpane": "^4.0.3"
   }

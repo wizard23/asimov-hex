@@ -516,6 +516,39 @@ Did I forget anything?
 If anything is unclear please just ask.
 
 
+for the constants please simplify the binding. Here is a tweakpane multiline example code:
+
+pane.addBinding(PARAMS, 'someLongString', {
+  readonly: true,
+  multiline: true,
+  rows: 5,
+});
+
+I was wrong. this does not support multiline after all. Please try it with the @pangenerator/tweakpane-textarea-plugin
+
+Her is some sample code for it:
+
+import {Pane} from 'tweakpane';
+import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin';
+
+const pane = new Pane();
+pane.registerPlugin(TextareaPlugin);
+
+const params = {
+  prop: 'Put your\nmultiline\ntext here!'
+};
+
+pane.addBinding(params, 'prop', {
+  view: 'textarea',
+  rows: 6,
+  placeholder: 'Type here...'
+}).on('change', (ev) => {
+  console.log(ev.value);
+});
+
+
+
+
 I want clean functionality for detecting
 * if the mouse hovers over a polygon
 * if the mouse hovers over an edge
