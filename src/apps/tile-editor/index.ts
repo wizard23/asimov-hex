@@ -271,7 +271,38 @@ class TileEditor {
       container: container,
     });
 
-    this.pane.addBinding(this.config, 'scale', {
+    const commandsFolder = this.pane.addFolder({ title: 'Commands' });
+    const tilingFolder = this.pane.addFolder({ title: 'Tiling' });
+    const viewFolder = this.pane.addFolder({ title: 'View' });
+    const guiFolder = this.pane.addFolder({ title: 'Gui Settings' });
+    const advancedFolder = this.pane.addFolder({ title: 'Advanced/Debug' });
+
+    commandsFolder.addButton({
+      title: 'Center View',
+    }).on('click', () => {
+      this.centerViewToPolygons();
+    });
+
+    commandsFolder.addButton({
+      title: 'Save Tiling',
+    }).on('click', () => this.saveTiling());
+
+    commandsFolder.addButton({
+      title: 'Load Tiling',
+    }).on('click', () => this.triggerLoadTiling());
+
+    tilingFolder.addBinding(this.config, 'numSides', {
+      min: DRAW_CONFIG.editorControls.numSides.min,
+      max: DRAW_CONFIG.editorControls.numSides.max,
+      step: DRAW_CONFIG.editorControls.numSides.step,
+      label: 'Number of Sides',
+    }).on('change', () => this.updateDisplay());
+
+    tilingFolder.addBinding(this.config, 'sideLengthExpression', {
+      label: 'Side Length Expr',
+    }).on('change', () => this.updateDisplay());
+
+    viewFolder.addBinding(this.config, 'scale', {
       min: DRAW_CONFIG.editorControls.scale.min,
       max: DRAW_CONFIG.editorControls.scale.max,
       label: 'Scale',
@@ -281,18 +312,14 @@ class TileEditor {
         this.redrawPolygons();
     });
 
-    this.pane.addBinding(this.config, 'numSides', {
-      min: DRAW_CONFIG.editorControls.numSides.min,
-      max: DRAW_CONFIG.editorControls.numSides.max,
-      step: DRAW_CONFIG.editorControls.numSides.step,
-      label: 'Number of Sides',
-    }).on('change', () => this.updateDisplay());
+    viewFolder.addBinding(this.config, 'viewOffset', {
+      label: 'View Offset',
+    }).on('change', () => {
+        this.updateDisplay();
+        this.updateViewportCenter();
+    });
 
-    this.pane.addBinding(this.config, 'sideLengthExpression', {
-      label: 'Side Length Expr',
-    }).on('change', () => this.updateDisplay());
-
-    this.pane.addBinding(this.config, 'edgeWidth', {
+    guiFolder.addBinding(this.config, 'edgeWidth', {
       min: DRAW_CONFIG.editorControls.edgeWidth.min,
       max: DRAW_CONFIG.editorControls.edgeWidth.max,
       step: DRAW_CONFIG.editorControls.edgeWidth.step,
@@ -302,19 +329,19 @@ class TileEditor {
         this.redrawPolygons();
     });
 
-    this.pane.addBinding(this.config, 'drawAxes', {
+    guiFolder.addBinding(this.config, 'drawAxes', {
       label: 'Draw Axes',
     }).on('change', () => {
       this.updatePreview();
     });
 
-    this.pane.addBinding(this.config, 'axesColor', {
+    guiFolder.addBinding(this.config, 'axesColor', {
       label: 'Axes Color',
     }).on('change', () => {
       this.updatePreview();
     });
 
-    this.pane.addBinding(this.config, 'axesLineWidth', {
+    guiFolder.addBinding(this.config, 'axesLineWidth', {
       min: DRAW_CONFIG.editorControls.axesLineWidth.min,
       max: DRAW_CONFIG.editorControls.axesLineWidth.max,
       step: DRAW_CONFIG.editorControls.axesLineWidth.step,
@@ -323,7 +350,7 @@ class TileEditor {
       this.updatePreview();
     });
 
-    this.pane.addBinding(this.config, 'closedPolygonEpsilon', {
+    advancedFolder.addBinding(this.config, 'closedPolygonEpsilon', {
       min: DRAW_CONFIG.editorControls.closedPolygonEpsilon.min,
       max: DRAW_CONFIG.editorControls.closedPolygonEpsilon.max,
       step: DRAW_CONFIG.editorControls.closedPolygonEpsilon.step,
@@ -331,27 +358,6 @@ class TileEditor {
     }).on('change', () => {
         this.updateDisplay();
     });
-
-    this.pane.addBinding(this.config, 'viewOffset', {
-      label: 'View Offset',
-    }).on('change', () => {
-        this.updateDisplay();
-        this.updateViewportCenter();
-    });
-
-    this.pane.addButton({
-      title: 'Center View',
-    }).on('click', () => {
-      this.centerViewToPolygons();
-    });
-
-    this.pane.addButton({
-      title: 'Save Tiling',
-    }).on('click', () => this.saveTiling());
-
-    this.pane.addButton({
-      title: 'Load Tiling',
-    }).on('click', () => this.triggerLoadTiling());
 
     const constantsBlock = document.createElement('div');
     constantsBlock.className = 'constants-block';
@@ -369,7 +375,7 @@ class TileEditor {
     });
     this.constantsInput = constantsInput;
     constantsBlock.append(constantsLabel, constantsInput);
-    this.pane.element.appendChild(constantsBlock);
+    tilingFolder.element.appendChild(constantsBlock);
     this.refreshConstants();
   }
 

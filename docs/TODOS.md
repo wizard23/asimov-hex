@@ -487,25 +487,33 @@ Is there a different code path for closed and non closed polygons? What about po
 
 
 
-Please group the existing controls in the "Editor Controls" into folders in this order
+Please group all the existing controls in the "Editor Controls" into folders in this order
 
-* "Commands" consisting of all buttons
-  * "Save Tiling"
-  * "Load Tiling"
+* "Commands" folder consisting of all buttons
+  * Center View
+  * Save Tiling
+  * Load Tiling
 
-* A "View" folder consisting of:
+* "Tiling" folder:  
+  * Number of Sides
+  * Side Length Expr
+  * Constants
+
+* "View" folder:
   * Scale
   * View Offset
 
-* Number of sides
-* Side Length Expr
+3. "Gui Settings" folder
+   * Edge Width
+   * Draw Axes
+   * Axes Color
 
-2. Application Settings. 
+* "Advanced/Debug" folder that for now only contains:
+  * "Closed Polygon Epsilon"
 
-* An "Advanced/Debug" folder that only contains the "Closed Polygon Epsilon" for now
 
-3. Gui Settings
-* all colors and line widths.
+Did I forget anything?
+If anything is unclear please just ask.
 
 
 I want clean functionality for detecting
