@@ -61,6 +61,35 @@
       margin-bottom: 20px;
       color: #fff;
     }
+    #timeline-panel.timeline-mode {
+      padding: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #timeline-panel.timeline-mode h2 {
+      margin-bottom: 12px;
+    }
+    .timeline-canvas-container {
+      flex: 1;
+      position: relative;
+      border: 1px solid #555;
+      border-radius: 8px;
+      background: rgba(20, 20, 20, 0.9);
+      overflow: hidden;
+    }
+    #timeline-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .timeline-info {
+      margin-top: 12px;
+    }
+    .commit-item-empty {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+    }
     .commit-item {
       background: rgba(50, 50, 50, 0.8);
       padding: 15px;
