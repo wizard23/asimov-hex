@@ -1,4 +1,5 @@
 import { Graphics } from "pixi.js";
+import { DRAW_CONFIG } from "./draw-config";
 import { Point } from "./types";
 
 export function drawPolygonPath(
@@ -34,7 +35,7 @@ export function drawDottedConnection(
   const dy = end.y - start.y;
   const length = Math.hypot(dx, dy);
   if (length === 0) return;
-  const dashLength = Math.max(width * 2, 4 / scale);
+  const dashLength = Math.max(width * DRAW_CONFIG.dottedDash.widthFactor, DRAW_CONFIG.dottedDash.minPx / scale);
   const gapLength = dashLength;
   const step = dashLength + gapLength;
   const ux = dx / length;
@@ -60,7 +61,7 @@ export function drawDashedPath(
   scale: number
 ): void {
   if (points.length < 2) return;
-  const dashLength = Math.max(width * 3, 6 / scale);
+  const dashLength = Math.max(width * DRAW_CONFIG.dashedDash.widthFactor, DRAW_CONFIG.dashedDash.minPx / scale);
   const gapLength = dashLength;
   const pattern = dashLength + gapLength;
   const offsetNorm = ((dashOffset % pattern) + pattern) % pattern;

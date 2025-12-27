@@ -4,6 +4,7 @@ import type { FederatedPointerEvent } from 'pixi.js';
 import { pointsCloseEuclidean } from '../../core/utils/geometry';
 import { ExpressionParser } from './expression-parser';
 import { pointInPolygon, pointNearPolyline, translatePoints } from './geometry-helpers';
+import { DRAW_CONFIG } from './draw-config';
 import { drawDashedPath, drawDottedConnection, drawLetter, drawPolygonPath } from './render-helpers';
 import { setupValuesToggle } from './ui-helpers';
 import { Point } from './types';
@@ -105,17 +106,17 @@ class TileEditor {
     side: HTMLElement[];
     angle: HTMLElement[];
   } = { description: null, side: [], angle: [] };
-  private readonly scaleBounds = { min: 1, max: 200 };
+  private readonly scaleBounds = { ...DRAW_CONFIG.scaleBounds };
   private config: EditorConfig = {
-    scale: 100,
+    scale: DRAW_CONFIG.defaultScale,
     numSides: 4,
     sideLengthExpression: '1',
     constantsText: '',
-    edgeWidth: 2,
+    edgeWidth: DRAW_CONFIG.defaultEdgeWidth,
     drawAxes: true,
-    axesColor: '#444444',
-    axesLineWidth: 1,
-    closedPolygonEpsilon: 1e-4,
+    axesColor: DRAW_CONFIG.defaultAxesColor,
+    axesLineWidth: DRAW_CONFIG.defaultAxesLineWidth,
+    closedPolygonEpsilon: DRAW_CONFIG.defaultClosedPolygonEpsilon,
     viewOffset: { x: 0, y: 0 },
   };
   private displayContainer: HTMLElement;
@@ -175,7 +176,7 @@ class TileEditor {
 
     this.app = new Application();
     await this.app.init({
-      background: '#1a1a1a',
+      background: DRAW_CONFIG.backgroundColor,
       resizeTo: container,
       antialias: true,
     });
@@ -1059,14 +1060,17 @@ class TileEditor {
 
       const labelX = new Graphics();
       const labelY = new Graphics();
-      const fontSize = 12 / this.config.scale;
-      const strokeWidth = Math.max(1 / this.config.scale, fontSize * 0.12);
+      const fontSize = DRAW_CONFIG.labelFontSizePx / this.config.scale;
+      const strokeWidth = Math.max(
+        DRAW_CONFIG.labelStrokeMinPx / this.config.scale,
+        fontSize * DRAW_CONFIG.labelStrokeScale
+      );
       drawLetter(labelX, 'X', fontSize, colorValue, strokeWidth);
       drawLetter(labelY, 'Y', fontSize, colorValue, strokeWidth);
-      labelX.x = xAxisDisplay.x + fontSize * 0.2;
-      labelX.y = xAxisDisplay.y - fontSize * 0.6;
-      labelY.x = yAxisDisplay.x - fontSize * 0.6;
-      labelY.y = yAxisDisplay.y - fontSize * 1.2;
+      labelX.x = xAxisDisplay.x + fontSize * DRAW_CONFIG.axisLabelOffsets.x.dx;
+      labelX.y = xAxisDisplay.y + fontSize * DRAW_CONFIG.axisLabelOffsets.x.dy;
+      labelY.x = yAxisDisplay.x + fontSize * DRAW_CONFIG.axisLabelOffsets.y.dx;
+      labelY.y = yAxisDisplay.y + fontSize * DRAW_CONFIG.axisLabelOffsets.y.dy;
       this.previewGraphics.addChild(labelX);
       this.previewGraphics.addChild(labelY);
   }
@@ -1185,11 +1189,21 @@ class TileEditor {
   private drawPolygonInstance(poly: PolygonData) {
       const isSelected = this.selectedPolygon === poly;
       const hasError = poly.description.hasError;
-      const color = poly.isHovered ? 0x4a9eff : hasError ? 0x661111 : 0x444444;
-      const alpha = poly.isClosed && !hasError ? 0.8 : 0;
-      const baseStroke = hasError ? 0xff4d4d : poly.isClosed ? 0xffffff : 0xff4d4d;
-      const strokeColor = (poly.isHovered && !isSelected) ? 0xffd24d : baseStroke;
-      const openStrokeColor = 0xff4d4d;
+      const color = poly.isHovered
+        ? DRAW_CONFIG.polygonFillColors.hover
+        : hasError
+          ? DRAW_CONFIG.polygonFillColors.error
+          : DRAW_CONFIG.polygonFillColors.normal;
+      const alpha = poly.isClosed && !hasError ? DRAW_CONFIG.polygonFillAlpha : 0;
+      const baseStroke = hasError
+        ? DRAW_CONFIG.polygonStrokeColors.error
+        : poly.isClosed
+          ? DRAW_CONFIG.polygonStrokeColors.closed
+          : DRAW_CONFIG.polygonStrokeColors.error;
+      const strokeColor = (poly.isHovered && !isSelected)
+        ? DRAW_CONFIG.polygonStrokeColors.hover
+        : baseStroke;
+      const openStrokeColor = DRAW_CONFIG.polygonStrokeColors.error;
       
       drawPolygonPath(
         poly.graphics,
@@ -1221,8 +1235,8 @@ class TileEditor {
             poly.graphics,
             poly.points,
             { x: poly.x, y: poly.y },
-            0x000000,
-            0xffffff,
+            DRAW_CONFIG.selectionStrokeColors.primary,
+            DRAW_CONFIG.selectionStrokeColors.secondary,
             this.getStrokeWidth(),
             poly.isClosed,
             this.dashOffset,
@@ -1685,8 +1699,11 @@ class TileEditor {
     if (!this.selectedPolygon) return;
     const labels = this.buildVertexLabels(this.selectedPolygon.description.sides);
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.description.sides);
-    const fontSize = 12 / this.config.scale;
-    const strokeWidth = Math.max(1 / this.config.scale, fontSize * 0.12);
+    const fontSize = DRAW_CONFIG.labelFontSizePx / this.config.scale;
+    const strokeWidth = Math.max(
+      DRAW_CONFIG.labelStrokeMinPx / this.config.scale,
+      fontSize * DRAW_CONFIG.labelStrokeScale
+    );
     const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
     centroid.x /= points.length;
     centroid.y /= points.length;
@@ -1695,12 +1712,12 @@ class TileEditor {
       const len = Math.hypot(dir.x, dir.y) || 1;
       const offset = { x: (dir.x / len) * fontSize, y: (dir.y / len) * fontSize };
       const label = new Graphics();
-      drawLetter(label, labels[index], fontSize, 0xffd24d, strokeWidth);
+      drawLetter(label, labels[index], fontSize, DRAW_CONFIG.labelColor, strokeWidth);
       if (!this.selectedPolygon) {
         throw new Error('Selected polygon missing while updating labels.');
       }
-      label.x = this.selectedPolygon.x + point.x + offset.x - fontSize * 0.5;
-      label.y = this.selectedPolygon.y + point.y + offset.y - fontSize * 0.5;
+      label.x = this.selectedPolygon.x + point.x + offset.x - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
+      label.y = this.selectedPolygon.y + point.y + offset.y - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
       this.labelContainer.addChild(label);
     });
   }
