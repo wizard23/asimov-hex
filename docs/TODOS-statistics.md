@@ -14,3 +14,9 @@ The intended logic is this:
 
 
 Please make the "Project Statistics" more compact such that it does not take up so much screen height
+
+please look at the stats script in package.json and include this information in the generated statistic json files. 
+Then display these values on the statistics page.
+
+
+great. please add number of tracked directories and also add seperators that ensure that it is easy to parse
