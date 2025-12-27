@@ -180,6 +180,22 @@ class StatisticsViewer {
             <div class="stat-item-value">${data.totals.bytes !== undefined ? data.totals.bytes.toLocaleString() : 'unknown'}</div>
           </div>
           <div class="stat-item">
+            <div class="stat-item-label">Total Commit Count</div>
+            <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.totalCommitCount)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-label">Tracked File Count</div>
+            <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.trackedFileCount)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-label">Tracked Dir Count</div>
+            <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.trackedDirCount)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-label">Tracked Content Bytes</div>
+            <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.trackedContentBytes)}</div>
+          </div>
+          <div class="stat-item">
             <div class="stat-item-label">Date</div>
             <div class="stat-item-value left">${timestamp}</div>
           </div>
@@ -352,13 +368,17 @@ function renderRepoSizeMetrics(metrics?: RepoSizeMetrics): string {
 
     <div class="stats-subtitle">Largest Blobs</div>
     ${renderStatsTable(
-      metrics.largestBlobs.map(blob => [blob.path, blob.sizeBytes]),
+      [...metrics.largestBlobs]
+        .sort((a, b) => b.sizeBytes - a.sizeBytes)
+        .map(blob => [blob.path, blob.sizeBytes]),
       { leftLabel: 'Path', rightLabel: 'Size (Bytes)' }
     )}
 
     <div class="stats-subtitle">Top Level Directories</div>
     ${renderStatsTable(
-      metrics.diskUsage.topLevelDirs.map(dir => [dir.path, dir.sizeBytes]),
+      [...metrics.diskUsage.topLevelDirs]
+        .sort((a, b) => b.sizeBytes - a.sizeBytes)
+        .map(dir => [dir.path, dir.sizeBytes]),
       { leftLabel: 'Path', rightLabel: 'Size (Bytes)' }
     )}
   `;
@@ -397,6 +417,13 @@ function formatValue(value: string | number): string {
     return value.toLocaleString();
   }
   return escapeHtml(value);
+}
+
+function formatOptionalNumber(value?: number): string {
+  if (value === undefined) {
+    return 'unknown';
+  }
+  return value.toLocaleString();
 }
 
 function escapeHtml(value: string): string {

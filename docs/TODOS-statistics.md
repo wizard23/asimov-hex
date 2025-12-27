@@ -36,3 +36,16 @@ Then please:
 * update the statistics page to show this data to the user.
 
 If anything is unclear please just ask.
+
+
+Pleae show in the Overview:
+* Total Commit Count
+* Tracked File Count
+* Tracked Dir Count
+* Tracked Content Bytes
+
+Sort the Top Level Directories and the largest blobs by size (desc)
+
+
+Please move the date from the overview to the header like so: Project Statistics — 2025/12/27 20:08:50
+
