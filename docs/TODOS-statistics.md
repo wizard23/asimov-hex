@@ -180,3 +180,6 @@ The units label says: "units: decade/year"
 
 Just in case that's relevant: the commits I use span a time interval of just 5 days.
 
+
+Pleas give me a list of all remaining code that comes from either failed attempts to fix the bugs or debugging code added for finding things out.
+

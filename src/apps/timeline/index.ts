@@ -27,7 +27,6 @@ class TimelineViewer {
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
   private timelineLineGraphics: Graphics | null = null;
-  private timelineDebugGraphics: Graphics | null = null;
   private timelineScaleGraphics: Graphics | null = null;
   private timelineHoverGraphics: Graphics | null = null;
   private timelineTextContainer: Container | null = null;
@@ -43,7 +42,6 @@ class TimelineViewer {
   private timelineRange = { startMs: 0, endMs: 0 };
   private timelineInfoContainer: HTMLElement | null = null;
   private hoveredCommit: Commit | null = null;
-  private hoverDebugElement: HTMLElement | null = null;
   private readonly timelineScaleHeight = 50;
   private readonly timelineLineOffset = 40;
   
@@ -57,7 +55,6 @@ class TimelineViewer {
 
   constructor() {
     this.timelinePanel = document.getElementById('timeline-panel')!;
-    this.hoverDebugElement = document.getElementById('hover-debug');
     this.init();
   }
 
@@ -302,20 +299,17 @@ class TimelineViewer {
 
     this.timelineScaleGraphics = new Graphics();
     this.timelineLineGraphics = new Graphics();
-    this.timelineDebugGraphics = new Graphics();
     this.timelineGraphics = new Graphics();
     this.timelineHoverGraphics = new Graphics();
     this.timelineTextContainer = new Container();
 
     this.timelineScaleGraphics.zIndex = 1;
-    this.timelineDebugGraphics.zIndex = 2;
-    this.timelineLineGraphics.zIndex = 3;
-    this.timelineGraphics.zIndex = 4;
-    this.timelineHoverGraphics.zIndex = 5;
-    this.timelineTextContainer.zIndex = 6;
+    this.timelineLineGraphics.zIndex = 2;
+    this.timelineGraphics.zIndex = 3;
+    this.timelineHoverGraphics.zIndex = 4;
+    this.timelineTextContainer.zIndex = 5;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
-    this.timelineApp.stage.addChild(this.timelineDebugGraphics);
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
     this.timelineApp.stage.addChild(this.timelineHoverGraphics);
@@ -366,7 +360,6 @@ class TimelineViewer {
     }
     this.timelineGraphics = null;
     this.timelineLineGraphics = null;
-    this.timelineDebugGraphics = null;
     this.timelineScaleGraphics = null;
     this.timelineHoverGraphics = null;
     this.timelineTextContainer = null;
@@ -530,12 +523,6 @@ class TimelineViewer {
       this.timelineInfoContainer = document.getElementById('timeline-info');
     }
 
-    if (this.hoverDebugElement) {
-      this.hoverDebugElement.textContent = this.hoveredCommit
-        ? this.hoveredCommit.hash
-        : 'not hovering over a commit';
-    }
-
     if (!this.timelineInfoContainer) return;
     this.timelineInfoContainer.innerHTML = this.renderCommitInfo(this.hoveredCommit);
     if (this.hoveredCommit) {
@@ -555,7 +542,7 @@ class TimelineViewer {
   }
 
   private drawTimeline() {
-    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics || !this.timelineDebugGraphics) {
+    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics) {
       return;
     }
 
@@ -569,14 +556,6 @@ class TimelineViewer {
     this.timelineLineGraphics.moveTo(startX, lineY);
     this.timelineLineGraphics.lineTo(endX, lineY);
     this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
-
-    this.timelineDebugGraphics.clear();
-    this.timelineDebugGraphics.moveTo(startX, lineY - 12);
-    this.timelineDebugGraphics.lineTo(endX, lineY - 12);
-    this.timelineDebugGraphics.stroke({ color: 0xffd84a, width: 1, alpha: 1 });
-    this.timelineDebugGraphics.moveTo(startX, lineY + 12);
-    this.timelineDebugGraphics.lineTo(endX, lineY + 12);
-    this.timelineDebugGraphics.stroke({ color: 0xff5bb3, width: 1, alpha: 1 });
 
     this.timelineGraphics.clear();
 
