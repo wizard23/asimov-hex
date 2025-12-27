@@ -199,7 +199,7 @@ class GridApp {
     };
     
     const githubLink = document.createElement('a');
-    githubLink.href = 'https://github.com/example/asimov-hex';
+    githubLink.href = 'https://github.com/wizard23/asimov-hex';
     githubLink.textContent = '🔗 GitHub Repository';
     githubLink.target = '_blank';
     githubLink.rel = 'noopener noreferrer';

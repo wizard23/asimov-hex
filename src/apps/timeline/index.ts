@@ -27,9 +27,12 @@ class TimelineViewer {
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
   private timelineLineGraphics: Graphics | null = null;
+  private timelineChangeGraphics: Graphics | null = null;
+  private timelineChangeScaleGraphics: Graphics | null = null;
   private timelineScaleGraphics: Graphics | null = null;
   private timelineHoverGraphics: Graphics | null = null;
   private timelineTextContainer: Container | null = null;
+  private timelineChangeTextContainer: Container | null = null;
   private timelineResizeObserver: ResizeObserver | null = null;
   private timelineViewOffset = { x: 0, y: 0 };
   private timelineViewOffsetStart = { x: 0, y: 0 };
@@ -44,6 +47,8 @@ class TimelineViewer {
   private hoveredCommit: Commit | null = null;
   private readonly timelineScaleHeight = 50;
   private readonly timelineLineOffset = 40;
+  private readonly timelineChangeMaxHeight = 80;
+  private readonly timelineChangeScaleRightPadding = 24;
   
   private config = {
     startDate: '',
@@ -299,21 +304,30 @@ class TimelineViewer {
 
     this.timelineScaleGraphics = new Graphics();
     this.timelineLineGraphics = new Graphics();
+    this.timelineChangeGraphics = new Graphics();
+    this.timelineChangeScaleGraphics = new Graphics();
     this.timelineGraphics = new Graphics();
     this.timelineHoverGraphics = new Graphics();
     this.timelineTextContainer = new Container();
+    this.timelineChangeTextContainer = new Container();
 
     this.timelineScaleGraphics.zIndex = 1;
     this.timelineLineGraphics.zIndex = 2;
-    this.timelineGraphics.zIndex = 3;
-    this.timelineHoverGraphics.zIndex = 4;
-    this.timelineTextContainer.zIndex = 5;
+    this.timelineChangeGraphics.zIndex = 3;
+    this.timelineGraphics.zIndex = 4;
+    this.timelineHoverGraphics.zIndex = 5;
+    this.timelineChangeScaleGraphics.zIndex = 6;
+    this.timelineTextContainer.zIndex = 7;
+    this.timelineChangeTextContainer.zIndex = 8;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
+    this.timelineApp.stage.addChild(this.timelineChangeGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
     this.timelineApp.stage.addChild(this.timelineHoverGraphics);
+    this.timelineApp.stage.addChild(this.timelineChangeScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineTextContainer);
+    this.timelineApp.stage.addChild(this.timelineChangeTextContainer);
 
     this.timelineApp.stage.on('pointerdown', (e: FederatedPointerEvent) => {
       this.handleTimelinePointerDown(e);
@@ -360,9 +374,12 @@ class TimelineViewer {
     }
     this.timelineGraphics = null;
     this.timelineLineGraphics = null;
+    this.timelineChangeGraphics = null;
+    this.timelineChangeScaleGraphics = null;
     this.timelineScaleGraphics = null;
     this.timelineHoverGraphics = null;
     this.timelineTextContainer = null;
+    this.timelineChangeTextContainer = null;
     this.timelineCommitPoints = [];
     this.timelineInfoContainer = null;
     this.hoveredCommit = null;
@@ -542,7 +559,7 @@ class TimelineViewer {
   }
 
   private drawTimeline() {
-    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics) {
+    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics || !this.timelineChangeGraphics || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) {
       return;
     }
 
@@ -556,6 +573,9 @@ class TimelineViewer {
     this.timelineLineGraphics.moveTo(startX, lineY);
     this.timelineLineGraphics.lineTo(endX, lineY);
     this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
+
+    this.timelineChangeGraphics.clear();
+    this.drawChangeLines(lineY);
 
     this.timelineGraphics.clear();
 
@@ -580,6 +600,7 @@ class TimelineViewer {
     }
 
     this.drawScale();
+    this.drawChangeScale(lineY);
     this.drawHoverCommit();
   }
 
@@ -610,6 +631,92 @@ class TimelineViewer {
 
     if (visibleRange.startMs > endMs || visibleRange.endMs < startMs) {
       return;
+    }
+  }
+
+  private drawChangeLines(lineY: number) {
+    if (!this.timelineChangeGraphics) return;
+
+    const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
+    const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
+    const maxValue = Math.max(maxAdded, maxRemoved, 1);
+
+    const valueToHeight = (value: number) => {
+      const clamped = Math.max(0, value);
+      const scaled = Math.log10(1 + clamped) / Math.log10(1 + maxValue);
+      return scaled * this.timelineChangeMaxHeight;
+    };
+
+    this.timelineChangeGraphics.clear();
+    for (const commit of this.filteredCommits) {
+      const commitMs = commit.timestamp * 1000;
+      const worldX = (commitMs - this.timelineRange.startMs) / 1000;
+      const screen = this.worldToScreen(worldX, 0);
+      const height = valueToHeight(commit.addedLines);
+      if (height <= 0) continue;
+      this.timelineChangeGraphics.moveTo(screen.x, lineY);
+      this.timelineChangeGraphics.lineTo(screen.x, lineY - height);
+    }
+    this.timelineChangeGraphics.stroke({ color: 0x3ddc6f, width: 2, alpha: 0.9 });
+
+    for (const commit of this.filteredCommits) {
+      const commitMs = commit.timestamp * 1000;
+      const worldX = (commitMs - this.timelineRange.startMs) / 1000;
+      const screen = this.worldToScreen(worldX, 0);
+      const height = valueToHeight(commit.removedLines);
+      if (height <= 0) continue;
+      this.timelineChangeGraphics.moveTo(screen.x, lineY);
+      this.timelineChangeGraphics.lineTo(screen.x, lineY + height);
+    }
+    this.timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
+  }
+
+  private drawChangeScale(lineY: number) {
+    if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) return;
+
+    const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
+    const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
+    const maxValue = Math.max(maxAdded, maxRemoved, 1);
+    const axisX = this.timelineApp.screen.width - this.timelineChangeScaleRightPadding;
+    const height = this.timelineChangeMaxHeight;
+
+    this.timelineChangeScaleGraphics.clear();
+    this.timelineChangeScaleGraphics.lineStyle(1, 0x8a8a8a, 0.9);
+    this.timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
+    this.timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
+    this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+
+    this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
+
+    const ticks = [1, 10, 100, 1000, 10000, 100000];
+    const labelStyle = new TextStyle({ fill: 0xcfcfcf, fontSize: 12 });
+    const valueToHeight = (value: number) => {
+      const scaled = Math.log10(1 + value) / Math.log10(1 + maxValue);
+      return scaled * height;
+    };
+
+    for (const tick of ticks) {
+      if (tick > maxValue) continue;
+      const offset = valueToHeight(tick);
+      this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
+      this.timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
+      this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
+      this.timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
+    }
+    this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+
+    for (const tick of ticks) {
+      if (tick > maxValue) continue;
+      const offset = valueToHeight(tick);
+      const labelUp = new Text(`${tick}`, labelStyle);
+      labelUp.x = axisX - 8 - labelUp.width;
+      labelUp.y = lineY - offset - labelUp.height / 2;
+      this.timelineChangeTextContainer.addChild(labelUp);
+
+      const labelDown = new Text(`${tick}`, labelStyle);
+      labelDown.x = axisX - 8 - labelDown.width;
+      labelDown.y = lineY + offset - labelDown.height / 2;
+      this.timelineChangeTextContainer.addChild(labelDown);
     }
   }
 

@@ -183,3 +183,10 @@ Just in case that's relevant: the commits I use span a time interval of just 5 d
 
 Pleas give me a list of all remaining code that comes from either failed attempts to fix the bugs or debugging code added for finding things out.
 
+
+Please add a green and a red line at each commit
+the green line represents lines added and points up
+the red line represents lines removed and points down
+
+Use a logarithmic scale for these lines and also show a scale for these on the right side of the screen.
+
