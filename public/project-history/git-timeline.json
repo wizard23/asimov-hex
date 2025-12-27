@@ -1,5 +1,131 @@
 [
   {
+    "hash": "7686cf62390c495f5d06c6ecc6388d9b81fccb75",
+    "timestamp": 1766876835,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added per‑commit change bars and a right‑side logarithmic scale",
+    "addedLines": 119,
+    "removedLines": 5
+  },
+  {
+    "hash": "d9dfb73c5091582a4a62be54c12161c569aa2d76",
+    "timestamp": 1766875185,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Removed all debug/failed‑attempt artifacts",
+    "addedLines": 8,
+    "removedLines": 40
+  },
+  {
+    "hash": "ad052a28dab3f641874f6f07609a2ebda1c1d5c7",
+    "timestamp": 1766874413,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "larger font size and disks for commits",
+    "addedLines": 3,
+    "removedLines": 3
+  },
+  {
+    "hash": "346d0bd690756ee7bfafab6a741a78b5d1047c70",
+    "timestamp": 1766873812,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": " removed the debug square/labels and fixed the unit selection logic so it picks the smallest unit that still has enough spacing",
+    "addedLines": 9,
+    "removedLines": 24
+  },
+  {
+    "hash": "387f7608563d2a4f87198a53e0719316fa2c3d02",
+    "timestamp": 1766873526,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "debugging with codex :) very interesting ai human interaction :))",
+    "addedLines": 22,
+    "removedLines": 1
+  },
+  {
+    "hash": "8d1b398f5b8321398fb1f40a3cf320468e9e4c9d",
+    "timestamp": 1766873176,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added a hardcoded red square and “SCALE” label at the top-left of the scale layer so we can confirm whether text and scale graphics are actually rendering at all. (yes! it works :)))",
+    "addedLines": 9,
+    "removedLines": 1
+  },
+  {
+    "hash": "2b1d31b06eb69e27d6297e97ad5bfcba37b382c7",
+    "timestamp": 1766872993,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "added explicit tick rectangles and moved labels to a simple top-left horizontal position (no rotation). This should make both subdivisions and labels visible for debugging. (but it does not. the tick marks and the labels still don't show up so the bug remains and it looks identically visually)",
+    "addedLines": 12,
+    "removedLines": 6
+  },
+  {
+    "hash": "8faeed69e9222ff59e545bbe6cb93252764502c9",
+    "timestamp": 1766872792,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Switched the timeline and scale drawing to Pixi v8’s stroke() API (same pattern used in tile-editor).",
+    "addedLines": 24,
+    "removedLines": 5
+  },
+  {
+    "hash": "9799146144303e5fc84e482f93dbb70c78c0cfa2",
+    "timestamp": 1766872418,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "after detailed debugging instructions by human: Split the timeline drawing into separate Pixi Graphics layers so line colors don’t bleed (but is does not work but shows the bug: lines are not visible at all. only the disks of the commit are visible now)",
+    "addedLines": 26,
+    "removedLines": 14
+  },
+  {
+    "hash": "2206ad5e26eac6cae2e1ea56042714679d88c1ca",
+    "timestamp": 1766871971,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human debugging instructions: Added the two debug lines parallel to the timeline: yellow above and pink below (bug: but they are not they all have the same color)",
+    "addedLines": 26,
+    "removedLines": 1
+  },
+  {
+    "hash": "49f10dfef6f3fa12a7ca738fb743c7be1371ad38",
+    "timestamp": 1766871363,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix hover bug in timeline with human debugging instructions :)",
+    "addedLines": 31,
+    "removedLines": 1
+  },
+  {
+    "hash": "9782f2e9e37a37f662ad4fb664d8e107bd41358e",
+    "timestamp": 1766870628,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: drafting timeline prompts",
+    "addedLines": 29,
+    "removedLines": 0
+  },
+  {
+    "hash": "7d5c14a37ae147721716a37fb7a7c9b0866830ea",
+    "timestamp": 1766869614,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "trying to fix the bugs but it still does not work",
+    "addedLines": 28,
+    "removedLines": 2
+  },
+  {
+    "hash": "38246cd21994ab2e77d82aedad285bb67bb15b9f",
+    "timestamp": 1766869395,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "trying to fix the bugs. Hovering works now a bit but only when zooming is triggered.",
+    "addedLines": 435,
+    "removedLines": 7
+  },
+  {
     "hash": "438908d7ca877ff8014f474a5094365cffbf9c7c",
     "timestamp": 1766868206,
     "authorName": "Philipp Tiefenbacher",
