@@ -345,20 +345,13 @@ class TileEditor {
       this.centerViewToPolygons();
     });
 
-    const saveLoadRow = document.createElement('div');
-    saveLoadRow.className = 'constants-block';
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save Tiling';
-    saveButton.className = 'constants-button';
-    saveButton.style.cursor = 'pointer';
-    saveButton.addEventListener('click', () => this.saveTiling());
-    const loadButton = document.createElement('button');
-    loadButton.textContent = 'Load Tiling';
-    loadButton.className = 'constants-button';
-    loadButton.style.cursor = 'pointer';
-    loadButton.addEventListener('click', () => this.triggerLoadTiling());
-    saveLoadRow.append(saveButton, loadButton);
-    this.pane.element.appendChild(saveLoadRow);
+    this.pane.addButton({
+      title: 'Save Tiling',
+    }).on('click', () => this.saveTiling());
+
+    this.pane.addButton({
+      title: 'Load Tiling',
+    }).on('click', () => this.triggerLoadTiling());
 
     const constantsBlock = document.createElement('div');
     constantsBlock.className = 'constants-block';

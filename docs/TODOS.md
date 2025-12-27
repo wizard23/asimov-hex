@@ -479,10 +479,42 @@ Please Identify any other hardcoded values that determine how anything appears t
 
 
 
+There is functionality in the tile editor to detect when the user hovers with the mouse over a polygon. How is this determined? What counts as hovering in the current implementation?
+
+You said "The point is close to any polygon edge (pointNearPolyline) with closePath = true."
+Is there a different code path for closed and non closed polygons? What about polygons that failed to solve?
 
 
 
 
+Please group the existing controls in the "Editor Controls" into folders in this order
+
+* "Commands" consisting of all buttons
+  * "Save Tiling"
+  * "Load Tiling"
+
+* A "View" folder consisting of:
+  * Scale
+  * View Offset
+
+* Number of sides
+* Side Length Expr
+
+2. Application Settings. 
+
+* An "Advanced/Debug" folder that only contains the "Closed Polygon Epsilon" for now
+
+3. Gui Settings
+* all colors and line widths.
+
+
+I want clean functionality for detecting
+* if the mouse hovers over a polygon
+* if the mouse hovers over an edge
+* if the mouse hovers over a vertex
+
+Please add the following functionality:
+* When the user 
 
 
 
