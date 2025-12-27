@@ -101,13 +101,16 @@
     .stat-item-value.left {
       text-align: left;
     }
-    .file-type-table {
+    .file-type-table,
+    .stats-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
     .file-type-table th,
-    .file-type-table td {
+    .file-type-table td,
+    .stats-table th,
+    .stats-table td {
       padding: 8px;
       text-align: left;
       border-bottom: 1px solid #555;
@@ -115,7 +118,11 @@
     .file-type-table .num {
       text-align: right;
     }
-    .file-type-table th {
+    .stats-table .num {
+      text-align: right;
+    }
+    .file-type-table th,
+    .stats-table th {
       background: rgba(50, 50, 50, 0.8);
       color: #fff;
       font-weight: 600;
@@ -123,15 +130,25 @@
       font-size: 12px;
       letter-spacing: 0.5px;
     }
-    .file-type-table td {
+    .file-type-table td,
+    .stats-table td {
       color: #e0e0e0;
     }
-    .file-type-table tr:hover {
+    .file-type-table tr:hover,
+    .stats-table tr:hover {
       background: rgba(60, 60, 60, 0.5);
     }
     .file-type-table .file-type {
       font-weight: 600;
       color: #4a9eff;
+    }
+    .stats-subtitle {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: #bdbdbd;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .excluded-list {
       margin-top: 10px;

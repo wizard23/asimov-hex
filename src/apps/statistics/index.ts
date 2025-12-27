@@ -1,4 +1,5 @@
 import { Pane } from 'tweakpane';
+import type { RepoSizeMetrics } from './types';
 
 interface FileTypeStats {
   fileType: string;
@@ -13,6 +14,7 @@ interface ProjectStatistics {
   fileTypes: FileTypeStats[];
   excludedFolders: string[];
   excludedFiles: string[];
+  repoSizeMetrics?: RepoSizeMetrics;
   totals: {
     files: number;
     lines: number;
@@ -221,6 +223,11 @@ class StatisticsViewer {
           ${renderExcludedList(data.excludedFiles)}
         </div>
       </div>
+
+      <div class="stat-section">
+        <h3>Repo Statistics</h3>
+        ${renderRepoSizeMetrics(data.repoSizeMetrics)}
+      </div>
     `;
   }
 }
@@ -299,4 +306,104 @@ function renderExcludedList(items?: string[]): string {
       ${items.map(item => `<li>${item}</li>`).join('')}
     </ul>
   `;
+}
+
+function renderRepoSizeMetrics(metrics?: RepoSizeMetrics): string {
+  if (!metrics) {
+    return `<div class="excluded-empty">unknown</div>`;
+  }
+
+  return `
+    <div class="stats-subtitle">Metadata</div>
+    ${renderStatsTable([
+      ['Format Version', metrics.version],
+      ['Timestamp (UTC)', metrics.timestamp],
+      ['Head Commit', metrics.repo.headCommit],
+      ['Head Branch', metrics.repo.headBranch],
+    ])}
+
+    <div class="stats-subtitle">Intrinsic</div>
+    ${renderStatsTable([
+      ['Commit Count', metrics.intrinsic.commitCount],
+      ['Total Commit Count', metrics.intrinsic.totalCommitCount],
+      ['Tracked File Count', metrics.intrinsic.trackedFileCount],
+      ['Tracked Dir Count', metrics.intrinsic.trackedDirCount],
+      ['Tracked Content Bytes', metrics.intrinsic.trackedContentBytes],
+    ])}
+
+    <div class="stats-subtitle">Git Objects</div>
+    ${renderStatsTable([
+      ['Loose Object Count', metrics.gitObjects.looseObjectCount],
+      ['Loose Object Size (KiB)', metrics.gitObjects.looseObjectSizeKiB],
+      ['Packed Object Count', metrics.gitObjects.packedObjectCount],
+      ['Packfile Count', metrics.gitObjects.packfileCount],
+      ['Packfile Size (KiB)', metrics.gitObjects.packfileSizeKiB],
+      ['Prune Packable Size (KiB)', metrics.gitObjects.prunePackableSizeKiB],
+      ['Garbage Object Count', metrics.gitObjects.garbageObjectCount],
+      ['Garbage Size (KiB)', metrics.gitObjects.garbageSizeKiB],
+    ])}
+
+    <div class="stats-subtitle">Disk Usage</div>
+    ${renderStatsTable([
+      ['Worktree Bytes', metrics.diskUsage.worktreeBytes],
+      ['Worktree Excluding Git Bytes', metrics.diskUsage.worktreeExcludingGitBytes],
+      ['Git Dir Bytes', metrics.diskUsage.gitDirBytes],
+    ])}
+
+    <div class="stats-subtitle">Largest Blobs</div>
+    ${renderStatsTable(
+      metrics.largestBlobs.map(blob => [blob.path, blob.sizeBytes]),
+      { leftLabel: 'Path', rightLabel: 'Size (Bytes)' }
+    )}
+
+    <div class="stats-subtitle">Top Level Directories</div>
+    ${renderStatsTable(
+      metrics.diskUsage.topLevelDirs.map(dir => [dir.path, dir.sizeBytes]),
+      { leftLabel: 'Path', rightLabel: 'Size (Bytes)' }
+    )}
+  `;
+}
+
+function renderStatsTable(
+  rows: Array<[string, string | number]>,
+  headers: { leftLabel: string; rightLabel: string } = { leftLabel: 'Metric', rightLabel: 'Value' }
+): string {
+  if (rows.length === 0) {
+    return `<div class="excluded-empty">(none)</div>`;
+  }
+
+  return `
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>${escapeHtml(headers.leftLabel)}</th>
+          <th class="num">${escapeHtml(headers.rightLabel)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(([label, value]) => `
+          <tr>
+            <td>${escapeHtml(label)}</td>
+            <td class="num">${formatValue(value)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function formatValue(value: string | number): string {
+  if (typeof value === 'number') {
+    return value.toLocaleString();
+  }
+  return escapeHtml(value);
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

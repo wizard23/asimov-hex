@@ -9,7 +9,7 @@
     "test": "vitest run",
     "lint": "eslint .",
     "verify": "npm run test && npm run lint && npm run build && echo 'Verification was successful :)'",
-    "stats": "du -sh . && du -sh --exclude=.git . && du -sh .git && git count-objects -vH",
+    "stats": "scripts/repo-statistics.sh",
     "create-project-statistics": "tsx scripts/create-project-statistics.ts",
     "re-create-git-timeline": "tsx scripts/re-create-git-timeline.ts"
   },

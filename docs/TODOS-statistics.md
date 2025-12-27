@@ -20,3 +20,19 @@ Then display these values on the statistics page.
 
 
 great. please add number of tracked directories and also add seperators that ensure that it is easy to parse
+
+
+I was not very happy with my simple statistics script in package.json so I reverted your last changes.
+I created a new shell script that generates the repo statistics in an easy to parse format. 
+please look at the script in scripts/repo-statistics.sh
+You can run it to see what it outputs
+
+Then please look at the data structure that is meant to contain the parsed data
+src/apps/statistics/types.ts
+
+Then please:
+* update the package.json stats script with a call of the new script.
+* update the scripts/create-project-statistics.ts to run the script and parse the data.
+* update the statistics page to show this data to the user.
+
+If anything is unclear please just ask.

@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import { readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, basename } from 'path';
+import type { RepoSizeMetrics } from '../src/apps/statistics/types';
 
 interface FileStats {
   fileType: string;
@@ -15,6 +16,7 @@ interface ProjectStatistics {
   fileTypes: FileStats[];
   excludedFolders: string[];
   excludedFiles: string[];
+  repoSizeMetrics?: RepoSizeMetrics;
   totals: {
     files: number;
     lines: number;
@@ -44,6 +46,216 @@ function getGitIncludedFiles(): string[] {
   } catch (error) {
     console.error('Error getting git included files:', error);
     return [];
+  }
+}
+
+function parseRepoStatisticsOutput(raw: string): RepoSizeMetrics | undefined {
+  const lines = raw.split(/\r?\n/);
+  let section: string | null = null;
+  const meta: Record<string, string> = {};
+  const intrinsic: Partial<RepoSizeMetrics['intrinsic']> = {};
+  const gitObjects: Partial<RepoSizeMetrics['gitObjects']> = {};
+  const largestBlobs: RepoSizeMetrics['largestBlobs'] = [];
+  const diskUsage: Partial<RepoSizeMetrics['diskUsage']> = {
+    topLevelDirs: [],
+  };
+
+  const parseNumber = (value: string): number | undefined => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  };
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      continue;
+    }
+    if (line.startsWith('### ')) {
+      section = line.slice(4).trim();
+      continue;
+    }
+
+    if (section === 'META' || section === 'INTRINSIC' || section === 'DISK_USAGE') {
+      const separatorIndex = line.indexOf('=');
+      if (separatorIndex === -1) {
+        continue;
+      }
+      const key = line.slice(0, separatorIndex).trim();
+      const value = line.slice(separatorIndex + 1).trim();
+
+      if (section === 'META') {
+        meta[key] = value;
+      } else if (section === 'INTRINSIC') {
+        const numeric = parseNumber(value);
+        if (numeric !== undefined) {
+          (intrinsic as Record<string, number>)[key] = numeric;
+        }
+      } else {
+        const numeric = parseNumber(value);
+        if (numeric !== undefined) {
+          (diskUsage as Record<string, number>)[key] = numeric;
+        }
+      }
+      continue;
+    }
+
+    if (section === 'GIT_OBJECTS') {
+      const match = line.match(/^([^:]+):\s*(.+)$/);
+      if (!match) {
+        continue;
+      }
+      const [, key, value] = match;
+      const numeric = parseNumber(value);
+      if (numeric === undefined) {
+        continue;
+      }
+      const mapping: Record<string, keyof RepoSizeMetrics['gitObjects']> = {
+        'count': 'looseObjectCount',
+        'size': 'looseObjectSizeKiB',
+        'in-pack': 'packedObjectCount',
+        'packs': 'packfileCount',
+        'size-pack': 'packfileSizeKiB',
+        'prune-packable': 'prunePackableSizeKiB',
+        'garbage': 'garbageObjectCount',
+        'size-garbage': 'garbageSizeKiB',
+      };
+      const mappedKey = mapping[key.trim()];
+      if (mappedKey) {
+        gitObjects[mappedKey] = numeric;
+      }
+      continue;
+    }
+
+    if (section === 'LARGEST_BLOBS') {
+      const match = line.match(/^(\d+)\s+(.+)$/);
+      if (!match) {
+        continue;
+      }
+      const [, size, path] = match;
+      const sizeBytes = parseNumber(size);
+      if (sizeBytes !== undefined) {
+        largestBlobs.push({ path, sizeBytes });
+      }
+      continue;
+    }
+
+    if (section === 'TOP_LEVEL_DIRS') {
+      const match = line.match(/^(\d+)\s+(.+)$/);
+      if (!match) {
+        continue;
+      }
+      const [, size, path] = match;
+      const sizeBytes = parseNumber(size);
+      if (sizeBytes !== undefined && diskUsage.topLevelDirs) {
+        diskUsage.topLevelDirs.push({ path, sizeBytes });
+      }
+    }
+  }
+
+  const version = parseNumber(meta.version || '');
+  const timestamp = meta.timestamp;
+  const headCommit = meta.headCommit;
+  const headBranch = meta.headBranch;
+
+  if (version === undefined || !timestamp || !headCommit || !headBranch) {
+    return undefined;
+  }
+
+  const {
+    commitCount,
+    totalCommitCount,
+    trackedFileCount,
+    trackedDirCount,
+    trackedContentBytes,
+  } = intrinsic;
+
+  if (
+    commitCount === undefined ||
+    totalCommitCount === undefined ||
+    trackedFileCount === undefined ||
+    trackedDirCount === undefined ||
+    trackedContentBytes === undefined
+  ) {
+    return undefined;
+  }
+
+  const {
+    looseObjectCount,
+    looseObjectSizeKiB,
+    packedObjectCount,
+    packfileCount,
+    packfileSizeKiB,
+    prunePackableSizeKiB,
+    garbageObjectCount,
+    garbageSizeKiB,
+  } = gitObjects;
+
+  if (
+    looseObjectCount === undefined ||
+    looseObjectSizeKiB === undefined ||
+    packedObjectCount === undefined ||
+    packfileCount === undefined ||
+    packfileSizeKiB === undefined ||
+    prunePackableSizeKiB === undefined ||
+    garbageObjectCount === undefined ||
+    garbageSizeKiB === undefined
+  ) {
+    return undefined;
+  }
+
+  if (
+    diskUsage.worktreeBytes === undefined ||
+    diskUsage.worktreeExcludingGitBytes === undefined ||
+    diskUsage.gitDirBytes === undefined ||
+    !diskUsage.topLevelDirs
+  ) {
+    return undefined;
+  }
+
+  return {
+    version,
+    timestamp,
+    repo: {
+      headCommit,
+      headBranch,
+    },
+    intrinsic: {
+      commitCount,
+      totalCommitCount,
+      trackedFileCount,
+      trackedDirCount,
+      trackedContentBytes,
+    },
+    gitObjects: {
+      looseObjectCount,
+      looseObjectSizeKiB,
+      packedObjectCount,
+      packfileCount,
+      packfileSizeKiB,
+      prunePackableSizeKiB,
+      garbageObjectCount,
+      garbageSizeKiB,
+    },
+    largestBlobs,
+    diskUsage: {
+      worktreeBytes: diskUsage.worktreeBytes,
+      worktreeExcludingGitBytes: diskUsage.worktreeExcludingGitBytes,
+      gitDirBytes: diskUsage.gitDirBytes,
+      topLevelDirs: diskUsage.topLevelDirs,
+    },
+  };
+}
+
+function getRepoSizeMetrics(): RepoSizeMetrics | undefined {
+  try {
+    const rawOutput = execSync('scripts/repo-statistics.sh', { encoding: 'utf-8' });
+    const parsed = parseRepoStatisticsOutput(rawOutput);
+    if (!parsed) {
+      console.warn('Warning: Could not parse repo statistics output.');
+    }
+    return parsed;
+  } catch (error) {
+    console.warn('Warning: Could not run repo statistics script:', error);
+    return undefined;
   }
 }
 
@@ -115,11 +327,14 @@ function generateStatistics(): ProjectStatistics {
       return b.totalWords - a.totalWords;
     });
 
+  const repoSizeMetrics = getRepoSizeMetrics();
+
   return {
     timestamp: new Date().toISOString(),
     fileTypes,
     excludedFolders,
     excludedFiles,
+    repoSizeMetrics,
     totals: {
       files: files.length,
       lines: totalLines,

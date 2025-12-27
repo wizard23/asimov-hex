@@ -1,0 +1,225 @@
+{
+  "timestamp": "2025-12-27T19:08:50.385Z",
+  "fileTypes": [
+    {
+      "fileType": ".ts",
+      "count": 32,
+      "totalLines": 7420,
+      "totalWords": 24367,
+      "totalBytes": 228244
+    },
+    {
+      "fileType": ".test.ts",
+      "count": 7,
+      "totalLines": 1276,
+      "totalWords": 5817,
+      "totalBytes": 41645
+    },
+    {
+      "fileType": ".sh",
+      "count": 5,
+      "totalLines": 220,
+      "totalWords": 911,
+      "totalBytes": 7048
+    },
+    {
+      "fileType": ".html",
+      "count": 4,
+      "totalLines": 718,
+      "totalWords": 1518,
+      "totalBytes": 16045
+    },
+    {
+      "fileType": ".json",
+      "count": 4,
+      "totalLines": 137,
+      "totalWords": 266,
+      "totalBytes": 3041
+    },
+    {
+      "fileType": ".js",
+      "count": 1,
+      "totalLines": 39,
+      "totalWords": 58,
+      "totalBytes": 859
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 7,
+      "totalWords": 18,
+      "totalBytes": 133
+    }
+  ],
+  "excludedFolders": [
+    "docs",
+    "public"
+  ],
+  "excludedFiles": [
+    "package-lock.json"
+  ],
+  "repoSizeMetrics": {
+    "version": 1,
+    "timestamp": "2025-12-27T19:08:49Z",
+    "repo": {
+      "headCommit": "0e132b47fa25bb0a6e02bd18430da532680797cd",
+      "headBranch": "main"
+    },
+    "intrinsic": {
+      "commitCount": 216,
+      "totalCommitCount": 216,
+      "trackedFileCount": 136,
+      "trackedDirCount": 27,
+      "trackedContentBytes": 59664896
+    },
+    "gitObjects": {
+      "looseObjectCount": 2171,
+      "looseObjectSizeKiB": 18816,
+      "packedObjectCount": 0,
+      "packfileCount": 0,
+      "packfileSizeKiB": 0,
+      "prunePackableSizeKiB": 0,
+      "garbageObjectCount": 0,
+      "garbageSizeKiB": 0
+    },
+    "largestBlobs": [
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 66859
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 81315
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 116297
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 116787
+      },
+      {
+        "path": "docs/generated/screnshot_hex_renderer.png",
+        "sizeBytes": 125235
+      },
+      {
+        "path": "docs/codex_dump_2025-12-25_01-35.txt",
+        "sizeBytes": 144031
+      },
+      {
+        "path": "docs/generated/cairo_debug_0002.png",
+        "sizeBytes": 186764
+      },
+      {
+        "path": "docs/generated/cairo_draft_001.png",
+        "sizeBytes": 221948
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.md",
+        "sizeBytes": 747578
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0152.log",
+        "sizeBytes": 784074
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.json",
+        "sizeBytes": 942628
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.md",
+        "sizeBytes": 1024940
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.json",
+        "sizeBytes": 1236904
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-23_03-04.md",
+        "sizeBytes": 1444382
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0251.log",
+        "sizeBytes": 3715769
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_18-30.md",
+        "sizeBytes": 4414798
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_21-15.md",
+        "sizeBytes": 4474271
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0504.log",
+        "sizeBytes": 7024481
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0320.log",
+        "sizeBytes": 14016075
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-1400.log",
+        "sizeBytes": 22884804
+      }
+    ],
+    "diskUsage": {
+      "worktreeBytes": 276250624,
+      "worktreeExcludingGitBytes": 255623168,
+      "gitDirBytes": 20627456,
+      "topLevelDirs": [
+        {
+          "path": ".",
+          "sizeBytes": 276250624
+        },
+        {
+          "path": "./node_modules",
+          "sizeBytes": 184696832
+        },
+        {
+          "path": "./docs",
+          "sizeBytes": 68624384
+        },
+        {
+          "path": "./.git",
+          "sizeBytes": 20627456
+        },
+        {
+          "path": "./dist",
+          "sizeBytes": 1261568
+        },
+        {
+          "path": "./src",
+          "sizeBytes": 401408
+        },
+        {
+          "path": "./public",
+          "sizeBytes": 221184
+        },
+        {
+          "path": "./cache",
+          "sizeBytes": 184320
+        },
+        {
+          "path": "./scripts",
+          "sizeBytes": 36864
+        },
+        {
+          "path": "./shell",
+          "sizeBytes": 16384
+        },
+        {
+          "path": "./.vscode",
+          "sizeBytes": 8192
+        }
+      ]
+    }
+  },
+  "totals": {
+    "files": 54,
+    "lines": 9817,
+    "words": 32955,
+    "bytes": 297015
+  }
+}
