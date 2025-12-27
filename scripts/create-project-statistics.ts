@@ -13,6 +13,8 @@ interface FileStats {
 interface ProjectStatistics {
   timestamp: string;
   fileTypes: FileStats[];
+  excludedFolders: string[];
+  excludedFiles: string[];
   totals: {
     files: number;
     lines: number;
@@ -52,7 +54,6 @@ function generateStatistics(): ProjectStatistics {
     'public',
   ];
   const excludedFiles = [
-    'TODOS.md',
     'package-lock.json'
   ];
 
@@ -117,6 +118,8 @@ function generateStatistics(): ProjectStatistics {
   return {
     timestamp: new Date().toISOString(),
     fileTypes,
+    excludedFolders,
+    excludedFiles,
     totals: {
       files: files.length,
       lines: totalLines,
@@ -169,4 +172,3 @@ function main() {
 }
 
 main();
-

@@ -11,6 +11,8 @@ interface FileTypeStats {
 interface ProjectStatistics {
   timestamp: string;
   fileTypes: FileTypeStats[];
+  excludedFolders: string[];
+  excludedFiles: string[];
   totals: {
     files: number;
     lines: number;
@@ -207,6 +209,18 @@ class StatisticsViewer {
           </tbody>
         </table>
       </div>
+
+      <div class="stat-section">
+        <h3>Excluded Paths</h3>
+        <div>
+          <div class="stat-item-label">Excluded Folders</div>
+          ${renderExcludedList(data.excludedFolders)}
+        </div>
+        <div style="margin-top: 16px;">
+          <div class="stat-item-label">Excluded Files</div>
+          ${renderExcludedList(data.excludedFiles)}
+        </div>
+      </div>
     `;
   }
 }
@@ -269,4 +283,16 @@ export function formatIsoTimestampLocal(iso: string): string {
       pad(date.getMinutes()),
       pad(date.getSeconds()),
     ].join(":");
+}
+
+function renderExcludedList(items: string[]): string {
+  if (!items || items.length === 0) {
+    return `<div class="excluded-empty">(none)</div>`;
+  }
+
+  return `
+    <ul class="excluded-list">
+      ${items.map(item => `<li>${item}</li>`).join('')}
+    </ul>
+  `;
 }

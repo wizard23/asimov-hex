@@ -1,0 +1,67 @@
+{
+  "timestamp": "2025-12-27T11:51:55.531Z",
+  "fileTypes": [
+    {
+      "fileType": ".ts",
+      "count": 31,
+      "totalLines": 7041,
+      "totalWords": 23420,
+      "totalBytes": 217600
+    },
+    {
+      "fileType": ".test.ts",
+      "count": 7,
+      "totalLines": 1276,
+      "totalWords": 5817,
+      "totalBytes": 41645
+    },
+    {
+      "fileType": ".html",
+      "count": 4,
+      "totalLines": 694,
+      "totalWords": 1471,
+      "totalBytes": 15526
+    },
+    {
+      "fileType": ".sh",
+      "count": 4,
+      "totalLines": 153,
+      "totalWords": 692,
+      "totalBytes": 5143
+    },
+    {
+      "fileType": ".json",
+      "count": 4,
+      "totalLines": 137,
+      "totalWords": 281,
+      "totalBytes": 3090
+    },
+    {
+      "fileType": ".js",
+      "count": 1,
+      "totalLines": 39,
+      "totalWords": 58,
+      "totalBytes": 859
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 7,
+      "totalWords": 18,
+      "totalBytes": 133
+    }
+  ],
+  "excludedFolders": [
+    "docs",
+    "public"
+  ],
+  "excludedFiles": [
+    "package-lock.json"
+  ],
+  "totals": {
+    "files": 52,
+    "lines": 9347,
+    "words": 31757,
+    "bytes": 283996
+  }
+}
