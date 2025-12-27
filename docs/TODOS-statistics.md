@@ -165,5 +165,7 @@ I don't see:
 * subdivisions on the scale line
 
 
-No 
+No I don't see tick marks on the scale line. I don't see any labels near the top. Visually it looks identical to how it looked before your most recent changes.
+
+Yes! I see a small red square and i see the yellow label reading "SCALE"
 

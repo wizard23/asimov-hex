@@ -615,12 +615,18 @@ class TimelineViewer {
     this.timelineScaleGraphics.moveTo(0, scaleHeight);
     this.timelineScaleGraphics.lineTo(this.timelineApp.screen.width, scaleHeight);
     this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
+    this.timelineScaleGraphics.rect(10, 10, 6, 6);
+    this.timelineScaleGraphics.fill({ color: 0xff3333, alpha: 1 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
     const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 10 });
 
     this.timelineTextContainer.removeChildren().forEach(child => child.destroy());
+    const debugLabel = new Text('SCALE', new TextStyle({ fill: 0xffcc66, fontSize: 11 }));
+    debugLabel.x = 22;
+    debugLabel.y = 6;
+    this.timelineTextContainer.addChild(debugLabel);
 
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
