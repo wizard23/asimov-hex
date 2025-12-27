@@ -26,6 +26,8 @@ class TimelineViewer {
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
+  private timelineLineGraphics: Graphics | null = null;
+  private timelineDebugGraphics: Graphics | null = null;
   private timelineScaleGraphics: Graphics | null = null;
   private timelineHoverGraphics: Graphics | null = null;
   private timelineTextContainer: Container | null = null;
@@ -299,16 +301,22 @@ class TimelineViewer {
     this.timelineApp.stage.hitArea = this.timelineApp.screen;
 
     this.timelineScaleGraphics = new Graphics();
+    this.timelineLineGraphics = new Graphics();
+    this.timelineDebugGraphics = new Graphics();
     this.timelineGraphics = new Graphics();
     this.timelineHoverGraphics = new Graphics();
     this.timelineTextContainer = new Container();
 
     this.timelineScaleGraphics.zIndex = 1;
-    this.timelineGraphics.zIndex = 2;
-    this.timelineHoverGraphics.zIndex = 3;
-    this.timelineTextContainer.zIndex = 4;
+    this.timelineDebugGraphics.zIndex = 2;
+    this.timelineLineGraphics.zIndex = 3;
+    this.timelineGraphics.zIndex = 4;
+    this.timelineHoverGraphics.zIndex = 5;
+    this.timelineTextContainer.zIndex = 6;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
+    this.timelineApp.stage.addChild(this.timelineDebugGraphics);
+    this.timelineApp.stage.addChild(this.timelineLineGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
     this.timelineApp.stage.addChild(this.timelineHoverGraphics);
     this.timelineApp.stage.addChild(this.timelineTextContainer);
@@ -357,6 +365,8 @@ class TimelineViewer {
       this.timelineApp = null;
     }
     this.timelineGraphics = null;
+    this.timelineLineGraphics = null;
+    this.timelineDebugGraphics = null;
     this.timelineScaleGraphics = null;
     this.timelineHoverGraphics = null;
     this.timelineTextContainer = null;
@@ -545,7 +555,7 @@ class TimelineViewer {
   }
 
   private drawTimeline() {
-    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer) {
+    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics || !this.timelineDebugGraphics) {
       return;
     }
 
@@ -555,18 +565,20 @@ class TimelineViewer {
     const startX = this.worldToScreen(0, 0).x;
     const endX = this.worldToScreen(rangeSeconds, 0).x;
 
+    this.timelineLineGraphics.clear();
+    this.timelineLineGraphics.lineStyle(2, 0x6b9cff, 0.9);
+    this.timelineLineGraphics.moveTo(startX, lineY);
+    this.timelineLineGraphics.lineTo(endX, lineY);
+
+    this.timelineDebugGraphics.clear();
+    this.timelineDebugGraphics.lineStyle(1, 0xffd84a, 1);
+    this.timelineDebugGraphics.moveTo(startX, lineY - 12);
+    this.timelineDebugGraphics.lineTo(endX, lineY - 12);
+    this.timelineDebugGraphics.lineStyle(1, 0xff5bb3, 1);
+    this.timelineDebugGraphics.moveTo(startX, lineY + 12);
+    this.timelineDebugGraphics.lineTo(endX, lineY + 12);
+
     this.timelineGraphics.clear();
-    this.timelineGraphics.lineStyle(2, 0x6b9cff, 0.8);
-    this.timelineGraphics.moveTo(startX, lineY);
-    this.timelineGraphics.lineTo(endX, lineY);
-
-    this.timelineGraphics.lineStyle(1, 0xffd84a, 0.9);
-    this.timelineGraphics.moveTo(startX, lineY - 12);
-    this.timelineGraphics.lineTo(endX, lineY - 12);
-
-    this.timelineGraphics.lineStyle(1, 0xff5bb3, 0.9);
-    this.timelineGraphics.moveTo(startX, lineY + 12);
-    this.timelineGraphics.lineTo(endX, lineY + 12);
 
     const dotRadius = 5;
     this.timelineCommitPoints = [];
