@@ -99,3 +99,32 @@ The other bugs are:
 * scale is still not visible anywhere on the screen
 * details of the highlighted commit are not shown anywhere on the screen
 
+
+
+Please look at the two apps in src/apps/tile-editor and in src/apps/timeline
+
+Both apps use pixi js to render stuff:
+* Tile Editor renders Polygons
+* Project Timeline renders commits
+
+Both apps are have a zoom and pan feature:
+* Tile Editor allows zooming in and out and panning the the polygons.
+* Project Timeline allows zooming in and out and panning the timeline with the commits.
+
+These features work well for both apps.
+
+Both apps are meant to support a hovering feature:
+* Tile Editor highlights polygons when the user hovers over them.
+* Project Timeline should highlight the commits when the user hovers over them.
+
+
+Tile Editor works flawlessly. Hovering works perfectly.
+But in the Project Timeline hovering has some bugs and does not actually work.  
+
+Please compare the code of the two apps and try to identify the root cause. 
+
+Don't make any changes in the code please but just report your detailed analysis.
+
+
+
+It still does not work. I think the bug is the result of not refreshing the view when hovering is detected since it works when I zoom in or out which probably triggers a Let's debug this systematically.
