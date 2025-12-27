@@ -580,7 +580,7 @@ class TimelineViewer {
 
     this.timelineGraphics.clear();
 
-    const dotRadius = 5;
+    const dotRadius = 7;
     this.timelineCommitPoints = [];
     for (const commit of this.filteredCommits) {
       const commitMs = commit.timestamp * 1000;
@@ -617,8 +617,8 @@ class TimelineViewer {
     this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
-    const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 11 });
-    const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 10 });
+    const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 15 });
+    const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 13 });
 
     this.timelineTextContainer.removeChildren().forEach(child => child.destroy());
 
