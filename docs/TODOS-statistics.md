@@ -496,7 +496,7 @@ Atm the ticks are at the top of the scale but they should be at the bottom of th
 When Group By is selected then please add labels next to each line on the left side of the screen. 
 
 When days are selected for grouping then use a label in this format: Sun 2025/12/28
-For all other units please use the same texts as are used for the ticks labels.
+For all other units please use the same texts that are used for the ticks labels.
 
 
 

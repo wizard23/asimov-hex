@@ -42,6 +42,7 @@ class TimelineViewer {
   private timelineHoverGraphics: Graphics | null = null;
   private timelineTextContainer: Container | null = null;
   private timelineChangeTextContainer: Container | null = null;
+  private timelineGroupLabelContainer: Container | null = null;
   private timelineResizeObserver: ResizeObserver | null = null;
   private timelineViewOffset = { x: 0, y: 0 };
   private timelineViewOffsetStart = { x: 0, y: 0 };
@@ -342,6 +343,7 @@ class TimelineViewer {
     this.timelineHoverGraphics = new Graphics();
     this.timelineTextContainer = new Container();
     this.timelineChangeTextContainer = new Container();
+    this.timelineGroupLabelContainer = new Container();
 
     this.timelineScaleGraphics.zIndex = 1;
     this.timelineLineGraphics.zIndex = 2;
@@ -351,6 +353,7 @@ class TimelineViewer {
     this.timelineChangeScaleGraphics.zIndex = 6;
     this.timelineTextContainer.zIndex = 7;
     this.timelineChangeTextContainer.zIndex = 8;
+    this.timelineGroupLabelContainer.zIndex = 9;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
@@ -360,6 +363,7 @@ class TimelineViewer {
     this.timelineApp.stage.addChild(this.timelineChangeScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineTextContainer);
     this.timelineApp.stage.addChild(this.timelineChangeTextContainer);
+    this.timelineApp.stage.addChild(this.timelineGroupLabelContainer);
 
     this.timelineApp.stage.on('pointerdown', (e: FederatedPointerEvent) => {
       this.handleTimelinePointerDown(e);
@@ -412,6 +416,7 @@ class TimelineViewer {
     this.timelineHoverGraphics = null;
     this.timelineTextContainer = null;
     this.timelineChangeTextContainer = null;
+    this.timelineGroupLabelContainer = null;
     this.timelineCommitPoints = [];
     this.timelineInfoContainer = null;
     this.hoveredCommit = null;
@@ -594,7 +599,17 @@ class TimelineViewer {
   }
 
   private drawTimeline() {
-    if (!this.timelineApp || !this.timelineGraphics || !this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineLineGraphics || !this.timelineChangeGraphics || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) {
+    if (
+      !this.timelineApp
+      || !this.timelineGraphics
+      || !this.timelineScaleGraphics
+      || !this.timelineTextContainer
+      || !this.timelineLineGraphics
+      || !this.timelineChangeGraphics
+      || !this.timelineChangeScaleGraphics
+      || !this.timelineChangeTextContainer
+      || !this.timelineGroupLabelContainer
+    ) {
       return;
     }
 
@@ -646,6 +661,7 @@ class TimelineViewer {
 
     this.drawScale();
     this.drawChangeScale(lineYs);
+    this.drawGroupLabels(grouped, lineYs);
     this.drawHoverCommit();
   }
 
@@ -1158,6 +1174,52 @@ class TimelineViewer {
     if (count <= 1) return [0];
     const mid = (count - 1) / 2;
     return Array.from({ length: count }, (_, idx) => (idx - mid) * this.timelineLineGap);
+  }
+
+  private drawGroupLabels(grouped: GroupedCommits[], lineYs: number[]) {
+    if (!this.timelineGroupLabelContainer || !this.timelineApp) return;
+    this.timelineGroupLabelContainer.removeChildren().forEach(child => child.destroy());
+
+    if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
+      return;
+    }
+
+    const labelStyle = new TextStyle({ fill: 0xcfcfcf, fontSize: 12 });
+    const padding = 10;
+
+    grouped.forEach((group, index) => {
+      const lineY = lineYs[index] ?? 0;
+      const labelText = this.formatGroupLabel(group);
+      const label = new Text({ text: labelText, style: labelStyle });
+      label.x = padding;
+      label.y = lineY - label.height / 2;
+      this.timelineGroupLabelContainer.addChild(label);
+    });
+  }
+
+  private formatGroupLabel(group: GroupedCommits): string {
+    const date = new Date(group.startMs);
+    if (this.config.groupBy === 'Day') {
+      const weekday = date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      return `${weekday} ${year}/${month}/${day}`;
+    }
+
+    if (this.config.groupBy === 'Week') {
+      return this.formatScaleLabel(date, 'day');
+    }
+
+    if (this.config.groupBy === 'Month') {
+      return this.formatScaleLabel(date, 'month');
+    }
+
+    if (this.config.groupBy === 'Year') {
+      return this.formatScaleLabel(date, 'year');
+    }
+
+    return '';
   }
 
   private clamp(value: number, min: number, max: number): number {
