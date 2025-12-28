@@ -13,7 +13,7 @@ usage() {
 # -----------------------------
 IDENTITY_FILE="./secrets/identity.sh"
 
-DEFAULT_EMAIL="your_email@example.com"
+DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
 
 if [[ -f "$IDENTITY_FILE" ]]; then

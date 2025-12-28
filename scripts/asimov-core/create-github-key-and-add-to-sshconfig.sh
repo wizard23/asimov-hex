@@ -13,7 +13,7 @@ usage() {
 IDENTITY_FILE="./secrets/identity.sh"
 
 # Defaults if identity file not present
-DEFAULT_EMAIL="your_email@example.com"
+DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
 HOST_ALIAS=""  # may be set by identity.sh; if empty we'll derive
 

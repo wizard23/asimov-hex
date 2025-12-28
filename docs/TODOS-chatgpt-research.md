@@ -51,6 +51,17 @@ please use email and hostname from there if this file exists otherwise just use 
 2) when possible: please ensure to do all tests that could fail before creating any files or modifying anything. The "SSH config already contains Host block" check for example
 
 
+Yes please refuse if the script would append a host alias that already exists.
+Also I made some mistakes in how the ./secrets/identity.sh works and how it is used exactly. It should look like like this:
+
+EMAIL="wizards23+github@gmail.com"
+HOSTNAME="$(hostname)"
+GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>--<SAFE_EMAIL>"
+
+If any of those is missing please use exactly the values from my example identity as defaults.
+
+Please adapt both scripts accordingly.
+
 
 
 
