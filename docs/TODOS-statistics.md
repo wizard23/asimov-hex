@@ -493,7 +493,61 @@ Atm the ticks are at the top of the scale but they should be at the bottom of th
 
 
 
+When Group By is selected then please add labels next to each line on the left side of the screen. 
 
+When days are selected for grouping then use a label in this format: Sun 2025/12/28
+For all other units please use the same texts as are used for the ticks labels.
+
+
+
+
+
+
+
+Please add a dropdown list at the top of the "Timeline Controls" that allows selecting a specific project. 
+Atm the commit history is loaded from one fixed json file. This should be changed such that the program first loads an index.json from: public/project-history/index.json
+
+The index.json contains:
+* a list of projects
+* each project consists of some metadata and a list of commits
+  * the metadata includes:
+    * the name of the project. this must be unique.
+    * 
+  * the list of commits is structured the same way as the existing public/project-history/git-timeline.json
+* Please add a versioning scheme so that changes to the data format can be easily implemented.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Please inspect the timeline code and then please report the following items to me:
+
+* Identify all hardcoded values|colors|etc that are used to determine how anything is drawn in the "Unit Cell Editor". Give me a list of all these hardcoded values with a short description of their use and the current hardcoded value. 
+
+
+Refactor the timelkine code please
+
+All hardcoded values that determine how the pixi window appears should be extracted into a seperate file like it is done in 
+src/apps/tile-editor with the src/apps/tile-editor/draw-config.ts
+
+
+
+
+
+
+
+
+
+Center view button
 
 
 When clicked pleas lock the selected commit in place. Get rid of the locking by right clicking.
@@ -501,6 +555,13 @@ When clicked pleas lock the selected commit in place. Get rid of the locking by 
 Please add a "context aware help" on top of the window. That always shows what actions are available to the user:
 * Use the scrollwheel to zoom in and out of the timeline.
 * pan the timeline by clicking anywhere and then drag and drop to pan through time.
+
+
+
+
+## UNUSED
+* Identify all duplicated or very similar hardcoded values that appear at multiple spots in the code.
+
 
 
 
