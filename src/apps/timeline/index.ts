@@ -600,8 +600,8 @@ class TimelineViewer {
     }
 
     this.updateTimelineVerticalOffset();
-    const rangeSeconds = this.getDisplayRangeSeconds(grouped);
     const grouped = this.getGroupedCommits();
+    const rangeSeconds = this.getDisplayRangeSeconds(grouped);
     const lineOffsets = this.getLineOffsets(grouped.length);
     const baseLineY = this.worldToScreen(0, 0).y;
     const lineYs = lineOffsets.map(offset => baseLineY + offset);
