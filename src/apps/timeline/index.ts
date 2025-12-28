@@ -598,6 +598,10 @@ class TimelineViewer {
       return;
     }
 
+    const timelineApp = this.timelineApp;
+    const timelineGraphics = this.timelineGraphics;
+    const timelineLineGraphics = this.timelineLineGraphics;
+
     this.updateTimelineVerticalOffset();
     const grouped = this.getGroupedCommits();
     const rangeSeconds = this.getDisplayRangeSeconds(grouped);
@@ -607,17 +611,17 @@ class TimelineViewer {
     const startX = this.worldToScreen(0, 0).x;
     const endX = this.worldToScreen(rangeSeconds, 0).x;
 
-    this.timelineLineGraphics.clear();
+    timelineLineGraphics.clear();
     for (const lineY of lineYs) {
-      this.timelineLineGraphics.moveTo(startX, lineY);
-      this.timelineLineGraphics.lineTo(endX, lineY);
+      timelineLineGraphics.moveTo(startX, lineY);
+      timelineLineGraphics.lineTo(endX, lineY);
     }
-    this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
+    timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
 
     this.timelineChangeGraphics.clear();
     this.drawChangeLines(grouped, lineYs);
 
-    this.timelineGraphics.clear();
+    timelineGraphics.clear();
 
     const dotRadius = 7;
     this.timelineCommitPoints = [];
@@ -627,11 +631,11 @@ class TimelineViewer {
         const commitMs = commit.timestamp * 1000;
         const worldX = (commitMs - group.startMs) / 1000;
         const screenX = this.worldToScreen(worldX, 0).x;
-        if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
+        if (screenX < -50 || screenX > timelineApp.screen.width + 50) {
           continue;
         }
-        this.timelineGraphics.circle(screenX, lineY, dotRadius);
-        this.timelineGraphics.fill({ color: 0x4a9eff, alpha: 0.95 });
+        timelineGraphics.circle(screenX, lineY, dotRadius);
+        timelineGraphics.fill({ color: 0x4a9eff, alpha: 0.95 });
         this.timelineCommitPoints.push({
           commit,
           screenX,
@@ -647,6 +651,8 @@ class TimelineViewer {
 
   private drawScale() {
     if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
+    const timelineScaleGraphics = this.timelineScaleGraphics;
+    const timelineApp = this.timelineApp;
     const scaleHeight = this.timelineScaleHeight;
     const grouped = this.getGroupedCommits();
     const scaleRange = this.getScaleRange(grouped);
@@ -654,10 +660,10 @@ class TimelineViewer {
     const visibleRange = this.getVisibleTimelineRange(scaleRange.startMs, scaleRange.endMs);
     const pxPerSecond = this.timelineScale;
 
-    this.timelineScaleGraphics.clear();
-    this.timelineScaleGraphics.moveTo(0, scaleHeight);
-    this.timelineScaleGraphics.lineTo(this.timelineApp.screen.width, scaleHeight);
-    this.timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
+    timelineScaleGraphics.clear();
+    timelineScaleGraphics.moveTo(0, scaleHeight);
+    timelineScaleGraphics.lineTo(timelineApp.screen.width, scaleHeight);
+    timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 15 });
@@ -679,6 +685,7 @@ class TimelineViewer {
 
   private drawChangeLines(grouped: GroupedCommits[], lineYs: number[]) {
     if (!this.timelineChangeGraphics) return;
+    const timelineChangeGraphics = this.timelineChangeGraphics;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
     const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
@@ -690,7 +697,7 @@ class TimelineViewer {
       return scaled * this.timelineChangeMaxHeight;
     };
 
-    this.timelineChangeGraphics.clear();
+    timelineChangeGraphics.clear();
     grouped.forEach((group, index) => {
       const lineY = lineYs[index] ?? 0;
       for (const commit of group.commits) {
@@ -699,11 +706,11 @@ class TimelineViewer {
         const screenX = this.worldToScreen(worldX, 0).x;
         const height = valueToHeight(commit.addedLines);
         if (height <= 0) continue;
-        this.timelineChangeGraphics.moveTo(screenX, lineY);
-        this.timelineChangeGraphics.lineTo(screenX, lineY - height);
+        timelineChangeGraphics.moveTo(screenX, lineY);
+        timelineChangeGraphics.lineTo(screenX, lineY - height);
       }
     });
-    this.timelineChangeGraphics.stroke({ color: 0x3ddc6f, width: 2, alpha: 0.9 });
+    timelineChangeGraphics.stroke({ color: 0x3ddc6f, width: 2, alpha: 0.9 });
 
     grouped.forEach((group, index) => {
       const lineY = lineYs[index] ?? 0;
@@ -713,28 +720,30 @@ class TimelineViewer {
         const screenX = this.worldToScreen(worldX, 0).x;
         const height = valueToHeight(commit.removedLines);
         if (height <= 0) continue;
-        this.timelineChangeGraphics.moveTo(screenX, lineY);
-        this.timelineChangeGraphics.lineTo(screenX, lineY + height);
+        timelineChangeGraphics.moveTo(screenX, lineY);
+        timelineChangeGraphics.lineTo(screenX, lineY + height);
       }
     });
-    this.timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
+    timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
   }
 
   private drawChangeScale(lineYs: number[]) {
     if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) return;
+    const timelineApp = this.timelineApp;
+    const timelineChangeScaleGraphics = this.timelineChangeScaleGraphics;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
     const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
     const maxValue = Math.max(maxAdded, maxRemoved, 1);
-    const axisX = this.timelineApp.screen.width - this.timelineChangeScaleRightPadding;
+    const axisX = timelineApp.screen.width - this.timelineChangeScaleRightPadding;
     const height = this.timelineChangeMaxHeight;
 
-    this.timelineChangeScaleGraphics.clear();
+    timelineChangeScaleGraphics.clear();
     lineYs.forEach(lineY => {
-      this.timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
-      this.timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
+      timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
+      timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
     });
-    this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+    timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
     this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
 
@@ -749,13 +758,13 @@ class TimelineViewer {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
       lineYs.forEach(lineY => {
-        this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
-        this.timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
-        this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
-        this.timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
+        timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
+        timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
+        timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
+        timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
       });
     }
-    this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+    timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
     const labelLineY = lineYs[Math.floor(lineYs.length / 2)] ?? 0;
     for (const tick of ticks) {
@@ -784,6 +793,8 @@ class TimelineViewer {
     scaleStartMs: number
   ) {
     if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
+    const timelineScaleGraphics = this.timelineScaleGraphics;
+    const timelineApp = this.timelineApp;
     const lineHeight = isMajor ? scaleHeight : scaleHeight * 0.6;
     const labelOffset = isMajor ? 6 : 8;
     let lastLabelX = Number.NEGATIVE_INFINITY;
@@ -794,20 +805,20 @@ class TimelineViewer {
       if (ms < startMs) continue;
       const worldX = (ms - scaleStartMs) / 1000;
       const screenX = this.worldToScreen(worldX, 0).x;
-      if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
+      if (screenX < -50 || screenX > timelineApp.screen.width + 50) {
         continue;
       }
       const tickColor = isMajor ? 0x777777 : 0x4b4b4b;
       const tickAlpha = isMajor ? 0.9 : 0.7;
-      this.timelineScaleGraphics.moveTo(screenX, 0);
-      this.timelineScaleGraphics.lineTo(screenX, lineHeight);
-      this.timelineScaleGraphics.stroke({
+      timelineScaleGraphics.moveTo(screenX, 0);
+      timelineScaleGraphics.lineTo(screenX, lineHeight);
+      timelineScaleGraphics.stroke({
         color: tickColor,
         width: 1,
         alpha: tickAlpha,
       });
-      this.timelineScaleGraphics.rect(screenX - 0.5, 0, 1, lineHeight);
-      this.timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
+      timelineScaleGraphics.rect(screenX - 0.5, 0, 1, lineHeight);
+      timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
         const label = new Text({ text: this.formatScaleLabel(date, unit), style });

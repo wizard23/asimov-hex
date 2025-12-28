@@ -428,7 +428,7 @@ I can’t run Chrome here. This environment doesn’t support launching GUI apps
   Please reload and check the console; the deprecation warnings should be gone. If any remain, paste them and I’ll clean those up too.
 
 
-  Thanks! Please 
+  Great all deprecation warnings are gone! There are however still ome errors in the build. Please fix these.
 
 
 
