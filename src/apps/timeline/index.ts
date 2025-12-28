@@ -842,14 +842,14 @@ class TimelineViewer {
       }
       const tickColor = isMajor ? 0x777777 : 0x4b4b4b;
       const tickAlpha = isMajor ? 0.9 : 0.7;
-      timelineScaleGraphics.moveTo(screenX, 0);
-      timelineScaleGraphics.lineTo(screenX, lineHeight);
+      timelineScaleGraphics.moveTo(screenX, scaleHeight);
+      timelineScaleGraphics.lineTo(screenX, scaleHeight - lineHeight);
       timelineScaleGraphics.stroke({
         color: tickColor,
         width: 1,
         alpha: tickAlpha,
       });
-      timelineScaleGraphics.rect(screenX - 0.5, 0, 1, lineHeight);
+      timelineScaleGraphics.rect(screenX - 0.5, scaleHeight - lineHeight, 1, lineHeight);
       timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {

@@ -487,6 +487,13 @@ To clarify what I mean: If the beginning of a new year happens to be within the 
 If anything is unclear please just ask.
 
 
+That works very well! Now I have another ux improvement for the timeline:
+Atm the ticks are at the top of the scale but they should be at the bottom of the scale closer to the timeline.
+
+
+
+
+
 
 
 When clicked pleas lock the selected commit in place. Get rid of the locking by right clicking.
