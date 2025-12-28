@@ -8,5 +8,9 @@
 
   "npm.autoDetect": "on", // default is on but good to have
   "npm.enableRunFromFolder": true,
-  "editor.formatOnSave": false
+  "editor.formatOnSave": false,
+
+
+   // If you still want shell integration but not suggestions:
+   "terminal.integrated.suggest.enabled": false
 }
