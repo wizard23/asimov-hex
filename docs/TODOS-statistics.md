@@ -193,3 +193,19 @@ Use a logarithmic scale for these lines and also show a scale for these on the r
 
 please put the timeline in the center of the window.
 
+
+the timeline is centered now but now there is a ux issue:
+
+when I hover over a commit the commit details change in height. This leads to the pixi window getting smaller and so the timeline moves up a little. This causes the commit being away from the mouse cursor and so the commit details shrink again because no commit is hovered. This again leads to the pixi window getting bigger and so on. 
+Please explore ways to prevent this dx issue. Don't change anything yet but only list possible approaches to the issue.  
+
+
+
+• Here are practical ways to prevent the hover‑height feedback loop (no code changes yet):
+
+  - Reserve a fixed-height area for the commit details so its height never changes (e.g., set a min/max height and make it scroll).
+  - Render the commit details in an overlay positioned above the canvas (absolute/fixed), so it doesn’t affect layout or canvas size.
+  - Keep the timeline canvas height fixed (CSS height or flex with fixed basis) and let only the details area scroll internally.
+  - Move the details panel outside the #timeline-panel flex container (e.g., sidebar or footer) to decouple it from the canvas size.
+  - Cache the last non-null hovered commit details height and lock the panel height until hover ends.
+
