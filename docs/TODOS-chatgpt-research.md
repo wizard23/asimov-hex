@@ -63,6 +63,17 @@ If any of those is missing please use exactly the values from my example identit
 Please adapt both scripts accordingly.
 
 
+Yes that is a good idea! refuse if the key files already exist but only one of the pair exists (e.g., private exists without .pub), because that usually indicates a broken state.
+
+This looks weird to me:
+DEFAULT_HOSTNAME=''"$(hostname)"''
+
+Thanks for trying to follow my instructions exactly but this one seems to be taken too verbatim ;)
+Please fix this.
+
+
+
+
 
 
 

@@ -3,23 +3,32 @@ set -euo pipefail
 
 usage() {
   echo "Usage:"
-  echo "  $0                         # prompt for email + hostname, then add matching key"
-  echo "  $0 <email> <host>          # add matching key"
-  echo "  $0 <path-to-private-key>   # add that key directly"
+  echo "  $0                         # prompt for email + hostname (with defaults) and load matching key"
+  echo "  $0 <email> <host>          # load matching key"
+  echo "  $0 <path-to-private-key>   # load that key directly"
 }
 
-# -----------------------------
-# Load optional identity file
-# -----------------------------
+# ------------------------------------------------------------
+# Identity defaults (must match your example exactly)
+# ------------------------------------------------------------
+DEFAULT_EMAIL='wizards23+github@gmail.com'
+DEFAULT_HOSTNAME=''"$(hostname)"''
+DEFAULT_GITHUB_HOST_ALIAS='github-<SAFE_HOSTNAME>--<SAFE_EMAIL>'
+
 IDENTITY_FILE="./secrets/identity.sh"
 
-DEFAULT_EMAIL="wizards23+github@gmail.com"
-DEFAULT_HOSTNAME="$(hostname)"
+EMAIL=""
+HOSTNAME=""
+GITHUB_HOST_ALIAS=""
 
 if [[ -f "$IDENTITY_FILE" ]]; then
   # shellcheck disable=SC1090
   source "$IDENTITY_FILE"
 fi
+
+EMAIL="${EMAIL:-$DEFAULT_EMAIL}"
+HOSTNAME="${HOSTNAME:-$DEFAULT_HOSTNAME}"
+GITHUB_HOST_ALIAS="${GITHUB_HOST_ALIAS:-$DEFAULT_GITHUB_HOST_ALIAS}"
 
 mangle() {
   echo "$1" \
@@ -32,30 +41,27 @@ require_cmd() {
   command -v "$c" >/dev/null 2>&1 || { echo "❌ Missing required command: $c" >&2; exit 127; }
 }
 
-# -----------------------------
 # Preflight: commands
-# -----------------------------
 require_cmd hostname
 require_cmd tr
 require_cmd sed
 require_cmd ssh-agent
 require_cmd ssh-add
+require_cmd ls
 
 SSH_DIR="${HOME:?}/.ssh"
 
-# -----------------------------
-# Determine which key to load (no modifications yet)
-# -----------------------------
 KEY_PATH=""
 
+# Determine key to load (no modifications yet)
 if [[ $# -eq 1 ]]; then
   KEY_PATH="$1"
 elif [[ $# -eq 0 ]]; then
-  read -rp "Email [$DEFAULT_EMAIL]: " EMAIL
-  EMAIL="${EMAIL:-$DEFAULT_EMAIL}"
+  read -rp "Email [$EMAIL]: " _EMAIL
+  EMAIL="${_EMAIL:-$EMAIL}"
 
-  read -rp "Hostname [$DEFAULT_HOSTNAME]: " HOSTNAME
-  HOSTNAME="${HOSTNAME:-$DEFAULT_HOSTNAME}"
+  read -rp "Hostname [$HOSTNAME]: " _HOST
+  HOSTNAME="${_HOST:-$HOSTNAME}"
 
   SAFE_EMAIL="$(mangle "$EMAIL")"
   SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
@@ -80,10 +86,7 @@ if [[ ! -f "$KEY_PATH" ]]; then
   exit 1
 fi
 
-# -----------------------------
 # Modifications start here
-# -----------------------------
-# Ensure ssh-agent is usable in this shell session
 if [[ -z "${SSH_AUTH_SOCK:-}" ]] || ! ssh-add -l >/dev/null 2>&1; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
