@@ -14,7 +14,7 @@ interface Commit {
 }
 
 type DisplayMode = 'List' | 'Timeline';
-type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'minute';
+type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'quarterHour' | 'minute';
 type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
 
 interface GroupedCommits {
@@ -859,12 +859,13 @@ class TimelineViewer {
 
   private pickScaleUnits(pxPerSecond: number): { major: ScaleUnit; minor: ScaleUnit | null } {
     const units: Array<{ unit: ScaleUnit; seconds: number }> = [
-      { unit: 'minute', seconds: 60 },
-      { unit: 'hour', seconds: 3600 },
-      { unit: 'day', seconds: 24 * 3600 },
-      { unit: 'month', seconds: 30 * 24 * 3600 },
-      { unit: 'year', seconds: 365.25 * 24 * 3600 },
       { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
+      { unit: 'year', seconds: 365.25 * 24 * 3600 },
+      { unit: 'month', seconds: 30 * 24 * 3600 },
+      { unit: 'day', seconds: 24 * 3600 },
+      { unit: 'hour', seconds: 3600 },
+      { unit: 'quarterHour', seconds: 15 * 60 },
+      { unit: 'minute', seconds: 60 },
     ];
 
     const majorMinPx = 70;
@@ -880,7 +881,7 @@ class TimelineViewer {
 
     const majorIndex = units.findIndex(entry => entry.unit === major);
     let minor: ScaleUnit | null = null;
-    for (let i = majorIndex - 1; i >= 0; i -= 1) {
+    for (let i = majorIndex + 1; i < units.length; i += 1) {
       if (pxPerSecond * units[i].seconds >= minorMinPx) {
         minor = units[i].unit;
         break;
@@ -895,6 +896,11 @@ class TimelineViewer {
     aligned.setUTCMilliseconds(0);
     aligned.setUTCSeconds(0);
     if (unit === 'minute') {
+      return aligned;
+    }
+    if (unit === 'quarterHour') {
+      const minutes = aligned.getUTCMinutes();
+      aligned.setUTCMinutes(Math.floor(minutes / 15) * 15);
       return aligned;
     }
     aligned.setUTCMinutes(0);
@@ -923,6 +929,9 @@ class TimelineViewer {
     switch (unit) {
       case 'minute':
         next.setUTCMinutes(next.getUTCMinutes() + 1);
+        return next;
+      case 'quarterHour':
+        next.setUTCMinutes(next.getUTCMinutes() + 15);
         return next;
       case 'hour':
         next.setUTCHours(next.getUTCHours() + 1);
@@ -962,6 +971,8 @@ class TimelineViewer {
         return `${month}-${day}`;
       case 'hour':
         return `${hour}:00`;
+      case 'quarterHour':
+        return `${hour}:${minute}`;
       case 'minute':
         return `${hour}:${minute}`;
       default:

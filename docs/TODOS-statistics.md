@@ -434,6 +434,9 @@ I can’t run Chrome here. This environment doesn’t support launching GUI apps
   The scale never shows minutes for me. No matter how deep in I zoom. Even when there is not a single hour tick visible anymore because i zoomed in on a very short time range of just a few minutes.
 
 
+  Great, now minutes show up. Now please introduce quater hours as an intermediate between hours and minutes. 
+
+
 
 
 
