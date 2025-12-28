@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DEFAULT_EMAIL="your_email@example.com"
-DEFAULT_HOSTNAME="$(hostname)"
-
 usage() {
   echo "Usage:"
   echo "  $0                         # prompt for email + hostname, then add matching key"
@@ -11,15 +8,46 @@ usage() {
   echo "  $0 <path-to-private-key>   # add that key directly"
 }
 
+# -----------------------------
+# Load optional identity file
+# -----------------------------
+IDENTITY_FILE="./secrets/identity.sh"
+
+DEFAULT_EMAIL="your_email@example.com"
+DEFAULT_HOSTNAME="$(hostname)"
+
+if [[ -f "$IDENTITY_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$IDENTITY_FILE"
+fi
+
 mangle() {
   echo "$1" \
     | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9._-]+/_/g; s/^_+//; s/_+$//'
 }
 
-SSH_DIR="$HOME/.ssh"
+require_cmd() {
+  local c="$1"
+  command -v "$c" >/dev/null 2>&1 || { echo "❌ Missing required command: $c" >&2; exit 127; }
+}
 
-# Determine which key to load
+# -----------------------------
+# Preflight: commands
+# -----------------------------
+require_cmd hostname
+require_cmd tr
+require_cmd sed
+require_cmd ssh-agent
+require_cmd ssh-add
+
+SSH_DIR="${HOME:?}/.ssh"
+
+# -----------------------------
+# Determine which key to load (no modifications yet)
+# -----------------------------
+KEY_PATH=""
+
 if [[ $# -eq 1 ]]; then
   KEY_PATH="$1"
 elif [[ $# -eq 0 ]]; then
@@ -44,6 +72,7 @@ else
   exit 2
 fi
 
+# Preflight: key exists
 if [[ ! -f "$KEY_PATH" ]]; then
   echo "❌ Private key not found: $KEY_PATH" >&2
   echo "Available GitHub keys in $SSH_DIR:" >&2
@@ -51,18 +80,14 @@ if [[ ! -f "$KEY_PATH" ]]; then
   exit 1
 fi
 
-# Ensure ssh-agent is available and running in this shell
-if ! command -v ssh-agent >/dev/null 2>&1; then
-  echo "❌ ssh-agent not found on PATH" >&2
-  exit 1
-fi
-
+# -----------------------------
+# Modifications start here
+# -----------------------------
+# Ensure ssh-agent is usable in this shell session
 if [[ -z "${SSH_AUTH_SOCK:-}" ]] || ! ssh-add -l >/dev/null 2>&1; then
-  # Start a new agent for this shell session
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
-# Add the key (prompts for passphrase if set)
 ssh-add "$KEY_PATH"
 
 echo "✅ Loaded key into ssh-agent: $KEY_PATH"
