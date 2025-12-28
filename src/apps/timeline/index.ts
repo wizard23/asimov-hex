@@ -674,6 +674,16 @@ class TimelineViewer {
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
     const usedLabelPositions = new Set<number>();
+    this.drawScaleMilestones(
+      unitSelection.major,
+      visibleRange.startMs,
+      visibleRange.endMs,
+      scaleHeight,
+      new TextStyle({ fill: 0xe6e6e6, fontSize: 14 }),
+      110,
+      scaleRange.startMs,
+      usedLabelPositions
+    );
     this.drawScaleUnit(
       unitSelection.major,
       true,
@@ -850,6 +860,52 @@ class TimelineViewer {
         const label = new Text({ text: this.formatScaleLabel(date, unit), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
+        label.y = scaleHeight - 4;
+        this.timelineTextContainer.addChild(label);
+        usedLabelPositions.add(labelKey);
+        lastLabelX = screenX;
+      }
+    }
+  }
+
+  private drawScaleMilestones(
+    majorUnit: ScaleUnit,
+    startMs: number,
+    endMs: number,
+    scaleHeight: number,
+    style: TextStyle,
+    minLabelSpacing: number,
+    scaleStartMs: number,
+    usedLabelPositions: Set<number>
+  ) {
+    if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
+    const timelineApp = this.timelineApp;
+    const largerUnits: ScaleUnit[] = ['decade', 'year', 'month', 'day', 'hour', 'tenMinute', 'minute'];
+    const majorIndex = largerUnits.indexOf(majorUnit);
+    const milestoneUnits = majorIndex <= 0 ? [] : largerUnits.slice(0, majorIndex);
+    if (milestoneUnits.length === 0) return;
+
+    for (const unit of milestoneUnits) {
+      let lastLabelX = Number.NEGATIVE_INFINITY;
+      const startDate = this.alignDateToUnit(new Date(startMs), unit);
+      for (let date = startDate; date.getTime() <= endMs; date = this.addUnit(date, unit)) {
+        const ms = date.getTime();
+        if (ms < startMs) continue;
+        const worldX = (ms - scaleStartMs) / 1000;
+        const screenX = this.worldToScreen(worldX, 0).x;
+        if (screenX < -50 || screenX > timelineApp.screen.width + 50) {
+          continue;
+        }
+        if (screenX - lastLabelX < minLabelSpacing) {
+          continue;
+        }
+        const labelKey = Math.round(screenX);
+        if (usedLabelPositions.has(labelKey)) {
+          continue;
+        }
+        const label = new Text({ text: this.formatScaleLabel(date, unit), style });
+        label.rotation = -Math.PI / 2;
+        label.x = screenX + 6;
         label.y = scaleHeight - 4;
         this.timelineTextContainer.addChild(label);
         usedLabelPositions.add(labelKey);

@@ -481,6 +481,10 @@ Please fix a small ux issues in the scale:
 When a tick label happens to coincide with a label of a larger unit (like day and hour 00:00) both get drawn on top of each other. please ensure that only the larger unit label gets drawn in this case
 
 
+That works very well! Now I have another ux improvement for the scale:
+For the special cases when a tick coincides with a potential tick on a maybe much larger timescale please show the label of the larger timescale.
+To clarify what I mean: If the beginning of a new year happens to be within the time range of the zoom and pan level for example: although the zoom level shows hours and ten minutes please show the label for the year.
+If anything is unclear please just ask.
 
 
 
