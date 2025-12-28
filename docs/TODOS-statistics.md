@@ -226,3 +226,23 @@ Great! It works! Now please add another dx feature. Keep the last highligted com
 Also: when there are many commits close together please ensure that the highlighted white disk is rendered on top of the others.
 
 
+Only when "Display Mode" is "Timeline" add a dropdown list called "Group By" containing 
+* (None) this is the default
+* Day
+* Week
+* Month
+* Year
+
+When anything except None is selected please do the following (I'm using grouping by Days as an example but please do the analogous things for weeks, Months and year)
+Split the timeline into multiple lines displayed on top of each other. Each line representing one day. All lines use the same paning and the same scale. 
+
+
+
+When clicked pleas lock the selected commit in place. Get rid of the locking by right clicking.
+
+Please add a "context aware help" on top of the window. That always shows what actions are available to the user:
+* Use the scrollwheel to zoom in and out of the timeline.
+* pan the timeline by clicking anywhere and then drag and drop to pan through time.
+ 
+
+

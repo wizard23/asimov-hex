@@ -15,6 +15,13 @@ interface Commit {
 
 type DisplayMode = 'List' | 'Timeline';
 type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'minute';
+type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
+
+interface GroupedCommits {
+  key: string;
+  startMs: number;
+  commits: Commit[];
+}
 
 class TimelineViewer {
   private pane!: Pane;
@@ -23,6 +30,7 @@ class TimelineViewer {
   private filteredCommits: Commit[] = [];
   private startDateElement: HTMLElement | null = null;
   private endDateElement: HTMLElement | null = null;
+  private groupByElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -48,11 +56,13 @@ class TimelineViewer {
   private readonly timelineScaleHeight = 50;
   private readonly timelineChangeMaxHeight = 80;
   private readonly timelineChangeScaleRightPadding = 24;
+  private readonly timelineLineGap = 28;
   
   private config = {
     startDate: '',
     endDate: '',
     displayMode: 'List' as DisplayMode,
+    groupBy: 'None' as GroupBy,
     searchTerm: '',
     enableDateFilter: false,
   };
@@ -157,12 +167,29 @@ class TimelineViewer {
       },
       label: 'Display Mode',
     }).on('change', () => {
+      this.updateGroupByVisibility();
+      this.render();
+    });
+
+    const groupByBinding = this.pane.addBinding(this.config, 'groupBy', {
+      options: {
+        '(None)': 'None',
+        'Day': 'Day',
+        'Week': 'Week',
+        'Month': 'Month',
+        'Year': 'Year',
+      },
+      label: 'Group By',
+    }).on('change', () => {
+      if (this.config.displayMode !== 'Timeline') return;
       this.render();
     });
 
     this.startDateElement = startDateBinding.element;
     this.endDateElement = endDateBinding.element;
+    this.groupByElement = groupByBinding.element;
     this.updateDateFilterVisibility();
+    this.updateGroupByVisibility();
   }
 
   private filterCommits() {
@@ -198,6 +225,11 @@ class TimelineViewer {
     const display = this.config.enableDateFilter ? '' : 'none';
     if (this.startDateElement) this.startDateElement.style.display = display;
     if (this.endDateElement) this.endDateElement.style.display = display;
+  }
+
+  private updateGroupByVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.groupByElement) this.groupByElement.style.display = display;
   }
 
   private render() {
@@ -568,41 +600,48 @@ class TimelineViewer {
 
     this.updateTimelineVerticalOffset();
     const rangeSeconds = (this.timelineRange.endMs - this.timelineRange.startMs) / 1000;
-    const lineY = this.worldToScreen(0, 0).y;
+    const grouped = this.getGroupedCommits();
+    const lineOffsets = this.getLineOffsets(grouped.length);
+    const lineYs = lineOffsets.map(offset => this.worldToScreen(0, offset).y);
     const startX = this.worldToScreen(0, 0).x;
     const endX = this.worldToScreen(rangeSeconds, 0).x;
 
     this.timelineLineGraphics.clear();
-    this.timelineLineGraphics.moveTo(startX, lineY);
-    this.timelineLineGraphics.lineTo(endX, lineY);
+    for (const lineY of lineYs) {
+      this.timelineLineGraphics.moveTo(startX, lineY);
+      this.timelineLineGraphics.lineTo(endX, lineY);
+    }
     this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
 
     this.timelineChangeGraphics.clear();
-    this.drawChangeLines(lineY);
+    this.drawChangeLines(grouped, lineOffsets, lineYs);
 
     this.timelineGraphics.clear();
 
     const dotRadius = 7;
     this.timelineCommitPoints = [];
-    for (const commit of this.filteredCommits) {
-      const commitMs = commit.timestamp * 1000;
-      const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-      const screen = this.worldToScreen(worldX, 0);
-      if (screen.x < -50 || screen.x > this.timelineApp.screen.width + 50) {
-        continue;
+    grouped.forEach((group, index) => {
+      const lineOffset = lineOffsets[index] ?? 0;
+      for (const commit of group.commits) {
+        const commitMs = commit.timestamp * 1000;
+        const worldX = (commitMs - this.timelineRange.startMs) / 1000;
+        const screen = this.worldToScreen(worldX, lineOffset);
+        if (screen.x < -50 || screen.x > this.timelineApp.screen.width + 50) {
+          continue;
+        }
+        this.timelineGraphics.beginFill(0x4a9eff, 0.95);
+        this.timelineGraphics.drawCircle(screen.x, screen.y, dotRadius);
+        this.timelineGraphics.endFill();
+        this.timelineCommitPoints.push({
+          commit,
+          screenX: screen.x,
+          screenY: screen.y,
+        });
       }
-      this.timelineGraphics.beginFill(0x4a9eff, 0.95);
-      this.timelineGraphics.drawCircle(screen.x, screen.y, dotRadius);
-      this.timelineGraphics.endFill();
-      this.timelineCommitPoints.push({
-        commit,
-        screenX: screen.x,
-        screenY: screen.y,
-      });
-    }
+    });
 
     this.drawScale();
-    this.drawChangeScale(lineY);
+    this.drawChangeScale(lineYs);
     this.drawHoverCommit();
   }
 
@@ -636,7 +675,7 @@ class TimelineViewer {
     }
   }
 
-  private drawChangeLines(lineY: number) {
+  private drawChangeLines(grouped: GroupedCommits[], lineOffsets: number[], lineYs: number[]) {
     if (!this.timelineChangeGraphics) return;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
@@ -650,30 +689,38 @@ class TimelineViewer {
     };
 
     this.timelineChangeGraphics.clear();
-    for (const commit of this.filteredCommits) {
-      const commitMs = commit.timestamp * 1000;
-      const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-      const screen = this.worldToScreen(worldX, 0);
-      const height = valueToHeight(commit.addedLines);
-      if (height <= 0) continue;
-      this.timelineChangeGraphics.moveTo(screen.x, lineY);
-      this.timelineChangeGraphics.lineTo(screen.x, lineY - height);
-    }
+    grouped.forEach((group, index) => {
+      const lineOffset = lineOffsets[index] ?? 0;
+      const lineY = lineYs[index] ?? 0;
+      for (const commit of group.commits) {
+        const commitMs = commit.timestamp * 1000;
+        const worldX = (commitMs - this.timelineRange.startMs) / 1000;
+        const screen = this.worldToScreen(worldX, lineOffset);
+        const height = valueToHeight(commit.addedLines);
+        if (height <= 0) continue;
+        this.timelineChangeGraphics.moveTo(screen.x, lineY);
+        this.timelineChangeGraphics.lineTo(screen.x, lineY - height);
+      }
+    });
     this.timelineChangeGraphics.stroke({ color: 0x3ddc6f, width: 2, alpha: 0.9 });
 
-    for (const commit of this.filteredCommits) {
-      const commitMs = commit.timestamp * 1000;
-      const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-      const screen = this.worldToScreen(worldX, 0);
-      const height = valueToHeight(commit.removedLines);
-      if (height <= 0) continue;
-      this.timelineChangeGraphics.moveTo(screen.x, lineY);
-      this.timelineChangeGraphics.lineTo(screen.x, lineY + height);
-    }
+    grouped.forEach((group, index) => {
+      const lineOffset = lineOffsets[index] ?? 0;
+      const lineY = lineYs[index] ?? 0;
+      for (const commit of group.commits) {
+        const commitMs = commit.timestamp * 1000;
+        const worldX = (commitMs - this.timelineRange.startMs) / 1000;
+        const screen = this.worldToScreen(worldX, lineOffset);
+        const height = valueToHeight(commit.removedLines);
+        if (height <= 0) continue;
+        this.timelineChangeGraphics.moveTo(screen.x, lineY);
+        this.timelineChangeGraphics.lineTo(screen.x, lineY + height);
+      }
+    });
     this.timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
   }
 
-  private drawChangeScale(lineY: number) {
+  private drawChangeScale(lineYs: number[]) {
     if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) return;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
@@ -684,8 +731,10 @@ class TimelineViewer {
 
     this.timelineChangeScaleGraphics.clear();
     this.timelineChangeScaleGraphics.lineStyle(1, 0x8a8a8a, 0.9);
-    this.timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
-    this.timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
+    lineYs.forEach(lineY => {
+      this.timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
+      this.timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
+    });
     this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
     this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
@@ -700,24 +749,27 @@ class TimelineViewer {
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
-      this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
-      this.timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
-      this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
-      this.timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
+      lineYs.forEach(lineY => {
+        this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
+        this.timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
+        this.timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
+        this.timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
+      });
     }
     this.timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
+    const labelLineY = lineYs[Math.floor(lineYs.length / 2)] ?? 0;
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
       const labelUp = new Text(`${tick}`, labelStyle);
       labelUp.x = axisX - 8 - labelUp.width;
-      labelUp.y = lineY - offset - labelUp.height / 2;
+      labelUp.y = labelLineY - offset - labelUp.height / 2;
       this.timelineChangeTextContainer.addChild(labelUp);
 
       const labelDown = new Text(`${tick}`, labelStyle);
       labelDown.x = axisX - 8 - labelDown.width;
-      labelDown.y = lineY + offset - labelDown.height / 2;
+      labelDown.y = labelLineY + offset - labelDown.height / 2;
       this.timelineChangeTextContainer.addChild(labelDown);
     }
   }
@@ -901,6 +953,71 @@ class TimelineViewer {
       default:
         return `${year}`;
     }
+  }
+
+  private getGroupedCommits(): GroupedCommits[] {
+    if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
+      return [{
+        key: 'all',
+        startMs: this.timelineRange.startMs,
+        commits: this.filteredCommits,
+      }];
+    }
+
+    const grouped = new Map<string, GroupedCommits>();
+    for (const commit of this.filteredCommits) {
+      const date = new Date(commit.timestamp * 1000);
+      const { key, startMs } = this.getGroupKeyAndStart(date, this.config.groupBy);
+      const existing = grouped.get(key);
+      if (existing) {
+        existing.commits.push(commit);
+      } else {
+        grouped.set(key, { key, startMs, commits: [commit] });
+      }
+    }
+
+    return Array.from(grouped.values()).sort((a, b) => a.startMs - b.startMs);
+  }
+
+  private getGroupKeyAndStart(date: Date, groupBy: GroupBy): { key: string; startMs: number } {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
+
+    if (groupBy === 'Year') {
+      const start = Date.UTC(year, 0, 1);
+      return { key: `${year}`, startMs: start };
+    }
+
+    if (groupBy === 'Month') {
+      const start = Date.UTC(year, month, 1);
+      const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+      return { key, startMs: start };
+    }
+
+    if (groupBy === 'Week') {
+      const dayIndex = (date.getUTCDay() + 6) % 7;
+      const startDate = new Date(Date.UTC(year, month, day));
+      startDate.setUTCDate(startDate.getUTCDate() - dayIndex);
+      const startMs = startDate.getTime();
+      const weekYear = startDate.getUTCFullYear();
+      const firstThursday = new Date(Date.UTC(weekYear, 0, 4));
+      const weekStart = new Date(firstThursday);
+      const weekStartDay = (weekStart.getUTCDay() + 6) % 7;
+      weekStart.setUTCDate(weekStart.getUTCDate() - weekStartDay);
+      const weekNumber = Math.floor((startMs - weekStart.getTime()) / (7 * 24 * 3600 * 1000)) + 1;
+      return { key: `${weekYear}-W${String(weekNumber).padStart(2, '0')}`, startMs };
+    }
+
+    const start = Date.UTC(year, month, day);
+    const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return { key, startMs: start };
+  }
+
+  private getLineOffsets(count: number): number[] {
+    if (count <= 1) return [0];
+    const mid = (count - 1) / 2;
+    return Array.from({ length: count }, (_, idx) => (idx - mid) * this.timelineLineGap);
   }
 
   private clamp(value: number, min: number, max: number): number {
