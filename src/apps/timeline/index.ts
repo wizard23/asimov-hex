@@ -14,7 +14,7 @@ interface Commit {
 }
 
 type DisplayMode = 'List' | 'Timeline';
-type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'quarterHour' | 'minute';
+type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'tenMinute' | 'minute';
 type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
 
 interface GroupedCommits {
@@ -862,7 +862,7 @@ class TimelineViewer {
     // The selection logic relies on this ordering when choosing major/minor units.
     const units: Array<{ unit: ScaleUnit; seconds: number }> = [
       { unit: 'minute', seconds: 60 },
-      { unit: 'quarterHour', seconds: 15 * 60 },
+      { unit: 'tenMinute', seconds: 10 * 60 },
       { unit: 'hour', seconds: 3600 },
       { unit: 'day', seconds: 24 * 3600 },
       { unit: 'month', seconds: 30 * 24 * 3600 },
@@ -900,9 +900,9 @@ class TimelineViewer {
     if (unit === 'minute') {
       return aligned;
     }
-    if (unit === 'quarterHour') {
+    if (unit === 'tenMinute') {
       const minutes = aligned.getUTCMinutes();
-      aligned.setUTCMinutes(Math.floor(minutes / 15) * 15);
+      aligned.setUTCMinutes(Math.floor(minutes / 10) * 10);
       return aligned;
     }
     aligned.setUTCMinutes(0);
@@ -932,8 +932,8 @@ class TimelineViewer {
       case 'minute':
         next.setUTCMinutes(next.getUTCMinutes() + 1);
         return next;
-      case 'quarterHour':
-        next.setUTCMinutes(next.getUTCMinutes() + 15);
+      case 'tenMinute':
+        next.setUTCMinutes(next.getUTCMinutes() + 10);
         return next;
       case 'hour':
         next.setUTCHours(next.getUTCHours() + 1);
@@ -973,7 +973,7 @@ class TimelineViewer {
         return `${month}-${day}`;
       case 'hour':
         return `${hour}:00`;
-      case 'quarterHour':
+      case 'tenMinute':
         return `${hour}:${minute}`;
       case 'minute':
         return `${hour}:${minute}`;

@@ -472,6 +472,18 @@ yes please.
 Now the scale is broken again because you did not actually fix the ordering of the units array. Please fix the order and add an important comment explaining the importance of the ordering to ensure that the ordering does not get changed again in the future by accident.
 
 
+Great! this works very well now :) Please change the quaterHour unit to 10 minute units.
+
+
+
+1 feat(timeline): replace quarterHour with tenMinute scale unit and fix unit ordering
+   2
+   3 - Reordered scale units from smallest to largest to ensure correct major/minor unit selection.
+   4 - Replaced 'quarterHour' (15 min) with 'tenMinute' (10 min) across the timeline application.
+   5 - Added documentation explaining the importance of the unit array ordering.
+   6 - Updated date alignment and formatting logic for the new 10-minute intervals.
+
+
 
 
 
