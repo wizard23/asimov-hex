@@ -209,3 +209,12 @@ Please explore ways to prevent this dx issue. Don't change anything yet but only
   - Move the details panel outside the #timeline-panel flex container (e.g., sidebar or footer) to decouple it from the canvas size.
   - Cache the last non-null hovered commit details height and lock the panel height until hover ends.
 
+
+
+git worktree add ../hotfix hotfix/login
+cd ../hotfix
+# fix + commit
+
+git worktree add ../wt/feature-stat-fixed-overlay feature/stat-fixed-overlay
+
+

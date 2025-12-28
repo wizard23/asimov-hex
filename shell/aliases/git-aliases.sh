@@ -42,3 +42,21 @@ alias gps='git push'
 alias gpu='git pull'
 alias gs='git status '
 alias gss='git for-each-ref --sort=-committerdate'
+
+
+gwww() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: gwww <branch-name>" >&2
+    return 1
+  fi
+
+  local branch="$1"
+  local dir="../wt/${branch//\//-}"
+
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add "$dir" "$branch"
+  else
+    git worktree add -b "$branch" "$dir"
+  fi
+}
+
