@@ -243,8 +243,8 @@ class TimelineViewer {
       <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}${dateSuffix}</h2>
       <div class="timeline-canvas-container">
         <div id="timeline-canvas"></div>
+        <div id="timeline-info" class="timeline-info-overlay">${this.renderCommitInfo(null)}</div>
       </div>
-      <div id="timeline-info" class="timeline-info">${this.renderCommitInfo(null)}</div>
     `;
 
     const canvasContainer = document.getElementById('timeline-canvas');

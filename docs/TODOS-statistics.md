@@ -218,3 +218,11 @@ cd ../hotfix
 git worktree add ../wt/feature-stat-fixed-overlay feature/stat-fixed-overlay
 
 
+I created a worktree at: ../wt/feature-stat-fixed-overlay
+Please implement the "Render the commit details in an overlay positioned above the canvas (absolute/fixed)" approach in the worktree.
+
+Great! It works! Now please add another dx feature. Keep the last highligted commit highlighted as long as no other commit is hovered.
+
+Also: when there are many commits close together please ensure that the highlighted white disk is rendered on top of the others.
+
+

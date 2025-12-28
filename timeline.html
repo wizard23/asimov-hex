@@ -82,9 +82,20 @@
       width: 100%;
       height: 100%;
     }
-    .timeline-info {
-      margin-top: 12px;
-      flex: 0 0 auto;
+    .timeline-info-overlay {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      max-height: 40%;
+      overflow: auto;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(20, 20, 20, 0.92);
+      border: 1px solid #555;
+    }
+    .timeline-info-overlay .commit-item {
+      margin-bottom: 0;
     }
     .commit-item-empty {
       text-align: center;
