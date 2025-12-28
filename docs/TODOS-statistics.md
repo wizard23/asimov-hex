@@ -463,6 +463,10 @@ const units: Array<{ unit: ScaleUnit; seconds: number }> = [
 ];
 
 
+Makes sense — the selection logic assumes the units array is ordered from largest to smallest. I’ve kept that ordering and now also filter by range length so short ranges don’t pick decade/year by mistake.
+If you want me to simplify that logic back now that quarter hours are added, I can.
+
+yes please.
 
 
 

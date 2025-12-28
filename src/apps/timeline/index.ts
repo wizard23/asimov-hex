@@ -659,14 +659,13 @@ class TimelineViewer {
     const { startMs, endMs } = scaleRange;
     const visibleRange = this.getVisibleTimelineRange(scaleRange.startMs, scaleRange.endMs);
     const pxPerSecond = this.timelineScale;
-    const rangeSeconds = (scaleRange.endMs - scaleRange.startMs) / 1000;
 
     timelineScaleGraphics.clear();
     timelineScaleGraphics.moveTo(0, scaleHeight);
     timelineScaleGraphics.lineTo(timelineApp.screen.width, scaleHeight);
     timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
 
-    const unitSelection = this.pickScaleUnits(pxPerSecond, rangeSeconds);
+    const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 15 });
     const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 13 });
 
@@ -858,7 +857,7 @@ class TimelineViewer {
     };
   }
 
-  private pickScaleUnits(pxPerSecond: number, rangeSeconds: number): { major: ScaleUnit; minor: ScaleUnit | null } {
+  private pickScaleUnits(pxPerSecond: number): { major: ScaleUnit; minor: ScaleUnit | null } {
     const units: Array<{ unit: ScaleUnit; seconds: number }> = [
       { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
       { unit: 'year', seconds: 365.25 * 24 * 3600 },
@@ -872,11 +871,8 @@ class TimelineViewer {
     const majorMinPx = 70;
     const minorMinPx = 40;
 
-    const eligibleUnits = units.filter(entry => entry.seconds <= rangeSeconds);
-    const candidates = eligibleUnits.length > 0 ? eligibleUnits : units.slice(-1);
-
-    let major = candidates[candidates.length - 1].unit;
-    for (const entry of candidates) {
+    let major = units[units.length - 1].unit;
+    for (const entry of units) {
       if (pxPerSecond * entry.seconds >= majorMinPx) {
         major = entry.unit;
         break;
