@@ -673,9 +673,30 @@ class TimelineViewer {
 
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
-    this.drawScaleUnit(unitSelection.major, true, visibleRange.startMs, visibleRange.endMs, scaleHeight, majorStyle, majorLabelSpacing, scaleRange.startMs);
+    const usedLabelPositions = new Set<number>();
+    this.drawScaleUnit(
+      unitSelection.major,
+      true,
+      visibleRange.startMs,
+      visibleRange.endMs,
+      scaleHeight,
+      majorStyle,
+      majorLabelSpacing,
+      scaleRange.startMs,
+      usedLabelPositions
+    );
     if (unitSelection.minor) {
-      this.drawScaleUnit(unitSelection.minor, false, visibleRange.startMs, visibleRange.endMs, scaleHeight, minorStyle, minorLabelSpacing, scaleRange.startMs);
+      this.drawScaleUnit(
+        unitSelection.minor,
+        false,
+        visibleRange.startMs,
+        visibleRange.endMs,
+        scaleHeight,
+        minorStyle,
+        minorLabelSpacing,
+        scaleRange.startMs,
+        usedLabelPositions
+      );
     }
 
     if (visibleRange.startMs > endMs || visibleRange.endMs < startMs) {
@@ -790,7 +811,8 @@ class TimelineViewer {
     scaleHeight: number,
     style: TextStyle,
     minLabelSpacing: number,
-    scaleStartMs: number
+    scaleStartMs: number,
+    usedLabelPositions: Set<number>
   ) {
     if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
     const timelineScaleGraphics = this.timelineScaleGraphics;
@@ -821,11 +843,16 @@ class TimelineViewer {
       timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
+        const labelKey = Math.round(screenX);
+        if (usedLabelPositions.has(labelKey)) {
+          continue;
+        }
         const label = new Text({ text: this.formatScaleLabel(date, unit), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
         label.y = scaleHeight - 4;
         this.timelineTextContainer.addChild(label);
+        usedLabelPositions.add(labelKey);
         lastLabelX = screenX;
       }
     }

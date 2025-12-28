@@ -26,7 +26,7 @@ the commiot message you gave me seems to mix multiple of the last interactions. 
 
 Please extract a meaningful commit message from the last interactions between human and AI in this file:
 docs/transcripts-buffer/codex/codex-2025-12-27-1250.log
-The log file is huge so please only look at the last 500 lines or so for determining the commit message.
+The log file is huge so please only look at the last 200 lines or so for determining the commit message.
 The commit message should not be a mix of multiple of the last interactions. Please only use the last interaction between human and AI for the commit message.
 The commit message should not start with a line number for each line (if it even needs multiple lines) because that makes it hard for me to just copy and paste it.
 
