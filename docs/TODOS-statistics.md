@@ -431,6 +431,9 @@ I can’t run Chrome here. This environment doesn’t support launching GUI apps
   Great all deprecation warnings are gone! There are however still ome errors in the build. Please fix these.
 
 
+  The scale never shows minutes for me. No matter how deep in I zoom. Even when there is not a single hour tick visible anymore because i zoomed in on a very short time range of just a few minutes.
+
+
 
 
 

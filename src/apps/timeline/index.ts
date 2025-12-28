@@ -867,9 +867,12 @@ class TimelineViewer {
       { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
     ];
 
+    const majorMinPx = 70;
+    const minorMinPx = 40;
+
     let major = units[units.length - 1].unit;
     for (const entry of units) {
-      if (pxPerSecond * entry.seconds >= 120) {
+      if (pxPerSecond * entry.seconds >= majorMinPx) {
         major = entry.unit;
         break;
       }
@@ -878,7 +881,7 @@ class TimelineViewer {
     const majorIndex = units.findIndex(entry => entry.unit === major);
     let minor: ScaleUnit | null = null;
     for (let i = majorIndex - 1; i >= 0; i -= 1) {
-      if (pxPerSecond * units[i].seconds >= 60) {
+      if (pxPerSecond * units[i].seconds >= minorMinPx) {
         minor = units[i].unit;
         break;
       }
