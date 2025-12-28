@@ -469,6 +469,9 @@ If you want me to simplify that logic back now that quarter hours are added, I c
 yes please.
 
 
+Now the scale is broken again because you did not actually fix the ordering of the units array. Please fix the order and add an important comment explaining the importance of the ordering to ensure that the ordering does not get changed again in the future by accident.
+
+
 
 
 

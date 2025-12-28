@@ -858,20 +858,22 @@ class TimelineViewer {
   }
 
   private pickScaleUnits(pxPerSecond: number): { major: ScaleUnit; minor: ScaleUnit | null } {
+    // IMPORTANT: Keep this array ordered from smallest to largest unit.
+    // The selection logic relies on this ordering when choosing major/minor units.
     const units: Array<{ unit: ScaleUnit; seconds: number }> = [
-      { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
-      { unit: 'year', seconds: 365.25 * 24 * 3600 },
-      { unit: 'month', seconds: 30 * 24 * 3600 },
-      { unit: 'day', seconds: 24 * 3600 },
-      { unit: 'hour', seconds: 3600 },
-      { unit: 'quarterHour', seconds: 15 * 60 },
       { unit: 'minute', seconds: 60 },
+      { unit: 'quarterHour', seconds: 15 * 60 },
+      { unit: 'hour', seconds: 3600 },
+      { unit: 'day', seconds: 24 * 3600 },
+      { unit: 'month', seconds: 30 * 24 * 3600 },
+      { unit: 'year', seconds: 365.25 * 24 * 3600 },
+      { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
     ];
 
     const majorMinPx = 70;
     const minorMinPx = 40;
 
-    let major = units[units.length - 1].unit;
+    let major = units[0].unit;
     for (const entry of units) {
       if (pxPerSecond * entry.seconds >= majorMinPx) {
         major = entry.unit;
@@ -881,7 +883,7 @@ class TimelineViewer {
 
     const majorIndex = units.findIndex(entry => entry.unit === major);
     let minor: ScaleUnit | null = null;
-    for (let i = majorIndex + 1; i < units.length; i += 1) {
+    for (let i = majorIndex - 1; i >= 0; i -= 1) {
       if (pxPerSecond * units[i].seconds >= minorMinPx) {
         minor = units[i].unit;
         break;
