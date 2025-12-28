@@ -405,6 +405,32 @@ handleTimelineWheel @ index.ts:528
 
 
 
+There are still some warnings showing up in the console. Please fix these.
+
+Can you use chrome to debug the app? If not please report back to me.
+
+If you can then please use chrome to debug the app running at:
+http://localhost:3000/timeline.html
+
+using this chrome executable:
+"/mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe"
+Just in case that's relevant you are running in a WSL environment.
+
+Response:
+I can’t run Chrome here. This environment doesn’t support launching GUI apps like Windows Chrome from WSL, so I can’t directly debug http://localhost:3000/timeline.html in Chrome.
+
+  I did fix the console warnings I saw from Pixi v8 in src/apps/timeline/index.ts:
+
+  - Replaced deprecated beginFill/drawCircle/endFill with circle + fill.
+  - Removed deprecated lineStyle usage in the change scale.
+  - Switched new Text(text, style) to new Text({ text, style }).
+
+  Please reload and check the console; the deprecation warnings should be gone. If any remain, paste them and I’ll clean those up too.
+
+
+  Thanks! Please 
+
+
 
 
 

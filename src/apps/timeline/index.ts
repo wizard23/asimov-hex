@@ -587,11 +587,10 @@ class TimelineViewer {
     if (!this.hoveredCommit) return;
     const point = this.timelineCommitPoints.find(candidate => candidate.commit.hash === this.hoveredCommit?.hash);
     if (!point) return;
-    this.timelineHoverGraphics.beginFill(0xffffff, 1);
-    this.timelineHoverGraphics.drawCircle(point.screenX, point.screenY, 7);
-    this.timelineHoverGraphics.endFill();
-    this.timelineHoverGraphics.lineStyle(2, 0xffffff, 0.9);
-    this.timelineHoverGraphics.drawCircle(point.screenX, point.screenY, 9);
+    this.timelineHoverGraphics.circle(point.screenX, point.screenY, 7);
+    this.timelineHoverGraphics.fill({ color: 0xffffff, alpha: 1 });
+    this.timelineHoverGraphics.circle(point.screenX, point.screenY, 9);
+    this.timelineHoverGraphics.stroke({ color: 0xffffff, width: 2, alpha: 0.9 });
   }
 
   private drawTimeline() {
@@ -631,9 +630,8 @@ class TimelineViewer {
         if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
           continue;
         }
-        this.timelineGraphics.beginFill(0x4a9eff, 0.95);
-        this.timelineGraphics.drawCircle(screenX, lineY, dotRadius);
-        this.timelineGraphics.endFill();
+        this.timelineGraphics.circle(screenX, lineY, dotRadius);
+        this.timelineGraphics.fill({ color: 0x4a9eff, alpha: 0.95 });
         this.timelineCommitPoints.push({
           commit,
           screenX,
@@ -732,7 +730,6 @@ class TimelineViewer {
     const height = this.timelineChangeMaxHeight;
 
     this.timelineChangeScaleGraphics.clear();
-    this.timelineChangeScaleGraphics.lineStyle(1, 0x8a8a8a, 0.9);
     lineYs.forEach(lineY => {
       this.timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
       this.timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
@@ -764,12 +761,12 @@ class TimelineViewer {
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
-      const labelUp = new Text(`${tick}`, labelStyle);
+      const labelUp = new Text({ text: `${tick}`, style: labelStyle });
       labelUp.x = axisX - 8 - labelUp.width;
       labelUp.y = labelLineY - offset - labelUp.height / 2;
       this.timelineChangeTextContainer.addChild(labelUp);
 
-      const labelDown = new Text(`${tick}`, labelStyle);
+      const labelDown = new Text({ text: `${tick}`, style: labelStyle });
       labelDown.x = axisX - 8 - labelDown.width;
       labelDown.y = labelLineY + offset - labelDown.height / 2;
       this.timelineChangeTextContainer.addChild(labelDown);
@@ -813,7 +810,7 @@ class TimelineViewer {
       this.timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
-        const label = new Text(this.formatScaleLabel(date, unit), style);
+        const label = new Text({ text: this.formatScaleLabel(date, unit), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
         label.y = scaleHeight - 4;
