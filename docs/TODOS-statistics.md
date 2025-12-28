@@ -238,11 +238,32 @@ Split the timeline into multiple lines displayed on top of each other. Each line
 
 
 
+
+
+I see the Group by dropbox when display mode is timeline that is as expected 
+but when I pick "Day" nothing happens. I still see a timeline ranging aprox 5 days but i would have expected to see 5 lines stacked on top of each other
+
+I copied all console output here:
+
+client:495 [vite] connecting...
+client:618 [vite] connected.
+index.ts:632 PixiJS Deprecation Warning: Graphics#beginFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.Deprecated since v8.0.0
+index.ts:633 PixiJS Deprecation Warning: Graphics#drawCircle has been renamed to Graphics#circleDeprecated since v8.0.0
+index.ts:634 PixiJS Deprecation Warning: Graphics#endFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.Deprecated since v8.0.0
+index.ts:813 PixiJS Deprecation Warning: use new Text({ text: "hi!", style }) insteadDeprecated since v8.0.0
+index.ts:733 PixiJS Deprecation Warning: Graphics#lineStyle is no longer needed. Use Graphics#setStrokeStyle to set the stroke style.Deprecated since v8.0.0
+
+
+
+
 When clicked pleas lock the selected commit in place. Get rid of the locking by right clicking.
 
 Please add a "context aware help" on top of the window. That always shows what actions are available to the user:
 * Use the scrollwheel to zoom in and out of the timeline.
 * pan the timeline by clicking anywhere and then drag and drop to pan through time.
- 
+
+
+
+
 
 

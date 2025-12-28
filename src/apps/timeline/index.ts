@@ -602,7 +602,8 @@ class TimelineViewer {
     const rangeSeconds = (this.timelineRange.endMs - this.timelineRange.startMs) / 1000;
     const grouped = this.getGroupedCommits();
     const lineOffsets = this.getLineOffsets(grouped.length);
-    const lineYs = lineOffsets.map(offset => this.worldToScreen(0, offset).y);
+    const baseLineY = this.worldToScreen(0, 0).y;
+    const lineYs = lineOffsets.map(offset => baseLineY + offset);
     const startX = this.worldToScreen(0, 0).x;
     const endX = this.worldToScreen(rangeSeconds, 0).x;
 
@@ -614,28 +615,28 @@ class TimelineViewer {
     this.timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
 
     this.timelineChangeGraphics.clear();
-    this.drawChangeLines(grouped, lineOffsets, lineYs);
+    this.drawChangeLines(grouped, lineYs);
 
     this.timelineGraphics.clear();
 
     const dotRadius = 7;
     this.timelineCommitPoints = [];
     grouped.forEach((group, index) => {
-      const lineOffset = lineOffsets[index] ?? 0;
+      const lineY = lineYs[index] ?? baseLineY;
       for (const commit of group.commits) {
         const commitMs = commit.timestamp * 1000;
         const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-        const screen = this.worldToScreen(worldX, lineOffset);
-        if (screen.x < -50 || screen.x > this.timelineApp.screen.width + 50) {
+        const screenX = this.worldToScreen(worldX, 0).x;
+        if (screenX < -50 || screenX > this.timelineApp.screen.width + 50) {
           continue;
         }
         this.timelineGraphics.beginFill(0x4a9eff, 0.95);
-        this.timelineGraphics.drawCircle(screen.x, screen.y, dotRadius);
+        this.timelineGraphics.drawCircle(screenX, lineY, dotRadius);
         this.timelineGraphics.endFill();
         this.timelineCommitPoints.push({
           commit,
-          screenX: screen.x,
-          screenY: screen.y,
+          screenX,
+          screenY: lineY,
         });
       }
     });
@@ -675,7 +676,7 @@ class TimelineViewer {
     }
   }
 
-  private drawChangeLines(grouped: GroupedCommits[], lineOffsets: number[], lineYs: number[]) {
+  private drawChangeLines(grouped: GroupedCommits[], lineYs: number[]) {
     if (!this.timelineChangeGraphics) return;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
@@ -690,31 +691,29 @@ class TimelineViewer {
 
     this.timelineChangeGraphics.clear();
     grouped.forEach((group, index) => {
-      const lineOffset = lineOffsets[index] ?? 0;
       const lineY = lineYs[index] ?? 0;
       for (const commit of group.commits) {
         const commitMs = commit.timestamp * 1000;
         const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-        const screen = this.worldToScreen(worldX, lineOffset);
+        const screenX = this.worldToScreen(worldX, 0).x;
         const height = valueToHeight(commit.addedLines);
         if (height <= 0) continue;
-        this.timelineChangeGraphics.moveTo(screen.x, lineY);
-        this.timelineChangeGraphics.lineTo(screen.x, lineY - height);
+        this.timelineChangeGraphics.moveTo(screenX, lineY);
+        this.timelineChangeGraphics.lineTo(screenX, lineY - height);
       }
     });
     this.timelineChangeGraphics.stroke({ color: 0x3ddc6f, width: 2, alpha: 0.9 });
 
     grouped.forEach((group, index) => {
-      const lineOffset = lineOffsets[index] ?? 0;
       const lineY = lineYs[index] ?? 0;
       for (const commit of group.commits) {
         const commitMs = commit.timestamp * 1000;
         const worldX = (commitMs - this.timelineRange.startMs) / 1000;
-        const screen = this.worldToScreen(worldX, lineOffset);
+        const screenX = this.worldToScreen(worldX, 0).x;
         const height = valueToHeight(commit.removedLines);
         if (height <= 0) continue;
-        this.timelineChangeGraphics.moveTo(screen.x, lineY);
-        this.timelineChangeGraphics.lineTo(screen.x, lineY + height);
+        this.timelineChangeGraphics.moveTo(screenX, lineY);
+        this.timelineChangeGraphics.lineTo(screenX, lineY + height);
       }
     });
     this.timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
