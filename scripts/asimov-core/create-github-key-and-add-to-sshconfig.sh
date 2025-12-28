@@ -8,11 +8,11 @@ usage() {
 }
 
 # ------------------------------------------------------------
-# Identity defaults (must match your example exactly)
+# Identity defaults (match your example values/intent)
 # ------------------------------------------------------------
-DEFAULT_EMAIL='wizards23+github@gmail.com'
-DEFAULT_HOSTNAME=''"$(hostname)"''
-DEFAULT_GITHUB_HOST_ALIAS='github-<SAFE_HOSTNAME>--<SAFE_EMAIL>'
+DEFAULT_EMAIL="wizards23+github@gmail.com"
+DEFAULT_HOSTNAME="$(hostname)"
+DEFAULT_GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>--<SAFE_EMAIL>"
 
 IDENTITY_FILE="./secrets/identity.sh"
 
@@ -29,7 +29,7 @@ if [[ -f "$IDENTITY_FILE" ]]; then
   source "$IDENTITY_FILE"
 fi
 
-# Fill missing identity values with exact defaults
+# Fill missing identity values with defaults
 EMAIL="${EMAIL:-$DEFAULT_EMAIL}"
 HOSTNAME="${HOSTNAME:-$DEFAULT_HOSTNAME}"
 GITHUB_HOST_ALIAS="${GITHUB_HOST_ALIAS:-$DEFAULT_GITHUB_HOST_ALIAS}"
@@ -105,8 +105,22 @@ else
   [[ -w "$SSH_DIR" ]] || { echo "❌ $SSH_DIR not writable: $SSH_DIR" >&2; exit 1; }
 fi
 
+PRIVATE_EXISTS=0
+PUBLIC_EXISTS=0
+[[ -f "$KEY_BASE" ]] && PRIVATE_EXISTS=1
+[[ -f "$PUB_KEY" ]] && PUBLIC_EXISTS=1
+
+# Refuse if keypair is in a broken half-existing state
+if [[ $PRIVATE_EXISTS -ne $PUBLIC_EXISTS ]]; then
+  echo "❌ Refusing to proceed: keypair appears incomplete (only one of private/public exists)." >&2
+  echo "   Private: $KEY_BASE  (exists=$PRIVATE_EXISTS)" >&2
+  echo "   Public : $PUB_KEY   (exists=$PUBLIC_EXISTS)" >&2
+  echo "   Fix by restoring the missing file or removing the orphaned one." >&2
+  exit 4
+fi
+
 NEED_KEYGEN=1
-if [[ -f "$KEY_BASE" || -f "$PUB_KEY" ]]; then
+if [[ $PRIVATE_EXISTS -eq 1 && $PUBLIC_EXISTS -eq 1 ]]; then
   NEED_KEYGEN=0
 fi
 
@@ -124,10 +138,6 @@ if [[ $CONFIG_EXISTS -eq 1 ]]; then
     exit 3
   fi
 fi
-
-# If config doesn't exist, ensure we can create it (once ~/.ssh exists)
-# (we already checked write permissions)
-: # no-op
 
 # ------------------------------------------------------------
 # Modifications start here

@@ -9,11 +9,11 @@ usage() {
 }
 
 # ------------------------------------------------------------
-# Identity defaults (must match your example exactly)
+# Identity defaults (match your example values/intent)
 # ------------------------------------------------------------
-DEFAULT_EMAIL='wizards23+github@gmail.com'
-DEFAULT_HOSTNAME=''"$(hostname)"''
-DEFAULT_GITHUB_HOST_ALIAS='github-<SAFE_HOSTNAME>--<SAFE_EMAIL>'
+DEFAULT_EMAIL="wizards23+github@gmail.com"
+DEFAULT_HOSTNAME="$(hostname)"
+DEFAULT_GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>--<SAFE_EMAIL>"
 
 IDENTITY_FILE="./secrets/identity.sh"
 
@@ -78,12 +78,20 @@ else
   exit 2
 fi
 
-# Preflight: key exists
+# Preflight: key exists and pair is complete
+PUB_PATH="${KEY_PATH}.pub"
+
 if [[ ! -f "$KEY_PATH" ]]; then
   echo "❌ Private key not found: $KEY_PATH" >&2
   echo "Available GitHub keys in $SSH_DIR:" >&2
   ls -1 "$SSH_DIR"/github-ssh-key--* 2>/dev/null || true
   exit 1
+fi
+
+if [[ ! -f "$PUB_PATH" ]]; then
+  echo "❌ Refusing to proceed: public key is missing for: $KEY_PATH" >&2
+  echo "   Expected: $PUB_PATH" >&2
+  exit 4
 fi
 
 # Modifications start here
