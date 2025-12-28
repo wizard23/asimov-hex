@@ -476,13 +476,9 @@ Great! this works very well now :) Please change the quaterHour unit to 10 minut
 
 
 
-1 feat(timeline): replace quarterHour with tenMinute scale unit and fix unit ordering
-   2
-   3 - Reordered scale units from smallest to largest to ensure correct major/minor unit selection.
-   4 - Replaced 'quarterHour' (15 min) with 'tenMinute' (10 min) across the timeline application.
-   5 - Added documentation explaining the importance of the unit array ordering.
-   6 - Updated date alignment and formatting logic for the new 10-minute intervals.
 
+Please fix a small ux issues in the scale:
+When a tick label happens to coincide with a label of a larger unit (like day and hour 00:00) both get drawn on top of each other. please ensure that only the larger unit label gets drawn in this case
 
 
 
