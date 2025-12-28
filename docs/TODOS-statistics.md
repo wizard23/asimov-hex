@@ -254,6 +254,162 @@ index.ts:813 PixiJS Deprecation Warning: use new Text({ text: "hi!", style }) in
 index.ts:733 PixiJS Deprecation Warning: Graphics#lineStyle is no longer needed. Use Graphics#setStrokeStyle to set the stroke style.Deprecated since v8.0.0
 
 
+I see 5 distinct lines now. That's good. But i was imprecise when I said that all lines should use "the same scale". What I meant was this:
+The time scale for each day should be the same. For grouping by days this would mean. The time scale starts at 00:00 and ends at 24:00. Commits that happened at the same time of day but on different days should have the same x coordinate (but a different y coordinate) in screen coordinates.
+
+If anything is unclear please just ask.
+
+
+
+It does not work yet. The build fails and there are errors on the console:
+
+client:495 [vite] connecting...
+client:618 [vite] connected.
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at ResizeObserver.<anonymous> (index.ts:387:12)
+drawTimeline @ index.ts:603
+(anonymous) @ index.ts:387
+index.ts:603 Uncaught (in promise) ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at TimelineViewer.updateTimelineInfo (index.ts:581:10)
+    at TimelineViewer.updateTimelineData (index.ts:437:10)
+    at TimelineViewer.renderTimeline (index.ts:288:10)
+drawTimeline @ index.ts:603
+updateTimelineInfo @ index.ts:581
+updateTimelineData @ index.ts:437
+renderTimeline @ index.ts:288
+await in renderTimeline
+render @ index.ts:249
+(anonymous) @ index.ts:172
+emitter_.on.key @ tweakpane.js?v=0079d56d:888
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+onValueChange_ @ tweakpane.js?v=0079d56d:903
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+onValueChange_ @ tweakpane.js?v=0079d56d:936
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+setRawValue @ tweakpane.js?v=0079d56d:191
+set rawValue @ tweakpane.js?v=0079d56d:171
+set rawValue @ tweakpane.js?v=0079d56d:920
+onSelectChange_ @ tweakpane.js?v=0079d56d:2937
+handleMouseUp_ @ unknown
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at ResizeObserver.<anonymous> (index.ts:387:12)
+drawTimeline @ index.ts:603
+(anonymous) @ index.ts:387
+index.ts:603 Uncaught (in promise) ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at TimelineViewer.updateTimelineInfo (index.ts:581:10)
+    at TimelineViewer.updateTimelineData (index.ts:437:10)
+    at TimelineViewer.renderTimeline (index.ts:288:10)
+drawTimeline @ index.ts:603
+updateTimelineInfo @ index.ts:581
+updateTimelineData @ index.ts:437
+renderTimeline @ index.ts:288
+await in renderTimeline
+render @ index.ts:249
+(anonymous) @ index.ts:186
+emitter_.on.key @ tweakpane.js?v=0079d56d:888
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+onValueChange_ @ tweakpane.js?v=0079d56d:903
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+onValueChange_ @ tweakpane.js?v=0079d56d:936
+(anonymous) @ tweakpane.js?v=0079d56d:152
+emit @ tweakpane.js?v=0079d56d:151
+setRawValue @ tweakpane.js?v=0079d56d:191
+set rawValue @ tweakpane.js?v=0079d56d:171
+set rawValue @ tweakpane.js?v=0079d56d:920
+onSelectChange_ @ tweakpane.js?v=0079d56d:2937
+handleMouseUp_ @ unknown
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+index.ts:603 Uncaught ReferenceError: Cannot access 'grouped' before initialization
+    at TimelineViewer.drawTimeline (index.ts:603:54)
+    at HTMLCanvasElement.handleTimelineWheel (index.ts:528:10)
+drawTimeline @ index.ts:603
+handleTimelineWheel @ index.ts:528
+
+
+
+
+
+
+
+
 
 
 When clicked pleas lock the selected commit in place. Get rid of the locking by right clicking.
