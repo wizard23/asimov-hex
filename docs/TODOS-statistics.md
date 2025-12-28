@@ -436,6 +436,32 @@ I can’t run Chrome here. This environment doesn’t support launching GUI apps
 
   Great, now minutes show up. Now please introduce quater hours as an intermediate between hours and minutes. 
 
+There seems to be a bug in the scale now: The scale is broken now: only one tick labeled '2000' shows up.
+
+
+The scale works again now. I think the cause was that had also changed the order of the units array while adding the quaterHours. It went from:
+
+const units: Array<{ unit: ScaleUnit; seconds: number }> = [
+    { unit: 'minute', seconds: 60 },
+    { unit: 'hour', seconds: 3600 },
+    { unit: 'day', seconds: 24 * 3600 },
+    { unit: 'month', seconds: 30 * 24 * 3600 },
+    { unit: 'year', seconds: 365.25 * 24 * 3600 },
+    { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
+];
+
+to:
+
+const units: Array<{ unit: ScaleUnit; seconds: number }> = [
+    { unit: 'decade', seconds: 10 * 365.25 * 24 * 3600 },
+    { unit: 'year', seconds: 365.25 * 24 * 3600 },
+    { unit: 'month', seconds: 30 * 24 * 3600 },
+    { unit: 'day', seconds: 24 * 3600 },
+    { unit: 'hour', seconds: 3600 },
+    { unit: 'quarterHour', seconds: 15 * 60 },
+    { unit: 'minute', seconds: 60 },
+];
+
 
 
 
