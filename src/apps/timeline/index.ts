@@ -504,10 +504,7 @@ class TimelineViewer {
   };
 
   private handleTimelineMouseLeave = () => {
-    if (!this.hoveredCommit) return;
-    this.hoveredCommit = null;
-    this.updateTimelineInfo();
-    this.drawHoverCommit();
+    // Keep the last highlighted commit when not hovering any other commit.
   };
 
   private updateHoverCommit(screenX: number, screenY: number) {
@@ -523,6 +520,10 @@ class TimelineViewer {
         bestDistance = dist;
         nextCommit = point.commit;
       }
+    }
+
+    if (!nextCommit) {
+      return;
     }
 
     if (nextCommit?.hash === this.hoveredCommit?.hash) {
@@ -553,8 +554,11 @@ class TimelineViewer {
     if (!this.hoveredCommit) return;
     const point = this.timelineCommitPoints.find(candidate => candidate.commit.hash === this.hoveredCommit?.hash);
     if (!point) return;
+    this.timelineHoverGraphics.beginFill(0xffffff, 1);
+    this.timelineHoverGraphics.drawCircle(point.screenX, point.screenY, 7);
+    this.timelineHoverGraphics.endFill();
     this.timelineHoverGraphics.lineStyle(2, 0xffffff, 0.9);
-    this.timelineHoverGraphics.drawCircle(point.screenX, point.screenY, 8);
+    this.timelineHoverGraphics.drawCircle(point.screenX, point.screenY, 9);
   }
 
   private drawTimeline() {
@@ -587,8 +591,7 @@ class TimelineViewer {
       if (screen.x < -50 || screen.x > this.timelineApp.screen.width + 50) {
         continue;
       }
-      const isHovered = this.hoveredCommit?.hash === commit.hash;
-      this.timelineGraphics.beginFill(isHovered ? 0xffffff : 0x4a9eff, isHovered ? 1 : 0.95);
+      this.timelineGraphics.beginFill(0x4a9eff, 0.95);
       this.timelineGraphics.drawCircle(screen.x, screen.y, dotRadius);
       this.timelineGraphics.endFill();
       this.timelineCommitPoints.push({
