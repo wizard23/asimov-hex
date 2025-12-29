@@ -80,6 +80,8 @@ For completeness please also prompt the user for the github host alias (so that 
 I just realized that load-github-key.sh needs to be sourced! so please modify it in such a way please.
 
 
+I have a weird bug with it that i managed to reproduce by: 1) source ./load-gitub-key.sh 2) ./load-githib-key.sh when I do this the shell crashes!
+
 
 
 
