@@ -1,5 +1,338 @@
 [
   {
+    "hash": "459c33a5351776a3e3245a33fd4c345d4cd8adfe",
+    "timestamp": 1767012603,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "chatgpt and human: remove set -e completely",
+    "addedLines": 24,
+    "removedLines": 30
+  },
+  {
+    "hash": "95e22caf4bfbbaa6505faa4c60e3bd78c4e8bc1d",
+    "timestamp": 1767012214,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "chatgpt plus human): guard set -euo pipefail when sourced (restore shell opts)",
+    "addedLines": 28,
+    "removedLines": 32
+  },
+  {
+    "hash": "af0c46615a3ecca80ad25315ad3984c0b46f9d49",
+    "timestamp": 1767011433,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: load key script must be sourced of course!",
+    "addedLines": 45,
+    "removedLines": 10
+  },
+  {
+    "hash": "2a891b401b32d73d8fe22f9d018c1cdf97d4177a",
+    "timestamp": 1767008730,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: make scripts executable",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "63a00113b76bbc1e898d34b1fb35fe3874c2e4a1",
+    "timestamp": 1767007926,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: simplify & streamline github key scripts",
+    "addedLines": 80,
+    "removedLines": 117
+  },
+  {
+    "hash": "9f4dba20684932ac7696bcd83c27765d670e486b",
+    "timestamp": 1766942322,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: final tweaking of githubcreate/load scripts",
+    "addedLines": 33,
+    "removedLines": 15
+  },
+  {
+    "hash": "f8c070a12e6f3d0f471d731a935ff352b267812d",
+    "timestamp": 1766942161,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: even more improvements",
+    "addedLines": 98,
+    "removedLines": 107
+  },
+  {
+    "hash": "374f783569595cafb8f2fe646a866da24373f05c",
+    "timestamp": 1766941692,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: use my email as default",
+    "addedLines": 13,
+    "removedLines": 2
+  },
+  {
+    "hash": "5b38a977035c9a6025d9075bf98a6fbe64584ec7",
+    "timestamp": 1766940430,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: use ./secret/identity.sh if it exists",
+    "addedLines": 168,
+    "removedLines": 36
+  },
+  {
+    "hash": "6b15822358137508d2db8f56274e45074cd551eb",
+    "timestamp": 1766940343,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: awesome create/load github key scripts from chatgpt plus prompts that created them :)",
+    "addedLines": 251,
+    "removedLines": 0
+  },
+  {
+    "hash": "353ca8a09e9228c4ddcce03585ed9a161bcecdcc",
+    "timestamp": 1766933326,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Add group labels to the left side of the timeline when 'Group By' is active, formatting day labels as 'Sun 2025/12/28' and using standard tick label formats for other units",
+    "addedLines": 66,
+    "removedLines": 2
+  },
+  {
+    "hash": "4816d84c5228f8584c22bca4248568c57776fcd5",
+    "timestamp": 1766932689,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: draft next statistics prompts; add more prompt flow ideas; tweak gemini commit instructions",
+    "addedLines": 77,
+    "removedLines": 0
+  },
+  {
+    "hash": "b1b4dc4e414007eb2e5b0899be3e29c7b957d517",
+    "timestamp": 1766922489,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Move the timeline scale ticks to the bottom of the scale area, closer to the timeline content, to improve visual connection.",
+    "addedLines": 11,
+    "removedLines": 3
+  },
+  {
+    "hash": "af47b993f550a68fa10221bb454c2ffe83b07820",
+    "timestamp": 1766921768,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Add milestone labels for larger time units (years, months, days, etc.) to the timeline scale. This ensures that major boundaries remain visible even when zoomed in to smaller units like hours or minutes, prioritizing their labels over the smaller unit ticks.",
+    "addedLines": 60,
+    "removedLines": 0
+  },
+  {
+    "hash": "3b57ac11d46e40327693aa720fe1ea9731b6baf6",
+    "timestamp": 1766916455,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fix timeline scale label overlap by ensuring only the larger unit label is drawn when ticks coincide",
+    "addedLines": 31,
+    "removedLines": 4
+  },
+  {
+    "hash": "2b42a4243b4179624de3716f33e456ce2a290a64",
+    "timestamp": 1766916266,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: detailed instructions for gemini about how to extract commit messages...gemini not as smart as codex ;)",
+    "addedLines": 21,
+    "removedLines": 8
+  },
+  {
+    "hash": "bf9d1de707839b936dee455eaf4e01c87c2f0842",
+    "timestamp": 1766914386,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat(timeline): replace quarterHour with tenMinute scale unit and fix unit ordering",
+    "addedLines": 33,
+    "removedLines": 8
+  },
+  {
+    "hash": "fe2569b8cc7f8292d4c325d32fae5f6a86d594f1",
+    "timestamp": 1766913572,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the unit ordering and added a warning comment so it doesn’t get changed accidentally. Also updated the selection logic to match the smallest→largest ordering.",
+    "addedLines": 13,
+    "removedLines": 8
+  },
+  {
+    "hash": "43ed5f8646d9fce0063edcfb22c04166ae05063a",
+    "timestamp": 1766913197,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Simplified the scale selection logic back to the original approach (now with quarterHour inserted) and removed the range-length filter (bug: human note: the ordering did not change so now the scale is broken again)",
+    "addedLines": 8,
+    "removedLines": 8
+  },
+  {
+    "hash": "7fa3c8fc82800dbb723b6373a7b0ca1c637cfe4a",
+    "timestamp": 1766912969,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the scale selection logic so it won’t pick decade/year for a short range (human note: I think the true cause of the bug was the reordering of the units array ;))",
+    "addedLines": 34,
+    "removedLines": 4
+  },
+  {
+    "hash": "b25ad0ee2e211307602fca03eecf5e93e6564a1c",
+    "timestamp": 1766912544,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added quarter-hour support in the scale logic and adjusted unit selection so it actually appears between hours and minutes (bug: it does not because the scale is broken now: only one tick labeled '2000' shows up)",
+    "addedLines": 21,
+    "removedLines": 7
+  },
+  {
+    "hash": "f5bb4d871b79a0cdd86f46860acc625a8e19fec8",
+    "timestamp": 1766911924,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Lowered the spacing thresholds for scale unit selection so minutes can appear at deeper zoom levels",
+    "addedLines": 8,
+    "removedLines": 2
+  },
+  {
+    "hash": "18eb5f1184f2f8bac943a4b09a3eaac82078e39b",
+    "timestamp": 1766911863,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: use displayMode: 'Timeline' and groupBy: 'Day' as default",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "21fc2f8039b0f0a20c8e4c763f34da62c957bf7d",
+    "timestamp": 1766911562,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the remaining TypeScript nullability errors by caching this.timelineChangeGraphics",
+    "addedLines": 47,
+    "removedLines": 36
+  },
+  {
+    "hash": "e6ad0fe0122da85cbd973648bada96e8e93b4035",
+    "timestamp": 1766910355,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix the console warnings I saw from Pixi v8 in src/apps/timeline/index.ts",
+    "addedLines": 35,
+    "removedLines": 12
+  },
+  {
+    "hash": "94ed3c61c83efc3c3692524ac7e02eb74b4c486a",
+    "timestamp": 1766897977,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the crash: grouped was referenced before initialization in drawTimeline. The declaration now comes first, so the timeline renders again.",
+    "addedLines": 6,
+    "removedLines": 1
+  },
+  {
+    "hash": "271cad4658284f04743144c056bc17a1b8b54df3",
+    "timestamp": 1766887748,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented “same time-of-period scale” for grouped timelines (bug: does not work; errors on console and build fails)",
+    "addedLines": 214,
+    "removedLines": 24
+  },
+  {
+    "hash": "80389727af5832b6456752c0584833609c5a2909",
+    "timestamp": 1766886874,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Fixed the grouping layout by decoupling vertical stacking from the time scale. The line offsets are now in screen pixels (not “seconds”), so day/week/month/year grouping actually stacks into distinct horizontal lanes.",
+    "addedLines": 38,
+    "removedLines": 18
+  },
+  {
+    "hash": "ca8562939f34acf2e7f9e18d2de4530fa5300848",
+    "timestamp": 1766885708,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "first draft of grouping by time range but it does not work yet (bug)",
+    "addedLines": 185,
+    "removedLines": 48
+  },
+  {
+    "hash": "86abf9d67dcf0803934eb7f2f5e78e087bf5ae4d",
+    "timestamp": 1766884364,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented the “sticky” highlight and ensured the highlighted disk renders on top",
+    "addedLines": 11,
+    "removedLines": 8
+  },
+  {
+    "hash": "ed2c268905513f027a393ae72daabb98829d7c14",
+    "timestamp": 1766884139,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implemented the fixed overlay approach",
+    "addedLines": 35,
+    "removedLines": 4
+  },
+  {
+    "hash": "cd03b699725758ff70a4d192bf80dfa861efdb0e",
+    "timestamp": 1766883776,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: disable buggy vscode suggestions in terminal",
+    "addedLines": 5,
+    "removedLines": 1
+  },
+  {
+    "hash": "08e08825afe375f90dca6a18f41c84e3b93619c0",
+    "timestamp": 1766882738,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: ultimate git worktree function :)) with chatgpt help",
+    "addedLines": 101,
+    "removedLines": 5
+  },
+  {
+    "hash": "0ff330daca18448d31aa5aa1ccb7eb7045cedfa2",
+    "timestamp": 1766882121,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: worktree function in aliases",
+    "addedLines": 27,
+    "removedLines": 0
+  },
+  {
+    "hash": "9345d6fc62326d1606dea304ca829f72e4cd3830",
+    "timestamp": 1766880731,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add git-aliases.sh; prepare for worktrees :)",
+    "addedLines": 60,
+    "removedLines": 0
+  },
+  {
+    "hash": "8734a102dbf5c7f3424a30e67543a53dee071e84",
+    "timestamp": 1766877595,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Centered the timeline vertically by anchoring the line at mid‑screen. (this triggered the same bug that we have in the tile editor that changing the window size because of the commit details getting larger jerks the pixi window around....interesting)",
+    "addedLines": 4,
+    "removedLines": 2
+  },
+  {
+    "hash": "457cbbc7b7c7cddec824cd7bf54ab9b47b2a6f50",
+    "timestamp": 1766877428,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update git timeline :)",
+    "addedLines": 126,
+    "removedLines": 0
+  },
+  {
     "hash": "7686cf62390c495f5d06c6ecc6388d9b81fccb75",
     "timestamp": 1766876835,
     "authorName": "Philipp Tiefenbacher",

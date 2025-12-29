@@ -63,8 +63,8 @@ class TimelineViewer {
   private config = {
     startDate: '',
     endDate: '',
-    displayMode: 'Timeline' as DisplayMode,
-    groupBy: 'Day' as GroupBy,
+    displayMode: 'List' as DisplayMode,
+    groupBy: 'None' as GroupBy,
     searchTerm: '',
     enableDateFilter: false,
   };

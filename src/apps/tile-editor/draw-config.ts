@@ -5,7 +5,7 @@ export const DRAW_CONFIG = {
   defaultScale: 100,
   editorControls: {
     scale: { min: 1, max: 200 },
-    numSides: { min: 3, max: 20, step: 1 },
+    numSides: { min: 3, max: 12, step: 1 },
     edgeWidth: { min: 1, max: 12, step: 1 },
     axesLineWidth: { min: 1, max: 6, step: 1 },
     closedPolygonEpsilon: { min: 1e-6, max: 1e-2, step: 1e-6 },
