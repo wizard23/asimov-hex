@@ -77,6 +77,10 @@ TODO: also HOSTNAME reconfigurable when started without args!
 For completeness please also prompt the user for the github host alias (so that EMAIL, HOSTNAME and GITHUB_HOST_ALIAS are treated in the same way) 
 
 
+I just realized that load-github-key.sh needs to be sourced! so please modify it in such a way please.
+
+
+
 
 
 

@@ -1,15 +1,32 @@
 #!/usr/bin/env bash
+# This script MUST be sourced, not executed.
+# It modifies the current shell environment (SSH_AUTH_SOCK, ssh-agent).
+
+# ------------------------------------------------------------
+# Guard: must be sourced
+# ------------------------------------------------------------
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo "❌ This script must be sourced, not executed."
+  echo
+  echo "Use:"
+  echo "  source $0"
+  echo "or:"
+  echo "  . $0"
+  echo
+  return 1 2>/dev/null || exit 1
+fi
+
 set -euo pipefail
 
 usage() {
   echo "Usage:"
-  echo "  $0"
-  echo "  $0 <email> <hostname>"
-  echo "  $0 <path-to-private-key>"
+  echo "  source $0"
+  echo "  source $0 <email> <hostname>"
+  echo "  source $0 <path-to-private-key>"
 }
 
 # ------------------------------------------------------------
-# Defaults
+# Defaults (must match create script)
 # ------------------------------------------------------------
 DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
@@ -21,6 +38,9 @@ EMAIL=""
 HOSTNAME=""
 GITHUB_HOST_ALIAS=""
 
+# ------------------------------------------------------------
+# Load identity file if present
+# ------------------------------------------------------------
 if [[ -f "$IDENTITY_FILE" ]]; then
   # shellcheck disable=SC1090
   source "$IDENTITY_FILE"
@@ -38,7 +58,10 @@ mangle() {
 }
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || { echo "❌ Missing required command: $1" >&2; exit 127; }
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "❌ Missing required command: $1" >&2
+    return 127
+  }
 }
 
 require_cmd ssh-agent
@@ -57,12 +80,16 @@ elif [[ $# -eq 2 ]]; then
   SAFE_EMAIL="$(mangle "$EMAIL")"
   SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
   KEY_PATH="$SSH_DIR/github-ssh-key--${SAFE_HOSTNAME}--${SAFE_EMAIL}"
-else
+elif [[ $# -eq 0 ]]; then
   read -rp "Email [$EMAIL]: " TMP && EMAIL="${TMP:-$EMAIL}"
   read -rp "Hostname [$HOSTNAME]: " TMP && HOSTNAME="${TMP:-$HOSTNAME}"
+
   SAFE_EMAIL="$(mangle "$EMAIL")"
   SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
   KEY_PATH="$SSH_DIR/github-ssh-key--${SAFE_HOSTNAME}--${SAFE_EMAIL}"
+else
+  usage
+  return 2
 fi
 
 # ------------------------------------------------------------
@@ -72,22 +99,26 @@ if [[ ! -f "$KEY_PATH" ]]; then
   echo "❌ Private key not found: $KEY_PATH" >&2
   echo "Available GitHub keys in $SSH_DIR:" >&2
   ls -1 "$SSH_DIR"/github-ssh-key--* 2>/dev/null || true
-  exit 1
+  return 1
 fi
 
 if [[ ! -f "${KEY_PATH}.pub" ]]; then
   echo "❌ Public key missing: ${KEY_PATH}.pub" >&2
-  exit 1
+  echo "Private key without a public key! Broken keypair detected!"
+  return 1
 fi
 
 # ------------------------------------------------------------
-# Load key
+# Start / attach ssh-agent
 # ------------------------------------------------------------
 if [[ -z "${SSH_AUTH_SOCK:-}" ]] || ! ssh-add -l >/dev/null 2>&1; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
+# ------------------------------------------------------------
+# Load key
+# ------------------------------------------------------------
 ssh-add "$KEY_PATH"
 
-echo "✅ Loaded key into ssh-agent:"
+echo "✅ Key loaded into ssh-agent:"
 ssh-add -l
