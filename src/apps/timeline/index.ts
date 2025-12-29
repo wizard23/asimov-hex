@@ -1178,7 +1178,8 @@ class TimelineViewer {
 
   private drawGroupLabels(grouped: GroupedCommits[], lineYs: number[]) {
     if (!this.timelineGroupLabelContainer || !this.timelineApp) return;
-    this.timelineGroupLabelContainer.removeChildren().forEach(child => child.destroy());
+    const timelineGroupLabelContainer = this.timelineGroupLabelContainer;
+    timelineGroupLabelContainer.removeChildren().forEach(child => child.destroy());
 
     if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
       return;
@@ -1193,7 +1194,7 @@ class TimelineViewer {
       const label = new Text({ text: labelText, style: labelStyle });
       label.x = padding;
       label.y = lineY - label.height / 2;
-      this.timelineGroupLabelContainer.addChild(label);
+      timelineGroupLabelContainer.addChild(label);
     });
   }
 
