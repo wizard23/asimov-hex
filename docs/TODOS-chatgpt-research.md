@@ -72,6 +72,11 @@ Thanks for trying to follow my instructions exactly but this one seems to be tak
 Please fix this.
 
 
+TODO: also HOSTNAME reconfigurable when started without args!
+
+For completeness please also prompt the user for the github host alias (so that EMAIL, HOSTNAME and GITHUB_HOST_ALIAS are treated in the same way) 
+
+
 
 
 

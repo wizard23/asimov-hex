@@ -3,13 +3,13 @@ set -euo pipefail
 
 usage() {
   echo "Usage:"
-  echo "  $0                         # prompt for email + hostname (with defaults) and load matching key"
-  echo "  $0 <email> <host>          # load matching key"
-  echo "  $0 <path-to-private-key>   # load that key directly"
+  echo "  $0"
+  echo "  $0 <email> <hostname>"
+  echo "  $0 <path-to-private-key>"
 }
 
 # ------------------------------------------------------------
-# Identity defaults (match your example values/intent)
+# Defaults
 # ------------------------------------------------------------
 DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
@@ -30,57 +30,44 @@ EMAIL="${EMAIL:-$DEFAULT_EMAIL}"
 HOSTNAME="${HOSTNAME:-$DEFAULT_HOSTNAME}"
 GITHUB_HOST_ALIAS="${GITHUB_HOST_ALIAS:-$DEFAULT_GITHUB_HOST_ALIAS}"
 
+# ------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------
 mangle() {
-  echo "$1" \
-    | tr '[:upper:]' '[:lower:]' \
-    | sed -E 's/[^a-z0-9._-]+/_/g; s/^_+//; s/_+$//'
+  echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/_/g; s/^_+//; s/_+$//'
 }
 
 require_cmd() {
-  local c="$1"
-  command -v "$c" >/dev/null 2>&1 || { echo "❌ Missing required command: $c" >&2; exit 127; }
+  command -v "$1" >/dev/null 2>&1 || { echo "❌ Missing required command: $1" >&2; exit 127; }
 }
 
-# Preflight: commands
-require_cmd hostname
-require_cmd tr
-require_cmd sed
 require_cmd ssh-agent
 require_cmd ssh-add
-require_cmd ls
 
-SSH_DIR="${HOME:?}/.ssh"
+SSH_DIR="$HOME/.ssh"
 
-KEY_PATH=""
-
-# Determine key to load (no modifications yet)
+# ------------------------------------------------------------
+# Resolve key path
+# ------------------------------------------------------------
 if [[ $# -eq 1 ]]; then
   KEY_PATH="$1"
-elif [[ $# -eq 0 ]]; then
-  read -rp "Email [$EMAIL]: " _EMAIL
-  EMAIL="${_EMAIL:-$EMAIL}"
-
-  read -rp "Hostname [$HOSTNAME]: " _HOST
-  HOSTNAME="${_HOST:-$HOSTNAME}"
-
-  SAFE_EMAIL="$(mangle "$EMAIL")"
-  SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
-  KEY_PATH="$SSH_DIR/github-ssh-key--${SAFE_HOSTNAME}--${SAFE_EMAIL}"
 elif [[ $# -eq 2 ]]; then
   EMAIL="$1"
   HOSTNAME="$2"
-
   SAFE_EMAIL="$(mangle "$EMAIL")"
   SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
   KEY_PATH="$SSH_DIR/github-ssh-key--${SAFE_HOSTNAME}--${SAFE_EMAIL}"
 else
-  usage >&2
-  exit 2
+  read -rp "Email [$EMAIL]: " TMP && EMAIL="${TMP:-$EMAIL}"
+  read -rp "Hostname [$HOSTNAME]: " TMP && HOSTNAME="${TMP:-$HOSTNAME}"
+  SAFE_EMAIL="$(mangle "$EMAIL")"
+  SAFE_HOSTNAME="$(mangle "$HOSTNAME")"
+  KEY_PATH="$SSH_DIR/github-ssh-key--${SAFE_HOSTNAME}--${SAFE_EMAIL}"
 fi
 
-# Preflight: key exists and pair is complete
-PUB_PATH="${KEY_PATH}.pub"
-
+# ------------------------------------------------------------
+# Validate keypair
+# ------------------------------------------------------------
 if [[ ! -f "$KEY_PATH" ]]; then
   echo "❌ Private key not found: $KEY_PATH" >&2
   echo "Available GitHub keys in $SSH_DIR:" >&2
@@ -88,19 +75,19 @@ if [[ ! -f "$KEY_PATH" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$PUB_PATH" ]]; then
-  echo "❌ Refusing to proceed: public key is missing for: $KEY_PATH" >&2
-  echo "   Expected: $PUB_PATH" >&2
-  exit 4
+if [[ ! -f "${KEY_PATH}.pub" ]]; then
+  echo "❌ Public key missing: ${KEY_PATH}.pub" >&2
+  exit 1
 fi
 
-# Modifications start here
+# ------------------------------------------------------------
+# Load key
+# ------------------------------------------------------------
 if [[ -z "${SSH_AUTH_SOCK:-}" ]] || ! ssh-add -l >/dev/null 2>&1; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
 ssh-add "$KEY_PATH"
 
-echo "✅ Loaded key into ssh-agent: $KEY_PATH"
-echo "Currently loaded keys:"
-ssh-add -l || true
+echo "✅ Loaded key into ssh-agent:"
+ssh-add -l
