@@ -1,30 +1,12 @@
 #!/usr/bin/env bash
-# Must be sourced: it sets SSH_AUTH_SOCK / starts ssh-agent for *this* shell.
+# Must be sourced: it needs to set SSH_AUTH_SOCK / start ssh-agent in this shell.
 
-# --- detect whether we are being sourced ---
-__IS_SOURCED=1
+# Guard: must be sourced, not executed
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  __IS_SOURCED=0
-fi
-
-# --- if sourced, preserve the caller's shell options and restore them on return ---
-# This prevents "set -euo pipefail" from leaking into your interactive shell.
-if [[ $__IS_SOURCED -eq 1 ]]; then
-  __OLD_SET_OPTS="$(set +o)"    # prints commands that restore current set -o flags
-  __restore_opts() { eval "$__OLD_SET_OPTS"; }
-  # RETURN runs when a sourced script finishes (bash).
-  trap '__restore_opts' RETURN
-fi
-
-# If executed, refuse politely (and do NOT use `return`).
-if [[ $__IS_SOURCED -eq 0 ]]; then
   echo "❌ This script must be sourced, not executed."
   echo "Use:  source ${BASH_SOURCE[0]}"
   exit 1
 fi
-
-# From here on: safe to use strict mode because we restore it afterwards.
-set -euo pipefail
 
 usage() {
   echo "Usage:"
@@ -66,13 +48,15 @@ require_cmd() {
   }
 }
 
-require_cmd ssh-agent
-require_cmd ssh-add
+require_cmd ssh-agent || return $?
+require_cmd ssh-add   || return $?
+require_cmd tr        || return $?
+require_cmd sed       || return $?
 
 SSH_DIR="$HOME/.ssh"
+KEY_PATH=""
 
 # Resolve key path
-KEY_PATH=""
 if [[ $# -eq 1 ]]; then
   KEY_PATH="$1"
 elif [[ $# -eq 2 ]]; then
@@ -92,7 +76,7 @@ else
   return 2
 fi
 
-# Validate keypair
+# Validate keypair completeness
 if [[ ! -f "$KEY_PATH" ]]; then
   echo "❌ Private key not found: $KEY_PATH" >&2
   echo "Available GitHub keys in $SSH_DIR:" >&2
@@ -105,14 +89,24 @@ if [[ ! -f "${KEY_PATH}.pub" ]]; then
   return 1
 fi
 
-# ------------------------------------------------------------
-# Start / attach ssh-agent
-# ------------------------------------------------------------
-if [[ -z "${SSH_AUTH_SOCK:-}" ]] || ! ssh-add -l >/dev/null 2>&1; then
-  eval "$(ssh-agent -s)" >/dev/null
+# Start / attach ssh-agent (in THIS shell)
+if [[ -z "${SSH_AUTH_SOCK:-}" ]]; then
+  eval "$(ssh-agent -s)" >/dev/null || {
+    echo "❌ Failed to start ssh-agent" >&2
+    return 1
+  }
+else
+  # If SSH_AUTH_SOCK is set but unusable, start a fresh agent
+  ssh-add -l >/dev/null 2>&1 || {
+    eval "$(ssh-agent -s)" >/dev/null || {
+      echo "❌ Failed to start ssh-agent" >&2
+      return 1
+    }
+  }
 fi
 
-ssh-add "$KEY_PATH"
+# Add key
+ssh-add "$KEY_PATH" || return $?
 
 echo "✅ Key loaded into ssh-agent:"
 ssh-add -l || true
