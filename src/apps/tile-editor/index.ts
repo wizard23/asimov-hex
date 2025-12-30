@@ -256,7 +256,7 @@ class TileEditor {
 
     // Update loop
     this.app.ticker.add(() => {
-      this.dashOffset += DRAW_CONFIG.dashAnimationSpeed / this.config.scale;
+      this.dashOffset += DRAW_CONFIG.dashAnimationSpeed;
       this.updatePreview();
       if (this.selectedPolygon) {
         this.drawPolygonInstance(this.selectedPolygon);
@@ -1037,24 +1037,25 @@ class TileEditor {
       }
 
       const colorValue = Number.parseInt(this.config.axesColor.replace('#', ''), 16);
-      const width = this.config.axesLineWidth / this.config.scale;
+      const width = this.config.axesLineWidth;
 
       const xAxisEnd = DRAW_CONFIG.axesEndpoints.x;
       const yAxisEnd = DRAW_CONFIG.axesEndpoints.y;
-      const xAxisDisplay = { x: xAxisEnd.x, y: -xAxisEnd.y };
-      const yAxisDisplay = { x: yAxisEnd.x, y: -yAxisEnd.y };
+      const origin = this.worldToScreen({ x: 0, y: 0 });
+      const xAxisDisplay = this.worldToScreen(xAxisEnd);
+      const yAxisDisplay = this.worldToScreen(yAxisEnd);
 
-      this.previewGraphics.moveTo(0, 0);
+      this.previewGraphics.moveTo(origin.x, origin.y);
       this.previewGraphics.lineTo(xAxisDisplay.x, xAxisDisplay.y);
-      this.previewGraphics.moveTo(0, 0);
+      this.previewGraphics.moveTo(origin.x, origin.y);
       this.previewGraphics.lineTo(yAxisDisplay.x, yAxisDisplay.y);
       this.previewGraphics.stroke({ color: colorValue, width });
 
       const labelX = new Graphics();
       const labelY = new Graphics();
-      const fontSize = DRAW_CONFIG.labelFontSizePx / this.config.scale;
+      const fontSize = DRAW_CONFIG.labelFontSizePx;
       const strokeWidth = Math.max(
-        DRAW_CONFIG.labelStrokeMinPx / this.config.scale,
+        DRAW_CONFIG.labelStrokeMinPx,
         fontSize * DRAW_CONFIG.labelStrokeScale
       );
       drawLetter(labelX, 'X', fontSize, colorValue, strokeWidth);
@@ -1183,6 +1184,7 @@ class TileEditor {
   private drawPolygonInstance(poly: PolygonData) {
       const isSelected = this.selectedPolygon === poly;
       const hasError = poly.description.hasError;
+      const screenPoints = this.getPolygonScreenPoints(poly);
       const color = poly.isHovered
         ? DRAW_CONFIG.polygonFillColors.hover
         : hasError
@@ -1201,22 +1203,22 @@ class TileEditor {
       
       drawPolygonPath(
         poly.graphics,
-        poly.points,
-        { x: poly.x, y: poly.y },
+        screenPoints,
+        { x: 0, y: 0 },
         color,
         alpha,
         strokeColor,
-        this.getStrokeWidth()
+        this.getStrokeWidthPx()
       );
 
-      if (!poly.isClosed || hasError) {
+      if ((!poly.isClosed || hasError) && screenPoints.length > 1) {
           drawDottedConnection(
             poly.graphics,
-            { x: poly.points[0].x + poly.x, y: poly.points[0].y + poly.y },
-            { x: poly.points[poly.points.length - 1].x + poly.x, y: poly.points[poly.points.length - 1].y + poly.y },
+            screenPoints[0],
+            screenPoints[screenPoints.length - 1],
             openStrokeColor,
-            this.getStrokeWidth(),
-            this.config.scale
+            this.getStrokeWidthPx(),
+            1
           );
       }
 
@@ -1227,14 +1229,14 @@ class TileEditor {
       if (isSelected) {
           drawDashedPath(
             poly.graphics,
-            poly.points,
-            { x: poly.x, y: poly.y },
+            screenPoints,
+            { x: 0, y: 0 },
             DRAW_CONFIG.selectionStrokeColors.primary,
             DRAW_CONFIG.selectionStrokeColors.secondary,
-            this.getStrokeWidth(),
+            this.getStrokeWidthPx(),
             poly.isClosed,
             this.dashOffset,
-            this.config.scale
+            1
           );
       }
 
@@ -1419,15 +1421,15 @@ class TileEditor {
       for (let j = i + 1; j < count; j++) {
         const adjacent = j === i + 1 || (i === 0 && j === count - 1);
         if (adjacent) continue;
-        const start = { x: vertices[i].x + poly.x, y: vertices[i].y + poly.y };
-        const end = { x: vertices[j].x + poly.x, y: vertices[j].y + poly.y };
+        const start = this.worldToScreen({ x: vertices[i].x + poly.x, y: vertices[i].y + poly.y });
+        const end = this.worldToScreen({ x: vertices[j].x + poly.x, y: vertices[j].y + poly.y });
         drawDottedConnection(
           poly.graphics,
           start,
           end,
           color,
-          this.getStrokeWidth(),
-          this.config.scale
+          this.getStrokeWidthPx(),
+          1
         );
       }
     }
@@ -1442,11 +1444,13 @@ class TileEditor {
       : points[edgeIndex + 1];
     if (!start || !end) return;
     const width = Math.max(
-      this.getStrokeWidth() * DRAW_CONFIG.hoverEdge.widthFactor,
-      DRAW_CONFIG.hoverEdge.minPx / this.config.scale
+      this.getStrokeWidthPx() * DRAW_CONFIG.hoverEdge.widthFactor,
+      DRAW_CONFIG.hoverEdge.minPx
     );
-    poly.graphics.moveTo(start.x + poly.x, start.y + poly.y);
-    poly.graphics.lineTo(end.x + poly.x, end.y + poly.y);
+    const startScreen = this.worldToScreen({ x: start.x + poly.x, y: start.y + poly.y });
+    const endScreen = this.worldToScreen({ x: end.x + poly.x, y: end.y + poly.y });
+    poly.graphics.moveTo(startScreen.x, startScreen.y);
+    poly.graphics.lineTo(endScreen.x, endScreen.y);
     poly.graphics.stroke({ color: DRAW_CONFIG.hoverEdge.color, width });
   }
 
@@ -1454,12 +1458,16 @@ class TileEditor {
     const points = this.getHoverPoints(poly);
     const vertex = points[vertexIndex];
     if (!vertex) return;
-    const radius = Math.max(
-      DRAW_CONFIG.hoverVertex.radiusPx / this.config.scale,
-      DRAW_CONFIG.hoverVertex.minWorld
-    );
-    poly.graphics.circle(vertex.x + poly.x, vertex.y + poly.y, radius);
+    const radius = Math.max(DRAW_CONFIG.hoverVertex.radiusPx, DRAW_CONFIG.hoverVertex.minWorld);
+    const vertexScreen = this.worldToScreen({ x: vertex.x + poly.x, y: vertex.y + poly.y });
+    poly.graphics.circle(vertexScreen.x, vertexScreen.y, radius);
     poly.graphics.fill({ color: DRAW_CONFIG.hoverVertex.color, alpha: 1 });
+  }
+
+  private getPolygonScreenPoints(poly: PolygonData): Point[] {
+    return poly.points.map((point) => {
+      return this.worldToScreen({ x: point.x + poly.x, y: point.y + poly.y });
+    });
   }
 
   private getPolygonWorldCenter(poly: PolygonData): Point {
@@ -1515,34 +1523,54 @@ class TileEditor {
     }
   }
 
-  private getStrokeWidth(): number {
+  private getStrokeWidthPx(): number {
+    return this.config.edgeWidth;
+  }
+
+  private getStrokeWidthWorld(): number {
     return this.config.edgeWidth / this.config.scale;
   }
 
   private getHitTolerance(): number {
-    return Math.max(0.1, this.getStrokeWidth() * 2);
+    return Math.max(0.1, this.getStrokeWidthWorld() * 2);
+  }
+
+  private getViewportCenter(): Point {
+    if (!this.app) return { x: 0, y: 0 };
+    return { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
+  }
+
+  private worldToScreen(point: Point): Point {
+    const center = this.getViewportCenter();
+    return {
+      x: (point.x + this.config.viewOffset.x) * this.config.scale + center.x,
+      y: (point.y + this.config.viewOffset.y) * this.config.scale + center.y,
+    };
   }
 
   private globalToWorld(point: { x: number; y: number }): Point {
-    if (!this.polygonContainer) return { x: point.x, y: point.y };
-    const local = this.polygonContainer.toLocal(point);
-    return { x: local.x, y: local.y };
+    const center = this.getViewportCenter();
+    return {
+      x: (point.x - center.x) / this.config.scale - this.config.viewOffset.x,
+      y: (point.y - center.y) / this.config.scale - this.config.viewOffset.y,
+    };
   }
 
   private updateScale() {
     if (!this.polygonContainer) return;
-    this.polygonContainer.scale.set(this.config.scale);
+    this.polygonContainer.scale.set(1);
     this.updateViewportCenter();
   }
 
   private updateViewportCenter() {
     if (!this.app || !this.polygonContainer) return;
-    const centerX = this.app.screen.width / 2;
-    const centerY = this.app.screen.height / 2;
-    const offsetX = this.config.viewOffset.x * this.config.scale;
-    const offsetY = this.config.viewOffset.y * this.config.scale;
-    this.polygonContainer.position.set(centerX + offsetX, centerY + offsetY);
+    this.polygonContainer.position.set(0, 0);
     this.polygonContainer.pivot.set(0, 0);
+    this.redrawPolygons();
+    this.updatePreview();
+    if (this.selectedPolygon) {
+      this.updateSelectedLabels();
+    }
   }
 
   private centerViewToPolygons() {
@@ -1820,9 +1848,9 @@ class TileEditor {
     if (!this.selectedPolygon) return;
     const labels = this.buildVertexLabels(this.selectedPolygon.description.sides);
     const points = this.selectedPolygon.points.slice(0, this.selectedPolygon.description.sides);
-    const fontSize = DRAW_CONFIG.labelFontSizePx / this.config.scale;
+    const fontSize = DRAW_CONFIG.labelFontSizePx;
     const strokeWidth = Math.max(
-      DRAW_CONFIG.labelStrokeMinPx / this.config.scale,
+      DRAW_CONFIG.labelStrokeMinPx,
       fontSize * DRAW_CONFIG.labelStrokeScale
     );
     const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
@@ -1837,8 +1865,12 @@ class TileEditor {
       if (!this.selectedPolygon) {
         throw new Error('Selected polygon missing while updating labels.');
       }
-      label.x = this.selectedPolygon.x + point.x + offset.x - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
-      label.y = this.selectedPolygon.y + point.y + offset.y - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
+      const screenPoint = this.worldToScreen({
+        x: this.selectedPolygon.x + point.x,
+        y: this.selectedPolygon.y + point.y,
+      });
+      label.x = screenPoint.x + offset.x - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
+      label.y = screenPoint.y + offset.y - fontSize * DRAW_CONFIG.vertexLabelCenterOffset;
       this.labelContainer.addChild(label);
     });
   }
