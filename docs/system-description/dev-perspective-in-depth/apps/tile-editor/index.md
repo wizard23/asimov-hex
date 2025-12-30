@@ -47,4 +47,48 @@ Use a clear and consistent linking scheme. All separate files in the documentati
 ---
 
 # "Tile Editor"
-TODO
+The Tile Editor is a Pixi.js-based canvas tool for defining polygon types from expressions and placing polygon instances into a tiling. Users interact with a 2D view and Tweakpane-driven UI; developers maintain the model (types + instances), expression evaluation, and rendering pipeline in one module.
+
+Back to system docs root: ["Tile Editor" (system description)](../../apps/tile-editor/index.md).
+
+## Coordinate systems
+The app uses multiple coordinate spaces, and switching between them is central to rendering and hit testing.
+- Screen/canvas space: pixel coordinates from pointer events and Pixi's screen space (`e.global`, canvas size).
+- World space: the logical editor coordinate system (view offset + scale applied to render). All interaction math (selection, hover, hit testing) uses world coordinates.
+- Polygon-local space: `PolygonDescription.points` are centered local points for a type; instances offset these by `poly.x`/`poly.y`.
+- Construction/math space: points are built with +Y up, then flipped to display orientation (Y inverted).
+- Render space: polygons and labels are drawn in screen space; world points are projected via a world->screen transform.
+
+## User interactions (overview)
+- Create a polygon: double-click empty canvas space.
+- Select polygon: click on a polygon instance.
+- Edit instance/type values: use the "Polygon Editor" pane.
+- Drag instance: click-and-drag a polygon.
+- Pan: drag empty canvas space.
+- Zoom: mouse wheel or the "Scale" control.
+- Clone: double-click a polygon to duplicate along the click ray.
+- Hover: moving the mouse highlights polygons, vertices, and edges.
+- Save/load: use "Save Tiling" and "Load Tiling" in "Editor Controls".
+
+## Architecture at a glance
+- UI controls are in "Editor Controls" (Tweakpane) and "Polygon Editor".
+- Geometry expressions define polygon types; instances reference types.
+- The render loop draws polygons, outlines, labels, hover highlights, and axes.
+- The solver fills in missing side/angle values when expressions include `?`.
+
+## Core sub-apps
+- ["Editor Controls"](./editor-controls.md): global controls, commands, and constants.
+- ["Polygon Editor"](./polygon-editor.md): instance/type editing and validation feedback.
+- ["Current Values"](./current-values.md): live readout of view and polygon measurements.
+- ["Unit Cell Editor"](./unit-cell-editor.md): canvas interactions and rendering.
+
+## Data flow summary
+1. User input updates `EditorConfig`, polygon types, or polygon instances.
+2. Expressions are evaluated against constants; results are stored in `PolygonDescription`.
+3. Instances derive rotated points from their type's centered points.
+4. Rendering projects world points to screen coordinates and draws with Pixi Graphics.
+5. Hit testing and hover detection run in world space, with feedback drawn in screen space.
+
+## Related technical docs
+- ["Tile Editor" Types](./index__types.md)
+- ["Tile Editor" Implementation Notes](./index__implementation.md)
