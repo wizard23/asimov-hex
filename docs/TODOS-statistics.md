@@ -502,6 +502,27 @@ For all other units please use the same texts that are used for the ticks labels
 
 
 
+I created a new branch and checked it out in a worktree in ../wt/center-view
+Please confirm that you can see this directory.
+
+
+Great! Please implement the following feature in the ../wt/center-view worktree:
+Add a "Center View" button in the "Timeline Controls" that resets the zoom and pan of the timeline
+This button should only be visible  when the "Display Mode" "Timeline is selected. 
+
+
+Atm when "Group By" is selected the labels for the different lines are drawn on top of the line and the commits and become hard to read. 
+Please propose some soltions to fix this ux issue.  
+
+Please add semi‑transparent label badges with padding and a darker background + border, so text stays readable over lines.
+
+
+
+
+
+
+
+
 
 
 Please add a dropdown list at the top of the "Timeline Controls" that allows selecting a specific project. 

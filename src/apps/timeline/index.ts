@@ -1185,16 +1185,30 @@ class TimelineViewer {
       return;
     }
 
-    const labelStyle = new TextStyle({ fill: 0xcfcfcf, fontSize: 12 });
+    const labelStyle = new TextStyle({ fill: 0xe0e0e0, fontSize: 12 });
     const padding = 10;
+    const badgePaddingX = 8;
+    const badgePaddingY = 4;
 
     grouped.forEach((group, index) => {
       const lineY = lineYs[index] ?? 0;
       const labelText = this.formatGroupLabel(group);
       const label = new Text({ text: labelText, style: labelStyle });
-      label.x = padding;
-      label.y = lineY - label.height / 2;
-      timelineGroupLabelContainer.addChild(label);
+      const badgeWidth = label.width + badgePaddingX * 2;
+      const badgeHeight = label.height + badgePaddingY * 2;
+      const badge = new Graphics();
+      badge.roundRect(0, 0, badgeWidth, badgeHeight, 6);
+      badge.fill({ color: 0x141414, alpha: 0.8 });
+      badge.stroke({ color: 0x3a3a3a, width: 1, alpha: 0.8 });
+
+      const badgeContainer = new Container();
+      badgeContainer.x = padding;
+      badgeContainer.y = lineY - badgeHeight / 2;
+      label.x = badgePaddingX;
+      label.y = badgePaddingY;
+      badgeContainer.addChild(badge);
+      badgeContainer.addChild(label);
+      timelineGroupLabelContainer.addChild(badgeContainer);
     });
   }
 

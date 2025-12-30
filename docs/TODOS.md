@@ -644,7 +644,21 @@ I have noticed some subtle bugs that I think are related. For now please don't m
 Please try to identify the root cause for these two bugs.
 
 
+Please describe in detail the different coordinate systems used.
+Then explain in detail how the bugs relate or are caused by the interaction of the coordinate systems.
 
+Before we change anything I need to understand how hovering works in detail. Please correct the following statements if they are wrong.
+* Determining if a vertex is hovered is done by calculating the distance from the vertex point (in screen/pixel coordinates) to the mouse location (in screen/pixel coordinates). This is then compared to DRAW_CONFIG.hoverVertex.radiusPx 
+* The width of the lines (in pixel) that are used to draw the the edges of the polygons is always this.config.edgeWidth from the "Gui Settings" and not influenced by the Scale.
+* Determining if a edge is hovered is done by checking whether the mouse location is inside a rectangle with side length of the edge and height of DRAW_CONFIG.hoverEdge.widthFactor * this.config.edgeWidth.
+
+
+Please propose different approaches to fix the bugs (vertex labels changing in size when changing scale and highlighted vertex points not being rendered as squares when scale is large). For each proposed solution please explicitly explain if this approach the following statement would be true: "The width of the lines (in pixel) that are used to draw the the edges of the polygons is always this.config.edgeWidth from the "Gui Settings" and not influenced by the Scale."
+
+Now please propose an approach that fixes the two bugs and also makes this statement true: "The width of the lines (in pixel) that are used to draw the the edges of the polygons is always this.config.edgeWidth from the "Gui Settings" and not influenced by the Scale."
+Then estimate the complexity and resulting architectural changes of this approach.
+
+Please estimate performance impacts of this proposed fix. 
 
 
 
