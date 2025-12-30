@@ -32,6 +32,7 @@ class TimelineViewer {
   private startDateElement: HTMLElement | null = null;
   private endDateElement: HTMLElement | null = null;
   private groupByElement: HTMLElement | null = null;
+  private centerViewElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -170,6 +171,7 @@ class TimelineViewer {
       label: 'Display Mode',
     }).on('change', () => {
       this.updateGroupByVisibility();
+      this.updateCenterViewVisibility();
       this.render();
     });
 
@@ -187,11 +189,21 @@ class TimelineViewer {
       this.render();
     });
 
+    const centerViewButton = this.pane.addButton({
+      title: 'Center View',
+    }).on('click', () => {
+      if (this.config.displayMode !== 'Timeline') return;
+      this.resetTimelineView();
+      this.drawTimeline();
+    });
+
     this.startDateElement = startDateBinding.element;
     this.endDateElement = endDateBinding.element;
     this.groupByElement = groupByBinding.element;
+    this.centerViewElement = centerViewButton.element;
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
+    this.updateCenterViewVisibility();
   }
 
   private filterCommits() {
@@ -232,6 +244,11 @@ class TimelineViewer {
   private updateGroupByVisibility() {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.groupByElement) this.groupByElement.style.display = display;
+  }
+
+  private updateCenterViewVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.centerViewElement) this.centerViewElement.style.display = display;
   }
 
   private render() {
