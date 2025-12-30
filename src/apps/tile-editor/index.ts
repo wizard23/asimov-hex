@@ -50,6 +50,8 @@ interface PolygonData {
   isClosed: boolean;
   graphics: Graphics;
   isHovered: boolean;
+  hoveredVertexIndex: number | null;
+  hoveredEdgeIndex: number | null;
 }
 
 interface ConstantEntry {
@@ -572,6 +574,8 @@ class TileEditor {
         isClosed: description.isClosed,
         graphics: g,
         isHovered: false,
+        hoveredVertexIndex: null,
+        hoveredEdgeIndex: null,
       };
       this.polygons.push(poly);
       this.updateInstanceFromDescription(poly);
@@ -1166,7 +1170,9 @@ class TileEditor {
           points: this.rotatePoints(evaluated.points, rotationValue),
           isClosed: evaluated.isClosed,
           graphics: g,
-          isHovered: false
+          isHovered: false,
+          hoveredVertexIndex: null,
+          hoveredEdgeIndex: null,
       };
       
       this.polygons.push(poly);
@@ -1231,6 +1237,14 @@ class TileEditor {
             this.config.scale
           );
       }
+
+      if (poly.hoveredEdgeIndex !== null) {
+        this.drawHoveredEdge(poly, poly.hoveredEdgeIndex);
+      }
+
+      if (poly.hoveredVertexIndex !== null) {
+        this.drawHoveredVertex(poly, poly.hoveredVertexIndex);
+      }
   }
 
   private redrawPolygons() {
@@ -1283,6 +1297,8 @@ class TileEditor {
         isClosed: source.description.isClosed,
         graphics: g,
         isHovered: false,
+        hoveredVertexIndex: null,
+        hoveredEdgeIndex: null,
       };
 
       this.polygons.push(clone);
@@ -1296,11 +1312,99 @@ class TileEditor {
 
       this.polygons.forEach(p => {
           const wasHovered = p.isHovered;
-          p.isHovered = (p === hovered);
-          if (p.isHovered !== wasHovered) {
-              this.drawPolygonInstance(p);
+          const prevVertex = p.hoveredVertexIndex;
+          const prevEdge = p.hoveredEdgeIndex;
+          if (p === hovered) {
+            p.isHovered = true;
+            p.hoveredVertexIndex = this.getHoveredVertexIndex(p, this.worldMousePosition);
+            p.hoveredEdgeIndex = p.hoveredVertexIndex === null
+              ? this.getHoveredEdgeIndex(p, this.worldMousePosition)
+              : null;
+          } else {
+            p.isHovered = false;
+            p.hoveredVertexIndex = null;
+            p.hoveredEdgeIndex = null;
+          }
+          if (
+            p.isHovered !== wasHovered ||
+            p.hoveredVertexIndex !== prevVertex ||
+            p.hoveredEdgeIndex !== prevEdge
+          ) {
+            this.drawPolygonInstance(p);
           }
       });
+  }
+
+  private getHoveredVertexIndex(poly: PolygonData, worldPos: Point): number | null {
+    const points = this.getHoverPoints(poly);
+    if (points.length === 0) return null;
+    const tolerance = this.getVertexHoverTolerance();
+    let bestIndex: number | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < points.length; i++) {
+      const dx = worldPos.x - (points[i].x + poly.x);
+      const dy = worldPos.y - (points[i].y + poly.y);
+      const dist = Math.hypot(dx, dy);
+      if (dist <= tolerance && dist < bestDist) {
+        bestDist = dist;
+        bestIndex = i;
+      }
+    }
+    return bestIndex;
+  }
+
+  private getHoveredEdgeIndex(poly: PolygonData, worldPos: Point): number | null {
+    const points = this.getHoverPoints(poly);
+    const count = points.length;
+    if (count < 2) return null;
+    const tolerance = this.getHitTolerance();
+    let bestIndex: number | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < count - 1; i++) {
+      const a = { x: points[i].x + poly.x, y: points[i].y + poly.y };
+      const b = { x: points[i + 1].x + poly.x, y: points[i + 1].y + poly.y };
+      const dist = this.pointSegmentDistance(worldPos, a, b);
+      if (dist <= tolerance && dist < bestDist) {
+        bestDist = dist;
+        bestIndex = i;
+      }
+    }
+    if (poly.isClosed) {
+      const a = { x: points[count - 1].x + poly.x, y: points[count - 1].y + poly.y };
+      const b = { x: points[0].x + poly.x, y: points[0].y + poly.y };
+      const dist = this.pointSegmentDistance(worldPos, a, b);
+      if (dist <= tolerance && dist < bestDist) {
+        bestDist = dist;
+        bestIndex = count - 1;
+      }
+    }
+    return bestIndex;
+  }
+
+  private pointSegmentDistance(point: Point, a: Point, b: Point): number {
+    const abx = b.x - a.x;
+    const aby = b.y - a.y;
+    const apx = point.x - a.x;
+    const apy = point.y - a.y;
+    const abLenSq = abx * abx + aby * aby;
+    if (abLenSq <= 1e-12) {
+      return Math.hypot(apx, apy);
+    }
+    const t = Math.min(1, Math.max(0, (apx * abx + apy * aby) / abLenSq));
+    const closestX = a.x + t * abx;
+    const closestY = a.y + t * aby;
+    return Math.hypot(point.x - closestX, point.y - closestY);
+  }
+
+  private getVertexHoverTolerance(): number {
+    const radius = DRAW_CONFIG.hoverVertex.radiusPx / this.config.scale;
+    const scaled = radius * DRAW_CONFIG.hoverVertex.toleranceScale;
+    return Math.max(DRAW_CONFIG.hoverVertex.minWorld, scaled);
+  }
+
+  private getHoverPoints(poly: PolygonData): Point[] {
+    if (!poly.isClosed) return poly.points;
+    return poly.points.length > 0 ? poly.points.slice(0, -1) : [];
   }
 
   private getPolygonWorldVertices(poly: PolygonData): Point[] {
@@ -1327,6 +1431,35 @@ class TileEditor {
         );
       }
     }
+  }
+
+  private drawHoveredEdge(poly: PolygonData, edgeIndex: number) {
+    const points = this.getHoverPoints(poly);
+    if (points.length < 2) return;
+    const start = points[edgeIndex];
+    const end = (edgeIndex === points.length - 1 && poly.isClosed)
+      ? points[0]
+      : points[edgeIndex + 1];
+    if (!start || !end) return;
+    const width = Math.max(
+      this.getStrokeWidth() * DRAW_CONFIG.hoverEdge.widthFactor,
+      DRAW_CONFIG.hoverEdge.minPx / this.config.scale
+    );
+    poly.graphics.moveTo(start.x + poly.x, start.y + poly.y);
+    poly.graphics.lineTo(end.x + poly.x, end.y + poly.y);
+    poly.graphics.stroke({ color: DRAW_CONFIG.hoverEdge.color, width });
+  }
+
+  private drawHoveredVertex(poly: PolygonData, vertexIndex: number) {
+    const points = this.getHoverPoints(poly);
+    const vertex = points[vertexIndex];
+    if (!vertex) return;
+    const radius = Math.max(
+      DRAW_CONFIG.hoverVertex.radiusPx / this.config.scale,
+      DRAW_CONFIG.hoverVertex.minWorld
+    );
+    poly.graphics.circle(vertex.x + poly.x, vertex.y + poly.y, radius);
+    poly.graphics.fill({ color: DRAW_CONFIG.hoverVertex.color, alpha: 1 });
   }
 
   private getPolygonWorldCenter(poly: PolygonData): Point {

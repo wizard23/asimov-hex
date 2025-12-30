@@ -10,7 +10,15 @@ Focus on the use cases that are relevant for developers and users of the system.
 
 The main audience of the documentation are the developers but it should be understandable for technically minded users as well. 
 
-Please document the types|interfaces|data structures|etc. in index__types.md and the non trivial implementation details in index__implementation.md
+Please document the types|interfaces|data structures|etc. in index__types.md and the (non trivial) implementation details in index__implementation.md
+
+### Deciding what details to include
+By reading the documentation a developer should be able to understand the architecture of the app and a user should be able to find out about all features the app supports. 
+
+#### These details need to be included in the documentation
+Ensure that these details are definitely included in the documentation:
+* The different coordinate systems that are used in the app.
+* All kinds of user interactions that are supported by the app. 
 
 ## Documenting Sub-Apps
 The following section is about how sub-apps of the app described in this document ought to be documented. It uses the sub-app "Editor Controls" as a specific example but it is, of course, meant to describe the general way for documenting sub-apps:

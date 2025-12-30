@@ -34,6 +34,17 @@ export const DRAW_CONFIG = {
     primary: 0x000000,
     secondary: 0xffffff,
   },
+  hoverVertex: {
+    color: 0xffd24d,
+    radiusPx: 6,
+    minWorld: 0.08,
+    toleranceScale: 1.6,
+  },
+  hoverEdge: {
+    color: 0x4a9eff,
+    widthFactor: 2,
+    minPx: 2,
+  },
   labelColor: 0xffd24d,
   labelFontSizePx: 12,
   labelStrokeMinPx: 1,

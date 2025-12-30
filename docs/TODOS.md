@@ -579,9 +579,63 @@ If you notice any other hardcoded colors that I forgot to mention then please do
 
 
 
-Then please add these new features in: "Tile Editor" in src/apps/tile-editor
+Please describe the algorithm used in the "Tile Editor" "Unit Cell Editor" to determine if the user hovers over a polygon instance.
+What constants are used there?
+Are there different code paths?
 
-* When hovering over vertices of polygon instances please highlight the vertex in
+
+
+• Here’s the hover algorithm as implemented in the Unit Cell Editor:
+
+  Algorithm (current implementation)
+
+  - On every pointermove, the cursor is converted from screen to world coordinates via globalToWorld.
+  - updateHoverState() calls getPolygonAt(worldX, worldY) to find the topmost polygon under the cursor.
+  - getPolygonAt() iterates polygons from last to first (top-most), and for each:
+      - Builds world-space vertices with translatePoints(points, { x: poly.x, y: poly.y }).
+      - Returns the polygon if either:
+          - pointInPolygon(point, worldPoints) is true, or
+          - pointNearPolyline(point, worldPoints, getHitTolerance(), true) is true.
+
+  Constants used for hover
+
+  - The only constant-like value in the hover path is the minimum hit tolerance inside getHitTolerance():
+      - getHitTolerance() returns max(0.1, strokeWidth * 2).
+      - strokeWidth = edgeWidth / scale.
+      - So the fixed constant is 0.1 world units; the rest depends on edgeWidth and scale.
+
+  Code paths
+
+  - There is no separate code path for closed vs. open polygons, or for error/unsolved polygons.
+  - All polygons are tested the same way against pointInPolygon or pointNearPolyline with closePath = true.
+  - Polygons that failed to solve still have placeholder points and follow the same hover logic.
+
+
+› what about closePath === false?
+
+
+
+
+Thanks. Now please add these new features in: "Tile Editor" in src/apps/tile-editor
+
+Please add a few related features to the "Tile Editor"
+* When hovering over a vertex of a polygon instances please highlight the vertex.
+* When hovering over an edge of a polygon instances please highlight the edge.
+
+If anything is unclear please just ask.
+
+
+Please document the way highlighting works now in detail in 
+
+Please look at the instructions in docs/system-description/apps/tile-editor/index.md
+docs/system-description/apps/tile-editor/unit-cell-editor__implementation.md
+
+
+docs/system-description/apps/tile-editor
+
+
+
+
 Allow the user to modify the rotation of polygon instances  
 
 
