@@ -633,7 +633,17 @@ Then document the new features and the relevant implementation details.
 I think it belongs in:
 docs/system-description/apps/tile-editor/unit-cell-editor__implementation.md
 
-docs/system-description/apps/tile-editor
+
+I have noticed some subtle bugs that I think are related. For now please don't make any modifications but let's just find the root cause and let's find a solution afterwards.
+
+* When a polygon instance is selected and I zoom in and out in the "Unit Cell Editor" by changing the scale the font size of the vertex labels changes. I would expect the font size of the labels to stay constant. When I click on the polygon instance again the labels get redrawn in the correct font size.
+* When I hover over a vertex the circle that marks the vertex has a different shape depending on the scale:
+  * when scale is 200 the circle is not rendered as a circle but as a diamond with only 4 corners
+  * when scale is 1 the circle is rendered as round circle.
+
+Please try to identify the root cause for these two bugs.
+
+
 
 
 

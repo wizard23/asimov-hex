@@ -1,5 +1,41 @@
 [
   {
+    "hash": "105d2772abae962dda3847e4c8a8a569ef341ba2",
+    "timestamp": 1767076996,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update Tile Editor documentation with hover feature details Added \"Unit Cell Editor\" implementation notes covering hover detection for vertices and edges, including tolerance calculations and styling. Also updated the main Unit Cell Editor document to link to these new implementation details.",
+    "addedLines": 34,
+    "removedLines": 4
+  },
+  {
+    "hash": "b00dff423d5368d0659c220907ca9936e9c9859e",
+    "timestamp": 1767076334,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implement hover highlighting for polygon vertices and edges in the Tile Editor, enabling precise visual feedback for interactive editing; human: update docs instructions",
+    "addedLines": 238,
+    "removedLines": 9
+  },
+  {
+    "hash": "4610e0487d68287ae019d444c060e77c375618f8",
+    "timestamp": 1767016938,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Build errors are fixed.",
+    "addedLines": 3,
+    "removedLines": 2
+  },
+  {
+    "hash": "8d2601345f980ff3a672df53df695e5ca0cda28e",
+    "timestamp": 1767014246,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: defaults to show off demo :)",
+    "addedLines": 563,
+    "removedLines": 4
+  },
+  {
     "hash": "459c33a5351776a3e3245a33fd4c345d4cd8adfe",
     "timestamp": 1767012603,
     "authorName": "Philipp Tiefenbacher",
