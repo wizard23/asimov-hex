@@ -41,8 +41,8 @@ export const DRAW_CONFIG = {
     toleranceScale: 1.6,
   },
   hoverEdge: {
-    color: 0x4a9eff,
-    widthFactor: 2,
+    color: 0xffd24d,
+    widthFactor: 3,
     minPx: 2,
   },
   labelColor: 0xffd24d,

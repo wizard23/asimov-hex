@@ -625,11 +625,13 @@ Please add a few related features to the "Tile Editor"
 If anything is unclear please just ask.
 
 
-Please document the way highlighting works now in detail in 
 
+I have updated the instructions for the documentation in:
 Please look at the instructions in docs/system-description/apps/tile-editor/index.md
-docs/system-description/apps/tile-editor/unit-cell-editor__implementation.md
+Then document the new features and the relevant implementation details.
 
+I think it belongs in:
+docs/system-description/apps/tile-editor/unit-cell-editor__implementation.md
 
 docs/system-description/apps/tile-editor
 

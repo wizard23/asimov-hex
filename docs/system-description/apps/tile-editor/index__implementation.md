@@ -38,4 +38,5 @@ Back to ["Tile Editor"](./index.md).
 ## Rendering pipeline
 - Pixi.js `Graphics` instances draw each polygon.
 - Selection and hover state update stroke/outline styling.
+- Hover state also computes a nearest vertex or edge and draws a highlight on the hovered element (vertex takes priority over edge).
 - The polygon labels are regenerated on selection updates.
