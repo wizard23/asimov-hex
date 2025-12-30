@@ -189,38 +189,39 @@ class GridApp {
     
     const links = document.createElement('div');
     links.id = 'info-panel-links';
-    
-    const manualLink = document.createElement('a');
-    manualLink.href = '#';
-    manualLink.textContent = '📖 User Manual';
-    manualLink.onclick = (e) => {
-      e.preventDefault();
-      alert('Manual coming soon!');
-    };
-    
-    const githubLink = document.createElement('a');
-    githubLink.href = 'https://github.com/wizard23/asimov-hex';
-    githubLink.textContent = '🔗 GitHub Repository';
-    githubLink.target = '_blank';
-    githubLink.rel = 'noopener noreferrer';
+
+    const timelineLink = document.createElement('a');
+    timelineLink.href = 'timeline.html';
+    timelineLink.textContent = '📅 Project Timeline';
     
     const statisticsLink = document.createElement('a');
     statisticsLink.href = 'statistics.html';
     statisticsLink.textContent = '📊 Project Statistics';
     
-    const timelineLink = document.createElement('a');
-    timelineLink.href = 'timeline.html';
-    timelineLink.textContent = '📅 Project Timeline';
-    
     const tileEditorLink = document.createElement('a');
     tileEditorLink.href = 'tile-editor.html';
     tileEditorLink.textContent = '🧩 Tile Editor';
+
+    // const manualLink = document.createElement('a');
+    // manualLink.href = '#';
+    // manualLink.textContent = '📖 User Manual';
+    // manualLink.onclick = (e) => {
+    //   e.preventDefault();
+    //   alert('Manual coming soon!');
+    // };
     
-    links.appendChild(manualLink);
-    links.appendChild(githubLink);
-    links.appendChild(statisticsLink);
+    // const githubLink = document.createElement('a');
+    // githubLink.href = 'https://github.com/wizard23/asimov-hex';
+    // githubLink.textContent = '🔗 GitHub Repository';
+    // githubLink.target = '_blank';
+    // githubLink.rel = 'noopener noreferrer';
+    
     links.appendChild(timelineLink);
+    links.appendChild(statisticsLink);
     links.appendChild(tileEditorLink);
+
+    // links.appendChild(manualLink);
+    // links.appendChild(githubLink);
     
     aboutContent.appendChild(content);
     aboutContent.appendChild(links);

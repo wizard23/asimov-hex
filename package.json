@@ -12,7 +12,8 @@
     "stats": "scripts/repo-statistics.sh",
     "create-project-statistics": "tsx scripts/create-project-statistics.ts",
     "re-create-git-timeline": "tsx scripts/re-create-git-timeline.ts", 
-    "prepare-for-release": "npm run verify && npm run create-project-statistics && npm run re-create-git-timeline && git add ./public/project-statistics && git add ./public/project-history && git commit -m 'automated: update project statistics'"
+    "prepare-for-release": "npm run verify && npm run create-project-statistics && npm run re-create-git-timeline && git add ./public/project-statistics && git add ./public/project-history && git commit -m 'automated: update project statistics'",
+    "deploy-to-server": "./scripts/deploy-dist-to-server.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

@@ -1,3 +1,4 @@
+.secrets
 dist
 node_modules
 cache
