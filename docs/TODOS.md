@@ -661,6 +661,33 @@ Then estimate the complexity and resulting architectural changes of this approac
 Please estimate performance impacts of this proposed fix. 
 
 
+I created two new branches and checked them out in these directories: 
+../wt/var-1--rework-render-architecture
+../wt/var-2--screen-space-labels
+
+Please confirm that you can see them.
+
+
+Please estimate the complexities or the following two approaches:
+
+Please implement the approach we discussed last in the ../wt/var-1--rework-render-architecture worktree: 
+The one that fixes both bugs and makes the statement true: 
+You proposed: Render polygons in screen space (pixel space), not scaled world space
+If anything is unclear please just ask.
+
+
+
+///// UNUSED
+var 2: the approach we discussed earlier. Specifically:
+* Approach B: Draw labels in screen space (unscaled overlay)
+* Approach D: Draw hover marker in screen space
+Please implement the ../wt/var-2--screen-space-labels
+///////////////
+
+
+
+
+
 
 Allow the user to modify the rotation of polygon instances  
 
