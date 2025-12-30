@@ -1,5 +1,104 @@
 [
   {
+    "hash": "bb42944f2cb2c0308fa0cc2bf84e556fc0206bd6",
+    "timestamp": 1767094926,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human add prepare-for-release script in package.json",
+    "addedLines": 2,
+    "removedLines": 1
+  },
+  {
+    "hash": "f8d626ba8be89548693ed88fcdd4fcee8a5a075d",
+    "timestamp": 1767094675,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Added the full developer in-depth documentation set for Tile Editor and wired the links.",
+    "addedLines": 268,
+    "removedLines": 1
+  },
+  {
+    "hash": "6b4cb621ff3ff67bc7e5b43162827ecac33823c9",
+    "timestamp": 1767093968,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: instructions for in-depth documentation",
+    "addedLines": 33,
+    "removedLines": 44
+  },
+  {
+    "hash": "2aee5000037bd84f18175615b366fbe6300f1baa",
+    "timestamp": 1767093016,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: split docs in overview and in depth",
+    "addedLines": 82,
+    "removedLines": 0
+  },
+  {
+    "hash": "d2d863e724f95b313b7f81bcecd387e4032b1fff",
+    "timestamp": 1767092177,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Merge branch 'var-1--rework-render-architecture'",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "41cf77b602e2e25e7cf8e588e00dbb9a962ee9ca",
+    "timestamp": 1767092166,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: instructions for refactoring",
+    "addedLines": 133,
+    "removedLines": 26
+  },
+  {
+    "hash": "46de753c17283c78899329128a931324fd473a09",
+    "timestamp": 1767090872,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor rendering to use screen-space coordinates for improved scaling and visual consistency. Implemented a \"screen-space rendering\" architecture where polygons, labels, axes, and hover highlights are drawn based on screen coordinates rather than world coordinates. This ensures that visual elements like stroke widths, hover radii, and dash patterns remain consistent and legible regardless of the zoom level. Added helper functions worldToScreen, getStrokeWidthPx, getStrokeWidthWorld, and getPolygonScreenPoints to facilitate this transformation and updated drawing logic across the Tile Editor to utilize these new helpers. Also adjusted hit testing and hover detection to align with the new coordinate system.",
+    "addedLines": 80,
+    "removedLines": 48
+  },
+  {
+    "hash": "dd867cad9ee083950b6b6c9bc034bc0d4bfb7eff",
+    "timestamp": 1767084426,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Merge branch 'center-view'",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "a2bdc44b6ce682ed251b5da74b6e0a6ed6dbf5f7",
+    "timestamp": 1767084391,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Improve timeline group label readability by adding semi-transparent badges with padding, darker background, and borders behind the text to prevent overlap with timeline lines.",
+    "addedLines": 354,
+    "removedLines": 4
+  },
+  {
+    "hash": "df8f3df244d15900510592cb86d83ff9cc807a7f",
+    "timestamp": 1767083925,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": " Added a Timeline‑only “Center View” button in the center‑view worktree. It resets zoom/pan via resetTimelineView() and redraws, and it’s hidden unless Display Mode = Timeline.",
+    "addedLines": 17,
+    "removedLines": 0
+  },
+  {
+    "hash": "0e9440d1fe917a28376cdd54bd30aa4470bdd25c",
+    "timestamp": 1767077676,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update statistics and timeline data",
+    "addedLines": 273,
+    "removedLines": 1
+  },
+  {
     "hash": "105d2772abae962dda3847e4c8a8a569ef341ba2",
     "timestamp": 1767076996,
     "authorName": "Philipp Tiefenbacher",
