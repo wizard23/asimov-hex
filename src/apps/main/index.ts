@@ -21,7 +21,7 @@ interface PaletteData {
   colors: Record<string, string>;
 }
 
-type LeftClickMode = 'draw' | 'spawnParticle';
+type LeftClickMode = 'draw' | 'spawnParticle' | 'smart';
 
 interface AppConfig {
   gridWidth: number;
@@ -485,6 +485,7 @@ class GridApp {
       options: {
         'Draw Cell': 'draw',
         'Spawn Particle': 'spawnParticle',
+        'Smart': 'smart',
       },
       label: 'Left Click Mode',
     });
@@ -785,7 +786,43 @@ class GridApp {
       this.highlightedVertex = null;
     }
 
-    if (this.config.leftClickMode === 'draw') {
+    const isSmartMode = this.config.leftClickMode === 'smart';
+    const edgeInfo = (this.config.leftClickMode === 'spawnParticle' || isSmartMode)
+      ? getEdgeAtPixel(
+          this.grid,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          x,
+          y,
+          10
+        )
+      : null;
+
+    if (edgeInfo) {
+      // Highlight edge and closest vertex
+      const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
+        ? this.config.edgeHighlightColor 
+        : '#ffff00';
+      this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
+      this.edgeContainer.addChild(this.highlightedEdge);
+
+      // Find and highlight closest vertex
+      const closestVertex = getVertexAtPixel(
+        this.grid,
+        this.config.gridWidth,
+        this.config.gridHeight,
+        x,
+        y,
+        20
+      );
+
+      if (closestVertex) {
+        this.highlightedVertex = this.gridRenderer.drawVertex(closestVertex, highlightColor);
+        if (this.highlightedVertex) {
+          this.edgeContainer.addChild(this.highlightedVertex);
+        }
+      }
+    } else if (this.config.leftClickMode === 'draw' || isSmartMode) {
       // Highlight cell
       const cellInfo = getCellAtPixel(
         this.grid,
@@ -806,41 +843,6 @@ class GridApp {
         );
         this.gridContainer.addChild(this.highlightedCell);
       }
-    } else {
-      // Highlight edge and closest vertex
-      const edgeInfo = getEdgeAtPixel(
-        this.grid,
-        this.config.gridWidth,
-        this.config.gridHeight,
-        x,
-        y,
-        10
-      );
-
-      if (edgeInfo) {
-        const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
-          ? this.config.edgeHighlightColor 
-          : '#ffff00';
-        this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
-        this.edgeContainer.addChild(this.highlightedEdge);
-
-        // Find and highlight closest vertex
-        const closestVertex = getVertexAtPixel(
-          this.grid,
-          this.config.gridWidth,
-          this.config.gridHeight,
-          x,
-          y,
-          20
-        );
-
-        if (closestVertex) {
-          this.highlightedVertex = this.gridRenderer.drawVertex(closestVertex, highlightColor);
-          if (this.highlightedVertex) {
-            this.edgeContainer.addChild(this.highlightedVertex);
-          }
-        }
-      }
     }
   }
 
@@ -850,7 +852,7 @@ class GridApp {
 
     if (e.button === 0) {
       // Left click
-      if (this.config.leftClickMode === 'spawnParticle') {
+      if (this.config.leftClickMode === 'spawnParticle' || this.config.leftClickMode === 'smart') {
         // Check for edge click for particle spawning
         const edgeX = e.clientX - rect.left - this.edgeContainer.x;
         const edgeY = e.clientY - rect.top - this.edgeContainer.y;
@@ -869,7 +871,9 @@ class GridApp {
           this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
           return;
         }
-      } else {
+      }
+
+      if (this.config.leftClickMode === 'draw' || this.config.leftClickMode === 'smart') {
         // Draw mode - check for cell click
         const x = e.clientX - rect.left - this.gridContainer.x;
         const y = e.clientY - rect.top - this.gridContainer.y;
