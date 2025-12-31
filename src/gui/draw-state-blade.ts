@@ -1,8 +1,8 @@
 import { BladeApi, BladeController, View } from '@tweakpane/core';
 import { createBlade } from '@tweakpane/core';
 import { ViewProps } from '@tweakpane/core';
-import { colorToRgb, getBrightness } from './core/utils/color-utils';
-import { ColorValue } from './types';
+import { colorToRgb, getBrightness } from '../core/utils/color-utils';
+import { ColorValue } from '../types';
 
 interface DrawStateBladeConfig {
   numStates: number;

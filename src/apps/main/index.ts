@@ -2,7 +2,7 @@ import { Application, Graphics, Container } from 'pixi.js';
 import { Pane } from 'tweakpane';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
 import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
-import { createDrawStateBlade, DrawStateBladeApi } from '../../draw-state-blade';
+import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
 import palettesData from '../../assets/palettes.json';
 import { ParticleSystem } from '../../core/particles/particle-system';
 import {
