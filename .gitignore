@@ -1,7 +1,13 @@
+# secrets
 .secrets
+
+temp
+cache
+
+# node/build artefacts
 dist
 node_modules
-cache
+
 # location for session transcripts that are being recorded to keep git status clean
 docs/transcripts-buffer
 

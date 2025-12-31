@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "streetsidesoftware.code-spell-checker",
+        "esbenp.prettier-vscode",
+        "mxsdev.typescript-explorer",
+        "eamodio.gitlens"
+    ]
+}

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
+# Creates a new GitHub SSH key pair (if needed), safely adds a corresponding host entry to ~/.ssh/config, and prevents conflicts or partial key states.
+
+
 set -euo pipefail
 
 usage() {
@@ -12,9 +16,11 @@ usage() {
 # ------------------------------------------------------------
 DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
-DEFAULT_GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>--<SAFE_EMAIL>"
+DEFAULT_GITHUB_HOST_ALIAS="github.com"
+## advanced setup if you need aliases
+# DEFAULT_GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>-<SAFE_EMAIL>"
 
-IDENTITY_FILE="./secrets/identity.sh"
+IDENTITY_FILE="./secrets/identity.env"
 
 EMAIL=""
 HOSTNAME=""
@@ -49,6 +55,7 @@ fi
 # ------------------------------------------------------------
 read -rp "Email [$EMAIL]: " TMP && EMAIL="${TMP:-$EMAIL}"
 read -rp "Hostname [$HOSTNAME]: " TMP && HOSTNAME="${TMP:-$HOSTNAME}"
+echo "Available templates for the hostname: <SAFE_HOSTNAME> and <SAFE_EMAIL>"
 read -rp "GitHub host alias [$GITHUB_HOST_ALIAS]: " TMP && GITHUB_HOST_ALIAS="${TMP:-$GITHUB_HOST_ALIAS}"
 
 # ------------------------------------------------------------

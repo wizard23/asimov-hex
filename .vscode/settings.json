@@ -1,16 +1,15 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
-
+  
+  "editor.formatOnSave": false,
   "editor.tabSize": 4,
-  "editor.detectIndentation": false,
-
+  "editor.detectIndentation": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   "npm.autoDetect": "on", // default is on but good to have
   "npm.enableRunFromFolder": true,
-  "editor.formatOnSave": false,
 
-
-   // If you still want shell integration but not suggestions:
-   "terminal.integrated.suggest.enabled": false
+  // If you still want shell integration but not suggestions:
+  "terminal.integrated.suggest.enabled": false,
+  "cSpell.words": ["artefacts", "tweakpane"]
 }
