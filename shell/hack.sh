@@ -1,9 +1,13 @@
-### must be sourced not executed since this is meant to setup the shell
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# must be sourced not executed since this is meant to setup the development shell
 
-# This script modifies the current shell and must be sourced.
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  echo "Error: this script must be sourced, not executed." >&2
-  echo "Usage: source ${BASH_SOURCE[0]}" >&2
+
+# --------------------------------------------------------------------
+# Guard 1: ensure we are running in bash
+# --------------------------------------------------------------------
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "❌ This script must be sourced from a bash shell." >&2
 
   # If the script was sourced, `return` cleanly stops execution of the sourced file
   # without killing the user's shell.
@@ -15,5 +19,16 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   return 1 2>/dev/null || exit 1
 fi
 
+# --------------------------------------------------------------------
+# Guard 2: ensure the script is sourced, not executed
+# --------------------------------------------------------------------
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  echo "❌ This script must be sourced, not executed." >&2
+  echo "   Use: source '${BASH_SOURCE[0]}'" >&2
+  return 1 2>/dev/null || exit 1
+fi
+
+
+. ./scripts/asimov-core/load-github-key.sh
+. ./shell/aliases/git-aliases.sh
 . ./shell/completions/npm-workspaces.sh 
-. ~/hack.sh

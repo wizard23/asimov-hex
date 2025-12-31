@@ -190,6 +190,16 @@ class GridApp {
     const links = document.createElement('div');
     links.id = 'info-panel-links';
 
+    const appsHeader = document.createElement('h2');
+    appsHeader.textContent = "Apps"
+
+    const tileEditorLink = document.createElement('a');
+    tileEditorLink.href = 'tile-editor.html';
+    tileEditorLink.textContent = '🧩 Tile Editor';
+
+    const metaAppsHeader = document.createElement('h2');
+    metaAppsHeader.textContent = "Meta Apps"
+
     const timelineLink = document.createElement('a');
     timelineLink.href = 'timeline.html';
     timelineLink.textContent = '📅 Project Timeline';
@@ -198,10 +208,6 @@ class GridApp {
     statisticsLink.href = 'statistics.html';
     statisticsLink.textContent = '📊 Project Statistics';
     
-    const tileEditorLink = document.createElement('a');
-    tileEditorLink.href = 'tile-editor.html';
-    tileEditorLink.textContent = '🧩 Tile Editor';
-
     // const manualLink = document.createElement('a');
     // manualLink.href = '#';
     // manualLink.textContent = '📖 User Manual';
@@ -216,9 +222,12 @@ class GridApp {
     // githubLink.target = '_blank';
     // githubLink.rel = 'noopener noreferrer';
     
+    links.appendChild(appsHeader);
+    links.appendChild(tileEditorLink);
+
+    links.appendChild(metaAppsHeader);
     links.appendChild(timelineLink);
     links.appendChild(statisticsLink);
-    links.appendChild(tileEditorLink);
 
     // links.appendChild(manualLink);
     // links.appendChild(githubLink);
