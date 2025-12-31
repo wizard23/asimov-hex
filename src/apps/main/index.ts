@@ -98,7 +98,7 @@ class GridApp {
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
       particleSpeed: 100,
-      leftClickMode: 'draw',
+      leftClickMode: 'smart',
       edgeSelectionRule: 'highestEdgeDelta',
     };
 
@@ -384,9 +384,9 @@ class GridApp {
     // Add grid type control
     this.pane.addBinding(this.config, 'gridType', {
       options: {
+        triangles: 'triangles',
         squares: 'squares',
         hexagons: 'hexagons',
-        triangles: 'triangles',
         cairo: 'cairo',
       },
       label: 'Grid Type',
@@ -483,9 +483,9 @@ class GridApp {
     // Add left click mode dropdown
     this.pane.addBinding(this.config, 'leftClickMode', {
       options: {
+        'Smart': 'smart',
         'Draw Cell': 'draw',
         'Spawn Particle': 'spawnParticle',
-        'Smart': 'smart',
       },
       label: 'Left Click Mode',
     });
