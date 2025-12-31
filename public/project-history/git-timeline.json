@@ -1,5 +1,68 @@
 [
   {
+    "hash": "a87e63091a5671a556d145fd38c52ad509f84849",
+    "timestamp": 1767198649,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "chore: update dev scripts, vscode settings, and reorganize main app",
+    "addedLines": 152,
+    "removedLines": 15
+  },
+  {
+    "hash": "0bdb675c03d712c27b48bd1f3307289885a71a99",
+    "timestamp": 1767180660,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update lo latest typescript@5.9.3",
+    "addedLines": 3,
+    "removedLines": 3
+  },
+  {
+    "hash": "920f07de9ace351e7e8e6841213d2112b59378cc",
+    "timestamp": 1767143955,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "chore: add commit script and update commit message prompts",
+    "addedLines": 50,
+    "removedLines": 4
+  },
+  {
+    "hash": "21797229faa9d8f83491e5b742a45cc3e7c1ab40",
+    "timestamp": 1767143520,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "chore: update project config and refine ssh key scripts",
+    "addedLines": 52,
+    "removedLines": 18
+  },
+  {
+    "hash": "d1cd130a753d1378ef38e35e41d8ba534bfeab54",
+    "timestamp": 1767096717,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add scripts/deploy-dist-to-server.sh and cleanup main app About info box :)) for Ra",
+    "addedLines": 76,
+    "removedLines": 22
+  },
+  {
+    "hash": "f46a0dd0477bff12edae565dc3da6837483fa9fc",
+    "timestamp": 1767095164,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: fix prepare-for-release script",
+    "addedLines": 226,
+    "removedLines": 1
+  },
+  {
+    "hash": "8ed46e0ba5439d4e812ad022c9599738f5c1989e",
+    "timestamp": 1767094958,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 100,
+    "removedLines": 0
+  },
+  {
     "hash": "bb42944f2cb2c0308fa0cc2bf84e556fc0206bd6",
     "timestamp": 1767094926,
     "authorName": "Philipp Tiefenbacher",
