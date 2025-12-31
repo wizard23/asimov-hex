@@ -22,6 +22,41 @@ If anything is unclear please just ask.
 
 
 
+Please give me a list of all Controls in the "Grid Controls" in the current order.
+
+Please restructure the Grid Controls by grouping them into separate folders in this order:
+
+"File"
+  - Save to PNG (button)
+  - Load from PNG (button)
+"Grid"
+  - Draw State selector (custom palette blade)
+  - Grid Scale
+  - Grid Type
+  - Grid Width
+  - Grid Height
+  - Particle Speed
+  - Edge Selection Rule
+"GUI"
+  - Palette
+  - Edge Width
+  - Edge Color
+"Advanced"
+  - Left Click Mode
+  - Number of States
+  - Show Coordinates
+  - Visualize Edge Delta
+  - Edge Palette
+
+All folders except he "Grid" folder should be closed initially.
+
+
+
+> If you want, I can tweak folder labels or add separators, but the current order matches your spec.
+Yes please tweak folder and control labels.
+
+
+Please make the "Grid Scale" adjustable using the mouse wheel zoom in/out.
 
 
 

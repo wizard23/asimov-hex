@@ -768,6 +768,7 @@ class GridApp {
     canvas.addEventListener('mousemove', (e: MouseEvent) => this.handleMouseMove(e));
     canvas.addEventListener('mousedown', (e: MouseEvent) => this.handleMouseDown(e));
     canvas.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
+    canvas.addEventListener('wheel', (e: WheelEvent) => this.handleMouseWheel(e), { passive: false });
   }
 
   private handleMouseMove(e: MouseEvent) {
@@ -918,6 +919,16 @@ class GridApp {
         this.updateGrid();
       }
     }
+  }
+
+  private handleMouseWheel(e: WheelEvent) {
+    e.preventDefault();
+    const direction = Math.sign(e.deltaY);
+    if (direction === 0) return;
+    const step = 1;
+    const nextScale = this.config.gridScale - direction * step;
+    this.config.gridScale = Math.max(5, Math.min(100, nextScale));
+    this.updateGrid();
   }
 }
 
