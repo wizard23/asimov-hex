@@ -1,5 +1,4 @@
 ## Timeline
-
 Please extract a meaningful commit message from the last interactions between human and AI in this file:
 docs/transcripts-buffer/codex/codex-2025-12-27-1250.log
 The log file is huge so please only look at the last 300 lines or so for determining the commit message.
@@ -14,7 +13,6 @@ Replace the <bug description> with a short, clear but precise description of the
 
 
 ## Tile Editor
-
 Please extract a meaningful commit message from the last interactions between human and AI in this file:
 docs/transcripts-buffer/codex/codex-2025-12-27-0035.log
 The log file is huge so please only look at the last 300 lines or so for determining the commit message.
@@ -34,9 +32,14 @@ Don't invent labels like "fix(timeline)" or "feature/order-list" but just descri
 
 
 
+## git diff based
+Please use `git diff` to look at the changes in the repo and create a commit message from that information. 
+If you need more information to create the commit message you can look at the files that got changed or any other files too for that matter.
+Please put the commit message in this file: temp/commit-message.txt
 
 
 
 
-Refactor rendering to use screen-space coordinates for improved scaling and visual consistency.
-Implemented a "screen-space rendering" architecture where polygons, labels, axes, and hover highlights are drawn based on screen coordinates rather than world coordinates. This ensures that visual elements like stroke widths, hover radii, and dash patterns remain consistent and legible regardless of the zoom level. Added helper functions worldToScreen, getStrokeWidthPx, getStrokeWidthWorld, and getPolygonScreenPoints to facilitate this transformation and updated drawing logic across the Tile Editor to utilize these new helpers. Also adjusted hit testing and hover detection to align with the new coordinate system.
+Please use `git diff --cached` to look at the staged changes in the repo and create a commit message from that information. 
+If you need more information to create the commit message you can look at the files that got changed or any other files too for that matter.
+Please put the commit message in this file: temp/commit-message.txt
