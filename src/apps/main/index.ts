@@ -1,5 +1,5 @@
 import { Application, Graphics, Container } from 'pixi.js';
-import { Pane } from 'tweakpane';
+import { Pane, FolderApi } from 'tweakpane';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
 import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
@@ -62,6 +62,7 @@ class GridApp {
   private mouseX: number = 0;
   private mouseY: number = 0;
   private grid!: Grid;
+  private gridFolder: FolderApi | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -360,29 +361,56 @@ class GridApp {
 
   private initTweakpane() {
     this.pane = new Pane({ title: 'Grid Controls' });
+    const fileFolder = this.pane.addFolder({ title: 'File', expanded: false });
+    this.gridFolder = this.pane.addFolder({ title: 'Grid', expanded: true });
+    const guiFolder = this.pane.addFolder({ title: 'GUI', expanded: false });
+    const advancedFolder = this.pane.addFolder({ title: 'Advanced', expanded: false });
 
-    // Add grid width control
-    this.pane.addBinding(this.config, 'gridWidth', {
-      min: 1,
-      max: 80,
-      step: 1,
-      label: 'Grid Width',
+    // Add palette selection dropdown
+    const paletteOptions: Record<string, string> = {};
+    this.palettes.forEach(palette => {
+      paletteOptions[palette.name] = palette.name;
+    });
+    
+    guiFolder.addBinding(this.config, 'selectedPalette', {
+      options: paletteOptions,
+      label: 'Palette',
+    }).on('change', () => {
+      this.applyPalette(this.config.selectedPalette);
+    });
+
+    // Add edge width slider
+    guiFolder.addBinding(this.config, 'edgeWidth', {
+      label: 'Edge Width',
+      min: 0,
+      max: 10,
+      step: 0.1,
     }).on('change', () => {
       this.updateGrid();
     });
 
-    // Add grid height control
-    this.pane.addBinding(this.config, 'gridHeight', {
-      min: 1,
-      max: 50,
+    // Add edge color picker
+    guiFolder.addBinding(this.config, 'edgeColor', {
+      label: 'Edge Color'
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add draw state selector (palette color picker)
+    this.updateDrawStateBlade();
+
+    // Add grid scale control
+    this.gridFolder.addBinding(this.config, 'gridScale', {
+      min: 5,
+      max: 100,
       step: 1,
-      label: 'Grid Height',
+      label: 'Grid Scale',
     }).on('change', () => {
       this.updateGrid();
     });
 
     // Add grid type control
-    this.pane.addBinding(this.config, 'gridType', {
+    this.gridFolder.addBinding(this.config, 'gridType', {
       options: {
         triangles: 'triangles',
         squares: 'squares',
@@ -394,18 +422,60 @@ class GridApp {
       this.updateGrid();
     });
 
-    // Add grid scale control
-    this.pane.addBinding(this.config, 'gridScale', {
-      min: 5,
-      max: 100,
+    // Add grid width control
+    this.gridFolder.addBinding(this.config, 'gridWidth', {
+      min: 1,
+      max: 80,
       step: 1,
-      label: 'Grid Scale',
+      label: 'Grid Width',
     }).on('change', () => {
       this.updateGrid();
     });
 
+    // Add grid height control
+    this.gridFolder.addBinding(this.config, 'gridHeight', {
+      min: 1,
+      max: 50,
+      step: 1,
+      label: 'Grid Height',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
+    // Add particle speed control
+    this.gridFolder.addBinding(this.config, 'particleSpeed', {
+      min: 1,
+      max: 400,
+      step: 1,
+      label: 'Particle Speed',
+    });
+
+    // Add edge selection rule dropdown
+    this.gridFolder.addBinding(this.config, 'edgeSelectionRule', {
+      options: {
+        'Random (No Backtrack)': 'randomNoBacktrack',
+        'Random (With Backtrack)': 'randomWithBacktrack',
+        'Always Turn Clockwise': 'clockwise',
+        'Always Turn Counter-Clockwise': 'counterClockwise',
+        'Follow Cursor': 'followCursor',
+        'Avoid Cursor': 'avoidCursor',
+        'Highest Edge Delta': 'highestEdgeDelta',
+      },
+      label: 'Edge Selection Rule',
+    });
+
+    // Add left click mode dropdown
+    advancedFolder.addBinding(this.config, 'leftClickMode', {
+      options: {
+        'Draw Cell': 'draw',
+        'Spawn Particle': 'spawnParticle',
+        'Smart': 'smart',
+      },
+      label: 'Left Click Mode',
+    });
+
     // Add number of states control
-    this.pane.addBinding(this.config, 'numStates', {
+    advancedFolder.addBinding(this.config, 'numStates', {
       min: 2,
       max: 8,
       step: 1,
@@ -420,17 +490,18 @@ class GridApp {
       this.updateGrid();
     });
 
-    // Add palette selection dropdown
-    const paletteOptions: Record<string, string> = {};
-    this.palettes.forEach(palette => {
-      paletteOptions[palette.name] = palette.name;
-    });
-    
-    this.pane.addBinding(this.config, 'selectedPalette', {
-      options: paletteOptions,
-      label: 'Palette',
+    // Add show coordinates checkbox
+    advancedFolder.addBinding(this.config, 'showCoordinates', {
+      label: 'Show Coordinates',
     }).on('change', () => {
-      this.applyPalette(this.config.selectedPalette);
+      this.updateGrid();
+    });
+
+    // Add visualize edge delta checkbox
+    advancedFolder.addBinding(this.config, 'visualizeEdgeDelta', {
+      label: 'Visualize Edge Delta'
+    }).on('change', () => {
+      this.updateGrid();
     });
 
     // Add edge palette selection dropdown
@@ -439,88 +510,22 @@ class GridApp {
       edgePaletteOptions[palette.name] = palette.name;
     });
     
-    this.pane.addBinding(this.config, 'selectedEdgePalette', {
+    advancedFolder.addBinding(this.config, 'selectedEdgePalette', {
       options: edgePaletteOptions,
       label: 'Edge Palette',
     }).on('change', () => {
       this.applyEdgePalette(this.config.selectedEdgePalette);
     });
 
-    // Add edge color picker
-    this.pane.addBinding(this.config, 'edgeColor', {
-      label: 'Edge Color'
-    }).on('change', () => {
-      this.updateGrid();
-    });
-
-    // Add edge width slider
-    this.pane.addBinding(this.config, 'edgeWidth', {
-      label: 'Edge Width',
-      min: 0,
-      max: 10,
-      step: 0.1,
-    }).on('change', () => {
-      this.updateGrid();
-    });
-
-    // Add visualize edge delta checkbox
-    this.pane.addBinding(this.config, 'visualizeEdgeDelta', {
-      label: 'Visualize Edge Delta'
-    }).on('change', () => {
-      this.updateGrid();
-    });
-
-    // Add draw state selector (palette color picker)
-    this.updateDrawStateBlade();
-
-    // Add show coordinates checkbox
-    this.pane.addBinding(this.config, 'showCoordinates', {
-      label: 'Show Coordinates',
-    }).on('change', () => {
-      this.updateGrid();
-    });
-
-    // Add left click mode dropdown
-    this.pane.addBinding(this.config, 'leftClickMode', {
-      options: {
-        'Smart': 'smart',
-        'Draw Cell': 'draw',
-        'Spawn Particle': 'spawnParticle',
-      },
-      label: 'Left Click Mode',
-    });
-
-    // Add particle speed control
-    this.pane.addBinding(this.config, 'particleSpeed', {
-      min: 1,
-      max: 400,
-      step: 1,
-      label: 'Particle Speed',
-    });
-
-    // Add edge selection rule dropdown
-    this.pane.addBinding(this.config, 'edgeSelectionRule', {
-      options: {
-        'Random (No Backtrack)': 'randomNoBacktrack',
-        'Random (With Backtrack)': 'randomWithBacktrack',
-        'Always Turn Clockwise': 'clockwise',
-        'Always Turn Counter-Clockwise': 'counterClockwise',
-        'Follow Cursor': 'followCursor',
-        'Avoid Cursor': 'avoidCursor',
-        'Highest Edge Delta': 'highestEdgeDelta',
-      },
-      label: 'Edge Selection Rule',
-    });
-
     // Add save/load PNG buttons
-    this.pane.addButton({
+    fileFolder.addButton({
       title: 'Save to PNG',
       label: 'Save to PNG',
     }).on('click', () => {
       this.saveToPNG();
     });
 
-    this.pane.addButton({
+    fileFolder.addButton({
       title: 'Load from PNG',
       label: 'Load from PNG',
     }).on('click', () => {
@@ -659,8 +664,12 @@ class GridApp {
       },
     });
 
-    // Add the blade to the pane
-    this.pane.add(this.drawStateBlade);
+    // Add the blade to the grid folder
+    if (this.gridFolder) {
+      this.gridFolder.add(this.drawStateBlade);
+    } else {
+      this.pane.add(this.drawStateBlade);
+    }
   }
 
   private initGrid() {
