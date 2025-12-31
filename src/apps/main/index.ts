@@ -99,7 +99,7 @@ class GridApp {
       showCoordinates: false,
       particleSpeed: 100,
       leftClickMode: 'draw',
-      edgeSelectionRule: 'randomNoBacktrack',
+      edgeSelectionRule: 'highestEdgeDelta',
     };
 
     this.updateGridInstance();
