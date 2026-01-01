@@ -109,10 +109,10 @@ class GridApp {
       particleSpeed: 250,
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
-      orbitDistance: 150,
-      orbitAlgorithm: 'gradient',
-      orbitEpsilon: 0.01,
-      showOrbit: false,
+      orbitDistance: 100,
+      orbitAlgorithm: 'twoStepGradient',
+      orbitEpsilon: 0.5,
+      showOrbit: true,
     };
 
     this.updateGridInstance();
