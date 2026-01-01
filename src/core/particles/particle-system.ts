@@ -65,6 +65,27 @@ export class ParticleSystem {
     this.createParticleGraphics(particle);
   }
 
+  spawnParticleOnEdge(edge: EdgeInfo, progress: number, direction: number): void {
+    const p1 = edge.points[0];
+    const p2 = edge.points[1];
+    const clampedProgress = Math.max(0, Math.min(1, progress));
+
+    const x = p1.x + (p2.x - p1.x) * clampedProgress;
+    const y = p1.y + (p2.y - p1.y) * clampedProgress;
+
+    const particle: Particle = {
+      x,
+      y,
+      currentEdge: edge,
+      direction: direction >= 0 ? 1 : -1,
+      progress: clampedProgress,
+      previousEdge: null,
+    };
+
+    this.particles.push(particle);
+    this.createParticleGraphics(particle);
+  }
+
   private createParticleGraphics(particle: Particle): void {
     const graphics = new Graphics();
     graphics.circle(0, 0, 4);

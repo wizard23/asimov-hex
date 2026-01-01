@@ -155,6 +155,11 @@ Several small fixes:
 In "spawn particle" mode when no edge is hovered but a cell is hovered.
 * highlight the cell
 * when clicked: spawn a particle at a random position and a a random direction on a random edge of the hovered cell 
+If anything is unclear please just ask instead of guessing what I meant.
+
+
+
+Always use the center of the edge for the spawning of particles.
 
 
 

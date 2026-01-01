@@ -929,7 +929,7 @@ class GridApp {
           this.edgeContainer.addChild(this.highlightedVertex);
         }
       }
-    } else if (this.config.leftClickMode === 'draw' || isSmartMode) {
+    } else if (this.config.leftClickMode === 'draw' || isSmartMode || this.config.leftClickMode === 'spawnParticle') {
       // Highlight cell
       const cellInfo = getCellAtPixel(
         this.grid,
@@ -973,10 +973,35 @@ class GridApp {
           10
         );
 
-        if (edgeInfo) {
-          // Spawn particle on edge click
-          this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
-          return;
+      if (edgeInfo) {
+        // Spawn particle on edge click
+        this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
+        return;
+      }
+    }
+
+      if (this.config.leftClickMode === 'spawnParticle') {
+        // Spawn particle on a random edge within the clicked cell
+        const x = e.clientX - rect.left - this.gridContainer.x;
+        const y = e.clientY - rect.top - this.gridContainer.y;
+
+        const cellInfo = getCellAtPixel(
+          this.grid,
+          this.config.gridWidth,
+          this.config.gridHeight,
+          x,
+          y
+        );
+
+        if (cellInfo) {
+          const edges = this.grid.getCellEdges({ col: cellInfo.col, row: cellInfo.row });
+          if (edges.length > 0) {
+            const edge = edges[Math.floor(Math.random() * edges.length)];
+            const progress = 0.5;
+            const direction = Math.random() < 0.5 ? -1 : 1;
+            this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
+            return;
+          }
         }
       }
 
