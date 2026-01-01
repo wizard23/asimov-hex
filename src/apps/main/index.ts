@@ -2,7 +2,7 @@ import { Application, Graphics, Container } from 'pixi.js';
 import { Pane, FolderApi } from 'tweakpane';
 import type { BindingApi } from '@tweakpane/core';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
-import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
+import { GridType, EdgeSelectionRule, OrbitAlgorithm, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
 import palettesData from '../../assets/palettes.json';
 import { ParticleSystem } from '../../core/particles/particle-system';
@@ -44,6 +44,7 @@ interface AppConfig {
   leftClickMode: LeftClickMode;
   edgeSelectionRule: EdgeSelectionRule;
   orbitDistance: number;
+  orbitAlgorithm: OrbitAlgorithm;
 }
 
 class GridApp {
@@ -106,6 +107,7 @@ class GridApp {
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
       orbitDistance: 200,
+      orbitAlgorithm: 'gradient',
     };
 
     this.updateGridInstance();
@@ -358,7 +360,8 @@ class GridApp {
         this.mouseX,
         this.mouseY,
         this.cellStates,
-        this.config.orbitDistance
+        this.config.orbitDistance,
+        this.config.orbitAlgorithm
       );
     });
 
@@ -491,6 +494,14 @@ class GridApp {
         'Smart': 'smart',
       },
       label: 'Left Click Mode',
+    });
+
+    advancedFolder.addBinding(this.config, 'orbitAlgorithm', {
+      options: {
+        'Gradient': 'gradient',
+        'Distance To Endpoint': 'distanceToEndpoint',
+      },
+      label: 'Orbit Algorithm',
     });
 
     // Add number of states control

@@ -82,7 +82,22 @@ Please make this new rule the default.
 If anything is unclear please just ask.
 
 
-If (and only if) it is selected a slider control labeled "Orbit Distance" is shown. It is an integer ranging from 0 to 1000.
+
+In the "Grid" folder please add a center view button that adjusts the scale such that all polygons are in the viewable area. Leave as little free space as possible please.
+
+
+In the "Advanced" folder please add a "Orbit Algorithm" dropdown list. There are two options for now:
+* "Gradient" (the new option, make this the default)
+* "Distance To Endpoint" (the current algorithm for deciding the next edge)
+
+When "Gradient" is selected then the particles don't decide the next edge based on the distance between mouse cursor and the endpoint of the edge but on the distance between the mouse cursor and the startpoint of the edge plus epsilon * direction vector. Use a small epsilon like 0.1 for this.
+
+If anything is unclear please just ask.
+
+
+I have a question about the epsilon used to calculate the gradient:
+* What epsilon would coincide with the endpoint of the edge?
+* what epsilon would coincide with the centerpoint of the edge?
 
 
 Please add a toolbar window on the top edge of the screen
