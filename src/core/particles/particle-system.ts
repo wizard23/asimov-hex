@@ -261,15 +261,30 @@ export class ParticleSystem {
         return;
       }
 
-      const foundEdge = this.findOrbitEdge(
-        vertex,
-        availableEdges,
-        mouseX,
-        mouseY,
-        orbitDistance,
-        orbitAlgorithm,
-        orbitEpsilon
-      );
+      let foundEdge: EdgeInfo | null = null;
+      if (orbitAlgorithm === 'distanceToEndpoint') {
+        foundEdge = this.findOrbitEndpointEdge(
+          vertex,
+          availableEdges,
+          mouseX,
+          mouseY,
+          orbitDistance
+        );
+      } else {
+        const pathLength = orbitAlgorithm === 'twoStepGradient' ? 2 : 1;
+        foundEdge = this.findOrbitEdgeByPathLength(
+          vertex,
+          availableEdges,
+          grid,
+          gridWidth,
+          gridHeight,
+          mouseX,
+          mouseY,
+          orbitDistance,
+          orbitEpsilon,
+          pathLength
+        );
+      }
 
       if (!foundEdge) {
         this.removeParticle(particle);
@@ -464,14 +479,12 @@ export class ParticleSystem {
     return bestEdge;
   }
 
-  private findOrbitEdge(
+  private findOrbitEndpointEdge(
     vertex: Point,
     connectedEdges: EdgeInfo[],
     mouseX: number,
     mouseY: number,
-    orbitDistance: number,
-    orbitAlgorithm: OrbitAlgorithm,
-    orbitEpsilon: number
+    orbitDistance: number
   ): EdgeInfo | null {
     if (connectedEdges.length === 0) return null;
     
@@ -480,13 +493,7 @@ export class ParticleSystem {
     
     for (const edge of connectedEdges) {
       const otherPoint = getOtherPoint(edge, vertex);
-      let targetPoint = otherPoint;
-      if (orbitAlgorithm === 'gradient') {
-        targetPoint = this.getOrbitGradientPoint(vertex, otherPoint, orbitEpsilon);
-      } else if (orbitAlgorithm === 'twoStepGradient') {
-        targetPoint = this.getOrbitGradientPoint(otherPoint, vertex, orbitEpsilon);
-      }
-      const distToCursor = Math.sqrt((mouseX - targetPoint.x) ** 2 + (mouseY - targetPoint.y) ** 2);
+      const distToCursor = Math.sqrt((mouseX - otherPoint.x) ** 2 + (mouseY - otherPoint.y) ** 2);
       const delta = Math.abs(distToCursor - orbitDistance);
       if (delta < bestDelta) {
         bestDelta = delta;
@@ -494,6 +501,80 @@ export class ParticleSystem {
       }
     }
     
+    return bestEdge;
+  }
+
+  private findOrbitEdgeByPathLength(
+    vertex: Point,
+    connectedEdges: EdgeInfo[],
+    grid: Grid,
+    gridWidth: number,
+    gridHeight: number,
+    mouseX: number,
+    mouseY: number,
+    orbitDistance: number,
+    orbitEpsilon: number,
+    pathLength: number
+  ): EdgeInfo | null {
+    if (connectedEdges.length === 0 || pathLength < 1) return null;
+
+    let bestEdge: EdgeInfo | null = null;
+    let bestDelta = Infinity;
+
+    type PathState = {
+      currentVertex: Point;
+      previousEdge: EdgeInfo | null;
+      firstEdge: EdgeInfo;
+      depth: number;
+      lastFrom: Point;
+      lastTo: Point;
+    };
+
+    const stack: PathState[] = [];
+    for (const edge of connectedEdges) {
+      const nextVertex = getOtherPoint(edge, vertex);
+      stack.push({
+        currentVertex: nextVertex,
+        previousEdge: edge,
+        firstEdge: edge,
+        depth: 1,
+        lastFrom: vertex,
+        lastTo: nextVertex,
+      });
+    }
+
+    while (stack.length > 0) {
+      const state = stack.pop();
+      if (!state) break;
+
+      if (state.depth === pathLength) {
+        const targetPoint = this.getOrbitGradientPoint(state.lastFrom, state.lastTo, orbitEpsilon);
+        const distToCursor = Math.sqrt((mouseX - targetPoint.x) ** 2 + (mouseY - targetPoint.y) ** 2);
+        const delta = Math.abs(distToCursor - orbitDistance);
+        if (delta < bestDelta) {
+          bestDelta = delta;
+          bestEdge = state.firstEdge;
+        }
+        continue;
+      }
+
+      const nextEdges = grid.getEdgesAtVertex(state.currentVertex, gridWidth, gridHeight);
+      for (const edge of nextEdges) {
+        if (state.previousEdge && edgesEqual(state.previousEdge, edge)) {
+          continue;
+        }
+        const nextVertex = getOtherPoint(edge, state.currentVertex);
+        stack.push({
+          currentVertex: nextVertex,
+          previousEdge: edge,
+          firstEdge: state.firstEdge,
+          depth: state.depth + 1,
+          lastFrom: state.currentVertex,
+          lastTo: nextVertex,
+        });
+      }
+    }
+
     return bestEdge;
   }
 

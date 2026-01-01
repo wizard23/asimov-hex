@@ -115,6 +115,31 @@ The next edge is selected by searching through all available edges and applying 
 If anything is unclear please just ask.
 
 
+Please explain in detail these two Orbit Algorithms as they are implemented now:
+* Gradient
+* 2 Step Gradient
+
+
+
+
+The current implementation of "2 Step Gradient" is not what I intended. I did not explain it well. Here is the more detailed description:
+
+For the "2 Step Gradient" the algorithm should not just look at all available edges originating from the vertex the particle just arrived at but at all paths consisting of 2 edges that are possible from the current vertex. 
+These paths of length 2 go from the the vertex the particle just arrived at (vertex A) to an intermediate vertex B and end in vertex C 
+For each of these paths of length 2 the "2 Step Gradient" algorithm should minimize the following value:
+|distance(B + epsilon * (C - B), mouse_cursor) - orbit_distance)|
+
+Please create a function for this search that takes the path length as a parameter. For now we only use paths of length 2 but we might have to search longer paths in the future.
+
+Did I describe it in a way that is clear? If anything is unclear please just ask.
+
+
+
+
+To decide on the next edge it should iterate through all edges E
+for each E it should run the normal "Gradient"
+
+
 
 
 
