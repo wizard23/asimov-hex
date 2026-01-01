@@ -1,5 +1,6 @@
 import { Application, Graphics, Container } from 'pixi.js';
-import { Pane, FolderApi, BindingApi } from 'tweakpane';
+import { Pane, FolderApi } from 'tweakpane';
+import type { BindingApi } from '@tweakpane/core';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
 import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
