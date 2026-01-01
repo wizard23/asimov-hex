@@ -45,6 +45,16 @@ If you need more information to create the commit message you can look at the fi
 Please put the commit message in this file: temp/commit-message.txt
 
 
+## with fancy labels
+Please use `git diff --cached` to look at the staged changes in the repo in: 
+./asimov-hex/asimov-hex
+Then create a commit message from that information. 
+If you need more information to create the commit message you can look at the files that got changed or other related files.
+Please put the commit message in this file: 
+./asimov-hex/asimov-hex/temp/commit-message.txt
+
+
+## no fancy labels
 Please use `git diff --cached` to look at the staged changes in the repo in: 
 ./asimov-hex/asimov-hex
 Then create a commit message from that information. 
