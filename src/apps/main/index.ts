@@ -523,14 +523,12 @@ class GridApp {
     // Add save/load PNG buttons
     fileFolder.addButton({
       title: 'Save to PNG',
-      label: 'Save to PNG',
     }).on('click', () => {
       this.saveToPNG();
     });
 
     fileFolder.addButton({
       title: 'Load from PNG',
-      label: 'Load from PNG',
     }).on('click', () => {
       this.loadFromPNG();
     });

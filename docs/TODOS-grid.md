@@ -52,17 +52,28 @@ All folders except he "Grid" folder should be closed initially.
 
 
 
-> If you want, I can tweak folder labels or add separators, but the current order matches your spec.
-Yes please tweak folder and control labels.
-
-
 Please make the "Grid Scale" adjustable using the mouse wheel zoom in/out.
+
 
 
 Some ux issues
 * when using the scroll wheel for zooming the "Grid Scale" slider is not updated.
 * the grid does not seem to be centered for grid types triangles and hexagons. (Squares and Cairo grids looks visually centered.)
 * when changing the grid height or grid height please keep the cell data instead of setting all to 0 when the size of the grid changes.
+
+
+
+Please create a new folder named "Particles" (initially open) right after "Grid" and move these two controls there:
+  - Particle Speed
+  - Edge Selection Rule
+
+
+
+The two buttons don't need the redundant label. Please remove them.
+
+
+
+
 
 
 

@@ -1,0 +1,3 @@
+I'm a mathematician with a background in linear algebra, category theory, complex analysis, functional analysis and discreet mathematics but I never understood what quantum theory is all about. Please explain in a way that might be accessible. I know what groups, eigenvectors and eigenvalues are so please don't simplify anything. I have some rudimentary understanding of newtonian mechanics but more on a high school level. I I tried some physics courses at university but I was baffled and confused by the lack of rigor in the way the physicists used results from analysis so I decided to focus entirely on mathematics. Long story short: Please explain quantum theory to me. I want to know :)
+
+https://chatgpt.com/share/6956593a-31f4-800c-9a1c-e834e4324642
