@@ -59,6 +59,10 @@ Yes please tweak folder and control labels.
 Please make the "Grid Scale" adjustable using the mouse wheel zoom in/out.
 
 
+Some ux issues
+* when using the scroll wheel for zooming the "Grid Scale" slider is not updated.
+* the grid does not seem to be centered for grid types triangles and hexagons. (Squares and Cairo grids looks visually centered.)
+* when changing the grid height or grid height please keep the cell data instead of setting all to 0 when the size of the grid changes.
 
 
 

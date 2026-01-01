@@ -1,5 +1,5 @@
 import { Application, Graphics, Container } from 'pixi.js';
-import { Pane, FolderApi } from 'tweakpane';
+import { Pane, FolderApi, BindingApi } from 'tweakpane';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
 import { GridType, EdgeSelectionRule, ColorValue } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
@@ -63,6 +63,7 @@ class GridApp {
   private mouseY: number = 0;
   private grid!: Grid;
   private gridFolder: FolderApi | null = null;
+  private gridScaleBinding: BindingApi | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -400,7 +401,7 @@ class GridApp {
     this.updateDrawStateBlade();
 
     // Add grid scale control
-    this.gridFolder.addBinding(this.config, 'gridScale', {
+    this.gridScaleBinding = this.gridFolder.addBinding(this.config, 'gridScale', {
       min: 5,
       max: 100,
       step: 1,
@@ -681,11 +682,11 @@ class GridApp {
     this.updateGridInstance();
 
     // Initialize cell states if needed
-    if (this.cellStates.length !== this.config.gridHeight || 
-        this.cellStates[0]?.length !== this.config.gridWidth) {
-      this.cellStates = Array(this.config.gridHeight)
-        .fill(0)
-        .map(() => Array(this.config.gridWidth).fill(0) as number[]);
+    if (
+      this.cellStates.length !== this.config.gridHeight ||
+      this.cellStates[0]?.length !== this.config.gridWidth
+    ) {
+      this.resizeCellStates(this.config.gridWidth, this.config.gridHeight);
     }
 
     // Clear existing graphics (but keep particles)
@@ -695,36 +696,13 @@ class GridApp {
     this.highlightedCell = null;
     this.highlightedVertex = null;
 
-    // Calculate grid dimensions based on type
-    let gridWidth: number, gridHeight: number;
-    if (this.config.gridType === 'squares') {
-      gridWidth = this.config.gridWidth * this.config.gridScale;
-      gridHeight = this.config.gridHeight * this.config.gridScale;
-    } else if (this.config.gridType === 'hexagons') {
-      const hexSpacingX = this.config.gridScale * Math.sqrt(3);
-      const hexSpacingY = this.config.gridScale * 1.5;
-      gridWidth = this.config.gridWidth * hexSpacingX + this.config.gridScale;
-      gridHeight = this.config.gridHeight * hexSpacingY + this.config.gridScale;
-    } else if (this.config.gridType === 'triangles') {
-      const triangleHeight = this.config.gridScale * Math.sqrt(3) / 2;
-      gridWidth = this.config.gridWidth * this.config.gridScale * 0.5 + this.config.gridScale;
-      gridHeight = this.config.gridHeight * triangleHeight + triangleHeight;
-    } else { // cairo
-      const cairoGrid = this.grid as CairoGrid;
-      const bounds = cairoGrid.getGridBounds(this.config.gridWidth, this.config.gridHeight);
-      gridWidth = bounds.width;
-      gridHeight = bounds.height;
-    }
+    const bounds = this.getGridBounds(this.config.gridWidth, this.config.gridHeight);
+    const gridWidth = bounds.maxX - bounds.minX;
+    const gridHeight = bounds.maxY - bounds.minY;
 
-    // Center the grid
-    let offsetX = (this.app.screen.width - gridWidth) / 2;
-    let offsetY = (this.app.screen.height - gridHeight) / 2;
-
-    if (this.grid instanceof CairoGrid) {
-      const bounds = this.grid.getGridBounds(this.config.gridWidth, this.config.gridHeight);
-      offsetX -= bounds.minX;
-      offsetY -= bounds.minY;
-    }
+    // Center the grid based on true bounds
+    const offsetX = (this.app.screen.width - gridWidth) / 2 - bounds.minX;
+    const offsetY = (this.app.screen.height - gridHeight) / 2 - bounds.minY;
 
     // Position all containers at the same offset so cells, edges, and particles align
     this.gridContainer.x = offsetX;
@@ -761,6 +739,48 @@ class GridApp {
       edgePaletteStrings, // Pass edgePalette
       this.config.showCoordinates
     );
+  }
+
+  private resizeCellStates(width: number, height: number) {
+    const previous = this.cellStates;
+    const next = Array(height)
+      .fill(0)
+      .map(() => Array(width).fill(0) as number[]);
+
+    const rows = Math.min(height, previous.length);
+    const cols = Math.min(width, previous[0]?.length ?? 0);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        next[row][col] = previous[row]?.[col] ?? 0;
+      }
+    }
+
+    this.cellStates = next;
+  }
+
+  private getGridBounds(width: number, height: number) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const poly = this.grid.getCellPolygon({ col, row });
+        for (const point of poly) {
+          minX = Math.min(minX, point.x);
+          minY = Math.min(minY, point.y);
+          maxX = Math.max(maxX, point.x);
+          maxY = Math.max(maxY, point.y);
+        }
+      }
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+    }
+
+    return { minX, minY, maxX, maxY };
   }
 
   private setupInteraction() {
@@ -928,6 +948,7 @@ class GridApp {
     const step = 1;
     const nextScale = this.config.gridScale - direction * step;
     this.config.gridScale = Math.max(5, Math.min(100, nextScale));
+    this.gridScaleBinding?.refresh();
     this.updateGrid();
   }
 }
