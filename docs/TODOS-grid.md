@@ -107,6 +107,25 @@ If anything is unclear please just ask.
 Yes please add a slider for it right below the "Orbit Algorithm" min is 0.01 max 2 in steps of 0.01
 
 
+
+
+
+Please add a new "Orbit Algorithm" called "2 Step Gradient":
+The next edge is selected by searching through all available edges and applying the normal "Gradient" algorithm starting from the edge's endpoint.
+If anything is unclear please just ask.
+
+
+
+
+
+
+
+
+
+
+
+
+
 In the "Grid" folder please add a center view button that adjusts the scale such that all polygons are in the viewable area. Leave as little free space as possible please.
 
 

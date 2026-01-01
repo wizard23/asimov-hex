@@ -502,6 +502,7 @@ class GridApp {
     advancedFolder.addBinding(this.config, 'orbitAlgorithm', {
       options: {
         'Gradient': 'gradient',
+        '2 Step Gradient': 'twoStepGradient',
         'Distance To Endpoint': 'distanceToEndpoint',
       },
       label: 'Orbit Algorithm',

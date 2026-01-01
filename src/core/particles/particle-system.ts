@@ -480,9 +480,12 @@ export class ParticleSystem {
     
     for (const edge of connectedEdges) {
       const otherPoint = getOtherPoint(edge, vertex);
-      const targetPoint = orbitAlgorithm === 'gradient'
-        ? this.getOrbitGradientPoint(vertex, otherPoint, orbitEpsilon)
-        : otherPoint;
+      let targetPoint = otherPoint;
+      if (orbitAlgorithm === 'gradient') {
+        targetPoint = this.getOrbitGradientPoint(vertex, otherPoint, orbitEpsilon);
+      } else if (orbitAlgorithm === 'twoStepGradient') {
+        targetPoint = this.getOrbitGradientPoint(otherPoint, vertex, orbitEpsilon);
+      }
       const distToCursor = Math.sqrt((mouseX - targetPoint.x) ** 2 + (mouseY - targetPoint.y) ** 2);
       const delta = Math.abs(distToCursor - orbitDistance);
       if (delta < bestDelta) {
