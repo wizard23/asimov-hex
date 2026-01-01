@@ -1,5 +1,77 @@
 [
   {
+    "hash": "943c248f62d1136811ee233d5fd7059192d66eed",
+    "timestamp": 1767229582,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix tweakpane imports",
+    "addedLines": 5,
+    "removedLines": 4
+  },
+  {
+    "hash": "7401427f04fcc4cc78b86532962d1ff7a80ac6ad",
+    "timestamp": 1767229099,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add commit scripts and update todos",
+    "addedLines": 170,
+    "removedLines": 69
+  },
+  {
+    "hash": "6e394c6f7d188bab024c3e6003ecb53617e90739",
+    "timestamp": 1767221858,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add mouse wheel support for grid zooming",
+    "addedLines": 46,
+    "removedLines": 0
+  },
+  {
+    "hash": "3fe78aaf2fb5bb1d15920f61ec4dbcb769290ed9",
+    "timestamp": 1767221368,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor(main): reorganize Tweakpane controls into folders",
+    "addedLines": 108,
+    "removedLines": 99
+  },
+  {
+    "hash": "36a166d8d810cbc53621e86f3d0dd6cb2dd79fe7",
+    "timestamp": 1767211968,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: smart as default mode in main app; drafting prompts/todos",
+    "addedLines": 4,
+    "removedLines": 3
+  },
+  {
+    "hash": "beb52403e851378aeff6cb15c997b1800f13c4ab",
+    "timestamp": 1767210476,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat(main): implement 'Smart' left-click mode",
+    "addedLines": 43,
+    "removedLines": 39
+  },
+  {
+    "hash": "9f58908515f451383634d4d5121b64607f5d51fb",
+    "timestamp": 1767210187,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: organize source files and update docs",
+    "addedLines": 107,
+    "removedLines": 6
+  },
+  {
+    "hash": "cc10347482212a390f70b5c7444a9ba6d5301198",
+    "timestamp": 1767203209,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 270,
+    "removedLines": 0
+  },
+  {
     "hash": "350dc84eaf2b559d5d4744cba0f33fa159425a4f",
     "timestamp": 1767203148,
     "authorName": "Philipp Tiefenbacher",
