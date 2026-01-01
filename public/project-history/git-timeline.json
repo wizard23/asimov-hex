@@ -1,5 +1,140 @@
 [
   {
+    "hash": "ebceb840f2e2f5117d0ef3362237cd7a1d536318",
+    "timestamp": 1767298968,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: tweak default params for release for gerji :)",
+    "addedLines": 4,
+    "removedLines": 4
+  },
+  {
+    "hash": "8d3babe379ac8b3c095a14aec55c942286753977",
+    "timestamp": 1767295070,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: allow spawning particles inside cells",
+    "addedLines": 56,
+    "removedLines": 5
+  },
+  {
+    "hash": "593de1ba77ea97f13e31e790f6a265680fe05552",
+    "timestamp": 1767293729,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fix(orbit): update overlay visibility and style",
+    "addedLines": 15,
+    "removedLines": 13
+  },
+  {
+    "hash": "ca37a297dfb430d4b4371bbbf270369c5d63dbd8",
+    "timestamp": 1767292546,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add orbit distance visualization",
+    "addedLines": 40,
+    "removedLines": 1
+  },
+  {
+    "hash": "0f0f940494dd25ec6618e12773d83ce4fccde071",
+    "timestamp": 1767291556,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add 3 and 4 step gradient orbit algorithms",
+    "addedLines": 17,
+    "removedLines": 4
+  },
+  {
+    "hash": "108a9e3b806a787662940468e904bef2815fe9f0",
+    "timestamp": 1767288904,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor orbit edge selection algorithms",
+    "addedLines": 126,
+    "removedLines": 20
+  },
+  {
+    "hash": "4482d9cd3c273c078f456126326784bcfc628255",
+    "timestamp": 1767287381,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "still buggy: add 2-step gradient orbit algorithm",
+    "addedLines": 27,
+    "removedLines": 4
+  },
+  {
+    "hash": "f9b4ee0d712be0be8f15779aca2740e37a6f63c8",
+    "timestamp": 1767278644,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: add orbit epsilon control and tune defaults",
+    "addedLines": 29,
+    "removedLines": 15
+  },
+  {
+    "hash": "7a728c7285a791f199f33256b8c53899224cda7a",
+    "timestamp": 1767276573,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tweak orbit gradient calculation",
+    "addedLines": 14,
+    "removedLines": 6
+  },
+  {
+    "hash": "e3d148282eb2a70a8e7ef6b32ebdada26876f01e",
+    "timestamp": 1767276159,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: add orbit algorithm selection",
+    "addedLines": 60,
+    "removedLines": 12
+  },
+  {
+    "hash": "31446ebb5f1be8efd382bee6e0c8f11e84ade9c6",
+    "timestamp": 1767274634,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add comprehensive documentation for main app and todo lists - create dev perspective docs for Main app, including architecture, coordinate systems, and interactions - document Grid Controls implementation, including orbit distance and grid scale sync - document Main app types and implementation details like grid centering and smart input resolution - add documentation prompts to `TODOS-commit-messages.md` - create `TODOS-documentation.md` for tracking documentation tasks - create `TODOS-timeline.md` for analyzing file structure",
+    "addedLines": 311,
+    "removedLines": 0
+  },
+  {
+    "hash": "b7b73d7c8687f7b5a8b47b5477badab97fde9a76",
+    "timestamp": 1767269391,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat(particles): add orbit cursor rule",
+    "addedLines": 112,
+    "removedLines": 9
+  },
+  {
+    "hash": "d1b7db2d234b386a59a44bddbd15e1eb1578c6b7",
+    "timestamp": 1767267274,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "remove redundant labels from save/load buttons in tweakpane",
+    "addedLines": 18,
+    "removedLines": 6
+  },
+  {
+    "hash": "f9ca7fd00e938e1fcf92c4b0b13f75bd0a7eb611",
+    "timestamp": 1767267051,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "group particle controls in gui",
+    "addedLines": 3,
+    "removedLines": 2
+  },
+  {
+    "hash": "e6aca7343e641d7a374e266d85026b9e9460b52c",
+    "timestamp": 1767229609,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 306,
+    "removedLines": 0
+  },
+  {
     "hash": "943c248f62d1136811ee233d5fd7059192d66eed",
     "timestamp": 1767229582,
     "authorName": "Philipp Tiefenbacher",
