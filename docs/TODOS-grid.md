@@ -169,6 +169,23 @@ Please trigger the "Center View" logic when switching grid types.
 In the "Particles" folder please add a clear particles button.
 
 
+What's the width of the tweakpane pane now. How is the width determined?
+
+please set the width it to min(40vw, 420px)
+
+
+This does not work. Please give the pane it's own parent container like in this example code:
+
+const wrap = document.getElementById('pane-wrap')!;
+const pane = new Pane({ container: wrap });
+
+Did I describe it in a way that is clear? If anything is unclear please just ask.
+
+
+
+Not quite. Please ensure the div exists by actually putting it in the index.html with a css class and do the styling there
+
+
 
 
 "orbit distance" and "particle speed" should be factors that get multiplied by scale to calculate the values that should be used the way that both of them are used now.

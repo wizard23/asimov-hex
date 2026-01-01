@@ -375,7 +375,11 @@ class GridApp {
   }
 
   private initTweakpane() {
-    this.pane = new Pane({ title: 'Grid Controls' });
+    const wrap = document.getElementById('pane-wrap');
+    if (!wrap) {
+      throw new Error('Missing #pane-wrap container for Tweakpane.');
+    }
+    this.pane = new Pane({ title: 'Grid Controls', container: wrap });
     const fileFolder = this.pane.addFolder({ title: 'File', expanded: false });
     this.gridFolder = this.pane.addFolder({ title: 'Grid', expanded: true });
     const particlesFolder = this.pane.addFolder({ title: 'Particles', expanded: true });

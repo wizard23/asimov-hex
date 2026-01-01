@@ -187,9 +187,17 @@
       color: #6bb0ff;
       text-decoration: underline;
     }
+    #pane-wrap {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: min(40vw, 420px);
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
+  <div id="pane-wrap"></div>
   <div id="app"></div>
   <script type="module" src="/src/apps/main/index.ts"></script>
 </body>
