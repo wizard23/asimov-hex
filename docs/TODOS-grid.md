@@ -135,6 +135,10 @@ Did I describe it in a way that is clear? If anything is unclear please just ask
 
 
 
+Please add a "3 Step Gradient" to the list of algorithms available.
+
+
+
 
 To decide on the next edge it should iterate through all edges E
 for each E it should run the normal "Gradient"

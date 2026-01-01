@@ -271,7 +271,14 @@ export class ParticleSystem {
           orbitDistance
         );
       } else {
-        const pathLength = orbitAlgorithm === 'twoStepGradient' ? 2 : 1;
+        let pathLength = 1;
+        if (orbitAlgorithm === 'twoStepGradient') {
+          pathLength = 2;
+        } else if (orbitAlgorithm === 'threeStepGradient') {
+          pathLength = 3;
+        } else if (orbitAlgorithm === 'fourStepGradient') {
+          pathLength = 4;
+        }
         foundEdge = this.findOrbitEdgeByPathLength(
           vertex,
           availableEdges,

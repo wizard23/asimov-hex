@@ -104,10 +104,10 @@ class GridApp {
       edgeHighlightColor: '#ffff00',
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
-      particleSpeed: 200,
+      particleSpeed: 250,
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
-      orbitDistance: 200,
+      orbitDistance: 150,
       orbitAlgorithm: 'gradient',
       orbitEpsilon: 0.01,
     };
@@ -503,6 +503,8 @@ class GridApp {
       options: {
         'Gradient': 'gradient',
         '2 Step Gradient': 'twoStepGradient',
+        '3 Step Gradient': 'threeStepGradient',
+        '4 Step Gradient': 'fourStepGradient',
         'Distance To Endpoint': 'distanceToEndpoint',
       },
       label: 'Orbit Algorithm',
