@@ -194,6 +194,33 @@
       width: min(40vw, 420px);
       z-index: 1000;
     }
+
+    /* Container controls layout */
+    #pane-wrap {
+      width: min(45vw, 320px);
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Let the pane actually fill the wrapper */
+    #pane-wrap .tp-dfwv {
+      width: 100%;
+    }
+
+    /* Label gets at most 30% */
+    #pane-wrap .tp-lblv_l {
+      flex: 0 1 35%;
+      max-width:  min(35%, 127px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Value gets the remaining space (≈60%) and must not collapse */
+    #pane-wrap .tp-lblv_v {
+      flex: 1 0 65%;
+      min-width: 0;      /* important in flex layouts */
+    }
   </style>
 </head>
 <body>
