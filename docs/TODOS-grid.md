@@ -139,6 +139,17 @@ Please add a "3 Step Gradient" to the list of algorithms available.
 
 
 
+Please add a "4 Step Gradient" to the list of algorithms available.
+
+
+
+
+Please add a "Show Orbit" checkbox after "Orbit Algorithm": When it is checked please draw a gray circle centered on the mouse cursor with radius "Orbit Distance". Line width for circle 1px.
+
+
+There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. Please suggest possible approaches to fix this. Don't change anything yet.
+
+
 
 To decide on the next edge it should iterate through all edges E
 for each E it should run the normal "Gradient"

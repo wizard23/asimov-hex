@@ -46,6 +46,7 @@ interface AppConfig {
   orbitDistance: number;
   orbitAlgorithm: OrbitAlgorithm;
   orbitEpsilon: number;
+  showOrbit: boolean;
 }
 
 class GridApp {
@@ -69,6 +70,7 @@ class GridApp {
   private gridFolder: FolderApi | null = null;
   private gridScaleBinding: BindingApi | null = null;
   private orbitDistanceBinding: BindingApi | null = null;
+  private orbitOverlay: Graphics | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -110,6 +112,7 @@ class GridApp {
       orbitDistance: 150,
       orbitAlgorithm: 'gradient',
       orbitEpsilon: 0.01,
+      showOrbit: false,
     };
 
     this.updateGridInstance();
@@ -510,9 +513,15 @@ class GridApp {
       label: 'Orbit Algorithm',
     });
 
+    advancedFolder.addBinding(this.config, 'showOrbit', {
+      label: 'Show Orbit',
+    }).on('change', () => {
+      this.updateOrbitOverlay();
+    });
+
     advancedFolder.addBinding(this.config, 'orbitEpsilon', {
       min: 0.01,
-      max: 3,
+      max: 2,
       step: 0.01,
       label: 'Orbit Epsilon',
     });
@@ -719,6 +728,22 @@ class GridApp {
     this.orbitDistanceBinding.element.style.display = isOrbit ? '' : 'none';
   }
 
+  private updateOrbitOverlay() {
+    if (this.orbitOverlay) {
+      this.edgeContainer.removeChild(this.orbitOverlay);
+      this.orbitOverlay = null;
+    }
+
+    if (!this.config.showOrbit || this.config.orbitDistance <= 0) {
+      return;
+    }
+
+    const graphics = new Graphics();
+    graphics.circle(this.mouseX, this.mouseY, this.config.orbitDistance).stroke({ color: 0x888888, width: 1 });
+    this.edgeContainer.addChild(graphics);
+    this.orbitOverlay = graphics;
+  }
+
   private initGrid() {
     this.gridRenderer = new GridRenderer();
     this.updateGrid();
@@ -785,6 +810,8 @@ class GridApp {
       edgePaletteStrings, // Pass edgePalette
       this.config.showCoordinates
     );
+
+    this.updateOrbitOverlay();
   }
 
   private resizeCellStates(width: number, height: number) {
@@ -847,6 +874,7 @@ class GridApp {
     // Store mouse position for particle cursor rules
     this.mouseX = x;
     this.mouseY = y;
+    this.updateOrbitOverlay();
 
     // Remove previous highlights
     if (this.highlightedEdge) {
