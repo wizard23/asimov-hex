@@ -137,32 +137,32 @@ Did I describe it in a way that is clear? If anything is unclear please just ask
 
 Please add a "3 Step Gradient" to the list of algorithms available.
 
-
-
 Please add a "4 Step Gradient" to the list of algorithms available.
-
 
 
 
 Please add a "Show Orbit" checkbox after "Orbit Algorithm": When it is checked please draw a gray circle centered on the mouse cursor with radius "Orbit Distance". Line width for circle 1px.
 
 
+
+Several small fixes:
+* the orbit circle should only be drawn when "Edge Selection Mode" orbit is selected and the checkbox is active.
+* orbit circle should use line width 2.
+* the orbit circle should be redrawn whenever the orbit distance changes
+
+
+
+In "spawn particle" mode when no edge is hovered but a cell is hovered.
+* highlight the cell
+* when clicked: spawn a particle at a random position and a a random direction on a random edge of the hovered cell 
+
+
+
+
+
+
+
 There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. Please suggest possible approaches to fix this. Don't change anything yet.
-
-
-
-To decide on the next edge it should iterate through all edges E
-for each E it should run the normal "Gradient"
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -172,7 +172,7 @@ In the "Grid" folder please add a center view button that adjusts the scale such
 Please add a toolbar window on the top edge of the screen
 
 
-The app should track a list of the last modified values (keep track of the last 20 for now)
+The app should track a list of which values got changed by the user. Only the  the last modified values (keep track of the last 20 for now)
 The last modified control should be highlighted either by changing the background color of it and by using a bold or colored font for the label
 
 

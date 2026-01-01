@@ -481,6 +481,7 @@ class GridApp {
       label: 'Edge Selection Rule',
     }).on('change', () => {
       this.updateOrbitDistanceVisibility();
+      this.updateOrbitOverlay();
     });
 
     this.orbitDistanceBinding = particlesFolder.addBinding(this.config, 'orbitDistance', {
@@ -488,6 +489,8 @@ class GridApp {
       max: 400,
       step: 1,
       label: 'Orbit Distance',
+    }).on('change', () => {
+      this.updateOrbitOverlay();
     });
 
     this.updateOrbitDistanceVisibility();
@@ -734,12 +737,12 @@ class GridApp {
       this.orbitOverlay = null;
     }
 
-    if (!this.config.showOrbit || this.config.orbitDistance <= 0) {
+    if (!this.config.showOrbit || this.config.edgeSelectionRule !== 'orbitCursor' || this.config.orbitDistance <= 0) {
       return;
     }
 
     const graphics = new Graphics();
-    graphics.circle(this.mouseX, this.mouseY, this.config.orbitDistance).stroke({ color: 0x888888, width: 1 });
+    graphics.circle(this.mouseX, this.mouseY, this.config.orbitDistance).stroke({ color: 0x888888, width: 2 });
     this.edgeContainer.addChild(graphics);
     this.orbitOverlay = graphics;
   }
