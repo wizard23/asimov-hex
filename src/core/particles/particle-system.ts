@@ -75,7 +75,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number, cellStates: number[][], orbitDistance: number, orbitAlgorithm: OrbitAlgorithm): void {
+  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number, cellStates: number[][], orbitDistance: number, orbitAlgorithm: OrbitAlgorithm, orbitEpsilon: number): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -100,10 +100,10 @@ export class ParticleSystem {
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance, orbitAlgorithm);
+        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance, orbitAlgorithm, orbitEpsilon);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance, orbitAlgorithm);
+        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance, orbitAlgorithm, orbitEpsilon);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -130,7 +130,8 @@ export class ParticleSystem {
     mouseY: number,
     cellStates: number[][],
     orbitDistance: number,
-    orbitAlgorithm: OrbitAlgorithm
+    orbitAlgorithm: OrbitAlgorithm,
+    orbitEpsilon: number
   ): void {
     // Find all edges connected to this vertex
     const connectedEdges = grid.getEdgesAtVertex(vertex, gridWidth, gridHeight);
@@ -266,7 +267,8 @@ export class ParticleSystem {
         mouseX,
         mouseY,
         orbitDistance,
-        orbitAlgorithm
+        orbitAlgorithm,
+        orbitEpsilon
       );
 
       if (!foundEdge) {
@@ -468,7 +470,8 @@ export class ParticleSystem {
     mouseX: number,
     mouseY: number,
     orbitDistance: number,
-    orbitAlgorithm: OrbitAlgorithm
+    orbitAlgorithm: OrbitAlgorithm,
+    orbitEpsilon: number
   ): EdgeInfo | null {
     if (connectedEdges.length === 0) return null;
     
@@ -478,7 +481,7 @@ export class ParticleSystem {
     for (const edge of connectedEdges) {
       const otherPoint = getOtherPoint(edge, vertex);
       const targetPoint = orbitAlgorithm === 'gradient'
-        ? this.getOrbitGradientPoint(vertex, otherPoint)
+        ? this.getOrbitGradientPoint(vertex, otherPoint, orbitEpsilon)
         : otherPoint;
       const distToCursor = Math.sqrt((mouseX - targetPoint.x) ** 2 + (mouseY - targetPoint.y) ** 2);
       const delta = Math.abs(distToCursor - orbitDistance);
@@ -491,8 +494,7 @@ export class ParticleSystem {
     return bestEdge;
   }
 
-  private getOrbitGradientPoint(start: Point, end: Point): Point {
-    const epsilon = 0.01;
+  private getOrbitGradientPoint(start: Point, end: Point, epsilon: number): Point {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     return {

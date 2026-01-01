@@ -14,8 +14,9 @@ type ParticleSystemPrivate = {
     mouseX: number,
     mouseY: number,
     cellStates: number[][],
-    orbitDistance: number
-    orbitAlgorithm: 'gradient' | 'distanceToEndpoint'
+    orbitDistance: number,
+    orbitAlgorithm: 'gradient' | 'distanceToEndpoint',
+    orbitEpsilon: number
   ): void;
   getEdgeDelta(
     edge: { type: 'edge'; points: Array<{ x: number; y: number }> },
@@ -191,7 +192,8 @@ describe('TriangleGrid Particle Bug', () => {
           0, 0, // mouse
           cellStates,
           0,
-          'distanceToEndpoint'
+          'distanceToEndpoint',
+          0.01
         );
         
         const newEdge = particle.currentEdge;

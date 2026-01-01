@@ -45,6 +45,7 @@ interface AppConfig {
   edgeSelectionRule: EdgeSelectionRule;
   orbitDistance: number;
   orbitAlgorithm: OrbitAlgorithm;
+  orbitEpsilon: number;
 }
 
 class GridApp {
@@ -103,11 +104,12 @@ class GridApp {
       edgeHighlightColor: '#ffff00',
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
-      particleSpeed: 100,
+      particleSpeed: 200,
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
       orbitDistance: 200,
       orbitAlgorithm: 'gradient',
+      orbitEpsilon: 0.01,
     };
 
     this.updateGridInstance();
@@ -361,7 +363,8 @@ class GridApp {
         this.mouseY,
         this.cellStates,
         this.config.orbitDistance,
-        this.config.orbitAlgorithm
+        this.config.orbitAlgorithm,
+        this.config.orbitEpsilon
       );
     });
 
@@ -479,7 +482,7 @@ class GridApp {
 
     this.orbitDistanceBinding = particlesFolder.addBinding(this.config, 'orbitDistance', {
       min: 0,
-      max: 1000,
+      max: 400,
       step: 1,
       label: 'Orbit Distance',
     });
@@ -502,6 +505,13 @@ class GridApp {
         'Distance To Endpoint': 'distanceToEndpoint',
       },
       label: 'Orbit Algorithm',
+    });
+
+    advancedFolder.addBinding(this.config, 'orbitEpsilon', {
+      min: 0.01,
+      max: 3,
+      step: 0.01,
+      label: 'Orbit Epsilon',
     });
 
     // Add number of states control
