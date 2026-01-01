@@ -365,6 +365,7 @@ class GridApp {
     this.pane = new Pane({ title: 'Grid Controls' });
     const fileFolder = this.pane.addFolder({ title: 'File', expanded: false });
     this.gridFolder = this.pane.addFolder({ title: 'Grid', expanded: true });
+    const particlesFolder = this.pane.addFolder({ title: 'Particles', expanded: true });
     const guiFolder = this.pane.addFolder({ title: 'GUI', expanded: false });
     const advancedFolder = this.pane.addFolder({ title: 'Advanced', expanded: false });
 
@@ -445,7 +446,7 @@ class GridApp {
     });
 
     // Add particle speed control
-    this.gridFolder.addBinding(this.config, 'particleSpeed', {
+    particlesFolder.addBinding(this.config, 'particleSpeed', {
       min: 1,
       max: 400,
       step: 1,
@@ -453,7 +454,7 @@ class GridApp {
     });
 
     // Add edge selection rule dropdown
-    this.gridFolder.addBinding(this.config, 'edgeSelectionRule', {
+    particlesFolder.addBinding(this.config, 'edgeSelectionRule', {
       options: {
         'Random (No Backtrack)': 'randomNoBacktrack',
         'Random (With Backtrack)': 'randomWithBacktrack',
