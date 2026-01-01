@@ -43,6 +43,7 @@ interface AppConfig {
   particleSpeed: number;
   leftClickMode: LeftClickMode;
   edgeSelectionRule: EdgeSelectionRule;
+  orbitDistance: number;
 }
 
 class GridApp {
@@ -65,6 +66,7 @@ class GridApp {
   private grid!: Grid;
   private gridFolder: FolderApi | null = null;
   private gridScaleBinding: BindingApi | null = null;
+  private orbitDistanceBinding: BindingApi | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -102,7 +104,8 @@ class GridApp {
       showCoordinates: false,
       particleSpeed: 100,
       leftClickMode: 'smart',
-      edgeSelectionRule: 'highestEdgeDelta',
+      edgeSelectionRule: 'orbitCursor',
+      orbitDistance: 200,
     };
 
     this.updateGridInstance();
@@ -354,7 +357,8 @@ class GridApp {
         this.config.edgeSelectionRule,
         this.mouseX,
         this.mouseY,
-        this.cellStates
+        this.cellStates,
+        this.config.orbitDistance
       );
     });
 
@@ -462,10 +466,22 @@ class GridApp {
         'Always Turn Counter-Clockwise': 'counterClockwise',
         'Follow Cursor': 'followCursor',
         'Avoid Cursor': 'avoidCursor',
+        'Orbit Cursor': 'orbitCursor',
         'Highest Edge Delta': 'highestEdgeDelta',
       },
       label: 'Edge Selection Rule',
+    }).on('change', () => {
+      this.updateOrbitDistanceVisibility();
     });
+
+    this.orbitDistanceBinding = particlesFolder.addBinding(this.config, 'orbitDistance', {
+      min: 0,
+      max: 1000,
+      step: 1,
+      label: 'Orbit Distance',
+    });
+
+    this.updateOrbitDistanceVisibility();
 
     // Add left click mode dropdown
     advancedFolder.addBinding(this.config, 'leftClickMode', {
@@ -671,6 +687,12 @@ class GridApp {
     } else {
       this.pane.add(this.drawStateBlade);
     }
+  }
+
+  private updateOrbitDistanceVisibility() {
+    if (!this.orbitDistanceBinding) return;
+    const isOrbit = this.config.edgeSelectionRule === 'orbitCursor';
+    this.orbitDistanceBinding.element.style.display = isOrbit ? '' : 'none';
   }
 
   private initGrid() {

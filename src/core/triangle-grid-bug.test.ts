@@ -13,7 +13,8 @@ type ParticleSystemPrivate = {
     edgeSelectionRule: 'highestEdgeDelta',
     mouseX: number,
     mouseY: number,
-    cellStates: number[][]
+    cellStates: number[][],
+    orbitDistance: number
   ): void;
   getEdgeDelta(
     edge: { type: 'edge'; points: Array<{ x: number; y: number }> },
@@ -187,7 +188,8 @@ describe('TriangleGrid Particle Bug', () => {
           5,
           'highestEdgeDelta',
           0, 0, // mouse
-          cellStates
+          cellStates,
+          0
         );
         
         const newEdge = particle.currentEdge;

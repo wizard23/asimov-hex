@@ -75,7 +75,7 @@ export class ParticleSystem {
     this.particleGraphics.set(particle, graphics);
   }
 
-  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number, cellStates: number[][]): void {
+  update(deltaTime: number, particleSpeed: number, gridWidth: number, gridHeight: number, grid: Grid, edgeSelectionRule: EdgeSelectionRule, mouseX: number, mouseY: number, cellStates: number[][], orbitDistance: number): void {
     const distancePerSecond = particleSpeed; // units per second
     const distanceThisFrame = (distancePerSecond * deltaTime) / 1000; // convert ms to seconds
     
@@ -100,10 +100,10 @@ export class ParticleSystem {
       // Check if reached vertex
       if (particle.progress >= 1) {
         // Reached p2
-        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates);
+        this.handleVertexArrival(particle, p2, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance);
       } else if (particle.progress <= 0) {
         // Reached p1
-        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates);
+        this.handleVertexArrival(particle, p1, grid, gridWidth, gridHeight, edgeSelectionRule, mouseX, mouseY, cellStates, orbitDistance);
       } else {
         // Update position along edge
         particle.x = p1.x + (p2.x - p1.x) * particle.progress;
@@ -128,7 +128,8 @@ export class ParticleSystem {
     edgeSelectionRule: EdgeSelectionRule,
     mouseX: number,
     mouseY: number,
-    cellStates: number[][]
+    cellStates: number[][],
+    orbitDistance: number
   ): void {
     // Find all edges connected to this vertex
     const connectedEdges = grid.getEdgesAtVertex(vertex, gridWidth, gridHeight);
@@ -236,6 +237,36 @@ export class ParticleSystem {
         edgeSelectionRule === 'followCursor'
       );
       
+      if (!foundEdge) {
+        this.removeParticle(particle);
+        return;
+      }
+      nextEdge = foundEdge;
+    } else if (edgeSelectionRule === 'orbitCursor') {
+      // Find the edge that best matches the orbit distance
+      if (connectedEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+
+      const availableEdges = connectedEdges.filter(edge => {
+        if (!particle.currentEdge) return true;
+        return !edgesEqual(particle.currentEdge, edge);
+      });
+
+      if (availableEdges.length === 0) {
+        this.removeParticle(particle);
+        return;
+      }
+
+      const foundEdge = this.findOrbitEdge(
+        vertex,
+        availableEdges,
+        mouseX,
+        mouseY,
+        orbitDistance
+      );
+
       if (!foundEdge) {
         this.removeParticle(particle);
         return;
@@ -423,6 +454,31 @@ export class ParticleSystem {
           bestDist = distToCursor;
           bestEdge = edge;
         }
+      }
+    }
+    
+    return bestEdge;
+  }
+
+  private findOrbitEdge(
+    vertex: Point,
+    connectedEdges: EdgeInfo[],
+    mouseX: number,
+    mouseY: number,
+    orbitDistance: number
+  ): EdgeInfo | null {
+    if (connectedEdges.length === 0) return null;
+    
+    let bestEdge: EdgeInfo | null = null;
+    let bestDelta = Infinity;
+    
+    for (const edge of connectedEdges) {
+      const otherPoint = getOtherPoint(edge, vertex);
+      const distToCursor = Math.sqrt((mouseX - otherPoint.x) ** 2 + (mouseY - otherPoint.y) ** 2);
+      const delta = Math.abs(distToCursor - orbitDistance);
+      if (delta < bestDelta) {
+        bestDelta = delta;
+        bestEdge = edge;
       }
     }
     

@@ -72,8 +72,24 @@ Please create a new folder named "Particles" (initially open) right after "Grid"
 The two buttons don't need the redundant label. Please remove them.
 
 
+Please create a new "Edge Selection Rule" called "Orbit Cursor". It should behave like this:
+* If (and only if) it is selected a slider control labeled "Orbit Distance" is shown. It is an integer ranging from 0 to 1000.
+* For deciding the edge: the particles choose the edge based on the endpoint of the edge. 
+* They should choose the edge with the lowest | distance(mouse cursor position, point at end of edge) - orbit distance | (the || means absolute value)  
+
+Please make this new rule the default.
+
+If anything is unclear please just ask.
 
 
+If (and only if) it is selected a slider control labeled "Orbit Distance" is shown. It is an integer ranging from 0 to 1000.
+
+
+Please add a toolbar window on the top edge of the screen
+
+
+The app should track a list of the last modified values (keep track of the last 20 for now)
+The last modified control should be highlighted either by changing the background color of it and by using a bold or colored font for the label
 
 
 
@@ -81,6 +97,13 @@ The two buttons don't need the redundant label. Please remove them.
 * unify spawn particle and cell manipulation by either highlighting cell or edge ;)
 * ask how it is now
 * particle rule: keep approx distance from mouse cursor
+* start/stop button that switches the label depending on if the simulation is running or not in "Simulation" folder
+  * bind space to it
+
+
+* shift+scrollwheel should increase/decrease in steps the last active slider/control
+* the "last modified slider"
+
 * multiple rules as priority list with rules that cant be fullfilled skipping to the next
 *
 
