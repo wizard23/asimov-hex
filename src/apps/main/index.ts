@@ -417,8 +417,8 @@ class GridApp {
 
     // Add grid scale control
     this.gridScaleBinding = this.gridFolder.addBinding(this.config, 'gridScale', {
-      min: 5,
-      max: 100,
+      min: 1,
+      max: 120,
       step: 1,
       label: 'Grid Scale',
     }).on('change', () => {
@@ -435,7 +435,7 @@ class GridApp {
       },
       label: 'Grid Type',
     }).on('change', () => {
-      this.updateGrid();
+      this.centerViewToGrid();
     });
 
     // Add grid width control
@@ -456,6 +456,12 @@ class GridApp {
       label: 'Grid Height',
     }).on('change', () => {
       this.updateGrid();
+    });
+
+    this.gridFolder.addButton({
+      title: 'Center View',
+    }).on('click', () => {
+      this.centerViewToGrid();
     });
 
     // Add particle speed control
@@ -482,6 +488,12 @@ class GridApp {
     }).on('change', () => {
       this.updateOrbitDistanceVisibility();
       this.updateOrbitOverlay();
+    });
+
+    particlesFolder.addButton({
+      title: 'Clear Particles',
+    }).on('click', () => {
+      this.particleSystem.clear();
     });
 
     this.orbitDistanceBinding = particlesFolder.addBinding(this.config, 'orbitDistance', {
@@ -835,6 +847,32 @@ class GridApp {
   }
 
   private getGridBounds(width: number, height: number) {
+    return this.getGridBoundsForGrid(this.grid, width, height);
+  }
+
+  private getGridBoundsForScale(scale: number) {
+    let grid: Grid;
+    if (this.config.gridType === 'squares') {
+      grid = new SquareGrid(scale);
+    } else if (this.config.gridType === 'hexagons') {
+      grid = new HexagonGrid(scale);
+    } else if (this.config.gridType === 'triangles') {
+      grid = new TriangleGrid(scale);
+    } else {
+      const cairoGrid = new CairoGrid({ scale, pentagonType: 'catalan' });
+      const bounds = cairoGrid.getGridBounds(this.config.gridWidth, this.config.gridHeight);
+      return {
+        minX: bounds.minX,
+        minY: bounds.minY,
+        maxX: bounds.minX + bounds.width,
+        maxY: bounds.minY + bounds.height,
+      };
+    }
+
+    return this.getGridBoundsForGrid(grid, this.config.gridWidth, this.config.gridHeight);
+  }
+
+  private getGridBoundsForGrid(grid: Grid, width: number, height: number) {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -842,7 +880,7 @@ class GridApp {
 
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
-        const poly = this.grid.getCellPolygon({ col, row });
+        const poly = grid.getCellPolygon({ col, row });
         for (const point of poly) {
           minX = Math.min(minX, point.x);
           minY = Math.min(minY, point.y);
@@ -857,6 +895,23 @@ class GridApp {
     }
 
     return { minX, minY, maxX, maxY };
+  }
+
+  private centerViewToGrid() {
+    const bounds = this.getGridBoundsForScale(1);
+    const gridWidth = bounds.maxX - bounds.minX;
+    const gridHeight = bounds.maxY - bounds.minY;
+    if (gridWidth <= 0 || gridHeight <= 0) return;
+
+    const maxScale = Math.floor(
+      Math.min(this.app.screen.width / gridWidth, this.app.screen.height / gridHeight)
+    );
+    const clampedScale = Math.max(1, Math.min(100, maxScale));
+    if (!Number.isFinite(clampedScale) || clampedScale <= 0) return;
+
+    this.config.gridScale = clampedScale;
+    this.gridScaleBinding?.refresh();
+    this.updateGrid();
   }
 
   private setupInteraction() {

@@ -157,13 +157,25 @@ In "spawn particle" mode when no edge is hovered but a cell is hovered.
 * when clicked: spawn a particle at a random position and a a random direction on a random edge of the hovered cell 
 If anything is unclear please just ask instead of guessing what I meant.
 
-
-
 Always use the center of the edge for the spawning of particles.
 
 
+In the "Grid" folder please add a center view button that adjusts the scale such that all cells are in the viewable area. Leave as little free space as possible with an integer scale.
 
 
+Please trigger the "Center View" logic when switching grid types.
+
+
+In the "Particles" folder please add a clear particles button.
+
+
+
+
+"orbit distance" and "particle speed" should be factors that get multiplied by scale to calculate the values that should be used the way that both of them are used now.
+
+right click deletes particles when clicked on edges in smart mode and for spawn particles mode it should also delete all particles from all edges of the right clicked cell.
+
+timeout for particles in seconds or edges
 
 
 
@@ -171,7 +183,7 @@ There is a UX bug when "Show Coordinates" is selected. For some grid types the f
 
 
 
-In the "Grid" folder please add a center view button that adjusts the scale such that all polygons are in the viewable area. Leave as little free space as possible please.
+
 
 
 Please add a toolbar window on the top edge of the screen
