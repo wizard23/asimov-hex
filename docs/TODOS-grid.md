@@ -83,7 +83,7 @@ If anything is unclear please just ask.
 
 
 
-In the "Grid" folder please add a center view button that adjusts the scale such that all polygons are in the viewable area. Leave as little free space as possible please.
+
 
 
 In the "Advanced" folder please add a "Orbit Algorithm" dropdown list. There are two options for now:
@@ -98,6 +98,16 @@ If anything is unclear please just ask.
 I have a question about the epsilon used to calculate the gradient:
 * What epsilon would coincide with the endpoint of the edge?
 * what epsilon would coincide with the centerpoint of the edge?
+
+Adjust the algorithm such that an epsilon of 1 will coincide with the endpoint and an epsilon og 0.5 would coincide with the centerpoint.
+Use an epsilon of 0.01 for now.
+If anything is unclear please just ask.
+
+
+Yes please add a slider for it right below the "Orbit Algorithm" min is 0.01 max 2 in steps of 0.01
+
+
+In the "Grid" folder please add a center view button that adjusts the scale such that all polygons are in the viewable area. Leave as little free space as possible please.
 
 
 Please add a toolbar window on the top edge of the screen

@@ -492,14 +492,12 @@ export class ParticleSystem {
   }
 
   private getOrbitGradientPoint(start: Point, end: Point): Point {
-    const epsilon = 0.1;
+    const epsilon = 0.01;
     const dx = end.x - start.x;
     const dy = end.y - start.y;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    if (len === 0) return { x: start.x, y: start.y };
     return {
-      x: start.x + (dx / len) * epsilon,
-      y: start.y + (dy / len) * epsilon,
+      x: start.x + dx * epsilon,
+      y: start.y + dy * epsilon,
     };
   }
 
