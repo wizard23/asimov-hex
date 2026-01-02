@@ -59,8 +59,6 @@ function showStatus(message: string, isError: boolean, linkHref?: string): void 
     const link = document.createElement('a');
     link.id = 'source-link';
     link.href = linkHref;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
     link.textContent = '(open source)';
     statusEl.appendChild(link);
   }
@@ -226,8 +224,6 @@ function appendLinksAndEmphasis(parent: HTMLElement, text: string, baseUrl: stri
     const link = document.createElement('a');
     const rawHref = match[2].trim();
     link.href = resolveMarkdownHref(rawHref, baseUrl);
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
     link.textContent = match[1].trim();
     parent.appendChild(link);
 
