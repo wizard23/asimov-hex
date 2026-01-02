@@ -207,6 +207,13 @@ class StatisticsViewer {
       <details class="stat-section" data-section-id="file-types" ${this.sectionState['file-types'] ? 'open' : ''}>
         <summary>File Types Breakdown</summary>
         <table class="file-type-table" data-file-type-table="true">
+          <colgroup>
+            <col class="col-type-name">
+            <col class="col-type-count">
+            <col class="col-type-lines">
+            <col class="col-type-words">
+            <col class="col-type-bytes">
+          </colgroup>
           <thead>
             <tr>
               ${renderFileTypeHeader('File Type', 'fileType', this.fileTypesSortKey, this.fileTypesSortDirection)}
@@ -487,6 +494,13 @@ function renderAllFilesTable(
 
   return `
     <table class="stats-table" data-all-files-table="true">
+      <colgroup>
+        <col class="col-file-path">
+        <col class="col-file-type">
+        <col class="col-file-lines">
+        <col class="col-file-words">
+        <col class="col-file-bytes">
+      </colgroup>
       <thead>
         <tr>
           ${renderSortableHeader('File', 'path', sortKey, sortDirection)}

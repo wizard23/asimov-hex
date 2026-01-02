@@ -125,6 +125,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      table-layout: fixed;
     }
     .file-type-table th,
     .file-type-table td,
@@ -139,6 +140,37 @@
     }
     .stats-table .num {
       text-align: right;
+    }
+    .file-type-table th.num,
+    .file-type-table td.num,
+    .stats-table th.num,
+    .stats-table td.num {
+      min-width: 90px;
+      font-variant-numeric: tabular-nums;
+    }
+    .file-type-table td,
+    .stats-table td {
+      word-break: break-word;
+    }
+    .col-type-name {
+      width: 34%;
+    }
+    .col-type-count,
+    .col-type-lines,
+    .col-type-words,
+    .col-type-bytes {
+      width: 16.5%;
+    }
+    .col-file-path {
+      width: 48%;
+    }
+    .col-file-type {
+      width: 16%;
+    }
+    .col-file-lines,
+    .col-file-words,
+    .col-file-bytes {
+      width: 12%;
     }
     .file-type-table th,
     .stats-table th {

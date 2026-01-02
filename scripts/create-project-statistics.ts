@@ -271,6 +271,7 @@ function getRepoSizeMetrics(): RepoSizeMetrics | undefined {
 function generateStatistics(): ProjectStatistics {
   const allFiles = getGitIncludedFiles();
   const excludedFolders = [
+    '.vscode',
     'docs',
     'public',
   ];
