@@ -106,10 +106,10 @@ class GridApp {
       edgeHighlightColor: '#ffff00',
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
-      particleSpeed: 250,
+      particleSpeed: 5,
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
-      orbitDistance: 100,
+      orbitDistance: 3.25,
       orbitAlgorithm: 'twoStepGradient',
       orbitEpsilon: 0.5,
       showOrbit: true,
@@ -355,9 +355,11 @@ class GridApp {
 
     // Setup particle update loop
     this.app.ticker.add((ticker) => {
+      const particleSpeedPx = this.config.particleSpeed * this.config.gridScale;
+      const orbitDistancePx = this.config.orbitDistance * this.config.gridScale;
       this.particleSystem.update(
         ticker.deltaMS,
-        this.config.particleSpeed,
+        particleSpeedPx,
         this.config.gridWidth,
         this.config.gridHeight,
         this.grid, // Pass grid instance
@@ -365,7 +367,7 @@ class GridApp {
         this.mouseX,
         this.mouseY,
         this.cellStates,
-        this.config.orbitDistance,
+        orbitDistancePx,
         this.config.orbitAlgorithm,
         this.config.orbitEpsilon
       );
@@ -424,7 +426,7 @@ class GridApp {
       min: 1,
       max: 120,
       step: 1,
-      label: 'Grid Scale',
+      label: 'Scale',
     }).on('change', () => {
       this.updateGrid();
     });
@@ -437,7 +439,7 @@ class GridApp {
         hexagons: 'hexagons',
         cairo: 'cairo',
       },
-      label: 'Grid Type',
+      label: 'Type',
     }).on('change', () => {
       this.centerViewToGrid();
     });
@@ -447,7 +449,7 @@ class GridApp {
       min: 1,
       max: 80,
       step: 1,
-      label: 'Grid Width',
+      label: 'Width',
     }).on('change', () => {
       this.updateGrid();
     });
@@ -457,7 +459,7 @@ class GridApp {
       min: 1,
       max: 50,
       step: 1,
-      label: 'Grid Height',
+      label: 'Height',
     }).on('change', () => {
       this.updateGrid();
     });
@@ -470,10 +472,10 @@ class GridApp {
 
     // Add particle speed control
     particlesFolder.addBinding(this.config, 'particleSpeed', {
-      min: 1,
-      max: 400,
-      step: 1,
-      label: 'Particle Speed',
+      min: 0.1,
+      max: 12,
+      step: 0.05,
+      label: 'Speed',
     });
 
     // Add edge selection rule dropdown
@@ -488,7 +490,7 @@ class GridApp {
         'Orbit Cursor': 'orbitCursor',
         'Highest Edge Delta': 'highestEdgeDelta',
       },
-      label: 'Edge Selection Rule',
+      label: 'Algorithm',
     }).on('change', () => {
       this.updateOrbitDistanceVisibility();
       this.updateOrbitOverlay();
@@ -501,10 +503,10 @@ class GridApp {
     });
 
     this.orbitDistanceBinding = particlesFolder.addBinding(this.config, 'orbitDistance', {
-      min: 0,
-      max: 400,
-      step: 1,
-      label: 'Orbit Distance',
+      min: 0.1,
+      max: 15,
+      step: 0.05,
+      label: 'Orbit Radius',
     }).on('change', () => {
       this.updateOrbitOverlay();
     });
@@ -518,7 +520,7 @@ class GridApp {
         'Spawn Particle': 'spawnParticle',
         'Smart': 'smart',
       },
-      label: 'Left Click Mode',
+      label: 'Click Tool',
     });
 
     advancedFolder.addBinding(this.config, 'orbitAlgorithm', {
@@ -550,7 +552,7 @@ class GridApp {
       min: 2,
       max: 8,
       step: 1,
-      label: 'Number of States',
+      label: 'Cell States',
     }).on('change', () => {
       // Clamp drawState to valid range when numStates changes
       if (this.config.drawState >= this.config.numStates) {
@@ -570,7 +572,7 @@ class GridApp {
 
     // Add visualize edge delta checkbox
     advancedFolder.addBinding(this.config, 'visualizeEdgeDelta', {
-      label: 'Visualize Edge Delta'
+      label: 'Show Edge Delta'
     }).on('change', () => {
       this.updateGrid();
     });
@@ -758,7 +760,8 @@ class GridApp {
     }
 
     const graphics = new Graphics();
-    graphics.circle(this.mouseX, this.mouseY, this.config.orbitDistance).stroke({ color: 0x888888, width: 2 });
+    const orbitDistancePx = this.config.orbitDistance * this.config.gridScale;
+    graphics.circle(this.mouseX, this.mouseY, orbitDistancePx).stroke({ color: 0x888888, width: 2 });
     this.edgeContainer.addChild(graphics);
     this.orbitOverlay = graphics;
   }

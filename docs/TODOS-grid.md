@@ -188,7 +188,38 @@ Not quite. Please ensure the div exists by actually putting it in the index.html
 
 
 
-"orbit distance" and "particle speed" should be factors that get multiplied by scale to calculate the values that should be used the way that both of them are used now.
+
+
+
+///////////////////// 2026/01/02
+
+
+
+I adapted the css and some parameters in the app. Please familiarize yourself with the changes. And summarize your findings.
+
+
+
+I already committed the changes to the tweakpane css.
+
+
+
+"orbit distance" and "particle speed" should be factors that get multiplied by scale to calculate the values in pixel. 
+
+// that should be used the way that both of them are used now.
+
+Yes please adapt it in the following way:
+* both should be floats with 0.05 steps ranging from 0.1 to 10
+* change labels to:
+  * Just "Speed" for the particle speed
+  * "Orbit Radius"
+
+  Adapt more labels please:
+  * for all sliders in the "Grid" folder please remove the redundant "Grid" text in the labels.
+  * For the dropdown in "Particles" just "Algorithm"
+  * "Click Tool" instead of "Left Click Mode"
+  * "Show Edge Delta" instead of "Visualize Edge Delta"
+  * "Cell States" instead "Number of States"
+
 
 right click deletes particles when clicked on edges in smart mode and for spawn particles mode it should also delete all particles from all edges of the right clicked cell.
 
