@@ -158,6 +158,13 @@ Pleas use the opportunity to clean up the code and make sure the code base is cl
 
 
 
+UX detail: When I sort by some column or when I go through te statistics files sometimes the layout of the table changes. The headers move around a bit. This movement is more pronunced in the "File Types Extension" table than in the "All Files" table but it happens in both. I would like the positions and sizes of the columns to be the same no matter what sorting order is used or what statistics file is used.
+Please analyze the root cause of this and propose some different solutions for this.
+
+
+Please implement this: "2. Fixed layout + min-widths on columns (hybrid)"
+
+
 ## INIT 2026/01/02
 
 Please look at:
