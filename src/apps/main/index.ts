@@ -1114,6 +1114,13 @@ class GridApp {
           if (this.highlightedEdgeInfo) {
             this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
           }
+          if (this.highlightedCellInfo) {
+            const edges = this.grid.getCellEdges({
+              col: this.highlightedCellInfo.col,
+              row: this.highlightedCellInfo.row,
+            });
+            this.particleSystem.removeParticlesOnEdges(edges);
+          }
           return;
         }
       }
