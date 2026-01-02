@@ -139,7 +139,6 @@ class StatisticsViewer {
       ? formatIsoTimestampUtc(data.timestamp)
       : formatIsoTimestampLocal(data.timestamp);
 
-    const groupedFiles = groupFilesByType(data.includedFiles);
     const allFilesRows = sortAllFiles(
       data.includedFiles,
       this.allFilesSortKey,
@@ -211,8 +210,6 @@ class StatisticsViewer {
             `).join('')}
           </tbody>
         </table>
-        <div class="stats-subtitle">Included Files by Type</div>
-        ${renderIncludedFilesByType(groupedFiles)}
       </div>
 
       <div class="stat-section">
@@ -334,29 +331,6 @@ function renderExcludedList(items?: string[]): string {
     <ul class="excluded-list">
       ${items.map(item => `<li>${item}</li>`).join('')}
     </ul>
-  `;
-}
-
-function renderIncludedFilesByType(items?: Map<string, IncludedFileStats[]>): string {
-  if (!items) {
-    return `<div class="excluded-empty">unknown</div>`;
-  }
-
-  if (items.size === 0) {
-    return `<div class="excluded-empty">(none)</div>`;
-  }
-
-  const sections = Array.from(items.entries()).sort(([a], [b]) => a.localeCompare(b));
-
-  return `
-    ${sections.map(([fileType, files]) => `
-      <details class="included-files-group">
-        <summary>${escapeHtml(fileType || '(no extension)')} (${files.length.toLocaleString()})</summary>
-        <ul class="excluded-list">
-          ${files.map(item => `<li>${escapeHtml(item.path)} (${item.lines.toLocaleString()} lines, ${item.words.toLocaleString()} words, ${item.bytes.toLocaleString()} bytes)</li>`).join('')}
-        </ul>
-      </details>
-    `).join('')}
   `;
 }
 
@@ -500,26 +474,6 @@ function renderSortableHeader(
       ${escapeHtml(label)} ${arrow}
     </th>
   `;
-}
-
-function groupFilesByType(items?: IncludedFileStats[]): Map<string, IncludedFileStats[]> {
-  const grouped = new Map<string, IncludedFileStats[]>();
-  if (!items) {
-    return grouped;
-  }
-
-  for (const item of items) {
-    const existing = grouped.get(item.fileType) ?? [];
-    existing.push(item);
-    grouped.set(item.fileType, existing);
-  }
-
-  for (const [key, files] of grouped.entries()) {
-    files.sort((a, b) => a.path.localeCompare(b.path));
-    grouped.set(key, files);
-  }
-
-  return grouped;
 }
 
 function sortAllFiles(
