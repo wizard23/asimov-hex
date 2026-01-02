@@ -1094,19 +1094,28 @@ class GridApp {
       }
     } else if (e.button === 2) {
       // Right click: always clear cell (set to state 0)
-      const shouldDeleteEdgeParticles =
-        this.config.leftClickMode === 'spawnParticle' ||
-        this.config.leftClickMode === 'smart';
-      if (shouldDeleteEdgeParticles && this.highlightedEdgeInfo) {
-        this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+      const isShift = e.shiftKey;
+      if (this.config.leftClickMode === 'spawnParticle') {
+        if (this.highlightedEdgeInfo) {
+          this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+        }
+        if (this.highlightedCellInfo) {
+          const edges = this.grid.getCellEdges({
+            col: this.highlightedCellInfo.col,
+            row: this.highlightedCellInfo.row,
+          });
+          this.particleSystem.removeParticlesOnEdges(edges);
+        }
+        return;
       }
 
-      if (this.config.leftClickMode === 'spawnParticle' && this.highlightedCellInfo) {
-        const edges = this.grid.getCellEdges({
-          col: this.highlightedCellInfo.col,
-          row: this.highlightedCellInfo.row,
-        });
-        this.particleSystem.removeParticlesOnEdges(edges);
+      if (this.config.leftClickMode === 'smart') {
+        if (isShift) {
+          if (this.highlightedEdgeInfo) {
+            this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+          }
+          return;
+        }
       }
 
       const x = e.clientX - rect.left - this.gridContainer.x;
