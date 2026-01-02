@@ -11,9 +11,7 @@ export default tseslint.config(
       "docs/**",
       "scripts/**",
       "shell/**",
-      "src/core/utils/solver.ts",
-      "src/core/utils/solver-cairo-pentagons-sorted.test.ts",
-      "src/core/utils/solver-cairo-pentagons-unsorted.test.ts"
+      "src/core/solver/**",
     ],
   },
   js.configs.recommended,

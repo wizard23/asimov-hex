@@ -9,8 +9,8 @@ import { DRAW_CONFIG } from './draw-config';
 import { drawDashedPath, drawDottedConnection, drawLetter, drawPolygonPath } from './render-helpers';
 import { setupValuesToggle } from './ui-helpers';
 import { Point } from './types';
-import { solveSimpleNgon } from '../../core/utils/solver';
-import type { PolygonConstraint, VertexKind } from '../../core/utils/solver-types';
+import { solveSimpleNgon } from '../../core/solver/solver';
+import type { PolygonConstraint, VertexKind } from '../../core/solver/solver-types';
 import { showToast } from '../../core/utils/toast';
 
 interface EditorConfig {
