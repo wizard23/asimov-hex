@@ -2,7 +2,7 @@ import { Application, Graphics, Container } from 'pixi.js';
 import { Pane, FolderApi } from 'tweakpane';
 import type { BindingApi } from '@tweakpane/core';
 import { GridRenderer } from '../../core/rendering/grid-renderer';
-import { GridType, EdgeSelectionRule, OrbitAlgorithm, ColorValue } from '../../types';
+import { GridType, EdgeSelectionRule, OrbitAlgorithm, ColorValue, EdgeInfo } from '../../types';
 import { createDrawStateBlade, DrawStateBladeApi } from '../../gui/draw-state-blade';
 import palettesData from '../../assets/palettes.json';
 import { ParticleSystem } from '../../core/particles/particle-system';
@@ -15,6 +15,7 @@ import {
   getCellAtPixel,
   getEdgeAtPixel,
   getVertexAtPixel,
+  CellHit,
 } from '../../core/grid';
 
 interface PaletteData {
@@ -60,6 +61,8 @@ class GridApp {
   private highlightedEdge: Graphics | null = null;
   private highlightedCell: Graphics | null = null;
   private highlightedVertex: Graphics | null = null;
+  private highlightedEdgeInfo: EdgeInfo | null = null;
+  private highlightedCellInfo: CellHit | null = null;
   private cellStates: number[][] = [];
   private drawStateBlade: DrawStateBladeApi | null = null;
   private palettes: PaletteData[] = [];
@@ -954,6 +957,8 @@ class GridApp {
       this.edgeContainer.removeChild(this.highlightedVertex);
       this.highlightedVertex = null;
     }
+    this.highlightedEdgeInfo = null;
+    this.highlightedCellInfo = null;
 
     const isSmartMode = this.config.leftClickMode === 'smart';
     const edgeInfo = (this.config.leftClickMode === 'spawnParticle' || isSmartMode)
@@ -974,6 +979,7 @@ class GridApp {
         : '#ffff00';
       this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
       this.edgeContainer.addChild(this.highlightedEdge);
+      this.highlightedEdgeInfo = edgeInfo;
 
       // Find and highlight closest vertex
       const closestVertex = getVertexAtPixel(
@@ -1011,6 +1017,7 @@ class GridApp {
           highlightColor
         );
         this.gridContainer.addChild(this.highlightedCell);
+        this.highlightedCellInfo = cellInfo;
       }
     }
   }
@@ -1087,6 +1094,21 @@ class GridApp {
       }
     } else if (e.button === 2) {
       // Right click: always clear cell (set to state 0)
+      const shouldDeleteEdgeParticles =
+        this.config.leftClickMode === 'spawnParticle' ||
+        this.config.leftClickMode === 'smart';
+      if (shouldDeleteEdgeParticles && this.highlightedEdgeInfo) {
+        this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+      }
+
+      if (this.config.leftClickMode === 'spawnParticle' && this.highlightedCellInfo) {
+        const edges = this.grid.getCellEdges({
+          col: this.highlightedCellInfo.col,
+          row: this.highlightedCellInfo.row,
+        });
+        this.particleSystem.removeParticlesOnEdges(edges);
+      }
+
       const x = e.clientX - rect.left - this.gridContainer.x;
       const y = e.clientY - rect.top - this.gridContainer.y;
 

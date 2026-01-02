@@ -632,4 +632,18 @@ export class ParticleSystem {
       this.removeParticle(particle);
     }
   }
+
+  removeParticlesOnEdge(edge: EdgeInfo): void {
+    this.removeParticlesOnEdges([edge]);
+  }
+
+  removeParticlesOnEdges(edges: EdgeInfo[]): void {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const particle = this.particles[i];
+      const matches = edges.some((edge) => edgesEqual(particle.currentEdge, edge));
+      if (matches) {
+        this.removeParticle(particle);
+      }
+    }
+  }
 }
