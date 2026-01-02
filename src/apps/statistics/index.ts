@@ -4,6 +4,7 @@ import type { ProjectStatistics, RepoSizeMetrics } from './types';
 type DateTimeTimeZone = 'local' | 'utc';
 type SortDirection = 'asc' | 'desc';
 type AllFilesSortKey = 'path' | 'fileType' | 'lines' | 'words' | 'bytes';
+type FileTypeSortKey = 'fileType' | 'count' | 'totalLines' | 'totalWords' | 'totalBytes';
 
 class StatisticsViewer {
   private pane!: Pane;
@@ -17,6 +18,8 @@ class StatisticsViewer {
   private currentStatistics: ProjectStatistics | null = null;
   private allFilesSortKey: AllFilesSortKey = 'path';
   private allFilesSortDirection: SortDirection = 'asc';
+  private fileTypesSortKey: FileTypeSortKey = 'count';
+  private fileTypesSortDirection: SortDirection = 'desc';
 
   constructor() {
     this.statisticsPanel = document.getElementById('statistics-panel')!;
@@ -139,6 +142,11 @@ class StatisticsViewer {
       ? formatIsoTimestampUtc(data.timestamp)
       : formatIsoTimestampLocal(data.timestamp);
 
+    const sortedFileTypes = sortFileTypes(
+      data.fileTypes,
+      this.fileTypesSortKey,
+      this.fileTypesSortDirection
+    );
     const allFilesRows = sortAllFiles(
       data.includedFiles,
       this.allFilesSortKey,
@@ -188,18 +196,18 @@ class StatisticsViewer {
 
       <div class="stat-section">
         <h3>File Types Breakdown</h3>
-        <table class="file-type-table">
+        <table class="file-type-table" data-file-type-table="true">
           <thead>
             <tr>
-              <th>File Type</th>
-              <th class="num">Count</th>
-              <th class="num">Lines</th>
-              <th class="num">Words</th>
-              <th class="num">Bytes</th>
+              ${renderFileTypeHeader('File Type', 'fileType', this.fileTypesSortKey, this.fileTypesSortDirection)}
+              ${renderFileTypeHeader('Count', 'count', this.fileTypesSortKey, this.fileTypesSortDirection, true)}
+              ${renderFileTypeHeader('Lines', 'totalLines', this.fileTypesSortKey, this.fileTypesSortDirection, true)}
+              ${renderFileTypeHeader('Words', 'totalWords', this.fileTypesSortKey, this.fileTypesSortDirection, true)}
+              ${renderFileTypeHeader('Bytes', 'totalBytes', this.fileTypesSortKey, this.fileTypesSortDirection, true)}
             </tr>
           </thead>
           <tbody>
-            ${data.fileTypes.map(ft => `
+            ${sortedFileTypes.map(ft => `
               <tr>
                 <td class="file-type">${ft.fileType || '(no extension)'}</td>
                 <td class="num">${ft.count.toLocaleString()}</td>
@@ -248,6 +256,27 @@ class StatisticsViewer {
           } else {
             this.allFilesSortKey = key;
             this.allFilesSortDirection = getDefaultSortDirection(key);
+          }
+          if (this.currentStatistics) {
+            this.displayStatistics(this.currentStatistics);
+          }
+        });
+      });
+    }
+
+    const fileTypeTable = this.statisticsPanel.querySelector('[data-file-type-table="true"]');
+    if (fileTypeTable) {
+      fileTypeTable.querySelectorAll('[data-sort-key]').forEach(header => {
+        header.addEventListener('click', () => {
+          const key = header.getAttribute('data-sort-key') as FileTypeSortKey | null;
+          if (!key) {
+            return;
+          }
+          if (this.fileTypesSortKey === key) {
+            this.fileTypesSortDirection = this.fileTypesSortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            this.fileTypesSortKey = key;
+            this.fileTypesSortDirection = getDefaultFileTypeSortDirection(key);
           }
           if (this.currentStatistics) {
             this.displayStatistics(this.currentStatistics);
@@ -476,6 +505,23 @@ function renderSortableHeader(
   `;
 }
 
+function renderFileTypeHeader(
+  label: string,
+  key: FileTypeSortKey,
+  activeKey: FileTypeSortKey,
+  activeDirection: SortDirection,
+  numeric: boolean = false
+): string {
+  const activeClass = key === activeKey ? 'is-active' : '';
+  const arrow = key === activeKey ? (activeDirection === 'asc' ? '↑' : '↓') : '';
+  const numericClass = numeric ? 'num' : '';
+  return `
+    <th class="${numericClass} ${activeClass}" data-sort-key="${key}">
+      ${escapeHtml(label)} ${arrow}
+    </th>
+  `;
+}
+
 function sortAllFiles(
   items: IncludedFileStats[],
   key: AllFilesSortKey,
@@ -501,6 +547,36 @@ function sortAllFiles(
 
 function getDefaultSortDirection(key: AllFilesSortKey): SortDirection {
   if (key === 'path' || key === 'fileType') {
+    return 'asc';
+  }
+  return 'desc';
+}
+
+function sortFileTypes(
+  items: ProjectStatistics['fileTypes'],
+  key: FileTypeSortKey,
+  direction: SortDirection
+): ProjectStatistics['fileTypes'] {
+  const rows = [...items];
+  rows.sort((a, b) => {
+    if (key === 'fileType') {
+      const result = a.fileType.localeCompare(b.fileType);
+      if (result !== 0) {
+        return direction === 'asc' ? result : -result;
+      }
+      return a.fileType.localeCompare(b.fileType);
+    }
+    const result = (a[key] ?? 0) - (b[key] ?? 0);
+    if (result !== 0) {
+      return direction === 'asc' ? result : -result;
+    }
+    return a.fileType.localeCompare(b.fileType);
+  });
+  return rows;
+}
+
+function getDefaultFileTypeSortDirection(key: FileTypeSortKey): SortDirection {
+  if (key === 'fileType') {
     return 'asc';
   }
   return 'desc';

@@ -135,6 +135,13 @@ Now, please remove the "Included Files by Type" section in the "File Types Break
 Please make the table in "File Types Breakdown" sortable the same way that sorting in the "All Files" window works. Tie breaker should be the File Type here since that is unique in this table.
 
 
+Some UX fine tuning please:
+* All windows like "Overview", "File Types Breakdown", etc. should be collapsable.
+* Replace the arrow used for indicating sort order by a symbol that better indicates the order. Please use symbls that are usually used for such purposes or reccomended in usability guidlines. please explain your choice in a sentence or two.
+* Older statistics files don't have the list of files. For these I now get an error: "Error loading statistics file: 2026-01-01_21-24.json  items is not iterable" please just use the same solution for teh files not being available in older versions: just display
+
+
+
 
 Pleas use the opportunity to clean up the code. The two tables should work 
 
