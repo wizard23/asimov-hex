@@ -2,6 +2,8 @@ import { Pane } from 'tweakpane';
 import type { ProjectStatistics, RepoSizeMetrics } from './types';
 
 type DateTimeTimeZone = 'local' | 'utc';
+type SortDirection = 'asc' | 'desc';
+type AllFilesSortKey = 'path' | 'fileType' | 'lines' | 'words' | 'bytes';
 
 class StatisticsViewer {
   private pane!: Pane;
@@ -14,6 +16,7 @@ class StatisticsViewer {
   };
   private currentStatistics: ProjectStatistics | null = null;
   private allFilesSortKey: AllFilesSortKey = 'path';
+  private allFilesSortDirection: SortDirection = 'asc';
 
   constructor() {
     this.statisticsPanel = document.getElementById('statistics-panel')!;
@@ -137,7 +140,11 @@ class StatisticsViewer {
       : formatIsoTimestampLocal(data.timestamp);
 
     const groupedFiles = groupFilesByType(data.includedFiles);
-    const allFilesRows = sortAllFiles(data.includedFiles, this.allFilesSortKey);
+    const allFilesRows = sortAllFiles(
+      data.includedFiles,
+      this.allFilesSortKey,
+      this.allFilesSortDirection
+    );
 
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics — ${timestamp}</h2>
@@ -210,7 +217,7 @@ class StatisticsViewer {
 
       <div class="stat-section">
         <h3>All Files</h3>
-        ${renderAllFilesTable(allFilesRows, this.allFilesSortKey)}
+        ${renderAllFilesTable(allFilesRows, this.allFilesSortKey, this.allFilesSortDirection)}
       </div>
 
       <div class="stat-section">
@@ -239,7 +246,12 @@ class StatisticsViewer {
           if (!key) {
             return;
           }
-          this.allFilesSortKey = key;
+          if (this.allFilesSortKey === key) {
+            this.allFilesSortDirection = this.allFilesSortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            this.allFilesSortKey = key;
+            this.allFilesSortDirection = getDefaultSortDirection(key);
+          }
           if (this.currentStatistics) {
             this.displayStatistics(this.currentStatistics);
           }
@@ -436,13 +448,12 @@ function renderStatsTable(
   `;
 }
 
-type AllFilesSortKey = 'path' | 'fileType' | 'lines' | 'words' | 'bytes';
-
 type IncludedFileStats = ProjectStatistics['includedFiles'][number];
 
 function renderAllFilesTable(
   rows: IncludedFileStats[],
-  sortKey: AllFilesSortKey
+  sortKey: AllFilesSortKey,
+  sortDirection: SortDirection
 ): string {
   if (rows.length === 0) {
     return `<div class="excluded-empty">(none)</div>`;
@@ -452,11 +463,11 @@ function renderAllFilesTable(
     <table class="stats-table" data-all-files-table="true">
       <thead>
         <tr>
-          ${renderSortableHeader('File', 'path', sortKey)}
-          ${renderSortableHeader('Type', 'fileType', sortKey)}
-          ${renderSortableHeader('Lines', 'lines', sortKey, true)}
-          ${renderSortableHeader('Words', 'words', sortKey, true)}
-          ${renderSortableHeader('Bytes', 'bytes', sortKey, true)}
+          ${renderSortableHeader('File', 'path', sortKey, sortDirection)}
+          ${renderSortableHeader('Type', 'fileType', sortKey, sortDirection)}
+          ${renderSortableHeader('Lines', 'lines', sortKey, sortDirection, true)}
+          ${renderSortableHeader('Words', 'words', sortKey, sortDirection, true)}
+          ${renderSortableHeader('Bytes', 'bytes', sortKey, sortDirection, true)}
         </tr>
       </thead>
       <tbody>
@@ -478,13 +489,15 @@ function renderSortableHeader(
   label: string,
   key: AllFilesSortKey,
   activeKey: AllFilesSortKey,
+  activeDirection: SortDirection,
   numeric: boolean = false
 ): string {
   const activeClass = key === activeKey ? 'is-active' : '';
+  const arrow = key === activeKey ? (activeDirection === 'asc' ? '↑' : '↓') : '';
   const numericClass = numeric ? 'num' : '';
   return `
     <th class="${numericClass} ${activeClass}" data-sort-key="${key}">
-      ${escapeHtml(label)}
+      ${escapeHtml(label)} ${arrow}
     </th>
   `;
 }
@@ -511,16 +524,32 @@ function groupFilesByType(items?: IncludedFileStats[]): Map<string, IncludedFile
 
 function sortAllFiles(
   items: IncludedFileStats[],
-  key: AllFilesSortKey
+  key: AllFilesSortKey,
+  direction: SortDirection
 ): IncludedFileStats[] {
   const rows = [...items];
   rows.sort((a, b) => {
     if (key === 'path' || key === 'fileType') {
-      return a[key].localeCompare(b[key]);
+      const result = a[key].localeCompare(b[key]);
+      if (result !== 0) {
+        return direction === 'asc' ? result : -result;
+      }
+      return a.path.localeCompare(b.path);
     }
-    return a[key] - b[key];
+    const result = a[key] - b[key];
+    if (result !== 0) {
+      return direction === 'asc' ? result : -result;
+    }
+    return a.path.localeCompare(b.path);
   });
   return rows;
+}
+
+function getDefaultSortDirection(key: AllFilesSortKey): SortDirection {
+  if (key === 'path' || key === 'fileType') {
+    return 'asc';
+  }
+  return 'desc';
 }
 
 function formatValue(value: string | number): string {

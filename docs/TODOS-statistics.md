@@ -104,6 +104,28 @@ By clicking on any header the table should get sorted by this field ascending.
 If anything is unclear please just ask.
 
 
+The statistics generation script is good now! We have all the data we need for the app :)
+
+The app needs some improvements. 
+Please extend the sorting capabilities:
+When clicking a header in the "All Files" window the sorting should work like this:
+* For numeric types the primary sorting order is descending.
+* For strings the primary sorting order is ascending.
+* One column is used for sorting. Initially this should be the path column
+* The column used for sorting the order should be visually indicated in the column header with arrow.
+* when a header is clicked that is already used for sorting invert the sorting order for that column.
+* when a header is clicked that is not used for sorting: this column becomes the one used for sorting. Initially order is the primary order of the type of the column.
+
+Does this make sense? Is it consistent with usual interfaces for sorting tables? or do you notice any inconsistencies or unspecified aspects of the feature?
+If anything is unclear please just ask.
+
+
+Tie breaker should be the path (in ascending order) since this should be unique. Does this make sense? Is it consistent with usual interfaces for sorting tables?
+
+Yes, please use the tie breaker for all types.
+
+
+
 
 
 ## INIT 2026/01/02
