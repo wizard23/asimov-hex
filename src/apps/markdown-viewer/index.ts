@@ -41,7 +41,7 @@ async function loadMarkdown(rawUrl: string): Promise<void> {
   }
 
   const text = await response.text();
-  renderMarkdown(text, markdownEl);
+  renderMarkdown(text, markdownEl, resolvedUrl.href);
   showStatus(`Loaded ${resolvedUrl.href}`, false, resolvedUrl.href);
 }
 
@@ -66,7 +66,7 @@ function showStatus(message: string, isError: boolean, linkHref?: string): void 
   }
 }
 
-function renderMarkdown(markdown: string, container: HTMLElement): void {
+function renderMarkdown(markdown: string, container: HTMLElement, baseUrl: string): void {
   container.replaceChildren();
   const lines = markdown.replace(/\r\n/g, '\n').split('\n');
 
@@ -78,7 +78,7 @@ function renderMarkdown(markdown: string, container: HTMLElement): void {
   const flushParagraph = () => {
     if (currentParagraph.length === 0) return;
     const p = document.createElement('p');
-    appendInline(p, currentParagraph.join(' '));
+    appendInline(p, currentParagraph.join(' '), baseUrl);
     container.appendChild(p);
     currentParagraph = [];
   };
@@ -88,7 +88,7 @@ function renderMarkdown(markdown: string, container: HTMLElement): void {
     const list = document.createElement(currentList.type);
     currentList.items.forEach((item) => {
       const li = document.createElement('li');
-      appendInline(li, item);
+      appendInline(li, item, baseUrl);
       list.appendChild(li);
     });
     container.appendChild(list);
@@ -98,7 +98,7 @@ function renderMarkdown(markdown: string, container: HTMLElement): void {
   const flushBlockquote = () => {
     if (currentBlockquote.length === 0) return;
     const block = document.createElement('blockquote');
-    appendInline(block, currentBlockquote.join(' '));
+    appendInline(block, currentBlockquote.join(' '), baseUrl);
     container.appendChild(block);
     currentBlockquote = [];
   };
@@ -133,7 +133,7 @@ function renderMarkdown(markdown: string, container: HTMLElement): void {
       if (match) {
         const level = match[1].length;
         const heading = document.createElement(`h${level}`);
-        appendInline(heading, match[2].trim());
+        appendInline(heading, match[2].trim(), baseUrl);
         container.appendChild(heading);
       }
       index += 1;
@@ -201,7 +201,7 @@ function renderMarkdown(markdown: string, container: HTMLElement): void {
   flushBlockquote();
 }
 
-function appendInline(parent: HTMLElement, text: string): void {
+function appendInline(parent: HTMLElement, text: string, baseUrl: string): void {
   const parts = text.split('`');
   parts.forEach((segment, idx) => {
     if (idx % 2 === 1) {
@@ -210,11 +210,11 @@ function appendInline(parent: HTMLElement, text: string): void {
       parent.appendChild(code);
       return;
     }
-    appendLinksAndEmphasis(parent, segment);
+    appendLinksAndEmphasis(parent, segment, baseUrl);
   });
 }
 
-function appendLinksAndEmphasis(parent: HTMLElement, text: string): void {
+function appendLinksAndEmphasis(parent: HTMLElement, text: string, baseUrl: string): void {
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null = null;
@@ -224,7 +224,8 @@ function appendLinksAndEmphasis(parent: HTMLElement, text: string): void {
     appendEmphasis(parent, prefix);
 
     const link = document.createElement('a');
-    link.href = match[2].trim();
+    const rawHref = match[2].trim();
+    link.href = resolveMarkdownHref(rawHref, baseUrl);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = match[1].trim();
@@ -273,5 +274,15 @@ function appendEmphasis(parent: HTMLElement, text: string): void {
     parent.appendChild(element);
 
     remaining = remaining.slice(nextMatch.index + nextMatch[0].length);
+  }
+}
+
+function resolveMarkdownHref(rawHref: string, baseUrl: string): string {
+  if (!rawHref) return rawHref;
+  if (rawHref.startsWith('#')) return rawHref;
+  try {
+    return new URL(rawHref, baseUrl).href;
+  } catch {
+    return rawHref;
   }
 }
