@@ -68,6 +68,18 @@
     #load-button:hover {
       background: #3a3a3a;
     }
+    #meta-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #cfcfcf;
+      user-select: none;
+    }
+    #hide-meta-controls {
+      width: 14px;
+      height: 14px;
+    }
     #content {
       flex: 1;
       overflow: auto;
@@ -156,9 +168,16 @@
       border-color: #b84a4a;
       color: #ff8a8a;
     }
+    .hide-meta #header,
+    .hide-meta #status {
+      display: none;
+    }
+    .hide-meta #content {
+      padding-top: 24px;
+    }
   </style>
 </head>
-<body>
+<body class="hide-meta">
   <div id="app">
     <div id="header">
       <h1>Markdown Viewer</h1>
@@ -166,6 +185,10 @@
       <form id="controls">
         <input id="url-input" type="url" placeholder="https://example.com/file.md" aria-label="Markdown URL" />
         <button id="load-button" type="submit">Load</button>
+        <label id="meta-toggle">
+          <input id="hide-meta-controls" type="checkbox" checked />
+          Hide Controls (M)
+        </label>
       </form>
     </div>
     <div id="content">

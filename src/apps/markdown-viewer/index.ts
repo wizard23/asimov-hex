@@ -2,14 +2,17 @@ const statusEl = document.getElementById('status');
 const markdownEl = document.getElementById('markdown');
 const urlInput = document.getElementById('url-input') as HTMLInputElement | null;
 const controlsForm = document.getElementById('controls') as HTMLFormElement | null;
+const hideMetaCheckbox = document.getElementById('hide-meta-controls') as HTMLInputElement | null;
 
-if (!statusEl || !markdownEl || !urlInput || !controlsForm) {
+if (!statusEl || !markdownEl || !urlInput || !controlsForm || !hideMetaCheckbox) {
   throw new Error('Markdown Viewer: missing required DOM elements.');
 }
 
 const params = new URLSearchParams(window.location.search);
 const initialUrl = params.get('url') || '';
 urlInput.value = initialUrl;
+hideMetaCheckbox.checked = true;
+document.body.classList.add('hide-meta');
 
 controlsForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -30,6 +33,17 @@ if (initialUrl) {
     showStatus(`Failed to load markdown: ${message}`, true);
   });
 }
+
+hideMetaCheckbox.addEventListener('change', () => {
+  document.body.classList.toggle('hide-meta', hideMetaCheckbox.checked);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key.toLowerCase() !== 'm') return;
+  event.preventDefault();
+  hideMetaCheckbox.checked = !hideMetaCheckbox.checked;
+  document.body.classList.toggle('hide-meta', hideMetaCheckbox.checked);
+});
 
 async function loadMarkdown(rawUrl: string): Promise<void> {
   const resolvedUrl = new URL(rawUrl, window.location.href);
