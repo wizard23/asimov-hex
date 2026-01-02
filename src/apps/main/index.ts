@@ -1028,7 +1028,33 @@ class GridApp {
 
     if (e.button === 0) {
       // Left click
-      if (this.config.leftClickMode === 'spawnParticle' || this.config.leftClickMode === 'smart') {
+      if (this.config.leftClickMode === 'smart') {
+        if (this.highlightedEdgeInfo) {
+          this.particleSystem.spawnParticle(this.highlightedEdgeInfo, this.mouseX, this.mouseY);
+          return;
+        }
+
+        if (this.highlightedCellInfo) {
+          if (e.shiftKey) {
+            const edges = this.grid.getCellEdges({
+              col: this.highlightedCellInfo.col,
+              row: this.highlightedCellInfo.row,
+            });
+            if (edges.length > 0) {
+              const edge = edges[Math.floor(Math.random() * edges.length)];
+              const progress = 0.5;
+              const direction = Math.random() < 0.5 ? -1 : 1;
+              this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
+            }
+          } else {
+            this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = this.config.drawState;
+            this.updateGrid();
+          }
+          return;
+        }
+      }
+
+      if (this.config.leftClickMode === 'spawnParticle') {
         // Check for edge click for particle spawning
         const edgeX = e.clientX - rect.left - this.edgeContainer.x;
         const edgeY = e.clientY - rect.top - this.edgeContainer.y;
@@ -1042,14 +1068,12 @@ class GridApp {
           10
         );
 
-      if (edgeInfo) {
-        // Spawn particle on edge click
-        this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
-        return;
-      }
-    }
+        if (edgeInfo) {
+          // Spawn particle on edge click
+          this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
+          return;
+        }
 
-      if (this.config.leftClickMode === 'spawnParticle') {
         // Spawn particle on a random edge within the clicked cell
         const x = e.clientX - rect.left - this.gridContainer.x;
         const y = e.clientY - rect.top - this.gridContainer.y;
@@ -1074,7 +1098,7 @@ class GridApp {
         }
       }
 
-      if (this.config.leftClickMode === 'draw' || this.config.leftClickMode === 'smart') {
+      if (this.config.leftClickMode === 'draw') {
         // Draw mode - check for cell click
         const x = e.clientX - rect.left - this.gridContainer.x;
         const y = e.clientY - rect.top - this.gridContainer.y;
@@ -1114,7 +1138,7 @@ class GridApp {
           if (this.highlightedEdgeInfo) {
             this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
           }
-          if (this.highlightedCellInfo) {
+          if (!this.highlightedEdgeInfo && this.highlightedCellInfo) {
             const edges = this.grid.getCellEdges({
               col: this.highlightedCellInfo.col,
               row: this.highlightedCellInfo.row,
@@ -1123,6 +1147,17 @@ class GridApp {
           }
           return;
         }
+
+        if (this.highlightedEdgeInfo) {
+          this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+          return;
+        }
+        if (this.highlightedCellInfo) {
+          this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = 0;
+          this.updateGrid();
+          return;
+        }
+        return;
       }
 
       const x = e.clientX - rect.left - this.gridContainer.x;
