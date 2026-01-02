@@ -120,11 +120,23 @@ Does this make sense? Is it consistent with usual interfaces for sorting tables?
 If anything is unclear please just ask.
 
 
+
 Tie breaker should be the path (in ascending order) since this should be unique. Does this make sense? Is it consistent with usual interfaces for sorting tables?
+
+
 
 Yes, please use the tie breaker for all types.
 
 
+Very good!
+Now, please remove the "Included Files by Type" section in the "File Types Breakdown" window  (the same information is now available in the "All Files" window)
+
+
+Please make the table in "File Types Breakdown" sortable the same way that sorting in the "All Files" window works. Tie breaker should be the File Type here since that is unique in this table.
+
+
+
+Pleas use the opportunity to clean up the code. The two tables should work 
 
 
 
