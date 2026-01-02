@@ -155,11 +155,11 @@ class StatisticsViewer {
       this.fileTypesSortKey,
       this.fileTypesSortDirection
     );
-    const hasIncludedFiles = Array.isArray(data.includedFiles);
-    const allFilesRows = hasIncludedFiles
-      ? sortAllFiles(data.includedFiles, this.allFilesSortKey, this.allFilesSortDirection)
+    const includedFiles = Array.isArray(data.includedFiles) ? data.includedFiles : undefined;
+    const allFilesRows = includedFiles
+      ? sortAllFiles(includedFiles, this.allFilesSortKey, this.allFilesSortDirection)
       : [];
-    const allFilesSection = hasIncludedFiles
+    const allFilesSection = includedFiles
       ? renderAllFilesTable(allFilesRows, this.allFilesSortKey, this.allFilesSortDirection)
       : `<div class="excluded-empty">unknown</div>`;
 
@@ -474,7 +474,7 @@ function renderStatsTable(
   `;
 }
 
-type IncludedFileStats = ProjectStatistics['includedFiles'][number];
+type IncludedFileStats = NonNullable<ProjectStatistics['includedFiles']>[number];
 
 function renderAllFilesTable(
   rows: IncludedFileStats[],

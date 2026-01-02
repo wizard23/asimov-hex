@@ -136,14 +136,25 @@ Please make the table in "File Types Breakdown" sortable the same way that sorti
 
 
 Some UX fine tuning please:
-* All windows like "Overview", "File Types Breakdown", etc. should be collapsable.
-* Replace the arrow used for indicating sort order by a symbol that better indicates the order. Please use symbls that are usually used for such purposes or reccomended in usability guidlines. please explain your choice in a sentence or two.
-* Older statistics files don't have the list of files. For these I now get an error: "Error loading statistics file: 2026-01-01_21-24.json  items is not iterable" please just use the same solution for teh files not being available in older versions: just display
+* All windows like "Overview", "File Types Breakdown", etc. should be collapsible.
+* Replace the arrow used for indicating sort order by a symbol that better indicates the order. Please use symbols that are usually used for such purposes or recommended in usability guidelines. please explain your choice in a sentence or two.
+* Older statistics files don't have the list of files. For these I now get an error: "Error loading statistics file: 2026-01-01_21-24.json items is not iterable". Older versions of the statistics must still be usable. Please use the same pattern for dealing with unavailable fields in older statistics files that is used in many places in the app: just display the text "unknown" instead of the table with the files. 
+
+
+Small bug/ux fine tuning:
+* the collapse state of the windows gets reset each time I change the statistics file in the dropdown menu. This should persist across changes of the used statistics file
 
 
 
 
-Pleas use the opportunity to clean up the code. The two tables should work 
+
+Pleas use the opportunity to clean up the code and make sure the code base is clean:
+* Are there any code smells in the code base?
+* Are there any now unused remains of previous features ore code paths that became derelict?
+* Are there any redundant or very similar code in multiple places?
+* Are all types consistent with the way they are used in the code?
+* Are any non optional fields tested for unknown or undefined? 
+* For every field of every type/interface that is used anywhere in the code for a legacy file format test: is the relevant field an optional field in the corresponding data type?
 
 
 

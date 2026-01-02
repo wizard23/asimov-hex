@@ -60,15 +60,15 @@ export interface ProjectStatistics {
     totalWords: number;
     totalBytes?: number;
   }>;
-  includedFiles: Array<{
+  includedFiles?: Array<{
     path: string;
     fileType: string;
     lines: number;
     words: number;
     bytes: number;
   }>;
-  excludedFolders: string[];
-  excludedFiles: string[];
+  excludedFolders?: string[];
+  excludedFiles?: string[];
   repoSizeMetrics?: RepoSizeMetrics;
   totals: {
     files: number;
