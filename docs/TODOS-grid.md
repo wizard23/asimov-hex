@@ -234,7 +234,144 @@ In Smart mode it should behave like this:
 * when Shift is not pressed the cell is set to 0 but no particles are affected.
 
 
+Yes. Smart+Shift+right click should also remove particles on the highlighted cell’s edges (when a cell is highlighted)
 
+
+
+Please describe in detail how each of the "Click Tool" modes behaves now for each of the cases: left/right click with/without shift.
+
+
+What you describe is not totally correct. Thats not exactly how it behaves Please re-create the description of what happens for each of the "Click Tool" modes. 
+For each of the cases systematically recreate the behaviors by inspecting the actual code and create the list structured like this:
+* left click
+ * with shift up
+   * with edge highlighted
+   * with cell highlighted
+ * with shift down
+   * with edge highlighted
+   * with cell highlighted
+* right click
+ * with shift up
+   * with edge highlighted
+   * with cell highlighted
+ * with shift down
+   * with edge highlighted
+   * with cell highlighted
+
+
+Yes please. The behavior should always depend only on what is highlighted. An edge or cells that is not highlighted should never be affected by the click.
+
+For highlighting purposes edges get priority when both an edge and a cell are found at the position of the mouse cursor (this already works but I write it for completeness).
+ 
+The actual actions triggered by the clicks when "Smart" "Click Tool" is active:
+* left click with shift up
+  * creates particle on the edge
+  * sets the state on the cell
+* left click with shift down
+  * creates a particle for edges
+  * creates a particle for on a cell edge
+* right click with shift up
+  * removes all particles on the edge
+  * sets the state on the cell to 0
+* right click with shift down
+  * removes all particles on the edge
+  * removes the all particles on cell edges
+
+Before you change anything: does this make sense to you? Do you see any inconsistencies? Is there a shorter more elegant way to describe the behavior I just described? I'm already thinking about how to document this in the manual.
+
+
+
+Thanks for bringing this up. To clarify: in my list when I describe a behavior for an edge and for a cell together what I meant is depending on what is highlighted. I implied an if before each action
+I explicitly wrote that down now. Here is my new list:
+
+* left click with shift up
+  * if an edge is highlighted: creates particle on the edge
+  * if a cell is highlighted: sets the state on the cell
+* left click with shift down
+  * if an edge is highlighted: creates a particle for edges
+  * if a cell is highlighted: creates a particle for on a cell edge
+* right click with shift up
+  * if an edge is highlighted: removes all particles on the edge
+  * if a cell is highlighted: sets the state on the cell to 0
+* right click with shift down
+  * if an edge is highlighted: removes all particles on the edge
+  * if a cell is highlighted: removes the all particles on cell edges
+
+Before you change anything: does this make sense to you? Do you see any inconsistencies? Is there a shorter more elegant way to describe the behavior I just described? I'm already thinking about how to document this in the manual.
+
+
+Yes please give me this matrix
+
+
+```
+• Yes, that makes sense and is internally consistent given the highlight‑priority rule. I don’t see inconsistencies.
+
+  A shorter way to document it:
+
+  Smart mode (edge highlight wins over cell; actions only affect the highlighted target)
+
+  - Left click
+      - Shift up: edge → spawn on edge; cell → set cell to draw state.
+      - Shift down: edge → spawn on edge; cell → spawn on a random edge of that cell.
+  - Right click
+      - Shift up: edge → remove particles on edge; cell → clear cell to 0.
+      - Shift down: edge → remove particles on edge; cell → remove particles on all edges of that cell.
+
+  If you want an even tighter version, we can format it as a 2×2 table (click × shift) with edge/cell outcomes per row.
+
+
+› Yes please give me this matrix
+
+
+• Smart mode (edge highlight wins over cell; actions only affect the highlighted target)
+
+                    Shift up                               Shift down
+  Left click   edge: spawn particle on edge          edge: spawn particle on edge
+               cell: set cell to draw state          cell: spawn particle on a random edge of that cell
+
+  Right click  edge: remove particles on edge        edge: remove particles on edge
+               cell: clear cell to 0                 cell: remove particles on all edges of that cell
+```
+
+Now please implement the "Smart" mode behavior in this way.
+
+
+
+I can't test it yet. Atm there is a build error. 
+
+
+
+I just noticed there is a lint errors too.
+
+Please look at the ./package.json
+Then run:
+npm run verify
+
+You can also use the individual scripts 
+* test
+* lint
+* build
+
+to save time.
+
+In the future when you change something please always use this method for finding out if there are still errors in the code.
+
+
+In the future you can use a longer timeout of 90sec for `npm run verify`
+The new "Smart" "Click Tool" works very well and I verified myself already.
+
+
+Earlier you suggested: 
+"If you want, I can also make “highlight only” apply to other modes for consistency."
+
+I thought this was already the case but it is quite some time since I looked at the code. 
+Please describe in detail how each of the three "Click Tool" modes work now.
+
+
+
+
+
+some ux bugs/inconsistencies:
 
 timeout for particles in seconds or edges
 
@@ -244,6 +381,22 @@ There is a UX bug when "Show Coordinates" is selected. For some grid types the f
 
 
 
+Please correct me if i'm wrong. I understand what you described like this:
+For the user the "Spawn Particle" and the "Draw Cell" mode already behave like “highlight only” but the code paths don't make this explicit.
+
+
+
+My main concern right now is a clean code base. Please estimate what behavior would result in the cleanest code base.
+For your estimate you may assume that this is true: 
+"Click hit‑testing lines up with the highlight because both use the current mouse position"
+
+
+"highlight is the single source of truth for actions in all modes. If nothing is highlighted, clicks do nothing."
+This plan sounds very solid to me. Just to make sure I know exactly what behavior this will result in please give me a detailed description of the highlighting behavior of all modes after this plan is implemented.
+
+
+
+Great! Please implement the plan for "highlight is the single source of truth for actions in all modes. If nothing is highlighted, clicks do nothing." and make the codebase as clean as possible.
 
 
 
