@@ -1023,9 +1023,6 @@ class GridApp {
   }
 
   private handleMouseDown(e: MouseEvent) {
-    const canvas = this.app.canvas;
-    const rect = canvas.getBoundingClientRect();
-
     if (e.button === 0) {
       // Left click
       if (this.config.leftClickMode === 'smart') {
@@ -1055,69 +1052,35 @@ class GridApp {
       }
 
       if (this.config.leftClickMode === 'spawnParticle') {
-        // Check for edge click for particle spawning
-        const edgeX = e.clientX - rect.left - this.edgeContainer.x;
-        const edgeY = e.clientY - rect.top - this.edgeContainer.y;
-        
-        const edgeInfo = getEdgeAtPixel(
-          this.grid,
-          this.config.gridWidth,
-          this.config.gridHeight,
-          edgeX,
-          edgeY,
-          10
-        );
-
-        if (edgeInfo) {
-          // Spawn particle on edge click
-          this.particleSystem.spawnParticle(edgeInfo, edgeX, edgeY);
+        if (this.highlightedEdgeInfo) {
+          this.particleSystem.spawnParticle(this.highlightedEdgeInfo, this.mouseX, this.mouseY);
           return;
         }
 
-        // Spawn particle on a random edge within the clicked cell
-        const x = e.clientX - rect.left - this.gridContainer.x;
-        const y = e.clientY - rect.top - this.gridContainer.y;
-
-        const cellInfo = getCellAtPixel(
-          this.grid,
-          this.config.gridWidth,
-          this.config.gridHeight,
-          x,
-          y
-        );
-
-        if (cellInfo) {
-          const edges = this.grid.getCellEdges({ col: cellInfo.col, row: cellInfo.row });
+        if (this.highlightedCellInfo) {
+          const edges = this.grid.getCellEdges({
+            col: this.highlightedCellInfo.col,
+            row: this.highlightedCellInfo.row,
+          });
           if (edges.length > 0) {
             const edge = edges[Math.floor(Math.random() * edges.length)];
             const progress = 0.5;
             const direction = Math.random() < 0.5 ? -1 : 1;
             this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
-            return;
           }
+          return;
         }
       }
 
       if (this.config.leftClickMode === 'draw') {
-        // Draw mode - check for cell click
-        const x = e.clientX - rect.left - this.gridContainer.x;
-        const y = e.clientY - rect.top - this.gridContainer.y;
-
-        const cellInfo = getCellAtPixel(
-          this.grid,
-          this.config.gridWidth,
-          this.config.gridHeight,
-          x,
-          y
-        );
-
-        if (cellInfo) {
-          this.cellStates[cellInfo.row][cellInfo.col] = this.config.drawState;
+        if (this.highlightedCellInfo) {
+          this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = this.config.drawState;
           this.updateGrid();
         }
+        return;
       }
     } else if (e.button === 2) {
-      // Right click: always clear cell (set to state 0)
+      // Right click: highlight-only actions
       const isShift = e.shiftKey;
       if (this.config.leftClickMode === 'spawnParticle') {
         if (this.highlightedEdgeInfo) {
@@ -1160,20 +1123,12 @@ class GridApp {
         return;
       }
 
-      const x = e.clientX - rect.left - this.gridContainer.x;
-      const y = e.clientY - rect.top - this.gridContainer.y;
-
-      const cellInfo = getCellAtPixel(
-        this.grid,
-        this.config.gridWidth,
-        this.config.gridHeight,
-        x,
-        y
-      );
-
-      if (cellInfo) {
-        this.cellStates[cellInfo.row][cellInfo.col] = 0;
-        this.updateGrid();
+      if (this.config.leftClickMode === 'draw') {
+        if (this.highlightedCellInfo) {
+          this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = 0;
+          this.updateGrid();
+        }
+        return;
       }
     }
   }
