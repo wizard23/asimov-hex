@@ -281,7 +281,12 @@ function resolveMarkdownHref(rawHref: string, baseUrl: string): string {
   if (!rawHref) return rawHref;
   if (rawHref.startsWith('#')) return rawHref;
   try {
-    return new URL(rawHref, baseUrl).href;
+    const resolved = new URL(rawHref, baseUrl).href;
+    const viewerUrl = new URL(window.location.href);
+    viewerUrl.search = '';
+    viewerUrl.hash = '';
+    viewerUrl.searchParams.set('url', resolved);
+    return viewerUrl.toString();
   } catch {
     return rawHref;
   }
