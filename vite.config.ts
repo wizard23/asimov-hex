@@ -13,6 +13,7 @@ export default defineConfig({
         statistics: resolve(__dirname, 'statistics.html'),
         timeline: resolve(__dirname, 'timeline.html'),
         tileEditor: resolve(__dirname, 'tile-editor.html'),
+        markdownViewer: resolve(__dirname, 'markdown-viewer.html'),
       },
     },
   },
