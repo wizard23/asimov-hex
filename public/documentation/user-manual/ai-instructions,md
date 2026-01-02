@@ -1,0 +1,31 @@
+
+# AI Instructions
+## Overview
+Please document the apps located in:
+./src/apps/main
+./src/apps/tile-editor
+
+These are used the usual way for a vite based web app defined in:
+package.json
+vite.config.ts
+
+If you need to you can look at all relevant source and html files.
+
+
+
+
+## Links
+### Links to sub pages
+
+### Links to the apps
+Please link the actual applications in the documentation. Please use absolute paths for the links to the apps. You should be able to deduce the correct links from the vite config.
+
+for linking the apps 
+
+
+./public/documentation/user-manual/main/index.md
+./public/documentation/user-manual/tile-editor/index.md
+
+## FAQ
+* Please keep these instructions as they are and only make changes in the other .md files.
+* If anything is unclear please just ask.

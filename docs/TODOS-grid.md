@@ -220,8 +220,21 @@ Yes please adapt it in the following way:
   * "Show Edge Delta" instead of "Visualize Edge Delta"
   * "Cell States" instead "Number of States"
 
+In the Main app
+When the "Click Tool"s "Smart" or "Spawn Particles" are active a right mouse click should delete all particles on the highlighted edge (if an edge is highlighted).
+When the "Click Tool"s "Spawn Particles" is active a right mouse click should delete all particles on any edge of the highlighted cell (if a cell is highlighted).
+If anything is unclear please just ask.
 
-right click deletes particles when clicked on edges in smart mode and for spawn particles mode it should also delete all particles from all edges of the right clicked cell.
+
+
+The right click behavior when a cell is highlighted is not totally correct now:
+It should never set the state of the cell to 0 in "Spawn Particle" mode.
+In Smart mode it should behave like this:
+* when Shift is pressed while clicking it should only remove the particles but not affect the cell.
+* when Shift is not pressed the cell is set to 0 but no particles are affected.
+
+
+
 
 timeout for particles in seconds or edges
 
@@ -266,6 +279,7 @@ Before we implement the new feature we need to refactor the way the grid interfa
 
 
 # INIT
+## OLD VERSIONS
 Please analyze the following list of files and directories in the cwd. For directories please also analyze any subdirectories.
 eslint.config.js
 index.html
@@ -289,10 +303,33 @@ src/core/utils/solver-types.ts
 src/core/utils/solver.ts
 
 
+## Current INIT
+We need to add some new features to the app in: src/apps/main/
+
+To do that please look the following list of files and directories in the cwd. For directories please also analyze any subdirectories.
+eslint.config.js
+index.html
+package.json
+statistics.html
+tile-editor.html
+timeline.html
+tsconfig.json
+vite.config.ts
+src/apps/main/
+src/assets/
+src/core
+src/gui
+src/types
+
+For this analysis please skip these files and/or directories since they are not relevant for the current tasks:
+src/core/solver/
+
+
 ## POSSIBLE IMPROVEMENTS
 * i might want to skip the solver next time
 * next time: "please familiarize yourself with these files and directories in the cwd" 
 * 79% context left (with solver)
+* => Yeah 88% ohne solver :)
 
 
 
