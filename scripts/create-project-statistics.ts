@@ -11,9 +11,18 @@ interface FileStats {
   totalBytes: number;
 }
 
+interface IncludedFileStats {
+  path: string;
+  fileType: string;
+  lines: number;
+  words: number;
+  bytes: number;
+}
+
 interface ProjectStatistics {
   timestamp: string;
   fileTypes: FileStats[];
+  includedFiles: IncludedFileStats[];
   excludedFolders: string[];
   excludedFiles: string[];
   repoSizeMetrics?: RepoSizeMetrics;
@@ -275,6 +284,7 @@ function generateStatistics(): ProjectStatistics {
   );
   
   const statsByType = new Map<string, { count: number; lines: number; words: number; bytes: number }>();
+  const includedFiles: IncludedFileStats[] = [];
 
   let totalLines = 0;
   let totalWords = 0;
@@ -295,6 +305,14 @@ function generateStatistics(): ProjectStatistics {
         lines: current.lines + lines,
         words: current.words + words,
         bytes: current.bytes + bytes,
+      });
+
+      includedFiles.push({
+        path: file,
+        fileType,
+        lines,
+        words,
+        bytes,
       });
 
       totalLines += lines;
@@ -332,6 +350,7 @@ function generateStatistics(): ProjectStatistics {
   return {
     timestamp: new Date().toISOString(),
     fileTypes,
+    includedFiles: includedFiles.sort((a, b) => a.path.localeCompare(b.path)),
     excludedFolders,
     excludedFiles,
     repoSizeMetrics,

@@ -50,3 +50,30 @@ export interface RepoSizeMetrics {
     }>;
   };
 }
+
+export interface ProjectStatistics {
+  timestamp: string;
+  fileTypes: Array<{
+    fileType: string;
+    count: number;
+    totalLines: number;
+    totalWords: number;
+    totalBytes?: number;
+  }>;
+  includedFiles: Array<{
+    path: string;
+    fileType: string;
+    lines: number;
+    words: number;
+    bytes: number;
+  }>;
+  excludedFolders: string[];
+  excludedFiles: string[];
+  repoSizeMetrics?: RepoSizeMetrics;
+  totals: {
+    files: number;
+    lines: number;
+    words: number;
+    bytes?: number;
+  };
+}

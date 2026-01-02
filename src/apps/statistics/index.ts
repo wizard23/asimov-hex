@@ -1,27 +1,5 @@
 import { Pane } from 'tweakpane';
-import type { RepoSizeMetrics } from './types';
-
-interface FileTypeStats {
-  fileType: string;
-  count: number;
-  totalLines: number;
-  totalWords: number;
-  totalBytes?: number;
-}
-
-interface ProjectStatistics {
-  timestamp: string;
-  fileTypes: FileTypeStats[];
-  excludedFolders: string[];
-  excludedFiles: string[];
-  repoSizeMetrics?: RepoSizeMetrics;
-  totals: {
-    files: number;
-    lines: number;
-    words: number;
-    bytes?: number;
-  };
-}
+import type { ProjectStatistics, RepoSizeMetrics } from './types';
 
 type DateTimeTimeZone = 'local' | 'utc';
 
@@ -35,6 +13,7 @@ class StatisticsViewer {
     dateTimeTimeZone: 'local' as DateTimeTimeZone,
   };
   private currentStatistics: ProjectStatistics | null = null;
+  private allFilesSortKey: AllFilesSortKey = 'path';
 
   constructor() {
     this.statisticsPanel = document.getElementById('statistics-panel')!;
@@ -157,6 +136,9 @@ class StatisticsViewer {
       ? formatIsoTimestampUtc(data.timestamp)
       : formatIsoTimestampLocal(data.timestamp);
 
+    const groupedFiles = groupFilesByType(data.includedFiles);
+    const allFilesRows = sortAllFiles(data.includedFiles, this.allFilesSortKey);
+
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics — ${timestamp}</h2>
       
@@ -222,6 +204,13 @@ class StatisticsViewer {
             `).join('')}
           </tbody>
         </table>
+        <div class="stats-subtitle">Included Files by Type</div>
+        ${renderIncludedFilesByType(groupedFiles)}
+      </div>
+
+      <div class="stat-section">
+        <h3>All Files</h3>
+        ${renderAllFilesTable(allFilesRows, this.allFilesSortKey)}
       </div>
 
       <div class="stat-section">
@@ -241,6 +230,22 @@ class StatisticsViewer {
         ${renderRepoSizeMetrics(data.repoSizeMetrics)}
       </div>
     `;
+
+    const allFilesTable = this.statisticsPanel.querySelector('[data-all-files-table="true"]');
+    if (allFilesTable) {
+      allFilesTable.querySelectorAll('[data-sort-key]').forEach(header => {
+        header.addEventListener('click', () => {
+          const key = header.getAttribute('data-sort-key') as AllFilesSortKey | null;
+          if (!key) {
+            return;
+          }
+          this.allFilesSortKey = key;
+          if (this.currentStatistics) {
+            this.displayStatistics(this.currentStatistics);
+          }
+        });
+      });
+    }
   }
 }
 
@@ -317,6 +322,29 @@ function renderExcludedList(items?: string[]): string {
     <ul class="excluded-list">
       ${items.map(item => `<li>${item}</li>`).join('')}
     </ul>
+  `;
+}
+
+function renderIncludedFilesByType(items?: Map<string, IncludedFileStats[]>): string {
+  if (!items) {
+    return `<div class="excluded-empty">unknown</div>`;
+  }
+
+  if (items.size === 0) {
+    return `<div class="excluded-empty">(none)</div>`;
+  }
+
+  const sections = Array.from(items.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+  return `
+    ${sections.map(([fileType, files]) => `
+      <details class="included-files-group">
+        <summary>${escapeHtml(fileType || '(no extension)')} (${files.length.toLocaleString()})</summary>
+        <ul class="excluded-list">
+          ${files.map(item => `<li>${escapeHtml(item.path)} (${item.lines.toLocaleString()} lines, ${item.words.toLocaleString()} words, ${item.bytes.toLocaleString()} bytes)</li>`).join('')}
+        </ul>
+      </details>
+    `).join('')}
   `;
 }
 
@@ -406,6 +434,93 @@ function renderStatsTable(
       </tbody>
     </table>
   `;
+}
+
+type AllFilesSortKey = 'path' | 'fileType' | 'lines' | 'words' | 'bytes';
+
+type IncludedFileStats = ProjectStatistics['includedFiles'][number];
+
+function renderAllFilesTable(
+  rows: IncludedFileStats[],
+  sortKey: AllFilesSortKey
+): string {
+  if (rows.length === 0) {
+    return `<div class="excluded-empty">(none)</div>`;
+  }
+
+  return `
+    <table class="stats-table" data-all-files-table="true">
+      <thead>
+        <tr>
+          ${renderSortableHeader('File', 'path', sortKey)}
+          ${renderSortableHeader('Type', 'fileType', sortKey)}
+          ${renderSortableHeader('Lines', 'lines', sortKey, true)}
+          ${renderSortableHeader('Words', 'words', sortKey, true)}
+          ${renderSortableHeader('Bytes', 'bytes', sortKey, true)}
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.path)}</td>
+            <td>${escapeHtml(row.fileType || '(no extension)')}</td>
+            <td class="num">${row.lines.toLocaleString()}</td>
+            <td class="num">${row.words.toLocaleString()}</td>
+            <td class="num">${row.bytes.toLocaleString()}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderSortableHeader(
+  label: string,
+  key: AllFilesSortKey,
+  activeKey: AllFilesSortKey,
+  numeric: boolean = false
+): string {
+  const activeClass = key === activeKey ? 'is-active' : '';
+  const numericClass = numeric ? 'num' : '';
+  return `
+    <th class="${numericClass} ${activeClass}" data-sort-key="${key}">
+      ${escapeHtml(label)}
+    </th>
+  `;
+}
+
+function groupFilesByType(items?: IncludedFileStats[]): Map<string, IncludedFileStats[]> {
+  const grouped = new Map<string, IncludedFileStats[]>();
+  if (!items) {
+    return grouped;
+  }
+
+  for (const item of items) {
+    const existing = grouped.get(item.fileType) ?? [];
+    existing.push(item);
+    grouped.set(item.fileType, existing);
+  }
+
+  for (const [key, files] of grouped.entries()) {
+    files.sort((a, b) => a.path.localeCompare(b.path));
+    grouped.set(key, files);
+  }
+
+  return grouped;
+}
+
+function sortAllFiles(
+  items: IncludedFileStats[],
+  key: AllFilesSortKey
+): IncludedFileStats[] {
+  const rows = [...items];
+  rows.sort((a, b) => {
+    if (key === 'path' || key === 'fileType') {
+      return a[key].localeCompare(b[key]);
+    }
+    return a[key] - b[key];
+  });
+  return rows;
 }
 
 function formatValue(value: string | number): string {
