@@ -147,17 +147,19 @@ class StatisticsViewer {
       this.fileTypesSortKey,
       this.fileTypesSortDirection
     );
-    const allFilesRows = sortAllFiles(
-      data.includedFiles,
-      this.allFilesSortKey,
-      this.allFilesSortDirection
-    );
+    const hasIncludedFiles = Array.isArray(data.includedFiles);
+    const allFilesRows = hasIncludedFiles
+      ? sortAllFiles(data.includedFiles, this.allFilesSortKey, this.allFilesSortDirection)
+      : [];
+    const allFilesSection = hasIncludedFiles
+      ? renderAllFilesTable(allFilesRows, this.allFilesSortKey, this.allFilesSortDirection)
+      : `<div class="excluded-empty">unknown</div>`;
 
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics — ${timestamp}</h2>
       
-      <div class="stat-section">
-        <h3>Overview</h3>
+      <details class="stat-section" open>
+        <summary>Overview</summary>
         <div class="stat-grid">
           <div class="stat-item">
             <div class="stat-item-label">Total Files</div>
@@ -192,10 +194,10 @@ class StatisticsViewer {
             <div class="stat-item-value">${formatOptionalNumber(data.repoSizeMetrics?.intrinsic.trackedContentBytes)}</div>
           </div>
         </div>
-      </div>
+      </details>
 
-      <div class="stat-section">
-        <h3>File Types Breakdown</h3>
+      <details class="stat-section" open>
+        <summary>File Types Breakdown</summary>
         <table class="file-type-table" data-file-type-table="true">
           <thead>
             <tr>
@@ -218,15 +220,15 @@ class StatisticsViewer {
             `).join('')}
           </tbody>
         </table>
-      </div>
+      </details>
 
-      <div class="stat-section">
-        <h3>All Files</h3>
-        ${renderAllFilesTable(allFilesRows, this.allFilesSortKey, this.allFilesSortDirection)}
-      </div>
+      <details class="stat-section" open>
+        <summary>All Files</summary>
+        ${allFilesSection}
+      </details>
 
-      <div class="stat-section">
-        <h3>Excluded Paths</h3>
+      <details class="stat-section" open>
+        <summary>Excluded Paths</summary>
         <div>
           <div class="stat-item-label">Excluded Folders</div>
           ${renderExcludedList(data.excludedFolders)}
@@ -235,12 +237,12 @@ class StatisticsViewer {
           <div class="stat-item-label">Excluded Files</div>
           ${renderExcludedList(data.excludedFiles)}
         </div>
-      </div>
+      </details>
 
-      <div class="stat-section">
-        <h3>Repo Statistics</h3>
+      <details class="stat-section" open>
+        <summary>Repo Statistics</summary>
         ${renderRepoSizeMetrics(data.repoSizeMetrics)}
-      </div>
+      </details>
     `;
 
     const allFilesTable = this.statisticsPanel.querySelector('[data-all-files-table="true"]');
@@ -496,7 +498,7 @@ function renderSortableHeader(
   numeric: boolean = false
 ): string {
   const activeClass = key === activeKey ? 'is-active' : '';
-  const arrow = key === activeKey ? (activeDirection === 'asc' ? '↑' : '↓') : '';
+  const arrow = key === activeKey ? (activeDirection === 'asc' ? '▲' : '▼') : '';
   const numericClass = numeric ? 'num' : '';
   return `
     <th class="${numericClass} ${activeClass}" data-sort-key="${key}">
@@ -513,7 +515,7 @@ function renderFileTypeHeader(
   numeric: boolean = false
 ): string {
   const activeClass = key === activeKey ? 'is-active' : '';
-  const arrow = key === activeKey ? (activeDirection === 'asc' ? '↑' : '↓') : '';
+  const arrow = key === activeKey ? (activeDirection === 'asc' ? '▲' : '▼') : '';
   const numericClass = numeric ? 'num' : '';
   return `
     <th class="${numericClass} ${activeClass}" data-sort-key="${key}">

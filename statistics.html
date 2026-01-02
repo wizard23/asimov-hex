@@ -68,10 +68,29 @@
       border-radius: 8px;
       border: 1px solid #555;
     }
-    .stat-section h3 {
+    .stat-section summary {
+      list-style: none;
+      cursor: pointer;
       margin-bottom: 10px;
       color: #fff;
       font-size: 16px;
+      font-weight: 600;
+    }
+    .stat-section summary::-webkit-details-marker {
+      display: none;
+    }
+    .stat-section summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 8px;
+      color: #6bb0ff;
+      transform: translateY(-1px);
+    }
+    .stat-section[open] summary::before {
+      content: "▾";
+    }
+    .stat-section summary + * {
+      margin-top: 8px;
     }
     .stat-grid {
       display: grid;
