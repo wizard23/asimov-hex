@@ -1,5 +1,113 @@
 [
   {
+    "hash": "bd348daa80ff912dde9206f210ea3d757ed9283b",
+    "timestamp": 1767371135,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Simplify mouse handling using highlighted info",
+    "addedLines": 18,
+    "removedLines": 63
+  },
+  {
+    "hash": "abb1135b35e07f7e8341d337b55a6c36303909f9",
+    "timestamp": 1767370120,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Separate smart mode logic in click handlers",
+    "addedLines": 45,
+    "removedLines": 10
+  },
+  {
+    "hash": "40299d2070b0692888e266d7c9414135c1e40938",
+    "timestamp": 1767365141,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Still buggy: feat: Enable cell-wide particle deletion in smart mode",
+    "addedLines": 7,
+    "removedLines": 0
+  },
+  {
+    "hash": "654a63c22eeb1b1ba607bc793f9430ae55cb38ff",
+    "timestamp": 1767362974,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Still buggy: Refactor: Refine particle deletion interactions",
+    "addedLines": 20,
+    "removedLines": 11
+  },
+  {
+    "hash": "913a444288986f039a840b9fc2e030b77f6e4721",
+    "timestamp": 1767361556,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: drafting AI instructions for user manual :)",
+    "addedLines": 69,
+    "removedLines": 1
+  },
+  {
+    "hash": "7041e70f4c14972621d73b696ff039e65e1a00d2",
+    "timestamp": 1767361523,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add ability to delete particles with right-click",
+    "addedLines": 37,
+    "removedLines": 1
+  },
+  {
+    "hash": "4b01b121faadaa33c5e9633001c13e123a872222",
+    "timestamp": 1767348039,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Move solver logic to dedicated directory",
+    "addedLines": 6,
+    "removedLines": 8
+  },
+  {
+    "hash": "d639aeca55245d7da63b0bc51192f4efddbce2a1",
+    "timestamp": 1767346430,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor config labels and scale-relative values",
+    "addedLines": 56,
+    "removedLines": 22
+  },
+  {
+    "hash": "773e50cce58fefc26457bcfb4e8c0015774da7cc",
+    "timestamp": 1767310708,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "juman: add  tweakpane ui styling",
+    "addedLines": 27,
+    "removedLines": 0
+  },
+  {
+    "hash": "58d4a90c2fcfc4496f85c5b470ae89959b3f39d7",
+    "timestamp": 1767310207,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor tweakpane container for better sizing",
+    "addedLines": 30,
+    "removedLines": 1
+  },
+  {
+    "hash": "758f462db2d332c790f3e0acd79a8811ca8c679d",
+    "timestamp": 1767303601,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: add 'Center View' and 'Clear Particles' controls",
+    "addedLines": 73,
+    "removedLines": 6
+  },
+  {
+    "hash": "f21098869b1b08dde44b4150418c85e4ca0ea428",
+    "timestamp": 1767299075,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 369,
+    "removedLines": 0
+  },
+  {
     "hash": "ebceb840f2e2f5117d0ef3362237cd7a1d536318",
     "timestamp": 1767298968,
     "authorName": "Philipp Tiefenbacher",
