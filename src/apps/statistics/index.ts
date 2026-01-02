@@ -5,6 +5,7 @@ type DateTimeTimeZone = 'local' | 'utc';
 type SortDirection = 'asc' | 'desc';
 type AllFilesSortKey = 'path' | 'fileType' | 'lines' | 'words' | 'bytes';
 type FileTypeSortKey = 'fileType' | 'count' | 'totalLines' | 'totalWords' | 'totalBytes';
+type SectionId = 'overview' | 'file-types' | 'all-files' | 'excluded-paths' | 'repo-stats';
 
 class StatisticsViewer {
   private pane!: Pane;
@@ -20,6 +21,13 @@ class StatisticsViewer {
   private allFilesSortDirection: SortDirection = 'asc';
   private fileTypesSortKey: FileTypeSortKey = 'count';
   private fileTypesSortDirection: SortDirection = 'desc';
+  private sectionState: Record<SectionId, boolean> = {
+    overview: true,
+    'file-types': true,
+    'all-files': true,
+    'excluded-paths': true,
+    'repo-stats': true,
+  };
 
   constructor() {
     this.statisticsPanel = document.getElementById('statistics-panel')!;
@@ -158,7 +166,7 @@ class StatisticsViewer {
     this.statisticsPanel.innerHTML = `
       <h2>Project Statistics — ${timestamp}</h2>
       
-      <details class="stat-section" open>
+      <details class="stat-section" data-section-id="overview" ${this.sectionState.overview ? 'open' : ''}>
         <summary>Overview</summary>
         <div class="stat-grid">
           <div class="stat-item">
@@ -196,7 +204,7 @@ class StatisticsViewer {
         </div>
       </details>
 
-      <details class="stat-section" open>
+      <details class="stat-section" data-section-id="file-types" ${this.sectionState['file-types'] ? 'open' : ''}>
         <summary>File Types Breakdown</summary>
         <table class="file-type-table" data-file-type-table="true">
           <thead>
@@ -222,12 +230,12 @@ class StatisticsViewer {
         </table>
       </details>
 
-      <details class="stat-section" open>
+      <details class="stat-section" data-section-id="all-files" ${this.sectionState['all-files'] ? 'open' : ''}>
         <summary>All Files</summary>
         ${allFilesSection}
       </details>
 
-      <details class="stat-section" open>
+      <details class="stat-section" data-section-id="excluded-paths" ${this.sectionState['excluded-paths'] ? 'open' : ''}>
         <summary>Excluded Paths</summary>
         <div>
           <div class="stat-item-label">Excluded Folders</div>
@@ -239,11 +247,24 @@ class StatisticsViewer {
         </div>
       </details>
 
-      <details class="stat-section" open>
+      <details class="stat-section" data-section-id="repo-stats" ${this.sectionState['repo-stats'] ? 'open' : ''}>
         <summary>Repo Statistics</summary>
         ${renderRepoSizeMetrics(data.repoSizeMetrics)}
       </details>
     `;
+
+    this.statisticsPanel.querySelectorAll('details[data-section-id]').forEach(section => {
+      if (!(section instanceof HTMLDetailsElement)) {
+        return;
+      }
+      section.addEventListener('toggle', () => {
+        const id = section.getAttribute('data-section-id');
+        if (!isSectionId(id)) {
+          return;
+        }
+        this.sectionState[id] = section.open;
+      });
+    });
 
     const allFilesTable = this.statisticsPanel.querySelector('[data-all-files-table="true"]');
     if (allFilesTable) {
@@ -582,6 +603,14 @@ function getDefaultFileTypeSortDirection(key: FileTypeSortKey): SortDirection {
     return 'asc';
   }
   return 'desc';
+}
+
+function isSectionId(value: string | null): value is SectionId {
+  return value === 'overview'
+    || value === 'file-types'
+    || value === 'all-files'
+    || value === 'excluded-paths'
+    || value === 'repo-stats';
 }
 
 function formatValue(value: string | number): string {
