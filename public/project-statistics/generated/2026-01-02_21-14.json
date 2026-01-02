@@ -1,0 +1,669 @@
+{
+  "timestamp": "2026-01-02T20:14:10.780Z",
+  "fileTypes": [
+    {
+      "fileType": ".ts",
+      "count": 32,
+      "totalLines": 9361,
+      "totalWords": 30696,
+      "totalBytes": 296520
+    },
+    {
+      "fileType": ".sh",
+      "count": 12,
+      "totalLines": 916,
+      "totalWords": 3584,
+      "totalBytes": 28479
+    },
+    {
+      "fileType": ".test.ts",
+      "count": 7,
+      "totalLines": 1282,
+      "totalWords": 5828,
+      "totalBytes": 41799
+    },
+    {
+      "fileType": ".json",
+      "count": 5,
+      "totalLines": 154,
+      "totalWords": 325,
+      "totalBytes": 3942
+    },
+    {
+      "fileType": ".html",
+      "count": 4,
+      "totalLines": 827,
+      "totalWords": 1771,
+      "totalBytes": 18636
+    },
+    {
+      "fileType": ".js",
+      "count": 1,
+      "totalLines": 37,
+      "totalWords": 56,
+      "totalBytes": 728
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 14,
+      "totalWords": 25,
+      "totalBytes": 183
+    }
+  ],
+  "includedFiles": [
+    {
+      "path": ".gitignore",
+      "fileType": ".gitignore",
+      "lines": 14,
+      "words": 25,
+      "bytes": 183
+    },
+    {
+      "path": ".vscode/extensions.json",
+      "fileType": ".json",
+      "lines": 8,
+      "words": 9,
+      "bytes": 181
+    },
+    {
+      "path": ".vscode/settings.json",
+      "fileType": ".json",
+      "lines": 16,
+      "words": 39,
+      "bytes": 459
+    },
+    {
+      "path": "eslint.config.js",
+      "fileType": ".js",
+      "lines": 37,
+      "words": 56,
+      "bytes": 728
+    },
+    {
+      "path": "index.html",
+      "fileType": ".html",
+      "lines": 232,
+      "words": 505,
+      "bytes": 5201
+    },
+    {
+      "path": "package.json",
+      "fileType": ".json",
+      "lines": 39,
+      "words": 118,
+      "bytes": 1490
+    },
+    {
+      "path": "scripts/asimov-core/create-github-key-and-add-to-sshconfig.sh",
+      "fileType": ".sh",
+      "lines": 160,
+      "words": 477,
+      "bytes": 4618
+    },
+    {
+      "path": "scripts/asimov-core/create-github-key.sh",
+      "fileType": ".sh",
+      "lines": 43,
+      "words": 103,
+      "bytes": 907
+    },
+    {
+      "path": "scripts/asimov-core/load-github-key.sh",
+      "fileType": ".sh",
+      "lines": 136,
+      "words": 505,
+      "bytes": 4057
+    },
+    {
+      "path": "scripts/cleanup-ansi-junk.sh",
+      "fileType": ".sh",
+      "lines": 31,
+      "words": 72,
+      "bytes": 545
+    },
+    {
+      "path": "scripts/codex-with-autotranscript.sh",
+      "fileType": ".sh",
+      "lines": 32,
+      "words": 94,
+      "bytes": 797
+    },
+    {
+      "path": "scripts/commit-staged-with-message-from-file-interactive.sh",
+      "fileType": ".sh",
+      "lines": 44,
+      "words": 119,
+      "bytes": 804
+    },
+    {
+      "path": "scripts/commit-staged-with-message-from-file.sh",
+      "fileType": ".sh",
+      "lines": 75,
+      "words": 187,
+      "bytes": 1589
+    },
+    {
+      "path": "scripts/create-project-statistics.ts",
+      "fileType": ".ts",
+      "lines": 409,
+      "words": 1140,
+      "bytes": 11300
+    },
+    {
+      "path": "scripts/deploy-dist-to-server.sh",
+      "fileType": ".sh",
+      "lines": 51,
+      "words": 173,
+      "bytes": 1397
+    },
+    {
+      "path": "scripts/re-create-git-timeline.ts",
+      "fileType": ".ts",
+      "lines": 214,
+      "words": 653,
+      "bytes": 5725
+    },
+    {
+      "path": "scripts/repo-statistics.sh",
+      "fileType": ".sh",
+      "lines": 67,
+      "words": 219,
+      "bytes": 1905
+    },
+    {
+      "path": "shell/aliases/git-aliases.sh",
+      "fileType": ".sh",
+      "lines": 159,
+      "words": 1012,
+      "bytes": 7149
+    },
+    {
+      "path": "shell/completions/npm-workspaces.sh",
+      "fileType": ".sh",
+      "lines": 83,
+      "words": 435,
+      "bytes": 3307
+    },
+    {
+      "path": "shell/hack.sh",
+      "fileType": ".sh",
+      "lines": 35,
+      "words": 188,
+      "bytes": 1404
+    },
+    {
+      "path": "src/apps/main/index.ts",
+      "fileType": ".ts",
+      "lines": 1154,
+      "words": 3284,
+      "bytes": 37500
+    },
+    {
+      "path": "src/apps/statistics/index.ts",
+      "fileType": ".ts",
+      "lines": 638,
+      "words": 1737,
+      "bytes": 21393
+    },
+    {
+      "path": "src/apps/statistics/types.ts",
+      "fileType": ".ts",
+      "lines": 80,
+      "words": 166,
+      "bytes": 1674
+    },
+    {
+      "path": "src/apps/tile-editor/draw-config.ts",
+      "fileType": ".ts",
+      "lines": 106,
+      "words": 250,
+      "bytes": 3023
+    },
+    {
+      "path": "src/apps/tile-editor/expression-parser.test.ts",
+      "fileType": ".test.ts",
+      "lines": 35,
+      "words": 126,
+      "bytes": 1088
+    },
+    {
+      "path": "src/apps/tile-editor/expression-parser.ts",
+      "fileType": ".ts",
+      "lines": 238,
+      "words": 739,
+      "bytes": 6771
+    },
+    {
+      "path": "src/apps/tile-editor/geometry-helpers.test.ts",
+      "fileType": ".test.ts",
+      "lines": 33,
+      "words": 158,
+      "bytes": 1020
+    },
+    {
+      "path": "src/apps/tile-editor/geometry-helpers.ts",
+      "fileType": ".ts",
+      "lines": 45,
+      "words": 194,
+      "bytes": 1273
+    },
+    {
+      "path": "src/apps/tile-editor/index.ts",
+      "fileType": ".ts",
+      "lines": 1880,
+      "words": 5734,
+      "bytes": 65427
+    },
+    {
+      "path": "src/apps/tile-editor/render-helpers.ts",
+      "fileType": ".ts",
+      "lines": 157,
+      "words": 720,
+      "bytes": 4972
+    },
+    {
+      "path": "src/apps/tile-editor/types.ts",
+      "fileType": ".ts",
+      "lines": 2,
+      "words": 10,
+      "bytes": 46
+    },
+    {
+      "path": "src/apps/tile-editor/ui-helpers.ts",
+      "fileType": ".ts",
+      "lines": 17,
+      "words": 49,
+      "bytes": 444
+    },
+    {
+      "path": "src/apps/timeline/index.ts",
+      "fileType": ".ts",
+      "lines": 1302,
+      "words": 4300,
+      "bytes": 46235
+    },
+    {
+      "path": "src/assets/palettes.json",
+      "fileType": ".json",
+      "lines": 71,
+      "words": 120,
+      "bytes": 1299
+    },
+    {
+      "path": "src/core/grid.test.ts",
+      "fileType": ".test.ts",
+      "lines": 440,
+      "words": 2216,
+      "bytes": 14822
+    },
+    {
+      "path": "src/core/grid/cairo-grid.ts",
+      "fileType": ".ts",
+      "lines": 451,
+      "words": 1660,
+      "bytes": 11847
+    },
+    {
+      "path": "src/core/grid/grid-scan.ts",
+      "fileType": ".ts",
+      "lines": 21,
+      "words": 82,
+      "bytes": 570
+    },
+    {
+      "path": "src/core/grid/grid-search.ts",
+      "fileType": ".ts",
+      "lines": 60,
+      "words": 231,
+      "bytes": 1739
+    },
+    {
+      "path": "src/core/grid/grid-selection.ts",
+      "fileType": ".ts",
+      "lines": 59,
+      "words": 182,
+      "bytes": 1212
+    },
+    {
+      "path": "src/core/grid/grid.ts",
+      "fileType": ".ts",
+      "lines": 37,
+      "words": 105,
+      "bytes": 860
+    },
+    {
+      "path": "src/core/grid/hex-grid.ts",
+      "fileType": ".ts",
+      "lines": 164,
+      "words": 670,
+      "bytes": 5017
+    },
+    {
+      "path": "src/core/grid/index.ts",
+      "fileType": ".ts",
+      "lines": 11,
+      "words": 66,
+      "bytes": 545
+    },
+    {
+      "path": "src/core/grid/square-grid.ts",
+      "fileType": ".ts",
+      "lines": 122,
+      "words": 399,
+      "bytes": 3134
+    },
+    {
+      "path": "src/core/grid/triangle-grid.ts",
+      "fileType": ".ts",
+      "lines": 198,
+      "words": 650,
+      "bytes": 4624
+    },
+    {
+      "path": "src/core/particles/particle-system.ts",
+      "fileType": ".ts",
+      "lines": 650,
+      "words": 2371,
+      "bytes": 21018
+    },
+    {
+      "path": "src/core/rendering/grid-renderer.ts",
+      "fileType": ".ts",
+      "lines": 162,
+      "words": 667,
+      "bytes": 6489
+    },
+    {
+      "path": "src/core/solver/solver-cairo-pentagons-sorted.test.ts",
+      "fileType": ".test.ts",
+      "lines": 198,
+      "words": 775,
+      "bytes": 5513
+    },
+    {
+      "path": "src/core/solver/solver-cairo-pentagons-unsorted.test.ts",
+      "fileType": ".test.ts",
+      "lines": 211,
+      "words": 919,
+      "bytes": 6919
+    },
+    {
+      "path": "src/core/solver/solver-convex-concave-impossible.test.ts",
+      "fileType": ".test.ts",
+      "lines": 148,
+      "words": 543,
+      "bytes": 4749
+    },
+    {
+      "path": "src/core/solver/solver-types.ts",
+      "fileType": ".ts",
+      "lines": 83,
+      "words": 255,
+      "bytes": 1919
+    },
+    {
+      "path": "src/core/solver/solver.ts",
+      "fileType": ".ts",
+      "lines": 749,
+      "words": 3199,
+      "bytes": 21107
+    },
+    {
+      "path": "src/core/triangle-grid-bug.test.ts",
+      "fileType": ".test.ts",
+      "lines": 217,
+      "words": 1091,
+      "bytes": 7688
+    },
+    {
+      "path": "src/core/utils/color-utils.ts",
+      "fileType": ".ts",
+      "lines": 42,
+      "words": 191,
+      "bytes": 1266
+    },
+    {
+      "path": "src/core/utils/geometry.ts",
+      "fileType": ".ts",
+      "lines": 68,
+      "words": 255,
+      "bytes": 1917
+    },
+    {
+      "path": "src/core/utils/toast.ts",
+      "fileType": ".ts",
+      "lines": 80,
+      "words": 274,
+      "bytes": 2656
+    },
+    {
+      "path": "src/gui/draw-state-blade.ts",
+      "fileType": ".ts",
+      "lines": 114,
+      "words": 317,
+      "bytes": 3505
+    },
+    {
+      "path": "src/types/index.ts",
+      "fileType": ".ts",
+      "lines": 24,
+      "words": 88,
+      "bytes": 663
+    },
+    {
+      "path": "statistics.html",
+      "fileType": ".html",
+      "lines": 222,
+      "words": 475,
+      "bytes": 5047
+    },
+    {
+      "path": "tile-editor.html",
+      "fileType": ".html",
+      "lines": 217,
+      "words": 460,
+      "bytes": 4947
+    },
+    {
+      "path": "timeline.html",
+      "fileType": ".html",
+      "lines": 156,
+      "words": 331,
+      "bytes": 3441
+    },
+    {
+      "path": "tsconfig.json",
+      "fileType": ".json",
+      "lines": 20,
+      "words": 39,
+      "bytes": 513
+    },
+    {
+      "path": "vite.config.ts",
+      "fileType": ".ts",
+      "lines": 24,
+      "words": 58,
+      "bytes": 649
+    }
+  ],
+  "excludedFolders": [
+    "docs",
+    "public"
+  ],
+  "excludedFiles": [
+    "package-lock.json"
+  ],
+  "repoSizeMetrics": {
+    "version": 1,
+    "timestamp": "2026-01-02T20:14:09Z",
+    "repo": {
+      "headCommit": "dc3a309dfc74afac46f1178faef8dba05ea9f78c",
+      "headBranch": "main"
+    },
+    "intrinsic": {
+      "commitCount": 342,
+      "totalCommitCount": 342,
+      "trackedFileCount": 191,
+      "trackedDirCount": 38,
+      "trackedContentBytes": 60032117
+    },
+    "gitObjects": {
+      "looseObjectCount": 3762,
+      "looseObjectSizeKiB": 26584,
+      "packedObjectCount": 0,
+      "packfileCount": 0,
+      "packfileSizeKiB": 0,
+      "prunePackableSizeKiB": 0,
+      "garbageObjectCount": 0,
+      "garbageSizeKiB": 0
+    },
+    "largestBlobs": [
+      {
+        "path": "public/project-history/git-timeline.json",
+        "sizeBytes": 104481
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 116297
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 116787
+      },
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 116787
+      },
+      {
+        "path": "docs/generated/screnshot_hex_renderer.png",
+        "sizeBytes": 125235
+      },
+      {
+        "path": "docs/codex_dump_2025-12-25_01-35.txt",
+        "sizeBytes": 144031
+      },
+      {
+        "path": "docs/generated/cairo_debug_0002.png",
+        "sizeBytes": 186764
+      },
+      {
+        "path": "docs/generated/cairo_draft_001.png",
+        "sizeBytes": 221948
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.md",
+        "sizeBytes": 747578
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0152.log",
+        "sizeBytes": 784074
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.json",
+        "sizeBytes": 942628
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.md",
+        "sizeBytes": 1024940
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.json",
+        "sizeBytes": 1236904
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-23_03-04.md",
+        "sizeBytes": 1444382
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0251.log",
+        "sizeBytes": 3715769
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_18-30.md",
+        "sizeBytes": 4414798
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_21-15.md",
+        "sizeBytes": 4474271
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0504.log",
+        "sizeBytes": 7024481
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0320.log",
+        "sizeBytes": 14016075
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-1400.log",
+        "sizeBytes": 22884804
+      }
+    ],
+    "diskUsage": {
+      "worktreeBytes": 338468864,
+      "worktreeExcludingGitBytes": 309559296,
+      "gitDirBytes": 28909568,
+      "topLevelDirs": [
+        {
+          "path": ".",
+          "sizeBytes": 338468864
+        },
+        {
+          "path": "./node_modules",
+          "sizeBytes": 184696832
+        },
+        {
+          "path": "./docs",
+          "sizeBytes": 121978880
+        },
+        {
+          "path": "./.git",
+          "sizeBytes": 28909568
+        },
+        {
+          "path": "./dist",
+          "sizeBytes": 1507328
+        },
+        {
+          "path": "./src",
+          "sizeBytes": 475136
+        },
+        {
+          "path": "./public",
+          "sizeBytes": 405504
+        },
+        {
+          "path": "./cache",
+          "sizeBytes": 184320
+        },
+        {
+          "path": "./scripts",
+          "sizeBytes": 69632
+        },
+        {
+          "path": "./shell",
+          "sizeBytes": 28672
+        },
+        {
+          "path": "./.secrets",
+          "sizeBytes": 20480
+        },
+        {
+          "path": "./.vscode",
+          "sizeBytes": 12288
+        },
+        {
+          "path": "./temp",
+          "sizeBytes": 8192
+        }
+      ]
+    }
+  },
+  "totals": {
+    "files": 62,
+    "lines": 12591,
+    "words": 42285,
+    "bytes": 390287
+  }
+}

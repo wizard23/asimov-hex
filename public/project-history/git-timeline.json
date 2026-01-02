@@ -1,5 +1,95 @@
 [
   {
+    "hash": "dc3a309dfc74afac46f1178faef8dba05ea9f78c",
+    "timestamp": 1767384754,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: Mark optional fields in ProjectStatistics",
+    "addedLines": 23,
+    "removedLines": 12
+  },
+  {
+    "hash": "52b48e3e549c40301fa3e29946782c7ff2cbac0a",
+    "timestamp": 1767384604,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Persist collapsible section state",
+    "addedLines": 34,
+    "removedLines": 5
+  },
+  {
+    "hash": "57f81512b2ef5ad8aa9c670e879446c06edcad4e",
+    "timestamp": 1767383958,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Use collapsible sections for statistics",
+    "addedLines": 45,
+    "removedLines": 24
+  },
+  {
+    "hash": "9cb6288f2c9ade0e97dc1244b82f8a2f3bd3a401",
+    "timestamp": 1767383037,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Make file type breakdown table sortable",
+    "addedLines": 97,
+    "removedLines": 7
+  },
+  {
+    "hash": "48b8096d4b8c5acf467980a6152298aa8238c1c2",
+    "timestamp": 1767378972,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update project statistics to have test data for new sorting feature :)",
+    "addedLines": 682,
+    "removedLines": 0
+  },
+  {
+    "hash": "ff89c1e7ef7f2dbc5443a9a4ce01e37482134ba6",
+    "timestamp": 1767378933,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Remove redundant file groupings from statistics",
+    "addedLines": 0,
+    "removedLines": 58
+  },
+  {
+    "hash": "425766926918a4834365d7e2b7d0bbb907f18035",
+    "timestamp": 1767378246,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add sort direction to statistics file table",
+    "addedLines": 66,
+    "removedLines": 15
+  },
+  {
+    "hash": "e112fcce3b02e86f69bbd3fa14de8f1aae5275d4",
+    "timestamp": 1767376841,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "docs: Update TODO lists and guidelines",
+    "addedLines": 824,
+    "removedLines": 501
+  },
+  {
+    "hash": "0213b6cf9fff6b077656f888a45f89546660abf5",
+    "timestamp": 1767376680,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Enhance statistics report with detailed file breakdowns",
+    "addedLines": 873,
+    "removedLines": 23
+  },
+  {
+    "hash": "196a5328a96b45dcd0d7d17a7bacc51003b50afd",
+    "timestamp": 1767371230,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 342,
+    "removedLines": 0
+  },
+  {
     "hash": "bd348daa80ff912dde9206f210ea3d757ed9283b",
     "timestamp": 1767371135,
     "authorName": "Philipp Tiefenbacher",
