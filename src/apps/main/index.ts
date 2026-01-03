@@ -79,6 +79,7 @@ class GridApp {
   private isPanning: boolean = false;
   private panStartMouse: { x: number; y: number } | null = null;
   private panStartOffset: { x: number; y: number } | null = null;
+  private panStartContainerPos: { x: number; y: number } | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -990,7 +991,16 @@ class GridApp {
         y: this.panStartOffset.y + dy / this.config.gridScale,
       };
       this.gridOffsetBinding?.refresh();
-      this.updateGrid();
+      if (this.panStartContainerPos) {
+        const nextX = this.panStartContainerPos.x + dx;
+        const nextY = this.panStartContainerPos.y + dy;
+        this.gridContainer.x = nextX;
+        this.gridContainer.y = nextY;
+        this.edgeContainer.x = nextX;
+        this.edgeContainer.y = nextY;
+        this.particleContainer.x = nextX;
+        this.particleContainer.y = nextY;
+      }
       return;
     }
 
@@ -1104,6 +1114,7 @@ class GridApp {
       this.isPanning = true;
       this.panStartMouse = { x: e.clientX, y: e.clientY };
       this.panStartOffset = { ...this.config.gridOffset };
+      this.panStartContainerPos = { x: this.gridContainer.x, y: this.gridContainer.y };
       return;
     }
 
@@ -1204,6 +1215,7 @@ class GridApp {
     this.isPanning = false;
     this.panStartMouse = null;
     this.panStartOffset = null;
+    this.panStartContainerPos = null;
   }
 
   private handleMouseWheel(e: WheelEvent) {
