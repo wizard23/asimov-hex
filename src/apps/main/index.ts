@@ -435,7 +435,7 @@ class GridApp {
     this.gridScaleBinding = this.gridFolder.addBinding(this.config, 'gridScale', {
       min: 1,
       max: 120,
-      step: 1,
+      step: 0.1,
       label: 'Scale',
     }).on('change', () => {
       this.updateGrid();
@@ -1158,9 +1158,11 @@ class GridApp {
     e.preventDefault();
     const direction = Math.sign(e.deltaY);
     if (direction === 0) return;
-    const step = 1;
     const currentScale = this.config.gridScale;
-    const nextScale = Math.max(5, Math.min(100, currentScale - direction * step));
+    const zoomFactor = 31 / 30;
+    const nextScale = direction > 0
+      ? Math.max(5, Math.min(100, currentScale / zoomFactor))
+      : Math.max(5, Math.min(100, currentScale * zoomFactor));
     if (nextScale === currentScale) return;
 
     const rect = this.app.canvas.getBoundingClientRect();
