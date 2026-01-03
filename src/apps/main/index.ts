@@ -49,6 +49,7 @@ interface AppConfig {
   showOrbit: boolean;
   vertexHighlighting: boolean;
   gridOffset: { x: number; y: number };
+  isSimulationRunning: boolean;
 }
 
 class GridApp {
@@ -76,6 +77,7 @@ class GridApp {
   private orbitDistanceBinding: BindingApi | null = null;
   private gridOffsetBinding: BindingApi | null = null;
   private orbitOverlay: Graphics | null = null;
+  private simulationButton: HTMLButtonElement | null = null;
   private isPanning: boolean = false;
   private panStartMouse: { x: number; y: number } | null = null;
   private panStartOffset: { x: number; y: number } | null = null;
@@ -126,12 +128,14 @@ class GridApp {
       showOrbit: true,
       vertexHighlighting: true,
       gridOffset: { x: 0, y: 0 },
+      isSimulationRunning: true,
     };
 
     this.updateGridInstance();
 
     this.initPixi().then(() => {
       this.initInfoPanel();
+      this.initToolbar();
       this.initTweakpane();
       this.initGrid();
       this.setupInteraction();
@@ -319,6 +323,35 @@ class GridApp {
     document.body.appendChild(panel);
   }
 
+  private initToolbar() {
+    const toolbar = document.createElement('div');
+    toolbar.id = 'toolbar';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toolbar-button';
+    button.onclick = () => {
+      this.config.isSimulationRunning = !this.config.isSimulationRunning;
+      this.updateSimulationButton();
+    };
+
+    this.simulationButton = button;
+    this.updateSimulationButton();
+
+    toolbar.appendChild(button);
+    document.body.appendChild(toolbar);
+  }
+
+  private updateSimulationButton() {
+    if (!this.simulationButton) return;
+    const isRunning = this.config.isSimulationRunning;
+    this.simulationButton.textContent = isRunning ? 'Pause' : 'Start';
+    this.simulationButton.setAttribute(
+      'aria-label',
+      isRunning ? 'Pause particle simulation' : 'Start particle simulation'
+    );
+  }
+
   private applyPaletteToConfig(
     paletteName: string,
     target: Record<number, ColorValue>,
@@ -371,6 +404,7 @@ class GridApp {
 
     // Setup particle update loop
     this.app.ticker.add((ticker) => {
+      if (!this.config.isSimulationRunning) return;
       const particleSpeedPx = this.config.particleSpeed * this.config.gridScale;
       const orbitDistancePx = this.config.orbitDistance * this.config.gridScale;
       this.particleSystem.update(

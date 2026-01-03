@@ -221,6 +221,37 @@
       flex: 1 0 65%;
       min-width: 0;      /* important in flex layouts */
     }
+
+    #toolbar {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: rgba(20, 20, 20, 0.9);
+      border: 1px solid #555;
+      border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .toolbar-button {
+      background: #2b2b2b;
+      color: #fff;
+      border: 1px solid #666;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .toolbar-button:hover {
+      background: #3a3a3a;
+    }
   </style>
 </head>
 <body>
