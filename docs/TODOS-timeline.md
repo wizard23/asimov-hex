@@ -476,6 +476,51 @@ Please add semi‑transparent label badges with padding and a darker background 
 
 
 
+## INIT 2026/01/04
+Please look at:
+package.json
+vite.config.ts
+timeline.html
+src/apps/timeline
+
+
+* In the Timeline mode when grouping is selected please increase the distance between the groups. Now it looks too dense.
+* Please put the scale (the logarithmic one that shows number of lines added/removed) next to the group that contains the highlighted commit.
+* The "Center View" logic should take care that the group labels and the scale don't overlap with the groups. (When no grouping is selcted the center view logic is good)
+
+
+When grouping is selected and the user uses the mouse wheel while holding down the Ctrl button the behavior should be like this:
+* Dont use the scroll wheel data for zooming
+* Use the scroll wheel data for scrolling through the groups.
+If anything is unclear please just ask.
+
+
+
+
+when grouping is selected please don't show tick labels taht contain syntetic info. To explain what I mean consider this case: Grouping by day is selected. I would expect the scale for the 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## FUTURE
 Please add a dropdown list at the top of the "Timeline Controls" that allows selecting a specific project. 
@@ -493,16 +538,6 @@ The index.json contains:
 
 
 
-
-
-
-
-
-
-
-
-
-
 Please inspect the timeline code and then please report the following items to me:
 
 * Identify all hardcoded values|colors|etc that are used to determine how anything is drawn in the "Unit Cell Editor". Give me a list of all these hardcoded values with a short description of their use and the current hardcoded value. 
@@ -512,10 +547,6 @@ Refactor the timelkine code please
 
 All hardcoded values that determine how the pixi window appears should be extracted into a seperate file like it is done in 
 src/apps/tile-editor with the src/apps/tile-editor/draw-config.ts
-
-
-
-
 
 
 
@@ -566,7 +597,17 @@ src/core/utils/solver-types.ts
 src/core/utils/solver.ts
 
 
+
 ## POSSIBLE IMPROVEMENTS
 * i might want to skip the solver next time
 * next time: "please familiarize yourself with these files and directories in the cwd" 
 * 79% context left (with solver)
+
+
+
+## INIT 2026/01/03
+Please look at:
+package.json
+vite.config.ts
+timeline.html
+src/apps/timeline

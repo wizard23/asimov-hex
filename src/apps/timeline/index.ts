@@ -60,6 +60,7 @@ class TimelineViewer {
   private readonly timelineChangeMaxHeight = 80;
   private readonly timelineChangeScaleRightPadding = 24;
   private readonly timelineLineGap = 28;
+  private readonly timelineGroupedLineGap = 48;
   
   private config = {
     startDate: '',
@@ -489,9 +490,21 @@ class TimelineViewer {
 
   private resetTimelineView() {
     if (!this.timelineApp) return;
-    const rangeSeconds = this.getDisplayRangeSeconds(this.getGroupedCommits());
-    const padding = 60;
-    const availableWidth = Math.max(1, this.timelineApp.screen.width - padding * 2);
+    const grouped = this.getGroupedCommits();
+    const rangeSeconds = this.getDisplayRangeSeconds(grouped);
+    const basePadding = 60;
+    let leftPadding = basePadding;
+    let rightPadding = basePadding;
+
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
+      leftPadding = Math.max(basePadding, this.getGroupLabelPadding(grouped));
+      const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
+      const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
+      const maxValue = Math.max(maxAdded, maxRemoved, 1);
+      rightPadding = Math.max(basePadding, this.getChangeScalePadding(maxValue) + 8);
+    }
+
+    const availableWidth = Math.max(1, this.timelineApp.screen.width - leftPadding - rightPadding);
     const nextScale = rangeSeconds > 0 ? availableWidth / rangeSeconds : 1;
     this.timelineScale = nextScale;
     this.timelineScaleBounds = {
@@ -499,7 +512,7 @@ class TimelineViewer {
       max: nextScale * 200,
     };
     this.timelineViewOffset = {
-      x: padding - this.timelineViewportCenter.x,
+      x: leftPadding - this.timelineViewportCenter.x,
       y: this.timelineViewOffset.y,
     };
     this.updateTimelineVerticalOffset();
@@ -677,7 +690,7 @@ class TimelineViewer {
     });
 
     this.drawScale();
-    this.drawChangeScale(lineYs);
+    this.drawChangeScale(grouped, lineYs);
     this.drawGroupLabels(grouped, lineYs);
     this.drawHoverCommit();
   }
@@ -791,7 +804,7 @@ class TimelineViewer {
     timelineChangeGraphics.stroke({ color: 0xff5b5b, width: 2, alpha: 0.9 });
   }
 
-  private drawChangeScale(lineYs: number[]) {
+  private drawChangeScale(grouped: GroupedCommits[], lineYs: number[]) {
     if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) return;
     const timelineApp = this.timelineApp;
     const timelineChangeScaleGraphics = this.timelineChangeScaleGraphics;
@@ -799,11 +812,12 @@ class TimelineViewer {
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
     const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
     const maxValue = Math.max(maxAdded, maxRemoved, 1);
-    const axisX = timelineApp.screen.width - this.timelineChangeScaleRightPadding;
+    const axisX = timelineApp.screen.width - this.getChangeScalePadding(maxValue);
     const height = this.timelineChangeMaxHeight;
+    const scaleLineYs = this.getChangeScaleLineYs(grouped, lineYs);
 
     timelineChangeScaleGraphics.clear();
-    lineYs.forEach(lineY => {
+    scaleLineYs.forEach(lineY => {
       timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
       timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
     });
@@ -821,7 +835,7 @@ class TimelineViewer {
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
-      lineYs.forEach(lineY => {
+      scaleLineYs.forEach(lineY => {
         timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
         timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
@@ -830,7 +844,7 @@ class TimelineViewer {
     }
     timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
-    const labelLineY = lineYs[Math.floor(lineYs.length / 2)] ?? 0;
+    const labelLineY = scaleLineYs[Math.floor(scaleLineYs.length / 2)] ?? 0;
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
@@ -1190,7 +1204,50 @@ class TimelineViewer {
   private getLineOffsets(count: number): number[] {
     if (count <= 1) return [0];
     const mid = (count - 1) / 2;
-    return Array.from({ length: count }, (_, idx) => (idx - mid) * this.timelineLineGap);
+    const gap = this.getLineGap();
+    return Array.from({ length: count }, (_, idx) => (idx - mid) * gap);
+  }
+
+  private getLineGap(): number {
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
+      return this.timelineGroupedLineGap;
+    }
+    return this.timelineLineGap;
+  }
+
+  private getGroupLabelPadding(grouped: GroupedCommits[]): number {
+    const maxLabelLength = Math.max(0, ...grouped.map(group => this.formatGroupLabel(group).length));
+    const estimatedLabelWidth = maxLabelLength * 7;
+    const badgePaddingX = 16;
+    const basePadding = 20;
+    return estimatedLabelWidth + badgePaddingX + basePadding;
+  }
+
+  private getChangeScalePadding(maxValue: number): number {
+    const ticks = [1, 10, 100, 1000, 10000, 100000];
+    let maxTick = 1;
+    for (const tick of ticks) {
+      if (tick > maxValue) break;
+      maxTick = tick;
+    }
+    const estimatedLabelWidth = String(maxTick).length * 7;
+    const tickPadding = 18;
+    return Math.max(this.timelineChangeScaleRightPadding, estimatedLabelWidth + tickPadding);
+  }
+
+  private getChangeScaleLineYs(grouped: GroupedCommits[], lineYs: number[]): number[] {
+    if (lineYs.length === 0) return lineYs;
+    if (this.config.groupBy === 'None') return lineYs;
+    if (!this.hoveredCommit) {
+      return [lineYs[Math.floor(lineYs.length / 2)] ?? lineYs[0]];
+    }
+    const groupIndex = grouped.findIndex(group => (
+      group.commits.some(commit => commit.hash === this.hoveredCommit?.hash)
+    ));
+    if (groupIndex < 0) {
+      return [lineYs[Math.floor(lineYs.length / 2)] ?? lineYs[0]];
+    }
+    return [lineYs[groupIndex] ?? lineYs[0]];
   }
 
   private drawGroupLabels(grouped: GroupedCommits[], lineYs: number[]) {
