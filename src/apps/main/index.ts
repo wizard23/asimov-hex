@@ -80,6 +80,8 @@ class GridApp {
   private panStartMouse: { x: number; y: number } | null = null;
   private panStartOffset: { x: number; y: number } | null = null;
   private panStartContainerPos: { x: number; y: number } | null = null;
+  private pendingPanDelta: { x: number; y: number } | null = null;
+  private panRafId: number | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -986,20 +988,27 @@ class GridApp {
     if (this.isPanning && this.panStartMouse && this.panStartOffset) {
       const dx = e.clientX - this.panStartMouse.x;
       const dy = e.clientY - this.panStartMouse.y;
-      this.config.gridOffset = {
-        x: this.panStartOffset.x + dx / this.config.gridScale,
-        y: this.panStartOffset.y + dy / this.config.gridScale,
-      };
-      this.gridOffsetBinding?.refresh();
-      if (this.panStartContainerPos) {
-        const nextX = this.panStartContainerPos.x + dx;
-        const nextY = this.panStartContainerPos.y + dy;
-        this.gridContainer.x = nextX;
-        this.gridContainer.y = nextY;
-        this.edgeContainer.x = nextX;
-        this.edgeContainer.y = nextY;
-        this.particleContainer.x = nextX;
-        this.particleContainer.y = nextY;
+      this.pendingPanDelta = { x: dx, y: dy };
+      if (this.panRafId === null) {
+        this.panRafId = requestAnimationFrame(() => {
+          this.panRafId = null;
+          if (!this.isPanning || !this.panStartOffset || !this.panStartContainerPos || !this.pendingPanDelta) {
+            return;
+          }
+          const delta = this.pendingPanDelta;
+          this.config.gridOffset = {
+            x: this.panStartOffset.x + delta.x / this.config.gridScale,
+            y: this.panStartOffset.y + delta.y / this.config.gridScale,
+          };
+          const nextX = this.panStartContainerPos.x + delta.x;
+          const nextY = this.panStartContainerPos.y + delta.y;
+          this.gridContainer.x = nextX;
+          this.gridContainer.y = nextY;
+          this.edgeContainer.x = nextX;
+          this.edgeContainer.y = nextY;
+          this.particleContainer.x = nextX;
+          this.particleContainer.y = nextY;
+        });
       }
       return;
     }
@@ -1115,6 +1124,11 @@ class GridApp {
       this.panStartMouse = { x: e.clientX, y: e.clientY };
       this.panStartOffset = { ...this.config.gridOffset };
       this.panStartContainerPos = { x: this.gridContainer.x, y: this.gridContainer.y };
+      this.pendingPanDelta = null;
+      if (this.panRafId !== null) {
+        cancelAnimationFrame(this.panRafId);
+        this.panRafId = null;
+      }
       return;
     }
 
@@ -1216,6 +1230,12 @@ class GridApp {
     this.panStartMouse = null;
     this.panStartOffset = null;
     this.panStartContainerPos = null;
+    this.pendingPanDelta = null;
+    if (this.panRafId !== null) {
+      cancelAnimationFrame(this.panRafId);
+      this.panRafId = null;
+    }
+    this.gridOffsetBinding?.refresh();
   }
 
   private handleMouseWheel(e: WheelEvent) {
