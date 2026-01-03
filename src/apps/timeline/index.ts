@@ -50,6 +50,7 @@ class TimelineViewer {
   private timelineViewportCenter = { x: 0, y: 0 };
   private timelineScale = 1;
   private timelineScaleBounds = { min: 0.000001, max: 1 };
+  private timelineGroupScrollOffsetY = 0;
   private timelineDragging = false;
   private timelineDragStart = { x: 0, y: 0 };
   private timelineCommitPoints: Array<{ commit: Commit; screenX: number; screenY: number }> = [];
@@ -452,6 +453,9 @@ class TimelineViewer {
     if (!this.timelineApp) return;
     const lineY = this.timelineApp.screen.height / 2;
     this.timelineViewOffset.y = lineY - this.timelineViewportCenter.y;
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
+      this.timelineViewOffset.y += this.timelineGroupScrollOffsetY;
+    }
   }
 
   private updateTimelineData() {
@@ -515,6 +519,7 @@ class TimelineViewer {
       x: leftPadding - this.timelineViewportCenter.x,
       y: this.timelineViewOffset.y,
     };
+    this.timelineGroupScrollOffsetY = 0;
     this.updateTimelineVerticalOffset();
   }
 
@@ -546,6 +551,20 @@ class TimelineViewer {
   private handleTimelineWheel = (e: WheelEvent) => {
     if (!this.timelineApp) return;
     e.preventDefault();
+
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' && e.ctrlKey) {
+      const grouped = this.getGroupedCommits();
+      const gap = this.getLineGap();
+      const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
+      this.timelineGroupScrollOffsetY = this.clamp(
+        this.timelineGroupScrollOffsetY - e.deltaY,
+        -maxOffset,
+        maxOffset
+      );
+      this.updateTimelineVerticalOffset();
+      this.drawTimeline();
+      return;
+    }
 
     const rect = this.timelineApp.canvas.getBoundingClientRect();
     const screenX = e.clientX - rect.left;
