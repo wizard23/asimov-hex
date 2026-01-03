@@ -1,5 +1,86 @@
 [
   {
+    "hash": "1ab6e3a436e204658b7bc743e11303ad100b619e",
+    "timestamp": 1767447761,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Use relative time labels for grouped timeline",
+    "addedLines": 80,
+    "removedLines": 13
+  },
+  {
+    "hash": "95dee3c95228640e901aad7e9701d90f5dafe6be",
+    "timestamp": 1767447436,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add extended scale ticks",
+    "addedLines": 24,
+    "removedLines": 0
+  },
+  {
+    "hash": "c4974bc7b46e4d465fe7f798dcc331f3173735fd",
+    "timestamp": 1767447206,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Improve timeline scale visibility",
+    "addedLines": 6,
+    "removedLines": 2
+  },
+  {
+    "hash": "e803406c7a06fef6e2c437bfbb50728efa99d124",
+    "timestamp": 1767446947,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add configurable group scroll speed",
+    "addedLines": 14,
+    "removedLines": 1
+  },
+  {
+    "hash": "202545afc02ddba66778a88f11245c819f6e5ffc",
+    "timestamp": 1767446661,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Snap timeline scrolling to group gap",
+    "addedLines": 3,
+    "removedLines": 1
+  },
+  {
+    "hash": "ad766d7797a745b6b17b9c9fa2d571b4e72bf24c",
+    "timestamp": 1767446447,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Make group gap configurable",
+    "addedLines": 21,
+    "removedLines": 1
+  },
+  {
+    "hash": "8f530f462e99e37220b6fa334dea0a0c764d9d54",
+    "timestamp": 1767446224,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Implement vertical scrolling for grouped timeline",
+    "addedLines": 19,
+    "removedLines": 0
+  },
+  {
+    "hash": "ad1b40e622ca0ff97106121ac80a7306904f539d",
+    "timestamp": 1767445995,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Adjust timeline layout for grouped view",
+    "addedLines": 123,
+    "removedLines": 25
+  },
+  {
+    "hash": "21ac3820f499c3278f5e35895adbcbf7c4356c90",
+    "timestamp": 1767444796,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 806,
+    "removedLines": 0
+  },
+  {
     "hash": "634ec39085deb971d1190663af10dcad14dfa2ae",
     "timestamp": 1767444739,
     "authorName": "Philipp Tiefenbacher",
