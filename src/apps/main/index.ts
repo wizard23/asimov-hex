@@ -223,14 +223,16 @@ class GridApp {
     const statisticsLink = document.createElement('a');
     statisticsLink.href = 'statistics.html';
     statisticsLink.textContent = '📊 Project Statistics';
-    
-    // const manualLink = document.createElement('a');
-    // manualLink.href = '#';
-    // manualLink.textContent = '📖 User Manual';
-    // manualLink.onclick = (e) => {
-    //   e.preventDefault();
-    //   alert('Manual coming soon!');
-    // };
+
+    const docsHeader = document.createElement('h2');
+    docsHeader.textContent = "Documentation"
+
+    const manualLink = document.createElement('a');
+    manualLink.href = 'markdown-viewer.html?url=/documentation/user-manual/main/index.md';
+    manualLink.textContent = '📖 User Manual';
+    manualLink.target = '_blank';
+    manualLink.rel = 'noopener noreferrer';
+
     
     // const githubLink = document.createElement('a');
     // githubLink.href = 'https://github.com/wizard23/asimov-hex';
@@ -244,8 +246,9 @@ class GridApp {
     links.appendChild(metaAppsHeader);
     links.appendChild(timelineLink);
     links.appendChild(statisticsLink);
+    links.appendChild(docsHeader);
+    links.appendChild(manualLink);
 
-    // links.appendChild(manualLink);
     // links.appendChild(githubLink);
     
     aboutContent.appendChild(content);

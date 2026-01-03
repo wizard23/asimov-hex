@@ -461,7 +461,7 @@ This button should only be visible  when the "Display Mode" "Timeline is selecte
 
 
 Atm when "Group By" is selected the labels for the different lines are drawn on top of the line and the commits and become hard to read. 
-Please propose some soltions to fix this ux issue.  
+Please propose some solutions to fix this ux issue.  
 
 Please add semi‑transparent label badges with padding and a darker background + border, so text stays readable over lines.
 
@@ -474,6 +474,10 @@ Please add semi‑transparent label badges with padding and a darker background 
 
 
 
+
+
+
+## FUTURE
 Please add a dropdown list at the top of the "Timeline Controls" that allows selecting a specific project. 
 Atm the commit history is loaded from one fixed json file. This should be changed such that the program first loads an index.json from: public/project-history/index.json
 

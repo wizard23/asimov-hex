@@ -33,3 +33,6 @@ Then document the new features and the relevant implementation details.
 
 
 ## Docs Detailed
+
+## Wenn er faul ist ;)
+Why are the changes in statistics.html not mentioned in the commit message???
