@@ -1,5 +1,77 @@
 [
   {
+    "hash": "cf476bb170b6e6e92bb686f394f1539caf30f353",
+    "timestamp": 1767407669,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Clear highlights on mouse leave",
+    "addedLines": 106,
+    "removedLines": 0
+  },
+  {
+    "hash": "e14e6493aad57272dea0772fa454ed5cf870d983",
+    "timestamp": 1767407614,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Implement grid panning with Ctrl+Click",
+    "addedLines": 30,
+    "removedLines": 0
+  },
+  {
+    "hash": "1909ee3d7018d26f5cf504485f766a32809b436a",
+    "timestamp": 1767406095,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Smooth zoom interaction",
+    "addedLines": 5,
+    "removedLines": 3
+  },
+  {
+    "hash": "ac22cebc59b5c787bd22b195f3cff01eeca8e621",
+    "timestamp": 1767405745,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Implement mouse-centered zooming and pan offset",
+    "addedLines": 45,
+    "removedLines": 4
+  },
+  {
+    "hash": "c914d2f7ea6e4e100f2157c5f4199fff18f7b79d",
+    "timestamp": 1767401244,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: clean code prompts :)",
+    "addedLines": 33,
+    "removedLines": 2
+  },
+  {
+    "hash": "0514091dd815374e469d82726aba0c925c4d0129",
+    "timestamp": 1767401215,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: Remove unused `getVertexAtPixel` and cleanup particle spawning",
+    "addedLines": 13,
+    "removedLines": 33
+  },
+  {
+    "hash": "67b97686defd3adeac9c97f9d90651a097bced83",
+    "timestamp": 1767400635,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Optimize vertex highlighting",
+    "addedLines": 19,
+    "removedLines": 13
+  },
+  {
+    "hash": "6a5aa795a8a75deefe165421e3b8b69574e316a2",
+    "timestamp": 1767400115,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update project statistics and repo timeline; cleanup grid prompts log",
+    "addedLines": 788,
+    "removedLines": 13
+  },
+  {
     "hash": "4bb50cb43712486bcda4b356703c5752f7d723bd",
     "timestamp": 1767399600,
     "authorName": "Philipp Tiefenbacher",
