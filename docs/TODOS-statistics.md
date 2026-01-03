@@ -150,7 +150,7 @@ Small bug/ux fine tuning:
 
 Pleas use the opportunity to clean up the code and make sure the code base is clean:
 * Are there any code smells in the code base?
-* Are there any now unused remains of previous features ore code paths that became derelict?
+* Are there any now unused remains of previous features or code paths that became derelict?
 * Are there any redundant or very similar code in multiple places?
 * Are all types consistent with the way they are used in the code?
 * Are any non optional fields tested for unknown or undefined? 

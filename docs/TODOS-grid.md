@@ -392,7 +392,27 @@ The vertex highlighting is a bit messy and needlessly complicated atm. It should
 * There should be a checkbox in the "Advanced" folder labeled "Vertex Highlighting"
 * When "Vertex Highlighting" is active and an edge is highlighted just also highlight one of the endpoints of the edge (whichever is closest to the mouse position).
 * When "Vertex Highlighting" is deactivated never highlight any vertex.
-I'm hoping that the code should be simplified by this change.  
+I'm hoping that the code should be simplified by this change.
+
+
+
+
+Pleas use the opportunity to clean up the code and make sure the code base is clean:
+* Are there any code smells in the code base?
+* Are there any now unused remains of previous features or code paths that became derelict?
+* Is there any redundant or very similar code in multiple places?
+* Are all types consistent with the way they are used in the code?
+* Are any non optional fields tested for unknown or undefined? 
+
+
+
+These sound great. Please make it so!
+
+
+The Grid interface should be as minimal as possible. Please find out if these functions in the interface are actually needed now after our refactorings:
+* getVertexAt
+* getEdgesAtVertex
+
 
 
 
