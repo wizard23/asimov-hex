@@ -1189,11 +1189,7 @@ class GridApp {
           this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
         }
         if (this.highlightedCellInfo) {
-          const edges = this.grid.getCellEdges({
-            col: this.highlightedCellInfo.col,
-            row: this.highlightedCellInfo.row,
-          });
-          this.particleSystem.removeParticlesOnEdges(edges);
+          this.removeParticlesOnHighlightedCellEdges();
         }
         return;
       }
@@ -1204,11 +1200,7 @@ class GridApp {
             this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
           }
           if (!this.highlightedEdgeInfo && this.highlightedCellInfo) {
-            const edges = this.grid.getCellEdges({
-              col: this.highlightedCellInfo.col,
-              row: this.highlightedCellInfo.row,
-            });
-            this.particleSystem.removeParticlesOnEdges(edges);
+            this.removeParticlesOnHighlightedCellEdges();
           }
           return;
         }
@@ -1271,6 +1263,19 @@ class GridApp {
     this.updateOrbitOverlay();
   }
 
+  private removeParticlesOnHighlightedCellEdges() {
+    if (!this.highlightedCellInfo) return;
+    const edges = this.grid.getCellEdges({
+      col: this.highlightedCellInfo.col,
+      row: this.highlightedCellInfo.row,
+    });
+    this.particleSystem.removeParticlesOnEdges(edges);
+  }
+
+  private adjustNumericSetting(current: number, delta: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, current + delta));
+  }
+
   private handleKeyDown(e: KeyboardEvent) {
     const target = e.target as HTMLElement | null;
     if (
@@ -1294,7 +1299,7 @@ class GridApp {
       e.preventDefault();
       const step = 0.05;
       const direction = e.shiftKey ? -1 : 1;
-      const next = Math.max(0.1, Math.min(15, this.config.orbitDistance + direction * step));
+      const next = this.adjustNumericSetting(this.config.orbitDistance, direction * step, 0.1, 15);
       if (next !== this.config.orbitDistance) {
         this.config.orbitDistance = next;
         this.orbitDistanceBinding?.refresh();
@@ -1308,7 +1313,7 @@ class GridApp {
       e.preventDefault();
       const step = 0.05;
       const direction = e.shiftKey ? -1 : 1;
-      const next = Math.max(0.1, Math.min(12, this.config.particleSpeed + direction * step));
+      const next = this.adjustNumericSetting(this.config.particleSpeed, direction * step, 0.1, 12);
       if (next !== this.config.particleSpeed) {
         this.config.particleSpeed = next;
         this.particleSpeedBinding?.refresh();
