@@ -795,16 +795,18 @@ class TimelineViewer {
     const majorLabelSpacing = 60;
     const minorLabelSpacing = 50;
     const usedLabelPositions = new Set<number>();
-    this.drawScaleMilestones(
-      unitSelection.major,
-      visibleRange.startMs,
-      visibleRange.endMs,
-      scaleHeight,
-      new TextStyle({ fill: 0xe6e6e6, fontSize: 14 }),
-      110,
-      scaleRange.startMs,
-      usedLabelPositions
-    );
+    if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
+      this.drawScaleMilestones(
+        unitSelection.major,
+        visibleRange.startMs,
+        visibleRange.endMs,
+        scaleHeight,
+        new TextStyle({ fill: 0xe6e6e6, fontSize: 14 }),
+        110,
+        scaleRange.startMs,
+        usedLabelPositions
+      );
+    }
     this.drawScaleUnit(
       unitSelection.major,
       true,
@@ -986,7 +988,7 @@ class TimelineViewer {
         if (usedLabelPositions.has(labelKey)) {
           continue;
         }
-        const label = new Text({ text: this.formatScaleLabel(date, unit), style });
+        const label = new Text({ text: this.formatScaleTickLabel(date, unit, scaleStartMs), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
         label.y = scaleHeight - 4;
@@ -1032,7 +1034,7 @@ class TimelineViewer {
         if (usedLabelPositions.has(labelKey)) {
           continue;
         }
-        const label = new Text({ text: this.formatScaleLabel(date, unit), style });
+        const label = new Text({ text: this.formatScaleTickLabel(date, unit, scaleStartMs), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + 6;
         label.y = scaleHeight - 4;
@@ -1191,6 +1193,51 @@ class TimelineViewer {
         return `${hour}:${minute}`;
       default:
         return `${year}`;
+    }
+  }
+
+  private formatScaleTickLabel(date: Date, unit: ScaleUnit, scaleStartMs: number): string {
+    if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
+      return this.formatScaleLabel(date, unit);
+    }
+
+    const diffMs = date.getTime() - scaleStartMs;
+    const totalMinutes = Math.floor(diffMs / 60000);
+    const totalHours = Math.floor(diffMs / 3600000);
+    const totalDays = Math.floor(diffMs / (24 * 3600 * 1000));
+    const baseDate = new Date(scaleStartMs);
+    const yearOffset = date.getUTCFullYear() - baseDate.getUTCFullYear();
+    const monthOffset = yearOffset * 12 + (date.getUTCMonth() - baseDate.getUTCMonth());
+
+    const pad2 = (value: number) => String(value).padStart(2, '0');
+
+    switch (unit) {
+      case 'minute':
+      case 'tenMinute': {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return `${pad2(hours)}:${pad2(minutes)}`;
+      }
+      case 'hour': {
+        const hours = totalHours;
+        return `${pad2(hours)}:00`;
+      }
+      case 'day': {
+        if (this.config.groupBy === 'Week') {
+          const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+          const idx = ((totalDays % 7) + 7) % 7;
+          return weekdayLabels[idx] ?? 'Mon';
+        }
+        return `Day ${totalDays + 1}`;
+      }
+      case 'month':
+        return `Month ${monthOffset + 1}`;
+      case 'year':
+        return `Year ${yearOffset + 1}`;
+      case 'decade':
+        return `Decade ${Math.floor(yearOffset / 10) + 1}`;
+      default:
+        return this.formatScaleLabel(date, unit);
     }
   }
 

@@ -496,9 +496,29 @@ If anything is unclear please just ask.
 
 
 
+Please add a slider control for timelineGroupedLineGap labeled "Group Gap". Like the other Timeline controls this should only be shown then "Display Mode" "Timeline is active". Please also hide it if grouping is "None"
 
-when grouping is selected please don't show tick labels taht contain syntetic info. To explain what I mean consider this case: Grouping by day is selected. I would expect the scale for the 
 
+Please adjust the scroll speed: one notch = one group please
+
+
+Please add a slider to set scroll speed labeled "Group Scroll Speed". This should be a factor (default to one, min: 0.1 max 2 step 0.1) that defines how many groups to scroll per notch. 
+
+
+Please ensure that when the time scale on the top of the window and a timeline overlap the time scale "wins" and use the same approach to reduce the visual noise for overlaps that was used for the group labels.
+
+Please add a checkbox to extend the tick lies from the time scale all the way down to the bottom of the window to make it clear to the user where they are on the timelines.
+If anything is unclear please just ask.
+
+
+
+
+When grouping is selected please don't show tick labels that contain synthetic info. 
+To explain what I mean please consider this case: Grouping by day is selected. 
+I would expect the labels for the ticks to be the hours of the day starting form "00:00" to "24:00"
+But the first is not "00:00" but "2000s" and the last label is not "24:00" but "01-02"
+(To clarify: 00:00 instead of 24:00 would also be ok...I don't insist on 24:00 if this makes the logic very complicated but I would prefer 24:00)
+If anything is unclear please just ask.
 
 
 
