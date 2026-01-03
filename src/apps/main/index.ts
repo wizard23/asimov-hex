@@ -1066,10 +1066,7 @@ class GridApp {
     const x = e.clientX - rect.left - this.edgeContainer.x;
     const y = e.clientY - rect.top - this.edgeContainer.y;
 
-    // Store mouse position for particle cursor rules
-    this.mouseX = x;
-    this.mouseY = y;
-    this.updateOrbitOverlay();
+    this.setOrbitMouse(x, y);
 
     // Remove previous highlights
     this.clearHighlights();
@@ -1128,11 +1125,8 @@ class GridApp {
   }
 
   private handleMouseLeave() {
-    this.mouseX = 0;
-    this.mouseY = 0;
-
     this.clearHighlights();
-    this.updateOrbitOverlay();
+    this.setOrbitMouse(0, 0);
   }
 
   private handleMouseDown(e: MouseEvent) {
@@ -1271,6 +1265,12 @@ class GridApp {
     this.gridOffsetBinding?.refresh();
   }
 
+  private setOrbitMouse(x: number, y: number) {
+    this.mouseX = x;
+    this.mouseY = y;
+    this.updateOrbitOverlay();
+  }
+
   private handleKeyDown(e: KeyboardEvent) {
     const target = e.target as HTMLElement | null;
     if (
@@ -1352,9 +1352,7 @@ class GridApp {
     this.refreshGridBindings();
     this.updateGrid();
 
-    this.mouseX = cursorX - this.edgeContainer.x;
-    this.mouseY = cursorY - this.edgeContainer.y;
-    this.updateOrbitOverlay();
+    this.setOrbitMouse(cursorX - this.edgeContainer.x, cursorY - this.edgeContainer.y);
   }
 }
 
