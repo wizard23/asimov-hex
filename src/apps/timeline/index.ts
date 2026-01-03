@@ -576,8 +576,10 @@ class TimelineViewer {
       const grouped = this.getGroupedCommits();
       const gap = this.getLineGap();
       const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
+      const direction = Math.sign(e.deltaY);
+      if (direction === 0) return;
       this.timelineGroupScrollOffsetY = this.clamp(
-        this.timelineGroupScrollOffsetY - e.deltaY,
+        this.timelineGroupScrollOffsetY - direction * gap,
         -maxOffset,
         maxOffset
       );
