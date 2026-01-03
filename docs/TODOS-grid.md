@@ -486,23 +486,125 @@ It correctly enters panning only when Ctrl is held pressed during the click. But
 
 
 
-
-
-
-
-
-
 ux bugs for the "Show Orbit" feature: 
 * during zooming in and out using the wheel the circle seemingly wanders around but it should remain centered on the cursor during zooming.
 * After leaving the window with the mouse cursor: no circle should be drawn since we don't know about the centers.
 
 
 
+Is there a memory or resource leak somewhere? When I excessively use panning and zooming for a while the app sometimes gets sluggish and eventually the window becomes unresponsive.
 
 
+Yes panning causes most sluggishness
+
+
+You proposed earlier:
+3. Optionally: add a lightweight updateOffsets() helper and throttle redraw to one per animation frame.
+Is this already included? Would it make sense?
+
+
+Sometimes when I pan after I release the mouse cursor the browser becomes unresponsive for half a second or so. I would really like to find out what causes this.
+
+
+
+```
+• Most likely cause: Tweakpane gridOffsetBinding.refresh() on every mousemove while panning. That’s a DOM/layout update at high frequency, so the browser builds a backlog; when you release, it catches up and
+  stalls for a moment.
+
+  We can fix this cleanly by:
+
+  - Throttling panning updates to rAF, and
+  - Refreshing the Tweakpane binding only on mouseup (or at a low rate), while still updating container positions every frame.
+
+  Want me to implement that?
+```
+
+
+Yes please.
+
+
+
+Please add a toolbar window in the center of the top edge of the screen. It should be overlay positioned above the canvas (absolute/fixed), so it doesn’t affect layout or canvas size
+For now the only items in the toolbar should be a start/pause button.
+By clicking the button the user is able to start or pause the particle simulation.
+
+
+that uses an appropriate symbol. When the user clicks it it switches state between 
+
+Yes please use CSS. Lets keep the code clean please.
+
+Please add a hotkey binding for <Space> to toggle start/stop
+
+I thought about this problem in general: Hotkeys can conflict with input fields. For now only the tweakpane has input fields but this could change. What if we had a textfield. Would the simulation always start/stop when the user types a space in the textfield?
+Please suggest possible approaches to fix this ux issue.
+
+```
+• A few clean options to avoid hotkey conflicts with text inputs:
+
+  1. Ignore all editable targets (most common)
+
+  - If event.target is input, textarea, select, or contenteditable, skip hotkey handling.
+  - Covers future text fields with no extra wiring.
+
+  2. Scope hotkeys to the canvas
+
+  - Attach the key listener only when the canvas has focus (set tabindex=0 and focus on click).
+  - Hotkeys won’t fire when user is typing elsewhere.
+
+  3. Use a global “hotkeys enabled” flag
+
+  - Toggle via a UI setting or a dedicated “keyboard focus” mode.
+  - Good if you plan more hotkeys later.
+
+  4. Require a modifier
+
+  - e.g., Ctrl+Space to toggle simulation.
+  - Reduces accidental triggers, but less convenient.
+
+  5. Disable hotkeys while Tweakpane is active
+
+  - Listen for focusin/focusout on the pane and gate hotkeys.
+  - Works now, but brittle if more inputs appear elsewhere.
+
+  If you want, I can implement option 1 (simple and future‑proof) or option 2 (more explicit focus behavior).
+```
+
+Yes please implement Option 1
+
+
+
+
+
+There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. The triangle grid is the one that has the biggest problems with this.
+Please suggest possible approaches to fix this. Don't change anything yet.
+
+
+
+timeout for particles in seconds or edges checkbox und slider in seconds
+
+
+Adwandced: Target FPS slider 1 bis 120 ?
 
 
 # NEXT
+
+
+Rulelist
+First rule filters down nr of edges
+2nd rule filters down even more
+if it becomes 0 we need fallback
+
+
+stochastic list of list
+when rand < prob(item no 1) use rule item 1
+else when rand < prob(utewm no 2) use rule item 2
+...
+fallback list
+
+
+Partricles haben state zb fallback richtung cw or ccw :)
+
+
 There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. Please suggest possible approaches to fix this. Don't change anything yet.
 
 

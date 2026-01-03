@@ -1016,6 +1016,7 @@ class GridApp {
     canvas.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
     canvas.addEventListener('wheel', (e: WheelEvent) => this.handleMouseWheel(e), { passive: false });
     window.addEventListener('mouseup', () => this.handleMouseUp());
+    window.addEventListener('keydown', (e: KeyboardEvent) => this.handleKeyDown(e));
   }
 
   private handleMouseMove(e: MouseEvent) {
@@ -1270,6 +1271,23 @@ class GridApp {
       this.panRafId = null;
     }
     this.gridOffsetBinding?.refresh();
+  }
+
+  private handleKeyDown(e: KeyboardEvent) {
+    if (e.code !== 'Space') return;
+    const target = e.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable)
+    ) {
+      return;
+    }
+    e.preventDefault();
+    this.config.isSimulationRunning = !this.config.isSimulationRunning;
+    this.updateSimulationButton();
   }
 
   private handleMouseWheel(e: WheelEvent) {
