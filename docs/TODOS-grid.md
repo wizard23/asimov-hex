@@ -369,18 +369,6 @@ Please describe in detail how each of the three "Click Tool" modes work now.
 
 
 
-
-
-some ux bugs/inconsistencies:
-
-timeout for particles in seconds or edges
-
-
-
-There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. Please suggest possible approaches to fix this. Don't change anything yet.
-
-
-
 Please correct me if i'm wrong. I understand what you described like this:
 For the user the "Spawn Particle" and the "Draw Cell" mode already behave like “highlight only” but the code paths don't make this explicit.
 
@@ -400,6 +388,20 @@ Great! Please implement the plan for "highlight is the single source of truth fo
 
 
 
+The vertex highlighting is a bit messy and needlessly complicated 
+
+
+
+
+
+
+
+
+
+# NEXT
+There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. Please suggest possible approaches to fix this. Don't change anything yet.
+
+
 Please add a toolbar window on the top edge of the screen
 
 
@@ -407,8 +409,6 @@ The app should track a list of which values got changed by the user. Only the  t
 The last modified control should be highlighted either by changing the background color of it and by using a bold or colored font for the label
 
 
-
-# NEXT
 * unify spawn particle and cell manipulation by either highlighting cell or edge ;)
 * ask how it is now
 * particle rule: keep approx distance from mouse cursor
@@ -421,6 +421,11 @@ The last modified control should be highlighted either by changing the backgroun
 
 * multiple rules as priority list with rules that cant be fullfilled skipping to the next
 *
+
+
+some ux bugs/inconsistencies:
+
+timeout for particles in seconds or edges
 
 # UNUSED
 New try with clean interface wenn tile editor fertig ist

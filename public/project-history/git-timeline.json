@@ -1,5 +1,104 @@
 [
   {
+    "hash": "4bb50cb43712486bcda4b356703c5752f7d723bd",
+    "timestamp": 1767399600,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Use helpers for DOM element retrieval in Markdown Viewer",
+    "addedLines": 29,
+    "removedLines": 9
+  },
+  {
+    "hash": "912a5ea1b5c85ad44820d8bc07750e7682f6121f",
+    "timestamp": 1767398600,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Link User Manual from Main App",
+    "addedLines": 102,
+    "removedLines": 12
+  },
+  {
+    "hash": "a6d4cfd52aca6f9cb1922532d105d832f34c4966",
+    "timestamp": 1767396716,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Toggle meta controls in Markdown Viewer",
+    "addedLines": 39,
+    "removedLines": 2
+  },
+  {
+    "hash": "b572122aa8382329013c5c87d01256cab10d7cc9",
+    "timestamp": 1767394998,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Allow internal navigation in Markdown Viewer",
+    "addedLines": 0,
+    "removedLines": 4
+  },
+  {
+    "hash": "7648dd98546184cfdb6b256126f7f43905ca6876",
+    "timestamp": 1767394645,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Support relative links in Markdown Viewer",
+    "addedLines": 6,
+    "removedLines": 1
+  },
+  {
+    "hash": "5c877a6df24f14fe11bb878941873ddbc91bb99f",
+    "timestamp": 1767394475,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Support relative links in Markdown Viewer",
+    "addedLines": 21,
+    "removedLines": 10
+  },
+  {
+    "hash": "6fee0d048dfef0e28f8d3d9f599a5c106786c48d",
+    "timestamp": 1767394031,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add standalone Markdown Viewer app",
+    "addedLines": 456,
+    "removedLines": 0
+  },
+  {
+    "hash": "eb58df8beffbd0cb2dd6eafd8035ca6cf3e8d06d",
+    "timestamp": 1767393132,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "docs: Create user manual pages for Main App and Statistics",
+    "addedLines": 292,
+    "removedLines": 0
+  },
+  {
+    "hash": "d823fa7fc42f80eb3dcaae542e8ba6d631d29d6e",
+    "timestamp": 1767387832,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Improve statistics table layout and default exclusions",
+    "addedLines": 704,
+    "removedLines": 0
+  },
+  {
+    "hash": "77a10cf31819bad1ea7656069cbcb2fd4955c93d",
+    "timestamp": 1767386888,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: instructions for user manual",
+    "addedLines": 136,
+    "removedLines": 76
+  },
+  {
+    "hash": "fec2a6fd06e3952a0d0abdc860fb4b7f9ad9784c",
+    "timestamp": 1767384851,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 760,
+    "removedLines": 0
+  },
+  {
     "hash": "dc3a309dfc74afac46f1178faef8dba05ea9f78c",
     "timestamp": 1767384754,
     "authorName": "Philipp Tiefenbacher",
