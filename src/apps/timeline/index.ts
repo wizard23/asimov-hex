@@ -62,6 +62,7 @@ class TimelineViewer {
   private readonly timelineChangeScaleRightPadding = 24;
   private readonly timelineLineGap = 28;
   private readonly timelineGroupedLineGap = 48;
+  private groupGapElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -70,6 +71,7 @@ class TimelineViewer {
     groupBy: 'Day' as GroupBy,
     searchTerm: '',
     enableDateFilter: false,
+    groupGap: this.timelineGroupedLineGap,
   };
 
   constructor() {
@@ -188,7 +190,18 @@ class TimelineViewer {
       label: 'Group By',
     }).on('change', () => {
       if (this.config.displayMode !== 'Timeline') return;
+      this.updateGroupGapVisibility();
       this.render();
+    });
+
+    const groupGapBinding = this.pane.addBinding(this.config, 'groupGap', {
+      label: 'Group Gap',
+      min: 20,
+      max: 120,
+      step: 2,
+    }).on('change', () => {
+      if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') return;
+      this.drawTimeline();
     });
 
     const centerViewButton = this.pane.addButton({
@@ -202,10 +215,12 @@ class TimelineViewer {
     this.startDateElement = startDateBinding.element;
     this.endDateElement = endDateBinding.element;
     this.groupByElement = groupByBinding.element;
+    this.groupGapElement = groupGapBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
     this.updateCenterViewVisibility();
+    this.updateGroupGapVisibility();
   }
 
   private filterCommits() {
@@ -251,6 +266,11 @@ class TimelineViewer {
   private updateCenterViewVisibility() {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.centerViewElement) this.centerViewElement.style.display = display;
+  }
+
+  private updateGroupGapVisibility() {
+    const display = this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' ? '' : 'none';
+    if (this.groupGapElement) this.groupGapElement.style.display = display;
   }
 
   private render() {
@@ -1229,7 +1249,7 @@ class TimelineViewer {
 
   private getLineGap(): number {
     if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
-      return this.timelineGroupedLineGap;
+      return this.config.groupGap;
     }
     return this.timelineLineGap;
   }
