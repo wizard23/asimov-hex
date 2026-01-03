@@ -74,6 +74,7 @@ class GridApp {
   private grid!: Grid;
   private gridFolder: FolderApi | null = null;
   private gridScaleBinding: BindingApi | null = null;
+  private particleSpeedBinding: BindingApi | null = null;
   private orbitDistanceBinding: BindingApi | null = null;
   private gridOffsetBinding: BindingApi | null = null;
   private orbitOverlay: Graphics | null = null;
@@ -521,7 +522,7 @@ class GridApp {
     });
 
     // Add particle speed control
-    particlesFolder.addBinding(this.config, 'particleSpeed', {
+    this.particleSpeedBinding = particlesFolder.addBinding(this.config, 'particleSpeed', {
       min: 0.1,
       max: 12,
       step: 0.05,
@@ -1274,7 +1275,6 @@ class GridApp {
   }
 
   private handleKeyDown(e: KeyboardEvent) {
-    if (e.code !== 'Space') return;
     const target = e.target as HTMLElement | null;
     if (
       target &&
@@ -1285,9 +1285,37 @@ class GridApp {
     ) {
       return;
     }
-    e.preventDefault();
-    this.config.isSimulationRunning = !this.config.isSimulationRunning;
-    this.updateSimulationButton();
+
+    if (e.code === 'Space') {
+      e.preventDefault();
+      this.config.isSimulationRunning = !this.config.isSimulationRunning;
+      this.updateSimulationButton();
+      return;
+    }
+
+    if (e.code === 'KeyO') {
+      e.preventDefault();
+      const step = 0.05;
+      const direction = e.shiftKey ? -1 : 1;
+      const next = Math.max(0.1, Math.min(15, this.config.orbitDistance + direction * step));
+      if (next !== this.config.orbitDistance) {
+        this.config.orbitDistance = next;
+        this.orbitDistanceBinding?.refresh();
+        this.updateOrbitOverlay();
+      }
+      return;
+    }
+
+    if (e.code === 'KeyP') {
+      e.preventDefault();
+      const step = 0.05;
+      const direction = e.shiftKey ? -1 : 1;
+      const next = Math.max(0.1, Math.min(12, this.config.particleSpeed + direction * step));
+      if (next !== this.config.particleSpeed) {
+        this.config.particleSpeed = next;
+        this.particleSpeedBinding?.refresh();
+      }
+    }
   }
 
   private handleMouseWheel(e: WheelEvent) {
