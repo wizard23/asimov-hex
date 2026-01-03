@@ -742,6 +742,112 @@ Any refactoring opportunities?
   Yes please do that.
 
 
+  ```
+  Applied the refactor pass:
+
+  - clearHighlights() is now used in updateGrid() so the highlight info stays consistent.
+  - Added getHighlightColor() to centralize highlight color selection.
+  - Removed updateOrbitOverlay() from updateGrid() to avoid redundant updates; callers now update it when needed.
+  - Reused applyContainerOffsets() and setGridOffsetFromPan() to reduce duplication.
+
+  File updated:
+
+  - src/apps/main/index.ts
+
+  Verification:
+
+  - npm run verify ✅
+
+  If you want me to add a single setOrbitMouse(x,y) helper so all callers update mouseX/Y + overlay consistently, I can do that next.
+  ```
+
+
+  Yes please do that.
+
+
+
+Now that we changed a lot please again search for these:
+
+Is there any other unused code?
+Is there any needlessly complicated code?
+Is there any code duplication or near code duplication?
+Any refactoring opportunities?
+
+
+```
+• Quick pass results:
+
+  - Unused code: nothing obvious in src/apps/main/index.ts right now. (The broader note still applies: Grid.getVertexAt is unused in app code, but you asked to keep it.)
+  - Needlessly complicated: the right‑click “remove particles on highlighted cell edges” logic is duplicated for Smart and Spawn modes; could be a small helper to keep that branch tighter.
+  - Duplication / near‑duplication:
+      - Two places compute edges = this.grid.getCellEdges({ col, row }) and call removeParticlesOnEdges.
+      - Two places clamp/adjust numeric settings (orbit radius and particle speed). Could be a small “adjustNumericSetting” helper if desired, though current code is readable.
+  - Refactoring opportunities:
+      - Add removeParticlesOnHighlightedCellEdges() to de‑dup the cell‑edge removal logic.
+      - Add adjustNumericSetting(current, delta, min, max) to unify hotkey adjustments, if you want the key handling smaller.
+
+  If you want me to implement any of these, tell me which ones to prioritize.
+```
+
+
+Let's again keep Grid.getVertexAt like it is for now but let's implement all your other suggestions. Please propose a plan for an optimal order in which to do these.
+
+
+```
+Proposed order (smallest/safest first):
+
+  1. Extract removeParticlesOnHighlightedCellEdges() helper and use it in both Smart + Spawn right‑click paths.
+  2. Add adjustNumericSetting() helper and use it for orbit radius and particle speed hotkeys.
+
+  If that looks good, I’ll implement in this order.
+```
+
+Sounds good to me. Please make it so.
+
+
+```
+• Applied the remaining cleanup pass:
+
+  - Added removeParticlesOnHighlightedCellEdges() and reused it in Smart/Spawn right‑click paths.
+  - Added adjustNumericSetting() and used it for orbit radius + particle speed hotkeys.
+
+  File updated:
+
+  - src/apps/main/index.ts
+
+  Verification:
+
+  - npm run verify ✅
+
+  Want me to do a final sweep for any other minor cleanups, or are we good here?
+```
+
+yes please one more sweep.
+
+```
+• Quick sweep results (no changes made):
+
+  - Minor duplication: the step = 0.05 and min/max values for particle speed and orbit radius are duplicated in the hotkey handlers and the Tweakpane bindings. If you want perfect DRY, we could centralize those
+    constants.
+  - Minor style: a lot of early return; in event handlers (fine), but the right‑click branches could be slightly flattened by extracting “clear cell” and “remove particles” helpers if you want even cleaner
+    flow. Not required.
+
+  No other obvious unused code or overly complex sections stood out in this pass.
+```
+
+
+Please implement the second point: "flatten by extracting helpers". I'll look at the changes and then decide if it is worth it.
+
+
+
+
+
+
+
+A small ux issue/bug with the orbit circle that gets drawn. When the mouse leaves the canvas this should disappear. This is already implemented but it seems to be implemented by just putting the circle in the top left corner. Please relly don't draw the circle when the mouse cursor is not over the canvas.
+Before you change anything: Is there a reason why the top left corner was used? I guess it's because the particles need a reference point for avoiding/following/orbit. In this case please put it in the center of the grid instead of the top left corner.
+
+
 
 
 There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. The triangle grid is the one that has the biggest problems with this.
