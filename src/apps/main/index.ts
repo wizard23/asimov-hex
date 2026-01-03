@@ -48,6 +48,7 @@ interface AppConfig {
   orbitEpsilon: number;
   showOrbit: boolean;
   vertexHighlighting: boolean;
+  gridOffset: { x: number; y: number };
 }
 
 class GridApp {
@@ -73,6 +74,7 @@ class GridApp {
   private gridFolder: FolderApi | null = null;
   private gridScaleBinding: BindingApi | null = null;
   private orbitDistanceBinding: BindingApi | null = null;
+  private gridOffsetBinding: BindingApi | null = null;
   private orbitOverlay: Graphics | null = null;
 
   constructor() {
@@ -117,6 +119,7 @@ class GridApp {
       orbitEpsilon: 0.5,
       showOrbit: true,
       vertexHighlighting: true,
+      gridOffset: { x: 0, y: 0 },
     };
 
     this.updateGridInstance();
@@ -554,6 +557,14 @@ class GridApp {
       label: 'Orbit Epsilon',
     });
 
+    this.gridOffsetBinding = advancedFolder.addBinding(this.config, 'gridOffset', {
+      label: 'Grid Offset',
+      x: { min: -40, max: 40, step: 0.001 },
+      y: { min: -40, max: 40, step: 0.001 },
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
     advancedFolder.addBinding(this.config, 'vertexHighlighting', {
       label: 'Vertex Highlighting',
     }).on('change', () => {
@@ -816,8 +827,10 @@ class GridApp {
     const gridHeight = bounds.maxY - bounds.minY;
 
     // Center the grid based on true bounds
-    const offsetX = (this.app.screen.width - gridWidth) / 2 - bounds.minX;
-    const offsetY = (this.app.screen.height - gridHeight) / 2 - bounds.minY;
+    const centerOffsetX = (this.app.screen.width - gridWidth) / 2 - bounds.minX;
+    const centerOffsetY = (this.app.screen.height - gridHeight) / 2 - bounds.minY;
+    const offsetX = centerOffsetX + this.config.gridOffset.x * this.config.gridScale;
+    const offsetY = centerOffsetY + this.config.gridOffset.y * this.config.gridScale;
 
     // Position all containers at the same offset so cells, edges, and particles align
     this.gridContainer.x = offsetX;
@@ -926,6 +939,16 @@ class GridApp {
     return { minX, minY, maxX, maxY };
   }
 
+  private getCenterOffsetForScale(scale: number) {
+    const bounds = this.getGridBoundsForScale(scale);
+    const gridWidth = bounds.maxX - bounds.minX;
+    const gridHeight = bounds.maxY - bounds.minY;
+    return {
+      x: (this.app.screen.width - gridWidth) / 2 - bounds.minX,
+      y: (this.app.screen.height - gridHeight) / 2 - bounds.minY,
+    };
+  }
+
   private centerViewToGrid() {
     const bounds = this.getGridBoundsForScale(1);
     const gridWidth = bounds.maxX - bounds.minX;
@@ -939,7 +962,9 @@ class GridApp {
     if (!Number.isFinite(clampedScale) || clampedScale <= 0) return;
 
     this.config.gridScale = clampedScale;
+    this.config.gridOffset = { x: 0, y: 0 };
     this.gridScaleBinding?.refresh();
+    this.gridOffsetBinding?.refresh();
     this.updateGrid();
   }
 
@@ -1134,9 +1159,25 @@ class GridApp {
     const direction = Math.sign(e.deltaY);
     if (direction === 0) return;
     const step = 1;
-    const nextScale = this.config.gridScale - direction * step;
-    this.config.gridScale = Math.max(5, Math.min(100, nextScale));
+    const currentScale = this.config.gridScale;
+    const nextScale = Math.max(5, Math.min(100, currentScale - direction * step));
+    if (nextScale === currentScale) return;
+
+    const rect = this.app.canvas.getBoundingClientRect();
+    const cursorX = e.clientX - rect.left;
+    const cursorY = e.clientY - rect.top;
+    const baseX = (cursorX - this.gridContainer.x) / currentScale;
+    const baseY = (cursorY - this.gridContainer.y) / currentScale;
+
+    const nextCenterOffset = this.getCenterOffsetForScale(nextScale);
+    this.config.gridScale = nextScale;
+    this.config.gridOffset = {
+      x: (cursorX - baseX * nextScale - nextCenterOffset.x) / nextScale,
+      y: (cursorY - baseY * nextScale - nextCenterOffset.y) / nextScale,
+    };
+
     this.gridScaleBinding?.refresh();
+    this.gridOffsetBinding?.refresh();
     this.updateGrid();
   }
 }
