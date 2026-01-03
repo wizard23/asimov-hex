@@ -14,7 +14,6 @@ import {
   CairoGrid,
   getCellAtPixel,
   getEdgeAtPixel,
-  getVertexAtPixel,
   CellHit,
 } from '../../core/grid';
 
@@ -48,6 +47,7 @@ interface AppConfig {
   orbitAlgorithm: OrbitAlgorithm;
   orbitEpsilon: number;
   showOrbit: boolean;
+  vertexHighlighting: boolean;
 }
 
 class GridApp {
@@ -116,6 +116,7 @@ class GridApp {
       orbitAlgorithm: 'twoStepGradient',
       orbitEpsilon: 0.5,
       showOrbit: true,
+      vertexHighlighting: true,
     };
 
     this.updateGridInstance();
@@ -553,6 +554,12 @@ class GridApp {
       label: 'Orbit Epsilon',
     });
 
+    advancedFolder.addBinding(this.config, 'vertexHighlighting', {
+      label: 'Vertex Highlighting',
+    }).on('change', () => {
+      this.updateGrid();
+    });
+
     // Add number of states control
     advancedFolder.addBinding(this.config, 'numStates', {
       min: 2,
@@ -984,17 +991,12 @@ class GridApp {
       this.edgeContainer.addChild(this.highlightedEdge);
       this.highlightedEdgeInfo = edgeInfo;
 
-      // Find and highlight closest vertex
-      const closestVertex = getVertexAtPixel(
-        this.grid,
-        this.config.gridWidth,
-        this.config.gridHeight,
-        x,
-        y,
-        20
-      );
-
-      if (closestVertex) {
+      if (this.config.vertexHighlighting) {
+        const p1 = edgeInfo.points[0];
+        const p2 = edgeInfo.points[1];
+        const dist1 = Math.hypot(x - p1.x, y - p1.y);
+        const dist2 = Math.hypot(x - p2.x, y - p2.y);
+        const closestVertex = dist1 <= dist2 ? p1 : p2;
         this.highlightedVertex = this.gridRenderer.drawVertex(closestVertex, highlightColor);
         if (this.highlightedVertex) {
           this.edgeContainer.addChild(this.highlightedVertex);

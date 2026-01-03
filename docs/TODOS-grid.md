@@ -388,7 +388,11 @@ Great! Please implement the plan for "highlight is the single source of truth fo
 
 
 
-The vertex highlighting is a bit messy and needlessly complicated 
+The vertex highlighting is a bit messy and needlessly complicated atm. It should behave like this:
+* There should be a checkbox in the "Advanced" folder labeled "Vertex Highlighting"
+* When "Vertex Highlighting" is active and an edge is highlighted just also highlight one of the endpoints of the edge (whichever is closest to the mouse position).
+* When "Vertex Highlighting" is deactivated never highlight any vertex.
+I'm hoping that the code should be simplified by this change.  
 
 
 
