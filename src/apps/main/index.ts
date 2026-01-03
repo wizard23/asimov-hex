@@ -76,6 +76,9 @@ class GridApp {
   private orbitDistanceBinding: BindingApi | null = null;
   private gridOffsetBinding: BindingApi | null = null;
   private orbitOverlay: Graphics | null = null;
+  private isPanning: boolean = false;
+  private panStartMouse: { x: number; y: number } | null = null;
+  private panStartOffset: { x: number; y: number } | null = null;
 
   constructor() {
     // Load palettes from JSON
@@ -974,9 +977,22 @@ class GridApp {
     canvas.addEventListener('mousedown', (e: MouseEvent) => this.handleMouseDown(e));
     canvas.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
     canvas.addEventListener('wheel', (e: WheelEvent) => this.handleMouseWheel(e), { passive: false });
+    window.addEventListener('mouseup', () => this.handleMouseUp());
   }
 
   private handleMouseMove(e: MouseEvent) {
+    if (this.isPanning && this.panStartMouse && this.panStartOffset) {
+      const dx = e.clientX - this.panStartMouse.x;
+      const dy = e.clientY - this.panStartMouse.y;
+      this.config.gridOffset = {
+        x: this.panStartOffset.x + dx / this.config.gridScale,
+        y: this.panStartOffset.y + dy / this.config.gridScale,
+      };
+      this.gridOffsetBinding?.refresh();
+      this.updateGrid();
+      return;
+    }
+
     const canvas = this.app.canvas;
     const rect = canvas.getBoundingClientRect();
     // Use edgeContainer position since edges are in edgeContainer
@@ -1062,6 +1078,13 @@ class GridApp {
   }
 
   private handleMouseDown(e: MouseEvent) {
+    if (e.ctrlKey) {
+      this.isPanning = true;
+      this.panStartMouse = { x: e.clientX, y: e.clientY };
+      this.panStartOffset = { ...this.config.gridOffset };
+      return;
+    }
+
     if (e.button === 0) {
       // Left click
       if (this.config.leftClickMode === 'smart') {
@@ -1152,6 +1175,13 @@ class GridApp {
         return;
       }
     }
+  }
+
+  private handleMouseUp(): void {
+    if (!this.isPanning) return;
+    this.isPanning = false;
+    this.panStartMouse = null;
+    this.panStartOffset = null;
   }
 
   private handleMouseWheel(e: WheelEvent) {
