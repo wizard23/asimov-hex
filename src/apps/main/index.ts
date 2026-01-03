@@ -779,6 +779,15 @@ class GridApp {
     this.orbitOverlay = graphics;
   }
 
+  private spawnParticleOnRandomCellEdge(cell: CellHit) {
+    const edges = this.grid.getCellEdges({ col: cell.col, row: cell.row });
+    if (edges.length === 0) return;
+    const edge = edges[Math.floor(Math.random() * edges.length)];
+    const progress = 0.5;
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
+  }
+
   private initGrid() {
     this.gridRenderer = new GridRenderer();
     this.updateGrid();
@@ -1038,16 +1047,7 @@ class GridApp {
 
         if (this.highlightedCellInfo) {
           if (e.shiftKey) {
-            const edges = this.grid.getCellEdges({
-              col: this.highlightedCellInfo.col,
-              row: this.highlightedCellInfo.row,
-            });
-            if (edges.length > 0) {
-              const edge = edges[Math.floor(Math.random() * edges.length)];
-              const progress = 0.5;
-              const direction = Math.random() < 0.5 ? -1 : 1;
-              this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
-            }
+            this.spawnParticleOnRandomCellEdge(this.highlightedCellInfo);
           } else {
             this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = this.config.drawState;
             this.updateGrid();
@@ -1063,16 +1063,7 @@ class GridApp {
         }
 
         if (this.highlightedCellInfo) {
-          const edges = this.grid.getCellEdges({
-            col: this.highlightedCellInfo.col,
-            row: this.highlightedCellInfo.row,
-          });
-          if (edges.length > 0) {
-            const edge = edges[Math.floor(Math.random() * edges.length)];
-            const progress = 0.5;
-            const direction = Math.random() < 0.5 ? -1 : 1;
-            this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
-          }
+          this.spawnParticleOnRandomCellEdge(this.highlightedCellInfo);
           return;
         }
       }

@@ -1,4 +1,4 @@
-import { EdgeInfo, Point } from "../../types";
+import { EdgeInfo } from "../../types";
 import { Grid } from "./grid";
 
 export interface CellHit {
@@ -30,17 +30,6 @@ export function getEdgeAtPixel(
   threshold: number
 ): EdgeInfo | null {
   return grid.getEdgeAt({ x, y }, threshold, width, height);
-}
-
-export function getVertexAtPixel(
-  grid: Grid,
-  width: number,
-  height: number,
-  x: number,
-  y: number,
-  threshold: number
-): Point | null {
-  return grid.getVertexAt({ x, y }, threshold, width, height);
 }
 
 export function filterInBounds(

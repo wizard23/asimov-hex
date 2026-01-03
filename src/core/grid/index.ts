@@ -1,6 +1,6 @@
 export type { Grid, CairoGridOptions } from "./grid";
 export { scanCellWindow } from "./grid-scan";
-export { getCellAtPixel, getEdgeAtPixel, getVertexAtPixel } from "./grid-selection";
+export { getCellAtPixel, getEdgeAtPixel } from "./grid-selection";
 export type { CellHit } from "./grid-selection";
 export { filterInBounds } from "./grid-selection";
 export { findClosestEdgeInWindow, findClosestVertexInWindow } from "./grid-search";
