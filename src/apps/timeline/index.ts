@@ -64,6 +64,7 @@ class TimelineViewer {
   private readonly timelineGroupedLineGap = 48;
   private groupGapElement: HTMLElement | null = null;
   private groupScrollSpeedElement: HTMLElement | null = null;
+  private extendedScaleTicksElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -74,6 +75,7 @@ class TimelineViewer {
     enableDateFilter: false,
     groupGap: this.timelineGroupedLineGap,
     groupScrollSpeed: 1,
+    extendedScaleTicks: false,
   };
 
   constructor() {
@@ -178,6 +180,7 @@ class TimelineViewer {
     }).on('change', () => {
       this.updateGroupByVisibility();
       this.updateCenterViewVisibility();
+      this.updateScaleTickVisibility();
       this.render();
     });
 
@@ -213,6 +216,13 @@ class TimelineViewer {
       step: 0.1,
     });
 
+    const extendedScaleTicksBinding = this.pane.addBinding(this.config, 'extendedScaleTicks', {
+      label: 'Extend Scale Ticks',
+    }).on('change', () => {
+      if (this.config.displayMode !== 'Timeline') return;
+      this.drawTimeline();
+    });
+
     const centerViewButton = this.pane.addButton({
       title: 'Center View',
     }).on('click', () => {
@@ -226,11 +236,13 @@ class TimelineViewer {
     this.groupByElement = groupByBinding.element;
     this.groupGapElement = groupGapBinding.element;
     this.groupScrollSpeedElement = groupScrollSpeedBinding.element;
+    this.extendedScaleTicksElement = extendedScaleTicksBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
     this.updateCenterViewVisibility();
     this.updateGroupGapVisibility();
+    this.updateScaleTickVisibility();
   }
 
   private filterCommits() {
@@ -276,6 +288,11 @@ class TimelineViewer {
   private updateCenterViewVisibility() {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.centerViewElement) this.centerViewElement.style.display = display;
+  }
+
+  private updateScaleTickVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.extendedScaleTicksElement) this.extendedScaleTicksElement.style.display = display;
   }
 
   private updateGroupGapVisibility() {
@@ -944,6 +961,13 @@ class TimelineViewer {
       const screenX = this.worldToScreen(worldX, 0).x;
       if (screenX < -50 || screenX > timelineApp.screen.width + 50) {
         continue;
+      }
+      if (this.config.extendedScaleTicks) {
+        const overlayAlpha = isMajor ? 0.35 : 0.22;
+        const overlayColor = isMajor ? 0x4a4a4a : 0x333333;
+        timelineScaleGraphics.moveTo(screenX, scaleHeight);
+        timelineScaleGraphics.lineTo(screenX, timelineApp.screen.height);
+        timelineScaleGraphics.stroke({ color: overlayColor, width: 1, alpha: overlayAlpha });
       }
       const tickColor = isMajor ? 0x777777 : 0x4b4b4b;
       const tickAlpha = isMajor ? 0.9 : 0.7;
