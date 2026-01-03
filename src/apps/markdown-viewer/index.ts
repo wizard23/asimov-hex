@@ -1,12 +1,8 @@
-const statusEl = document.getElementById('status');
-const markdownEl = document.getElementById('markdown');
-const urlInput = document.getElementById('url-input') as HTMLInputElement | null;
-const controlsForm = document.getElementById('controls') as HTMLFormElement | null;
-const hideMetaCheckbox = document.getElementById('hide-meta-controls') as HTMLInputElement | null;
-
-if (!statusEl || !markdownEl || !urlInput || !controlsForm || !hideMetaCheckbox) {
-  throw new Error('Markdown Viewer: missing required DOM elements.');
-}
+const statusEl = requireElement('status');
+const markdownEl = requireElement('markdown');
+const urlInput = requireInputElement('url-input');
+const controlsForm = requireFormElement('controls');
+const hideMetaCheckbox = requireInputElement('hide-meta-controls');
 
 const params = new URLSearchParams(window.location.search);
 const initialUrl = params.get('url') || '';
@@ -76,6 +72,30 @@ function showStatus(message: string, isError: boolean, linkHref?: string): void 
     link.textContent = '(open source)';
     statusEl.appendChild(link);
   }
+}
+
+function requireElement(id: string): HTMLElement {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`Markdown Viewer: missing #${id}.`);
+  }
+  return element;
+}
+
+function requireInputElement(id: string): HTMLInputElement {
+  const element = document.getElementById(id);
+  if (!element || !(element instanceof HTMLInputElement)) {
+    throw new Error(`Markdown Viewer: missing input #${id}.`);
+  }
+  return element;
+}
+
+function requireFormElement(id: string): HTMLFormElement {
+  const element = document.getElementById(id);
+  if (!element || !(element instanceof HTMLFormElement)) {
+    throw new Error(`Markdown Viewer: missing form #${id}.`);
+  }
+  return element;
 }
 
 function renderMarkdown(markdown: string, container: HTMLElement, baseUrl: string): void {
