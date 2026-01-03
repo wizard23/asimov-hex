@@ -79,6 +79,7 @@ class GridApp {
   private gridOffsetBinding: BindingApi | null = null;
   private orbitOverlay: Graphics | null = null;
   private simulationButton: HTMLButtonElement | null = null;
+  private focusDebugLabel: HTMLDivElement | null = null;
   private isPanning: boolean = false;
   private panStartMouse: { x: number; y: number } | null = null;
   private panStartOffset: { x: number; y: number } | null = null;
@@ -137,6 +138,7 @@ class GridApp {
     this.initPixi().then(() => {
       this.initInfoPanel();
       this.initToolbar();
+      this.initFocusDebug();
       this.initTweakpane();
       this.initGrid();
       this.setupInteraction();
@@ -341,6 +343,26 @@ class GridApp {
 
     toolbar.appendChild(button);
     document.body.appendChild(toolbar);
+  }
+
+  private initFocusDebug() {
+    const label = document.createElement('div');
+    label.id = 'focus-debug';
+    label.textContent = 'Focused: (none)';
+    document.body.appendChild(label);
+    this.focusDebugLabel = label;
+  }
+
+  private updateFocusDebug(element: Element | null, label: string) {
+    if (!this.focusDebugLabel) return;
+    if (!element) {
+      this.focusDebugLabel.textContent = `Focused (${label}): (none)`;
+      return;
+    }
+    const id = (element as HTMLElement).id || '-';
+    const name = (element as HTMLElement).getAttribute?.('name') || '-';
+    const classes = (element as HTMLElement).className || '-';
+    this.focusDebugLabel.textContent = `Focused (${label}): id=${id} name=${name} classes=${classes}`;
   }
 
   private updateSimulationButton() {
@@ -1302,6 +1324,7 @@ class GridApp {
         this.config.orbitDistance = next;
         this.orbitDistanceBinding?.refresh();
         this.updateOrbitOverlay();
+        this.focusBindingInput(this.orbitDistanceBinding);
       }
       return;
     }
@@ -1314,7 +1337,19 @@ class GridApp {
       if (next !== this.config.particleSpeed) {
         this.config.particleSpeed = next;
         this.particleSpeedBinding?.refresh();
+        this.focusBindingInput(this.particleSpeedBinding);
       }
+    }
+  }
+
+  private focusBindingInput(binding: BindingApi | null) {
+    if (!binding) return;
+    const sliderTrack = binding.element.querySelector('.tp-sldv_t');
+    if (sliderTrack instanceof HTMLElement) {
+      sliderTrack.focus();
+      this.updateFocusDebug(sliderTrack, 'slider');
+    } else {
+      this.updateFocusDebug(null, 'slider');
     }
   }
 
