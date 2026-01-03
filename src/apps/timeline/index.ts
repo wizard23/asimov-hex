@@ -63,6 +63,7 @@ class TimelineViewer {
   private readonly timelineLineGap = 28;
   private readonly timelineGroupedLineGap = 48;
   private groupGapElement: HTMLElement | null = null;
+  private groupScrollSpeedElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -72,6 +73,7 @@ class TimelineViewer {
     searchTerm: '',
     enableDateFilter: false,
     groupGap: this.timelineGroupedLineGap,
+    groupScrollSpeed: 1,
   };
 
   constructor() {
@@ -204,6 +206,13 @@ class TimelineViewer {
       this.drawTimeline();
     });
 
+    const groupScrollSpeedBinding = this.pane.addBinding(this.config, 'groupScrollSpeed', {
+      label: 'Group Scroll Speed',
+      min: 0.1,
+      max: 2,
+      step: 0.1,
+    });
+
     const centerViewButton = this.pane.addButton({
       title: 'Center View',
     }).on('click', () => {
@@ -216,6 +225,7 @@ class TimelineViewer {
     this.endDateElement = endDateBinding.element;
     this.groupByElement = groupByBinding.element;
     this.groupGapElement = groupGapBinding.element;
+    this.groupScrollSpeedElement = groupScrollSpeedBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
@@ -271,6 +281,7 @@ class TimelineViewer {
   private updateGroupGapVisibility() {
     const display = this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' ? '' : 'none';
     if (this.groupGapElement) this.groupGapElement.style.display = display;
+    if (this.groupScrollSpeedElement) this.groupScrollSpeedElement.style.display = display;
   }
 
   private render() {
@@ -578,8 +589,10 @@ class TimelineViewer {
       const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
       const direction = Math.sign(e.deltaY);
       if (direction === 0) return;
+      const speed = Number.isFinite(this.config.groupScrollSpeed) ? this.config.groupScrollSpeed : 1;
+      const stepGroups = Math.max(0.1, speed);
       this.timelineGroupScrollOffsetY = this.clamp(
-        this.timelineGroupScrollOffsetY - direction * gap,
+        this.timelineGroupScrollOffsetY - direction * gap * stepGroups,
         -maxOffset,
         maxOffset
       );
