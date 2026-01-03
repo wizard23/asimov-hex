@@ -395,15 +395,15 @@ class TimelineViewer {
     this.timelineChangeTextContainer = new Container();
     this.timelineGroupLabelContainer = new Container();
 
-    this.timelineScaleGraphics.zIndex = 1;
     this.timelineLineGraphics.zIndex = 2;
     this.timelineChangeGraphics.zIndex = 3;
     this.timelineGraphics.zIndex = 4;
     this.timelineHoverGraphics.zIndex = 5;
     this.timelineChangeScaleGraphics.zIndex = 6;
-    this.timelineTextContainer.zIndex = 7;
     this.timelineChangeTextContainer.zIndex = 8;
     this.timelineGroupLabelContainer.zIndex = 9;
+    this.timelineScaleGraphics.zIndex = 10;
+    this.timelineTextContainer.zIndex = 11;
 
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
@@ -761,6 +761,10 @@ class TimelineViewer {
     const pxPerSecond = this.timelineScale;
 
     timelineScaleGraphics.clear();
+    const scaleOverlayHeight = scaleHeight + 28;
+    timelineScaleGraphics.rect(0, 0, timelineApp.screen.width, scaleOverlayHeight);
+    timelineScaleGraphics.fill({ color: 0x141414, alpha: 0.92 });
+    timelineScaleGraphics.stroke({ color: 0x2f2f2f, width: 1, alpha: 0.8 });
     timelineScaleGraphics.moveTo(0, scaleHeight);
     timelineScaleGraphics.lineTo(timelineApp.screen.width, scaleHeight);
     timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
