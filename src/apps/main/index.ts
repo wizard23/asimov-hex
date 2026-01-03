@@ -840,6 +840,12 @@ class GridApp {
     this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
   }
 
+  private getHighlightColor(): ColorValue {
+    return typeof this.config.edgeHighlightColor === 'string'
+      ? this.config.edgeHighlightColor
+      : '#ffff00';
+  }
+
   private clearHighlights() {
     if (this.highlightedEdge) {
       this.edgeContainer.removeChild(this.highlightedEdge);
@@ -885,9 +891,7 @@ class GridApp {
     // Clear existing graphics (but keep particles)
     this.gridContainer.removeChildren();
     this.edgeContainer.removeChildren();
-    this.highlightedEdge = null;
-    this.highlightedCell = null;
-    this.highlightedVertex = null;
+    this.clearHighlights();
 
     const bounds = this.getGridBounds(this.config.gridWidth, this.config.gridHeight);
     const gridWidth = bounds.maxX - bounds.minX;
@@ -929,8 +933,6 @@ class GridApp {
       edgePaletteStrings, // Pass edgePalette
       this.config.showCoordinates
     );
-
-    this.updateOrbitOverlay();
   }
 
   private resizeCellStates(width: number, height: number) {
@@ -1086,9 +1088,7 @@ class GridApp {
 
     if (edgeInfo) {
       // Highlight edge and closest vertex
-      const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
-        ? this.config.edgeHighlightColor 
-        : '#ffff00';
+      const highlightColor = this.getHighlightColor();
       this.highlightedEdge = this.gridRenderer.drawEdge(edgeInfo, highlightColor);
       this.edgeContainer.addChild(this.highlightedEdge);
       this.highlightedEdgeInfo = edgeInfo;
@@ -1115,9 +1115,7 @@ class GridApp {
       );
 
       if (cellInfo) {
-        const highlightColor = typeof this.config.edgeHighlightColor === 'string' 
-          ? this.config.edgeHighlightColor 
-          : '#ffff00';
+        const highlightColor = this.getHighlightColor();
         this.highlightedCell = this.gridRenderer.drawCellHighlight(
           cellInfo,
           this.grid, // Pass grid
