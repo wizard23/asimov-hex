@@ -975,6 +975,7 @@ class GridApp {
     const canvas = this.app.canvas;
     canvas.addEventListener('mousemove', (e: MouseEvent) => this.handleMouseMove(e));
     canvas.addEventListener('mousedown', (e: MouseEvent) => this.handleMouseDown(e));
+    canvas.addEventListener('mouseleave', () => this.handleMouseLeave());
     canvas.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
     canvas.addEventListener('wheel', (e: WheelEvent) => this.handleMouseWheel(e), { passive: false });
     window.addEventListener('mouseup', () => this.handleMouseUp());
@@ -1075,6 +1076,27 @@ class GridApp {
         this.highlightedCellInfo = cellInfo;
       }
     }
+  }
+
+  private handleMouseLeave() {
+    this.mouseX = 0;
+    this.mouseY = 0;
+
+    if (this.highlightedEdge) {
+      this.edgeContainer.removeChild(this.highlightedEdge);
+      this.highlightedEdge = null;
+    }
+    if (this.highlightedCell) {
+      this.gridContainer.removeChild(this.highlightedCell);
+      this.highlightedCell = null;
+    }
+    if (this.highlightedVertex) {
+      this.edgeContainer.removeChild(this.highlightedVertex);
+      this.highlightedVertex = null;
+    }
+    this.highlightedEdgeInfo = null;
+    this.highlightedCellInfo = null;
+    this.updateOrbitOverlay();
   }
 
   private handleMouseDown(e: MouseEvent) {
@@ -1211,6 +1233,10 @@ class GridApp {
     this.gridScaleBinding?.refresh();
     this.gridOffsetBinding?.refresh();
     this.updateGrid();
+
+    this.mouseX = cursorX - this.edgeContainer.x;
+    this.mouseY = cursorY - this.edgeContainer.y;
+    this.updateOrbitOverlay();
   }
 }
 

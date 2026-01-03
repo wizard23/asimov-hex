@@ -417,6 +417,86 @@ The Grid interface should be as minimal as possible. Please find out if these fu
 
 
 
+Atm the grid is always centered in the center of the window if I understand it correctly. We need a x/y offset expressed as two factors that get multiplied with scale to determine the actual offset in pixel.
+1. It should have a 2d vector control for it in the "Advanced" folder.
+2. The offset should change when using the mousewheel when zooming in and out. Are there any idiomatic ways to do this?
+3. This offset should get reset when "Center View" is clicked.
+
+Before you actually modify anything please give me a list of proposed solutions for my 2nd requirement in my list please.
+If anything is unclear please just ask.
+
+
+Please implement my requirements using your "1. Zoom toward cursor (most common UX)" approach.
+
+
+
+This does not really work atm. When zooming in using the mouse wheel it always moves the top left corner of the grid. Zooming out moves to the lower right corner of the grind.
+
+
+This is much better but it still does not satisfy the requirement of:
+"Apply new scale, then adjust the offset so that world point stays under the cursor."
+It almost does that but it wobbles and drifts around a bit. 
+
+Before you change anything please answer my question:
+Is my requirement for the offsets to be factors instead of pixel values to blame for this small drifts/wobble?
+
+
+
+
+I'm thinking this because the offsets only have one digit of decimal precision the way they are now. 
+So we wil get several pixel of rounding error with large scale values.
+
+
+
+Use step 0.001 for the offset just for debugging.
+
+
+
+Debugging was successful: The drift is totally gone now.
+
+
+Please suggest cleaner solutions that "don’t let the UI step drive it"
+
+
+
+You also suggested to "remove the center‑recompute drift by anchoring the “center” term to the current scale delta only.". Please explain what this means. Is this one of these four numbered approaches?
+
+
+What would result in the cleanest code?
+
+
+Okay please go for option 1.
+
+
+
+That did not work. Now it wobbles/drifts again. Please just use the 0.001 precision solution.
+
+
+
+
+To make the zoom feel more natural please use 0.1 precision for scale and when using the scroll wheel increase/decrease the scale by a factor of (31/30)
+
+
+
+Feels great! Now please add panning by dragging the window. To distinguish panning from the existing mouse clicks please only pan when the Ctrl key is pressed.
+
+
+
+It correctly enters panning only when Ctrl is held pressed during the click. But when I release the mouse button it sometimes stays in panning mode. When the mouse is released panning mode should stop no matter if Ctrl is pressed at this moment or not. Please fix this bug.
+
+
+
+
+
+
+
+
+
+ux bugs for the "Show Orbit" feature: 
+* during zooming in and out using the wheel the circle seemingly wanders around but it should remain centered on the cursor during zooming.
+* After leaving the window with the mouse cursor: no circle should be drawn since we don't know about the centers.
+
+
 
 
 
