@@ -1,5 +1,140 @@
 [
   {
+    "hash": "634ec39085deb971d1190663af10dcad14dfa2ae",
+    "timestamp": 1767444739,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: docs: Update TODO lists and notes",
+    "addedLines": 183,
+    "removedLines": 1
+  },
+  {
+    "hash": "626c75c59cf88dca4de91c9138e3df25154737a4",
+    "timestamp": 1767444596,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Simplify right-click handlers",
+    "addedLines": 18,
+    "removedLines": 20
+  },
+  {
+    "hash": "82998efe71bc0a6b277a8ef531272a06b10a74d5",
+    "timestamp": 1767444356,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Consolidate particle removal and numeric adjustment logic",
+    "addedLines": 17,
+    "removedLines": 12
+  },
+  {
+    "hash": "6ea1fcb7d07aa95611c8280caccbfa7a0e305130",
+    "timestamp": 1767443653,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: Centralize orbit mouse updates",
+    "addedLines": 9,
+    "removedLines": 11
+  },
+  {
+    "hash": "ddeab29dea81e366ab55670b5b12004f30abbb4c",
+    "timestamp": 1767443525,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: Centralize highlight color logic",
+    "addedLines": 9,
+    "removedLines": 11
+  },
+  {
+    "hash": "8e81d695c8627498562f2b04c35455951aca9edb",
+    "timestamp": 1767443172,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Refactor: Consolidate grid update logic",
+    "addedLines": 217,
+    "removedLines": 50
+  },
+  {
+    "hash": "c2cb5d35168da508c42b68ccc916b0e8d186c794",
+    "timestamp": 1767441951,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: Remove focus debug overlay",
+    "addedLines": 0,
+    "removedLines": 44
+  },
+  {
+    "hash": "8af32b905a15c949f5a0f134a54587da09255ff7",
+    "timestamp": 1767441554,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add focus debug overlay and auto-focus bindings",
+    "addedLines": 55,
+    "removedLines": 0
+  },
+  {
+    "hash": "4633a222b565ffe731c2bfda95b73558fac0d67f",
+    "timestamp": 1767440321,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add keyboard shortcuts for Orbit and Particle settings",
+    "addedLines": 33,
+    "removedLines": 5
+  },
+  {
+    "hash": "583c4dc825d506594af999f4ae3a7d21d756aa62",
+    "timestamp": 1767439317,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add spacebar shortcut for simulation toggle",
+    "addedLines": 123,
+    "removedLines": 3
+  },
+  {
+    "hash": "04b84992118b6fd26b8dc67c616532191b4cbfab",
+    "timestamp": 1767438774,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add simulation toolbar",
+    "addedLines": 65,
+    "removedLines": 0
+  },
+  {
+    "hash": "c691533b1d9f3fcd2a8463eb07562809543ab154",
+    "timestamp": 1767412174,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "perf: Optimize panning with requestAnimationFrame",
+    "addedLines": 34,
+    "removedLines": 14
+  },
+  {
+    "hash": "6c743e415be949b978c8fc2f886ed4d9ae867926",
+    "timestamp": 1767411271,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "perf: Optimize grid panning performance",
+    "addedLines": 13,
+    "removedLines": 1
+  },
+  {
+    "hash": "0edd7493abc961536a52887b4da25f153c225672",
+    "timestamp": 1767411064,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add session resume support to codex-with-autotranscript.sh",
+    "addedLines": 19,
+    "removedLines": 4
+  },
+  {
+    "hash": "ea7a95dd6f7ef35f11d988aea3a40d2cea8da1b6",
+    "timestamp": 1767407692,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 743,
+    "removedLines": 0
+  },
+  {
     "hash": "cf476bb170b6e6e92bb686f394f1539caf30f353",
     "timestamp": 1767407669,
     "authorName": "Philipp Tiefenbacher",
