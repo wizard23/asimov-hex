@@ -572,6 +572,175 @@ Please suggest possible approaches to fix this ux issue.
 Yes please implement Option 1
 
 
+Please list all available hotkeys in this app.
+
+
+Please suggest possible hotkeys for increasing/decreasing these settings:
+* Particle Speed
+* Orbit Radius
+
+Please use O to increase orbit radius. Shift+O to decrease orbit radius.
+Please use P to increase particle speed. Shift+P to decrease particle speed.
+Just for clarification: Step sizes are the ones defined for the tweakpane control.
+
+
+Is it possible to focus the appropriate tweakpane control if one of these hotkeys (orbit speed or particle speed) is used?
+
+
+```
+ It’s possible, but Tweakpane doesn’t expose a clean public “focus this binding” API. The practical way is to grab the binding’s DOM element (binding.element) and focus the first input inside it (e.g.,
+  querySelector('input')). That’s a bit brittle to internal DOM changes, but it works.
+
+  If you want that behavior, I can add it for the orbit radius and particle speed bindings.
+```
+
+Yes please implement this. Do it in a way that is as clean as possible.
+
+That's not what I meant. Now the input box gets focused but i meant the slider.
+
+
+This still focuses the text input. For debugging purposes please add a overlay positioned debugging label at the bottom of the window and always print the id, name and classes of the element that got focused.
+
+
+
+It still focuses the input field instead of the slider. To help you diagnose the problem here is the HTML of the complete "Particles" folder that contains the
+* Particle Speed slider
+* Algorithm drop down
+* "Cleart Particles" button
+* Orbit Radius slider.
+
+<div class="tp-fldv tp-cntv tp-fldv-expanded tp-fldv-cpl"><button class="tp-fldv_b"><div class="tp-fldv_t">Particles</div><div class="tp-fldv_m"></div></button><div class="tp-fldv_i"></div><div class="tp-fldv_c" style="height: auto;"><div class="tp-lblv tp-v-fst"><div class="tp-lblv_l">Speed</div><div class="tp-lblv_v"><div class="tp-sldtxtv"><div class="tp-sldtxtv_s"><div class="tp-sldv"><div class="tp-sldv_t" tabindex="0"><div class="tp-sldv_k" style="width: 60.9244%;"></div></div></div></div><div class="tp-sldtxtv_t"><div class="tp-txtv tp-txtv-num"><input class="tp-txtv_i" type="text"><div class="tp-txtv_k"><svg class="tp-txtv_g"><path class="tp-txtv_gb"></path><path class="tp-txtv_gh"></path></svg><div class="tp-ttv"></div></div></div></div></div></div></div><div class="tp-lblv"><div class="tp-lblv_l">Algorithm</div><div class="tp-lblv_v"><div class="tp-lstv"><select class="tp-lstv_s"><option>Random (No Backtrack)</option><option>Random (With Backtrack)</option><option>Always Turn Clockwise</option><option>Always Turn Counter-Clockwise</option><option>Follow Cursor</option><option>Avoid Cursor</option><option>Orbit Cursor</option><option>Highest Edge Delta</option></select><div class="tp-lstv_m"><svg><path d="M5 7h6l-3 3 z"></path></svg></div></div></div></div><div class="tp-lblv tp-lblv-nol"><div class="tp-lblv_l"></div><div class="tp-lblv_v"><div class="tp-btnv"><button class="tp-btnv_b"><div class="tp-btnv_t">Clear Particles</div></button></div></div></div><div class="tp-lblv tp-v-lst"><div class="tp-lblv_l">Orbit Radius</div><div class="tp-lblv_v"><div class="tp-sldtxtv"><div class="tp-sldtxtv_s"><div class="tp-sldv"><div class="tp-sldv_t" tabindex="0"><div class="tp-sldv_k" style="width: 11.0738%;"></div></div></div></div><div class="tp-sldtxtv_t"><div class="tp-txtv tp-txtv-num"><input class="tp-txtv_i" type="text"><div class="tp-txtv_k"><svg class="tp-txtv_g"><path class="tp-txtv_gb"></path><path class="tp-txtv_gh"></path></svg><div class="tp-ttv"></div></div></div></div></div></div></div></div></div>
+
+Please try to find ways to reliable focus the slider. For now please just propose startegies and don't change the code yet.
+
+
+```
+Here are reliable strategies for focusing the slider track in Tweakpane, based on the DOM you shared:
+
+  1. Focus the slider “track” element directly
+
+  - The slider track is .tp-sldv_t and already has tabindex="0".
+  - Use binding.element.querySelector('.tp-sldv_t')?.focus().
+
+  2. Prefer first tabbable element inside the binding
+
+  - Query for [tabindex] within the binding; the slider track is the only one for slider rows.
+  - binding.element.querySelector('[tabindex]')?.focus().
+
+  3. Target the slider wrapper chain
+
+  - Locate .tp-sldtxtv then .tp-sldv_t.
+  - Useful if the binding element scope is larger than one row.
+
+  4. Use closest to limit scope
+
+  - If the binding element is too broad, find the closest .tp-lblv row and query within it for .tp-sldv_t.
+
+  5. Defer focus to the next frame
+
+  - Some DOM updates are async; use requestAnimationFrame(() => el.focus()).
+
+  Given the HTML you posted, #1 is the most direct and should work consistently. If it doesn’t, #4 + #5 is the safest combo.
+```
+
+Yes please implement 1. and try to focus the slider if it exists. It's totally ok if nothing gets focused. Don't use a fallback if the "slider" is not found. In the debug outbut please print a message indicating if something was found or not.
+
+
+It now works :)
+Debug label is (after pressing O):
+<div id="focus-debug">Focused (slider): id=- name=- classes=tp-sldv_t</div>
+
+
+Yes! Please remove all code used for debugging this.
+
+
+Is there any other unused code?
+Is there any needlessly complicated code?
+Is there any code duplication or near code duplication?
+Any refactoring opportunities?
+
+
+```
+• Here’s a quick pass based on the current code state (no changes made):
+
+  Potential unused/low‑value code
+
+  - Grid.getVertexAt is still in the interface and implemented, but no app code calls it anymore. Removing it would require editing every grid class and the interface.
+
+  Needlessly complicated
+
+  - Highlight clearing logic is duplicated in handleMouseMove and handleMouseLeave. Could be a small helper like clearHighlights().
+
+  Duplication / near‑duplication
+
+  - Container position updates happen in multiple places (panning, updateGrid). A tiny applyContainerOffsets(x,y) helper would reduce repetition.
+  - Orbit overlay update gets called from multiple places; if you want, that could be centralized after state changes.
+
+  Refactoring opportunities
+
+  - Extract a small setGridOffsetFromPan(dx,dy) helper to keep pan math and side effects in one place.
+  - Consider an updateUiBindings() helper for the few places we refresh multiple bindings (gridScaleBinding, gridOffsetBinding).
+
+  If you want me to refactor any of these, tell me which ones to prioritize.
+  ```
+
+
+  Let's keep Grid.getVertexAt like it is for now but let's do all the other suggestions. Please propose an optimal order in which to do these.
+
+
+  ```
+  • Proposed order (lowest risk → highest impact):
+
+  1. Add clearHighlights() and use it in handleMouseMove + handleMouseLeave
+  2. Add applyContainerOffsets(x, y) and replace repeated container position blocks
+  3. Add setGridOffsetFromPan(dx, dy) to centralize pan math + side effects
+  4. Add refreshGridBindings() for grouped binding refreshes (scale/offset/orbit)
+
+  If that looks good, I’ll implement in this order.
+  ```
+
+  Yes please make it so!
+
+
+  ```
+   Refactors applied as requested:
+
+  - Added clearHighlights() and used it in handleMouseMove and handleMouseLeave.
+  - Added applyContainerOffsets(x, y) and replaced repeated container position blocks.
+  - Added setGridOffsetFromPan(delta) and wired it into the panning rAF path.
+  - Added refreshGridBindings() and used it where scale/offset bindings are refreshed.
+
+  File updated:
+
+  - src/apps/main/index.ts
+
+  Verification:
+
+  - npm run verify ✅
+
+  If you want further cleanup (e.g., consolidating highlight color or orbit updates), I can do another pass.
+  ```
+
+
+  Yes please make another pass and report your findings before changing anything.
+
+  ```
+   Here’s another pass with findings only (no changes made):
+
+  - Stale highlight state risk: updateGrid() clears highlightedEdge/Cell/Vertex but does not reset highlightedEdgeInfo/CellInfo. It bypasses clearHighlights(), so the info fields can become stale. Suggest
+    calling clearHighlights() inside updateGrid() to keep everything consistent.
+  - Duplicate highlight color logic: highlightColor is computed twice in handleMouseMove (edge and cell branches). A small helper like getHighlightColor() would reduce duplication and keep the logic in one
+    place.
+  - Redundant orbit overlay updates: updateGrid() always calls updateOrbitOverlay(), but handleMouseWheel() also calls it after updateGrid() with updated mouseX/Y. This can cause a redundant overlay update.
+    Consider moving orbit overlay updates out of updateGrid() (or add a flag to skip) so callers can update once with correct mouse coordinates.
+  - Highlight clearing duplication: clearHighlights() exists and is used in handleMouseMove/handleMouseLeave, but updateGrid() does its own manual clearing. Use clearHighlights() there to remove duplication and
+    avoid stale info (ties to the first point).
+
+  If you want, I can implement these in a small, safe refactor pass.
+  ```
+
+  Yes please do that.
+
 
 
 

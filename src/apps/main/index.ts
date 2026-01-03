@@ -840,6 +840,32 @@ class GridApp {
     this.particleSystem.spawnParticleOnEdge(edge, progress, direction);
   }
 
+  private clearHighlights() {
+    if (this.highlightedEdge) {
+      this.edgeContainer.removeChild(this.highlightedEdge);
+      this.highlightedEdge = null;
+    }
+    if (this.highlightedCell) {
+      this.gridContainer.removeChild(this.highlightedCell);
+      this.highlightedCell = null;
+    }
+    if (this.highlightedVertex) {
+      this.edgeContainer.removeChild(this.highlightedVertex);
+      this.highlightedVertex = null;
+    }
+    this.highlightedEdgeInfo = null;
+    this.highlightedCellInfo = null;
+  }
+
+  private applyContainerOffsets(x: number, y: number) {
+    this.gridContainer.x = x;
+    this.gridContainer.y = y;
+    this.edgeContainer.x = x;
+    this.edgeContainer.y = y;
+    this.particleContainer.x = x;
+    this.particleContainer.y = y;
+  }
+
   private initGrid() {
     this.gridRenderer = new GridRenderer();
     this.updateGrid();
@@ -874,12 +900,7 @@ class GridApp {
     const offsetY = centerOffsetY + this.config.gridOffset.y * this.config.gridScale;
 
     // Position all containers at the same offset so cells, edges, and particles align
-    this.gridContainer.x = offsetX;
-    this.gridContainer.y = offsetY;
-    this.edgeContainer.x = offsetX;
-    this.edgeContainer.y = offsetY;
-    this.particleContainer.x = offsetX;
-    this.particleContainer.y = offsetY;
+    this.applyContainerOffsets(offsetX, offsetY);
 
     // Convert palette to string format for renderer
     const paletteStrings: Record<number, string> = {};
@@ -1004,8 +1025,7 @@ class GridApp {
 
     this.config.gridScale = clampedScale;
     this.config.gridOffset = { x: 0, y: 0 };
-    this.gridScaleBinding?.refresh();
-    this.gridOffsetBinding?.refresh();
+    this.refreshGridBindings();
     this.updateGrid();
   }
 
@@ -1032,18 +1052,7 @@ class GridApp {
             return;
           }
           const delta = this.pendingPanDelta;
-          this.config.gridOffset = {
-            x: this.panStartOffset.x + delta.x / this.config.gridScale,
-            y: this.panStartOffset.y + delta.y / this.config.gridScale,
-          };
-          const nextX = this.panStartContainerPos.x + delta.x;
-          const nextY = this.panStartContainerPos.y + delta.y;
-          this.gridContainer.x = nextX;
-          this.gridContainer.y = nextY;
-          this.edgeContainer.x = nextX;
-          this.edgeContainer.y = nextY;
-          this.particleContainer.x = nextX;
-          this.particleContainer.y = nextY;
+          this.setGridOffsetFromPan(delta);
         });
       }
       return;
@@ -1061,20 +1070,7 @@ class GridApp {
     this.updateOrbitOverlay();
 
     // Remove previous highlights
-    if (this.highlightedEdge) {
-      this.edgeContainer.removeChild(this.highlightedEdge);
-      this.highlightedEdge = null;
-    }
-    if (this.highlightedCell) {
-      this.gridContainer.removeChild(this.highlightedCell);
-      this.highlightedCell = null;
-    }
-    if (this.highlightedVertex) {
-      this.edgeContainer.removeChild(this.highlightedVertex);
-      this.highlightedVertex = null;
-    }
-    this.highlightedEdgeInfo = null;
-    this.highlightedCellInfo = null;
+    this.clearHighlights();
 
     const isSmartMode = this.config.leftClickMode === 'smart';
     const edgeInfo = (this.config.leftClickMode === 'spawnParticle' || isSmartMode)
@@ -1137,20 +1133,7 @@ class GridApp {
     this.mouseX = 0;
     this.mouseY = 0;
 
-    if (this.highlightedEdge) {
-      this.edgeContainer.removeChild(this.highlightedEdge);
-      this.highlightedEdge = null;
-    }
-    if (this.highlightedCell) {
-      this.gridContainer.removeChild(this.highlightedCell);
-      this.highlightedCell = null;
-    }
-    if (this.highlightedVertex) {
-      this.edgeContainer.removeChild(this.highlightedVertex);
-      this.highlightedVertex = null;
-    }
-    this.highlightedEdgeInfo = null;
-    this.highlightedCellInfo = null;
+    this.clearHighlights();
     this.updateOrbitOverlay();
   }
 
@@ -1260,6 +1243,17 @@ class GridApp {
     }
   }
 
+  private setGridOffsetFromPan(delta: { x: number; y: number }) {
+    if (!this.panStartOffset || !this.panStartContainerPos) return;
+    this.config.gridOffset = {
+      x: this.panStartOffset.x + delta.x / this.config.gridScale,
+      y: this.panStartOffset.y + delta.y / this.config.gridScale,
+    };
+    const nextX = this.panStartContainerPos.x + delta.x;
+    const nextY = this.panStartContainerPos.y + delta.y;
+    this.applyContainerOffsets(nextX, nextY);
+  }
+
   private handleMouseUp(): void {
     if (!this.isPanning) return;
     this.isPanning = false;
@@ -1271,6 +1265,11 @@ class GridApp {
       cancelAnimationFrame(this.panRafId);
       this.panRafId = null;
     }
+    this.refreshGridBindings();
+  }
+
+  private refreshGridBindings() {
+    this.gridScaleBinding?.refresh();
     this.gridOffsetBinding?.refresh();
   }
 
@@ -1352,8 +1351,7 @@ class GridApp {
       y: (cursorY - baseY * nextScale - nextCenterOffset.y) / nextScale,
     };
 
-    this.gridScaleBinding?.refresh();
-    this.gridOffsetBinding?.refresh();
+    this.refreshGridBindings();
     this.updateGrid();
 
     this.mouseX = cursorX - this.edgeContainer.x;
