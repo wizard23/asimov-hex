@@ -1185,43 +1185,30 @@ class GridApp {
       // Right click: highlight-only actions
       const isShift = e.shiftKey;
       if (this.config.leftClickMode === 'spawnParticle') {
-        if (this.highlightedEdgeInfo) {
-          this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
-        }
-        if (this.highlightedCellInfo) {
-          this.removeParticlesOnHighlightedCellEdges();
-        }
+        this.removeParticlesOnHighlightedEdge();
+        this.removeParticlesOnHighlightedCellEdges();
         return;
       }
 
       if (this.config.leftClickMode === 'smart') {
         if (isShift) {
-          if (this.highlightedEdgeInfo) {
-            this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
-          }
-          if (!this.highlightedEdgeInfo && this.highlightedCellInfo) {
+          this.removeParticlesOnHighlightedEdge();
+          if (!this.highlightedEdgeInfo) {
             this.removeParticlesOnHighlightedCellEdges();
           }
           return;
         }
 
         if (this.highlightedEdgeInfo) {
-          this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
+          this.removeParticlesOnHighlightedEdge();
           return;
         }
-        if (this.highlightedCellInfo) {
-          this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = 0;
-          this.updateGrid();
-          return;
-        }
+        this.clearHighlightedCell();
         return;
       }
 
       if (this.config.leftClickMode === 'draw') {
-        if (this.highlightedCellInfo) {
-          this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = 0;
-          this.updateGrid();
-        }
+        this.clearHighlightedCell();
         return;
       }
     }
@@ -1274,6 +1261,17 @@ class GridApp {
 
   private adjustNumericSetting(current: number, delta: number, min: number, max: number) {
     return Math.max(min, Math.min(max, current + delta));
+  }
+
+  private clearHighlightedCell() {
+    if (!this.highlightedCellInfo) return;
+    this.cellStates[this.highlightedCellInfo.row][this.highlightedCellInfo.col] = 0;
+    this.updateGrid();
+  }
+
+  private removeParticlesOnHighlightedEdge() {
+    if (!this.highlightedEdgeInfo) return;
+    this.particleSystem.removeParticlesOnEdge(this.highlightedEdgeInfo);
   }
 
   private handleKeyDown(e: KeyboardEvent) {
