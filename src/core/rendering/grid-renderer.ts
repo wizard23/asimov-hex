@@ -35,10 +35,10 @@ export class GridRenderer {
         container.addChild(cellShape);
 
         if (showCoordinates) {
-          const center = grid.cellToPixel({ col, row });
+          const center = this.getPolygonCentroid(poly);
           // Scale estimation for text size: distance between first two points of polygon / 4 roughly
           const scaleEst = Math.sqrt(Math.pow(poly[0].x - poly[1].x, 2) + Math.pow(poly[0].y - poly[1].y, 2)); 
-          this.drawCoordinates(container, `${col},${row}`, center.x, center.y, scaleEst / 2);
+          this.drawCoordinates(container, `${col},${row}`, center.x, center.y, scaleEst / 6);
         }
 
         if (visualizeEdgeDelta) {
@@ -131,6 +131,17 @@ export class GridRenderer {
     coordText.anchor.set(0.5);
     coordText.position.set(x, y);
     container.addChild(coordText);
+  }
+
+  private getPolygonCentroid(points: Point[]): Point {
+    let x = 0;
+    let y = 0;
+    for (const point of points) {
+      x += point.x;
+      y += point.y;
+    }
+    const count = points.length || 1;
+    return { x: x / count, y: y / count };
   }
 
   // unused?

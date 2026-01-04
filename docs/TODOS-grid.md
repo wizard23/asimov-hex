@@ -844,14 +844,26 @@ Please implement the second point: "flatten by extracting helpers". I'll look at
 
 
 
-A small ux issue/bug with the orbit circle that gets drawn. When the mouse leaves the canvas this should disappear. This is already implemented but it seems to be implemented by just putting the circle in the top left corner. Please relly don't draw the circle when the mouse cursor is not over the canvas.
+A small ux issue/bug with the orbit circle that gets drawn. When the mouse leaves the canvas this should disappear. This is already implemented but it seems to be implemented by just putting the circle in the top left corner. 
 Before you change anything: Is there a reason why the top left corner was used? I guess it's because the particles need a reference point for avoiding/following/orbit. In this case please put it in the center of the grid instead of the top left corner.
 
+
+
+Please really don't draw the circle when the mouse cursor is not over the canvas.
+
+
+
+
+
+Yes please use the grid center. Nut don't suppress the drawing since it's what the particles use.
 
 
 
 There is a UX bug when "Show Coordinates" is selected. For some grid types the font is too large. The triangle grid is the one that has the biggest problems with this.
 Please suggest possible approaches to fix this. Don't change anything yet.
+
+
+Draw Style for Particles: linesegment or circle/disk 
 
 
 
