@@ -50,20 +50,10 @@ export async function getCommitsWithLineStats(
   const skipMerges = options.skipMerges ?? false;
 
   // Run git
-  const child = spawn(
-    "git",
-    [
-      "log",
-      branch,
-      "--no-decorate",
-      "--pretty=format:@@@%n%H|%P|%ct|%an|%ae%n%B",
-      "--numstat",
-    ],
-    {
-      cwd: repoDir,
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
+  const child = spawn("git", getGitLogArgs(branch), {
+    cwd: repoDir,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 
   const rl = readline.createInterface({ input: child.stdout });
 
@@ -190,31 +180,58 @@ function streamToString(stream: NodeJS.ReadableStream | null | undefined): Promi
   });
 }
 
+function getGitLogArgs(branch: string): string[] {
+  return [
+    "log",
+    branch,
+    "--no-decorate",
+    "--pretty=format:@@@%n%H|%P|%ct|%an|%ae%n%B",
+    "--numstat",
+  ];
+}
+
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  getCommitsWithLineStats(process.cwd(), "main")
-    .then(async (commits) => {
-            //   commits
-            //     .sort((a, b) => b.timestamp - a.timestamp)
-            //     .forEach((c) => console.log(c))
+  const run = async () => {
+    const debugGit = process.argv.includes("--debug-git");
+    if (debugGit) {
+      const child = spawn("git", getGitLogArgs("main"), {
+        cwd: process.cwd(),
+        stdio: "inherit",
+      });
+      const exitCode: number = await new Promise((resolve, reject) => {
+        child.on("error", reject);
+        child.on("close", resolve);
+      });
+      process.exit(exitCode);
+    }
 
-            const sorted = commits.sort((a, b) => b.timestamp - a.timestamp);
+    getCommitsWithLineStats(process.cwd(), "main")
+      .then(async (commits) => {
+              //   commits
+              //     .sort((a, b) => b.timestamp - a.timestamp)
+              //     .forEach((c) => console.log(c))
 
-            const outDir = join(process.cwd(), "public/project-history");
-            const outFile = join(outDir, "git-timeline.json");
+              const sorted = commits.sort((a, b) => b.timestamp - a.timestamp);
 
-            await mkdir(outDir, { recursive: true });
-            await writeFile(outFile, JSON.stringify(sorted, null, 2), "utf8");
+              const outDir = join(process.cwd(), "public/project-history");
+              const outFile = join(outDir, "git-timeline.json");
 
-            console.log(`Saved ${sorted.length} commits to ${outFile}`);
-        }
-    )
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
-    });
+              await mkdir(outDir, { recursive: true });
+              await writeFile(outFile, JSON.stringify(sorted, null, 2), "utf8");
+
+              console.log(`Saved ${sorted.length} commits to ${outFile}`);
+          }
+      )
+      .catch((err) => {
+        console.error(err);
+        process.exit(1);
+      });
+  };
+
+  void run();
 }
