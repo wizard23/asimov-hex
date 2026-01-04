@@ -28,6 +28,10 @@
       padding: 20px;
       border-bottom: 1px solid #555;
       background: rgba(30, 30, 30, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
     #header h1 {
       margin-bottom: 10px;
@@ -40,6 +44,28 @@
     #header a:hover {
       color: #6bb0ff;
       text-decoration: underline;
+    }
+    #header .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    #header .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #fullscreen-toggle {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #4a9eff;
+      background: rgba(74, 158, 255, 0.15);
+      color: #dbeaff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #fullscreen-toggle:hover {
+      background: rgba(74, 158, 255, 0.28);
     }
     #content {
       flex: 1;
@@ -78,6 +104,22 @@
     }
     #gesture-hints li {
       margin-bottom: 6px;
+    }
+    .gesture-key {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      margin-right: 8px;
+      border-radius: 999px;
+      background: rgba(74, 158, 255, 0.2);
+      color: #d6e7ff;
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .gesture-desc {
+      color: #c9c9c9;
     }
     #timeline-panel {
       flex: 1;
@@ -162,13 +204,35 @@
       color: #888;
       font-style: italic;
     }
+    body.fullscreen-mode {
+      overflow: hidden;
+    }
+    body.fullscreen-mode #header,
+    body.fullscreen-mode #controls-sidebar {
+      display: none;
+    }
+    body.fullscreen-mode #content {
+      height: 100%;
+    }
+    body.fullscreen-mode #timeline-panel {
+      padding: 0;
+    }
+    body.fullscreen-mode .timeline-canvas-container {
+      border-radius: 0;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <div id="header">
-      <h1>Project Timeline</h1>
-      <a href="index.html">← Back to Main App</a>
+      <div class="header-left">
+        <h1>Project Timeline</h1>
+        <a href="index.html">← Back to Main App</a>
+      </div>
+      <div class="header-actions">
+        <button id="fullscreen-toggle" type="button">Fullscreen Mode</button>
+      </div>
     </div>
     <div id="content">
       <div id="controls-sidebar">
@@ -176,11 +240,10 @@
         <div id="gesture-hints">
           <h3>Mouse Gestures</h3>
           <ul>
-            <li>Hover: highlight a commit and show details.</li>
-            <li>Left-drag: pan the timeline view.</li>
-            <li>Ctrl + left-drag: scroll through groups (grouped mode).</li>
-            <li>Scroll wheel: zoom in/out on the timeline.</li>
-            <li>Ctrl + wheel: scroll through groups (grouped mode).</li>
+            <li><span class="gesture-key">Hover</span><span class="gesture-desc">Highlight a commit and show details.</span></li>
+            <li><span class="gesture-key">Left-drag</span><span class="gesture-desc">Pan the timeline view.</span></li>
+            <li><span class="gesture-key">Wheel</span><span class="gesture-desc">Zoom in/out on the timeline.</span></li>
+            <li id="gesture-group-scroll"><span class="gesture-key">Ctrl + drag / wheel</span><span class="gesture-desc">Scroll through groups.</span></li>
           </ul>
         </div>
       </div>

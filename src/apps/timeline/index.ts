@@ -33,6 +33,7 @@ class TimelineViewer {
   private endDateElement: HTMLElement | null = null;
   private groupByElement: HTMLElement | null = null;
   private centerViewElement: HTMLElement | null = null;
+  private fullscreenToggleElement: HTMLButtonElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -67,6 +68,8 @@ class TimelineViewer {
   private groupGapElement: HTMLElement | null = null;
   private groupScrollSpeedElement: HTMLElement | null = null;
   private extendedScaleTicksElement: HTMLElement | null = null;
+  private gestureHintsElement: HTMLElement | null = null;
+  private gestureGroupScrollElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -77,7 +80,7 @@ class TimelineViewer {
     enableDateFilter: false,
     groupGap: this.timelineGroupedLineGap,
     groupScrollSpeed: 1,
-    extendedScaleTicks: false,
+    extendedScaleTicks: true,
   };
 
   constructor() {
@@ -86,6 +89,7 @@ class TimelineViewer {
   }
 
   private async init() {
+    this.initFullscreenToggle();
     await this.loadTimeline();
     this.initTweakpane();
     this.filterCommits();
@@ -183,6 +187,7 @@ class TimelineViewer {
       this.updateGroupByVisibility();
       this.updateCenterViewVisibility();
       this.updateScaleTickVisibility();
+      this.updateGestureHintsVisibility();
       this.render();
     });
 
@@ -198,6 +203,7 @@ class TimelineViewer {
     }).on('change', () => {
       if (this.config.displayMode !== 'Timeline') return;
       this.updateGroupGapVisibility();
+      this.updateGestureHintsContent();
       this.render();
     });
 
@@ -240,11 +246,30 @@ class TimelineViewer {
     this.groupScrollSpeedElement = groupScrollSpeedBinding.element;
     this.extendedScaleTicksElement = extendedScaleTicksBinding.element;
     this.centerViewElement = centerViewButton.element;
+    this.gestureHintsElement = document.getElementById('gesture-hints');
+    this.gestureGroupScrollElement = document.getElementById('gesture-group-scroll');
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
     this.updateCenterViewVisibility();
     this.updateGroupGapVisibility();
     this.updateScaleTickVisibility();
+    this.updateGestureHintsVisibility();
+    this.updateGestureHintsContent();
+  }
+
+  private initFullscreenToggle() {
+    this.fullscreenToggleElement = document.getElementById('fullscreen-toggle') as HTMLButtonElement | null;
+    if (!this.fullscreenToggleElement) return;
+    this.fullscreenToggleElement.addEventListener('click', () => {
+      document.body.classList.toggle('fullscreen-mode');
+      this.timelineApp?.resize();
+      this.updateTimelineViewport();
+      this.updateTimelineVerticalOffset();
+      this.drawTimeline();
+      this.fullscreenToggleElement!.textContent = document.body.classList.contains('fullscreen-mode')
+        ? 'Exit Fullscreen'
+        : 'Fullscreen Mode';
+    });
   }
 
   private filterCommits() {
@@ -285,6 +310,7 @@ class TimelineViewer {
   private updateGroupByVisibility() {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.groupByElement) this.groupByElement.style.display = display;
+    this.updateGestureHintsContent();
   }
 
   private updateCenterViewVisibility() {
@@ -297,10 +323,23 @@ class TimelineViewer {
     if (this.extendedScaleTicksElement) this.extendedScaleTicksElement.style.display = display;
   }
 
+  private updateGestureHintsVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.gestureHintsElement) this.gestureHintsElement.style.display = display;
+    this.updateGestureHintsContent();
+  }
+
   private updateGroupGapVisibility() {
     const display = this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' ? '' : 'none';
     if (this.groupGapElement) this.groupGapElement.style.display = display;
     if (this.groupScrollSpeedElement) this.groupScrollSpeedElement.style.display = display;
+  }
+
+  private updateGestureHintsContent() {
+    const display = this.config.groupBy === 'None' ? 'none' : '';
+    if (this.gestureGroupScrollElement) {
+      this.gestureGroupScrollElement.style.display = display;
+    }
   }
 
   private render() {
