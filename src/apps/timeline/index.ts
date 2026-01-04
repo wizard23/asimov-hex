@@ -1170,6 +1170,7 @@ class TimelineViewer {
     if (!this.timelineHoverGraphics) return;
     this.timelineHoverGraphics.clear();
     if (!this.hoveredCommit) return;
+    if (this.lockedCommit && this.lockedCommit.hash === this.hoveredCommit.hash) return;
     const point = this.timelineCommitPoints.find(candidate => candidate.commit.hash === this.hoveredCommit?.hash);
     if (!point) return;
     this.timelineHoverGraphics.circle(point.screenX, point.screenY, 7);
@@ -1859,14 +1860,14 @@ class TimelineViewer {
   private getChangeScaleLineYs(grouped: GroupedCommits[], lineYs: number[]): number[] {
     if (lineYs.length === 0) return lineYs;
     if (this.config.groupBy === 'None') return lineYs;
-    if (!this.hoveredCommit) {
-      return [lineYs[Math.floor(lineYs.length / 2)] ?? lineYs[0]];
+    if (!this.lockedCommit) {
+      return [];
     }
     const groupIndex = grouped.findIndex(group => (
-      group.commits.some(commit => commit.hash === this.hoveredCommit?.hash)
+      group.commits.some(commit => commit.hash === this.lockedCommit?.hash)
     ));
     if (groupIndex < 0) {
-      return [lineYs[Math.floor(lineYs.length / 2)] ?? lineYs[0]];
+      return [];
     }
     return [lineYs[groupIndex] ?? lineYs[0]];
   }
