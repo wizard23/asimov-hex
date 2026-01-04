@@ -91,6 +91,7 @@ class TimelineViewer {
 
   private async init() {
     this.initFullscreenToggle();
+    this.initHotkeys();
     await this.loadTimeline();
     this.initTweakpane();
     this.filterCommits();
@@ -280,6 +281,55 @@ class TimelineViewer {
     this.fullscreenExitElement.onclick = () => this.toggleFullscreenMode();
   }
 
+  private initHotkeys() {
+    document.addEventListener('keydown', (event) => this.handleHotkeys(event));
+  }
+
+  private handleHotkeys(event: KeyboardEvent) {
+    if (event.defaultPrevented || this.isTextInputActive()) return;
+
+    if (event.key === 'f' || event.key === 'F') {
+      event.preventDefault();
+      this.toggleFullscreenMode();
+      return;
+    }
+
+    if (this.config.displayMode !== 'Timeline') return;
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.navigateCommit(-1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.navigateCommit(1);
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      this.navigateGroupEdge(-1);
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      this.navigateGroupEdge(1);
+    }
+  }
+
+  private isTextInputActive(): boolean {
+    const active = document.activeElement;
+    if (!active) return false;
+    if (active instanceof HTMLInputElement) return true;
+    if (active instanceof HTMLTextAreaElement) return true;
+    if (active instanceof HTMLSelectElement) return true;
+    if (active instanceof HTMLElement && active.isContentEditable) return true;
+    return false;
+  }
+
   private toggleFullscreenMode() {
     if (this.config.displayMode !== 'Timeline') return;
     document.body.classList.toggle('fullscreen-mode');
@@ -440,6 +490,45 @@ class TimelineViewer {
     this.updateTimelineData();
     this.resetTimelineView();
     this.drawTimeline();
+  }
+
+  private navigateCommit(direction: -1 | 1) {
+    if (this.filteredCommits.length === 0) return;
+    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    const currentIndex = this.filteredCommits.findIndex(commit => commit.hash === current.hash);
+    const startIndex = currentIndex >= 0 ? currentIndex : 0;
+    const nextIndex = this.clamp(startIndex + (direction > 0 ? -1 : 1), 0, this.filteredCommits.length - 1);
+    const nextCommit = this.filteredCommits[nextIndex];
+    if (!nextCommit) return;
+    this.hoveredCommit = nextCommit;
+    this.centerOnCommitData(nextCommit);
+    this.updateTimelineInfo();
+  }
+
+  private navigateGroupEdge(direction: -1 | 1) {
+    if (this.filteredCommits.length === 0) return;
+    if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
+      const target = direction < 0 ? this.filteredCommits[this.filteredCommits.length - 1] : this.filteredCommits[0];
+      if (!target) return;
+      this.hoveredCommit = target;
+      this.centerOnCommitData(target);
+      this.updateTimelineInfo();
+      return;
+    }
+
+    const grouped = this.getGroupedCommits();
+    if (grouped.length === 0) return;
+    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    const currentGroupIndex = grouped.findIndex(group => (
+      group.commits.some(commit => commit.hash === current.hash)
+    ));
+    const groupIndex = currentGroupIndex >= 0 ? currentGroupIndex : 0;
+    const group = grouped[groupIndex];
+    if (!group || group.commits.length === 0) return;
+    const target = direction < 0 ? group.commits[group.commits.length - 1] : group.commits[0];
+    this.hoveredCommit = target;
+    this.centerOnCommitData(target);
+    this.updateTimelineInfo();
   }
 
   private buildCommitCard(commit: Commit): string {
@@ -657,6 +746,11 @@ class TimelineViewer {
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
     if (e.button !== 0) return;
+    const commitPoint = this.findCommitPointAt(e.global.x, e.global.y);
+    if (!e.ctrlKey && commitPoint) {
+      this.centerOnScreenPoint(commitPoint.screenX, commitPoint.screenY);
+      return;
+    }
     this.timelineDragging = true;
     this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
       && this.config.groupBy !== 'None'
@@ -693,6 +787,64 @@ class TimelineViewer {
     }
 
     this.updateHoverCommit(e.global.x, e.global.y);
+  }
+
+  private findCommitPointAt(screenX: number, screenY: number) {
+    const radius = 10;
+    let best: { commit: Commit; screenX: number; screenY: number } | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const point of this.timelineCommitPoints) {
+      const dx = screenX - point.screenX;
+      const dy = screenY - point.screenY;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= radius && dist < bestDistance) {
+        bestDistance = dist;
+        best = point;
+      }
+    }
+    return best;
+  }
+
+  private centerOnCommitData(commit: Commit) {
+    if (!this.timelineApp) return;
+    const grouped = this.getGroupedCommits();
+    const lineOffsets = this.getLineOffsets(grouped.length);
+    const baseLineY = this.worldToScreen(0, 0).y;
+    const lineYs = lineOffsets.map(offset => baseLineY + offset);
+    let groupIndex = 0;
+    for (let i = 0; i < grouped.length; i += 1) {
+      if (grouped[i]?.commits.some(item => item.hash === commit.hash)) {
+        groupIndex = i;
+        break;
+      }
+    }
+    const group = grouped[groupIndex];
+    if (!group) return;
+    const lineY = lineYs[groupIndex] ?? baseLineY;
+    const commitMs = commit.timestamp * 1000;
+    const worldX = (commitMs - group.startMs) / 1000;
+    const screenX = this.worldToScreen(worldX, 0).x;
+    this.centerOnScreenPoint(screenX, lineY);
+  }
+
+  private centerOnScreenPoint(screenX: number, screenY: number) {
+    const dx = this.timelineViewportCenter.x - screenX;
+    this.timelineViewOffset.x += dx;
+
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
+      const grouped = this.getGroupedCommits();
+      const gap = this.getLineGap();
+      const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
+      const dy = this.timelineViewportCenter.y - screenY;
+      this.timelineGroupScrollOffsetY = this.clamp(
+        this.timelineGroupScrollOffsetY + dy,
+        -maxOffset,
+        maxOffset
+      );
+    }
+
+    this.updateTimelineVerticalOffset();
+    this.drawTimeline();
   }
 
   private handleTimelinePointerUp() {
