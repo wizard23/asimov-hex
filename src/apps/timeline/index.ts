@@ -54,6 +54,7 @@ class TimelineViewer {
   private timelineScaleBounds = { min: 0.000001, max: 1 };
   private timelineGroupScrollOffsetY = 0;
   private timelineGroupScrollOffsetStart = 0;
+  private timelineTransitionFrame: number | null = null;
   private timelineDragging = false;
   private timelineDraggingGroups = false;
   private timelineDragStart = { x: 0, y: 0 };
@@ -71,6 +72,7 @@ class TimelineViewer {
   private extendedScaleTicksElement: HTMLElement | null = null;
   private gestureHintsElement: HTMLElement | null = null;
   private gestureGroupScrollElement: HTMLElement | null = null;
+  private transitionDurationElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -82,6 +84,7 @@ class TimelineViewer {
     groupGap: this.timelineGroupedLineGap,
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
+    transitionDuration: 0.5,
   };
 
   constructor() {
@@ -191,6 +194,7 @@ class TimelineViewer {
       this.updateScaleTickVisibility();
       this.updateGestureHintsVisibility();
       this.updateFullscreenToggleVisibility();
+      this.updateTransitionDurationVisibility();
       if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
         this.exitFullscreenMode();
       }
@@ -230,6 +234,13 @@ class TimelineViewer {
       step: 0.1,
     });
 
+    const transitionDurationBinding = this.pane.addBinding(this.config, 'transitionDuration', {
+      label: 'Transition Time (s)',
+      min: 0,
+      max: 1,
+      step: 0.01,
+    });
+
     const extendedScaleTicksBinding = this.pane.addBinding(this.config, 'extendedScaleTicks', {
       label: 'Extend Scale Ticks',
     }).on('change', () => {
@@ -250,6 +261,7 @@ class TimelineViewer {
     this.groupByElement = groupByBinding.element;
     this.groupGapElement = groupGapBinding.element;
     this.groupScrollSpeedElement = groupScrollSpeedBinding.element;
+    this.transitionDurationElement = transitionDurationBinding.element;
     this.extendedScaleTicksElement = extendedScaleTicksBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.gestureHintsElement = document.getElementById('gesture-hints');
@@ -262,6 +274,7 @@ class TimelineViewer {
     this.updateGestureHintsVisibility();
     this.updateGestureHintsContent();
     this.updateFullscreenToggleVisibility();
+    this.updateTransitionDurationVisibility();
   }
 
   private initFullscreenToggle() {
@@ -444,6 +457,13 @@ class TimelineViewer {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.fullscreenToggleElement) {
       this.fullscreenToggleElement.style.display = display;
+    }
+  }
+
+  private updateTransitionDurationVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.transitionDurationElement) {
+      this.transitionDurationElement.style.display = display;
     }
   }
 
@@ -794,6 +814,7 @@ class TimelineViewer {
       this.centerOnScreenPoint(commitPoint.screenX, commitPoint.screenY);
       return;
     }
+    this.cancelTimelineTransition();
     this.timelineDragging = true;
     this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
       && this.config.groupBy !== 'None'
@@ -872,22 +893,63 @@ class TimelineViewer {
 
   private centerOnScreenPoint(screenX: number, screenY: number) {
     const dx = this.timelineViewportCenter.x - screenX;
-    this.timelineViewOffset.x += dx;
+    const targetViewOffsetX = this.timelineViewOffset.x + dx;
+    let targetGroupScrollOffsetY = this.timelineGroupScrollOffsetY;
 
     if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
       const grouped = this.getGroupedCommits();
       const gap = this.getLineGap();
       const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
       const dy = this.timelineViewportCenter.y - screenY;
-      this.timelineGroupScrollOffsetY = this.clamp(
+      targetGroupScrollOffsetY = this.clamp(
         this.timelineGroupScrollOffsetY + dy,
         -maxOffset,
         maxOffset
       );
     }
 
-    this.updateTimelineVerticalOffset();
-    this.drawTimeline();
+    this.animateToOffsets(targetViewOffsetX, targetGroupScrollOffsetY);
+  }
+
+  private animateToOffsets(targetViewOffsetX: number, targetGroupScrollOffsetY: number) {
+    const duration = Math.max(0, Math.min(1, this.config.transitionDuration)) * 1000;
+    if (duration === 0) {
+      this.timelineViewOffset.x = targetViewOffsetX;
+      this.timelineGroupScrollOffsetY = targetGroupScrollOffsetY;
+      this.updateTimelineVerticalOffset();
+      this.drawTimeline();
+      return;
+    }
+
+    this.cancelTimelineTransition();
+
+    const startX = this.timelineViewOffset.x;
+    const startGroupY = this.timelineGroupScrollOffsetY;
+    const deltaX = targetViewOffsetX - startX;
+    const deltaGroupY = targetGroupScrollOffsetY - startGroupY;
+    const startTime = performance.now();
+
+    const step = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      this.timelineViewOffset.x = startX + deltaX * eased;
+      this.timelineGroupScrollOffsetY = startGroupY + deltaGroupY * eased;
+      this.updateTimelineVerticalOffset();
+      this.drawTimeline();
+      if (t < 1) {
+        this.timelineTransitionFrame = requestAnimationFrame(step);
+      } else {
+        this.timelineTransitionFrame = null;
+      }
+    };
+
+    this.timelineTransitionFrame = requestAnimationFrame(step);
+  }
+
+  private cancelTimelineTransition() {
+    if (this.timelineTransitionFrame === null) return;
+    cancelAnimationFrame(this.timelineTransitionFrame);
+    this.timelineTransitionFrame = null;
   }
 
   private handleTimelinePointerUp() {
@@ -900,6 +962,7 @@ class TimelineViewer {
     e.preventDefault();
 
     if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' && e.ctrlKey) {
+      this.cancelTimelineTransition();
       const grouped = this.getGroupedCommits();
       const gap = this.getLineGap();
       const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
@@ -926,6 +989,7 @@ class TimelineViewer {
     const nextScale = this.clamp(this.timelineScale * factor, this.timelineScaleBounds.min, this.timelineScaleBounds.max);
     if (nextScale === this.timelineScale) return;
 
+    this.cancelTimelineTransition();
     this.timelineScale = nextScale;
     const nextScreen = this.worldToScreen(worldPos.x, worldPos.y);
     this.timelineViewOffset.x += screenX - nextScreen.x;
