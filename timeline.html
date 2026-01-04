@@ -67,6 +67,23 @@
     #fullscreen-toggle:hover {
       background: rgba(74, 158, 255, 0.28);
     }
+    #fullscreen-exit {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      z-index: 20;
+      display: none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #4a9eff;
+      background: rgba(74, 158, 255, 0.2);
+      color: #e6f1ff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #fullscreen-exit:hover {
+      background: rgba(74, 158, 255, 0.32);
+    }
     #content {
       flex: 1;
       display: flex;
@@ -221,6 +238,11 @@
       border-radius: 0;
       border: none;
     }
+    body.fullscreen-mode #fullscreen-exit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -248,6 +270,7 @@
         </div>
       </div>
       <div id="timeline-panel">
+        <button id="fullscreen-exit" type="button">Exit Fullscreen</button>
         <div class="no-data">Loading timeline...</div>
       </div>
     </div>

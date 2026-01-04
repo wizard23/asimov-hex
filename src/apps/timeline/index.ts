@@ -34,6 +34,7 @@ class TimelineViewer {
   private groupByElement: HTMLElement | null = null;
   private centerViewElement: HTMLElement | null = null;
   private fullscreenToggleElement: HTMLButtonElement | null = null;
+  private fullscreenExitElement: HTMLButtonElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -259,17 +260,32 @@ class TimelineViewer {
 
   private initFullscreenToggle() {
     this.fullscreenToggleElement = document.getElementById('fullscreen-toggle') as HTMLButtonElement | null;
-    if (!this.fullscreenToggleElement) return;
-    this.fullscreenToggleElement.addEventListener('click', () => {
-      document.body.classList.toggle('fullscreen-mode');
-      this.timelineApp?.resize();
-      this.updateTimelineViewport();
-      this.updateTimelineVerticalOffset();
-      this.drawTimeline();
-      this.fullscreenToggleElement!.textContent = document.body.classList.contains('fullscreen-mode')
+    this.fullscreenToggleElement?.addEventListener('click', () => this.toggleFullscreenMode());
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (!document.body.classList.contains('fullscreen-mode')) return;
+      this.toggleFullscreenMode();
+    });
+    this.bindFullscreenExit();
+  }
+
+  private bindFullscreenExit() {
+    this.fullscreenExitElement = document.getElementById('fullscreen-exit') as HTMLButtonElement | null;
+    if (!this.fullscreenExitElement) return;
+    this.fullscreenExitElement.onclick = () => this.toggleFullscreenMode();
+  }
+
+  private toggleFullscreenMode() {
+    document.body.classList.toggle('fullscreen-mode');
+    this.timelineApp?.resize();
+    this.updateTimelineViewport();
+    this.updateTimelineVerticalOffset();
+    this.drawTimeline();
+    if (this.fullscreenToggleElement) {
+      this.fullscreenToggleElement.textContent = document.body.classList.contains('fullscreen-mode')
         ? 'Exit Fullscreen'
         : 'Fullscreen Mode';
-    });
+    }
   }
 
   private filterCommits() {
@@ -384,6 +400,7 @@ class TimelineViewer {
     this.timelinePanel.innerHTML = `
       <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}${dateSuffix}</h2>
       <div class="timeline-canvas-container">
+        <button id="fullscreen-exit" type="button">Exit Fullscreen</button>
         <div id="timeline-canvas"></div>
         <div id="timeline-info" class="timeline-info-overlay">${this.renderCommitInfo(null)}</div>
       </div>
@@ -392,6 +409,7 @@ class TimelineViewer {
     const canvasContainer = document.getElementById('timeline-canvas');
     if (!canvasContainer) return;
     this.timelineInfoContainer = document.getElementById('timeline-info');
+    this.bindFullscreenExit();
 
     await this.initTimelinePixi(canvasContainer);
     this.updateTimelineData();
