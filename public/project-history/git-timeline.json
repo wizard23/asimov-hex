@@ -1,10 +1,37 @@
 [
   {
+    "hash": "a72f00f9fbe9164edf0cfdd9aa2948709c74e3ac",
+    "timestamp": 1767510564,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Center grid coordinates and adjust text size\n\n- Replace `grid.cellToPixel` with `getPolygonCentroid` for coordinate label positioning, ensuring labels are visually centered within irregular cell shapes.\n- Reduce coordinate text size scaling factor from `scaleEst / 2` to `scaleEst / 6` to prevent overlapping labels.\n- Implement `getPolygonCentroid` helper method in `GridRenderer`.",
+    "addedLines": 26,
+    "removedLines": 3
+  },
+  {
+    "hash": "8363bb25b7e871a8a95fb1eff93897765e4ae3a8",
+    "timestamp": 1767508687,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Center orbit cursor on mouse leave\n\n- Update `handleMouseLeave` in `GridApp` to calculate the visual center of the grid and move the orbit cursor there instead of hiding it or resetting to (0,0).\n- Ensures the orbit visualization remains active and centered when the mouse exits the canvas, providing a cleaner fallback state.",
+    "addedLines": 9,
+    "removedLines": 1
+  },
+  {
+    "hash": "954fe5fdc1ef6101a9bc45056c9b271abf97f2d9",
+    "timestamp": 1767447778,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 752,
+    "removedLines": 0
+  },
+  {
     "hash": "1ab6e3a436e204658b7bc743e11303ad100b619e",
     "timestamp": 1767447761,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Use relative time labels for grouped timeline",
+    "message": "feat: Use relative time labels for grouped timeline\n\n- Introduce `formatScaleTickLabel` to generate relative time labels (e.g., \"00:00\", \"01:00\") relative to the group start, instead of absolute dates.\n- Suppress \"Milestone\" labels (like year/month transitions) when grouping is active to avoid clutter and confusion with synthetic relative times.\n- Update `drawScaleUnit` and `drawScaleMilestones` to use the new formatting logic.\n- Implements specific relative formatting for minute, hour, day, month, and year units based on the active grouping mode.",
     "addedLines": 80,
     "removedLines": 13
   },
@@ -13,7 +40,7 @@
     "timestamp": 1767447436,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add extended scale ticks",
+    "message": "feat: Add extended scale ticks\n\n- Add `extendedScaleTicks` option to Timeline configuration and UI.\n- When enabled, draws faint vertical lines extending from the scale down through the timeline, helping users align events across groups.\n- Option is visible only in Timeline mode.",
     "addedLines": 24,
     "removedLines": 0
   },
@@ -22,7 +49,7 @@
     "timestamp": 1767447206,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Improve timeline scale visibility",
+    "message": "feat: Improve timeline scale visibility\n\n- Raise z-index of timeline scale graphics and text to ensure they render above other elements (like group labels and commit points).\n- Add a semi-transparent background and border to the scale overlay to improve readability and separation from scrolling content.",
     "addedLines": 6,
     "removedLines": 2
   },
@@ -31,7 +58,7 @@
     "timestamp": 1767446947,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add configurable group scroll speed",
+    "message": "feat: Add configurable group scroll speed\n\n- Add `groupScrollSpeed` configuration to adjust the vertical scrolling sensitivity in grouped timeline view.\n- Expose scroll speed control in Tweakpane UI, visible only when grouping is active.\n- Scroll delta is now calculated as `direction * gap * speed`.",
     "addedLines": 14,
     "removedLines": 1
   },
@@ -40,7 +67,7 @@
     "timestamp": 1767446661,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Snap timeline scrolling to group gap",
+    "message": "feat: Snap timeline scrolling to group gap\n\n- Update vertical scrolling logic (Ctrl+Scroll) in grouped timeline view to snap by `groupGap` increments.\n- Improves navigation precision by aligning scroll steps with group rows.",
     "addedLines": 3,
     "removedLines": 1
   },
@@ -49,7 +76,7 @@
     "timestamp": 1767446447,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Make group gap configurable",
+    "message": "feat: Make group gap configurable\n\n- Add `groupGap` to timeline configuration and Tweakpane UI.\n- Allow adjusting vertical spacing between groups dynamically when grouping is active.\n- Automatically hide the \"Group Gap\" control when grouping is disabled or not in Timeline mode.\n- Update `getLineGap` to use the configured `groupGap` value.",
     "addedLines": 21,
     "removedLines": 1
   },
@@ -58,7 +85,7 @@
     "timestamp": 1767446224,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Implement vertical scrolling for grouped timeline",
+    "message": "feat: Implement vertical scrolling for grouped timeline\n\n- Add `timelineGroupScrollOffsetY` to track vertical scroll position in grouped view.\n- Update `handleTimelineWheel` to handle Ctrl+Scroll for vertical scrolling when grouping is active.\n- Update `updateTimelineVerticalOffset` to apply the scroll offset.\n- Reset scroll offset when resetting the timeline view.",
     "addedLines": 19,
     "removedLines": 0
   },
@@ -67,7 +94,7 @@
     "timestamp": 1767445995,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Adjust timeline layout for grouped view",
+    "message": "feat: Adjust timeline layout for grouped view\n\n- Update `resetTimelineView` to dynamically calculate left and right padding based on group labels and change scale width when grouping is active.\n- Refactor `drawChangeScale` to accept grouped commits and adjust drawing logic (though implementation details are truncated in the diff).\n- Introduce `timelineGroupedLineGap` constant for better vertical spacing in grouped views.",
     "addedLines": 123,
     "removedLines": 25
   },
@@ -85,7 +112,7 @@
     "timestamp": 1767444739,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "human: docs: Update TODO lists and notes",
+    "message": "human: docs: Update TODO lists and notes\n\n- Add vision notes on structured tags, algebraic data types, and templating engine ideas to `docs/TODOS-asimov-core.md`.\n- Update `docs/TODOS-commit-messages.md` with a prompt snippet for generating commit messages.\n- Document recent refactoring achievements (centralized highlighting, orbit overlay optimization) in `docs/TODOS-grid.md`.",
     "addedLines": 183,
     "removedLines": 1
   },
@@ -94,7 +121,7 @@
     "timestamp": 1767444596,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Simplify right-click handlers",
+    "message": "Refactor: Simplify right-click handlers\n\n- Introduce `removeParticlesOnHighlightedEdge` and `clearHighlightedCell` helper methods to encapsulate common actions.\n- Simplify right-click logic in `handleMouseDown` by using these helpers, reducing code duplication and improving readability for 'spawnParticle', 'smart', and 'draw' modes.",
     "addedLines": 18,
     "removedLines": 20
   },
@@ -103,7 +130,7 @@
     "timestamp": 1767444356,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Consolidate particle removal and numeric adjustment logic",
+    "message": "Refactor: Consolidate particle removal and numeric adjustment logic\n\n- Extract `removeParticlesOnHighlightedCellEdges` to eliminate duplicate logic for deleting particles from a selected cell.\n- Introduce `adjustNumericSetting` helper to standardize clamped value updates for configuration settings.\n- Apply `adjustNumericSetting` to keyboard handlers for orbit distance and particle speed adjustments.",
     "addedLines": 17,
     "removedLines": 12
   },
@@ -112,7 +139,7 @@
     "timestamp": 1767443653,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: Centralize orbit mouse updates",
+    "message": "refactor: Centralize orbit mouse updates\n\n- Introduce `setOrbitMouse` to encapsulate `mouseX`/`mouseY` updates and orbit overlay refreshing.\n- Refactor `handleMouseMove`, `handleMouseLeave`, and `handleMouseWheel` to use `setOrbitMouse`, ensuring consistent behavior and reducing code duplication.",
     "addedLines": 9,
     "removedLines": 11
   },
@@ -121,7 +148,7 @@
     "timestamp": 1767443525,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: Centralize highlight color logic",
+    "message": "refactor: Centralize highlight color logic\n\n- Introduce `getHighlightColor` helper method to standardize edge and cell highlight color retrieval.\n- Update `updateGrid` to use `clearHighlights` for consistent state cleanup.\n- Replace duplicate highlight color logic in mouse move handler with `getHighlightColor`.",
     "addedLines": 9,
     "removedLines": 11
   },
@@ -130,7 +157,7 @@
     "timestamp": 1767443172,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Consolidate grid update logic",
+    "message": "Refactor: Consolidate grid update logic\n\n- Introduce `applyContainerOffsets` to centralize container positioning.\n- Create `clearHighlights` to manage highlight cleanup.\n- Refactor `setGridOffsetFromPan` to handle panning logic (inferred from diff context, as method name appears in usage).\n- Use `refreshGridBindings` (inferred) to update UI bindings.\n- Reduce code duplication in `updateGrid` and event handlers.",
     "addedLines": 217,
     "removedLines": 50
   },
@@ -139,7 +166,7 @@
     "timestamp": 1767441951,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: Remove focus debug overlay",
+    "message": "refactor: Remove focus debug overlay\n\n- Remove the `focus-debug` element and related methods (`initFocusDebug`, `updateFocusDebug`) from `GridApp` and `index.html`.\n- The debug overlay was useful for development but is no longer needed in the production UI.\n- `focusBindingInput` remains active for accessibility but no longer updates the debug label.",
     "addedLines": 0,
     "removedLines": 44
   },
@@ -148,7 +175,7 @@
     "timestamp": 1767441554,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add focus debug overlay and auto-focus bindings",
+    "message": "feat: Add focus debug overlay and auto-focus bindings\n\n- Add a debug overlay at the bottom of the screen to display the currently focused element's ID, name, and classes.\n- Implement `focusBindingInput` helper to programmatically focus Tweakpane inputs.\n- Automatically focus the corresponding input field when using 'O' (Orbit) or 'P' (Particle Speed) hotkeys, improving keyboard accessibility and feedback.",
     "addedLines": 55,
     "removedLines": 0
   },
@@ -157,7 +184,7 @@
     "timestamp": 1767440321,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add keyboard shortcuts for Orbit and Particle settings",
+    "message": "feat: Add keyboard shortcuts for Orbit and Particle settings\n\n- Implement 'O' key handler to adjust orbit distance (Shift+O to decrease).\n- Implement 'P' key handler to adjust particle speed (Shift+P to decrease).\n- Bind particle speed control to `particleSpeedBinding` for UI synchronization.\n- Consolidate keyboard event handling in `handleKeyDown`.",
     "addedLines": 33,
     "removedLines": 5
   },
@@ -166,7 +193,7 @@
     "timestamp": 1767439317,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add spacebar shortcut for simulation toggle",
+    "message": "feat: Add spacebar shortcut for simulation toggle\n\n- Implement `handleKeyDown` listener to toggle simulation running state when the Spacebar is pressed.\n- Prevent default spacebar scrolling behavior.\n- Ensure the shortcut is ignored when focusing input elements.",
     "addedLines": 123,
     "removedLines": 3
   },
@@ -175,7 +202,7 @@
     "timestamp": 1767438774,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add simulation toolbar",
+    "message": "feat: Add simulation toolbar\n\n- Implement a floating toolbar with a play/pause button for the simulation.\n- Add `isSimulationRunning` to `AppConfig` to track simulation state.\n- Update `index.html` with styles for the toolbar.\n- Initialize toolbar in `GridApp` and handle button clicks to toggle simulation state.",
     "addedLines": 65,
     "removedLines": 0
   },
@@ -184,7 +211,7 @@
     "timestamp": 1767412174,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "perf: Optimize panning with requestAnimationFrame",
+    "message": "perf: Optimize panning with requestAnimationFrame\n\n- Throttles panning updates in `GridApp` using `requestAnimationFrame` to ensure visual updates are synchronized with the display refresh rate.\n- Reduces CPU overhead by only processing the latest mouse delta per frame during high-frequency `mousemove` events.\n- Defers UI binding refresh until `mouseup` to minimize redundant DOM updates.\n- Properly handles RAF cancellation during input start/end to prevent stale updates.",
     "addedLines": 34,
     "removedLines": 14
   },
@@ -193,7 +220,7 @@
     "timestamp": 1767411271,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "perf: Optimize grid panning performance",
+    "message": "perf: Optimize grid panning performance\n\n- Update `GridApp` to directly modify container positions (`gridContainer`, `edgeContainer`, `particleContainer`) during panning instead of triggering a full `updateGrid()` recalculation on every mouse move.\n- Add `panStartContainerPos` to track initial container coordinates for precise delta application.\n- This results in significantly smoother panning feedback.",
     "addedLines": 13,
     "removedLines": 1
   },
@@ -202,7 +229,7 @@
     "timestamp": 1767411064,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add session resume support to codex-with-autotranscript.sh",
+    "message": "feat: Add session resume support to codex-with-autotranscript.sh\n\n- Add optional [session-id] argument to resume existing sessions.\n- Validate session ID as a UUID.\n- Append session ID to the transcript log filename when resuming.",
     "addedLines": 19,
     "removedLines": 4
   },
@@ -220,7 +247,7 @@
     "timestamp": 1767407669,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Clear highlights on mouse leave",
+    "message": "feat: Clear highlights on mouse leave\n\n- Implement `handleMouseLeave` to clear all grid highlights (edges, cells, vertices) when the mouse exits the canvas.\n- Update `handleMouseWheel` to recalculate `mouseX`/`mouseY` relative to the grid and refresh the orbit overlay, fixing highlight drift during zooming.",
     "addedLines": 106,
     "removedLines": 0
   },
@@ -229,7 +256,7 @@
     "timestamp": 1767407614,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Implement grid panning with Ctrl+Click",
+    "message": "feat: Implement grid panning with Ctrl+Click\n\n- Add `isPanning`, `panStartMouse`, and `panStartOffset` state to `GridApp`.\n- Implement `handleMouseDown` to initiate panning when Ctrl is held.\n- Implement `handleMouseMove` to update `gridOffset` based on mouse movement during panning.\n- Implement `handleMouseUp` to end the panning session.\n- Add `window` level mouseup listener to ensure panning stops even if the mouse leaves the canvas.",
     "addedLines": 30,
     "removedLines": 0
   },
@@ -238,7 +265,7 @@
     "timestamp": 1767406095,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Smooth zoom interaction",
+    "message": "feat: Smooth zoom interaction\n\n- Change mouse wheel zoom to use a multiplicative factor (31/30) instead of a fixed linear step for smoother and more proportional zooming.\n- Update grid scale binding step to 0.1 for finer manual control.",
     "addedLines": 5,
     "removedLines": 3
   },
@@ -247,7 +274,7 @@
     "timestamp": 1767405745,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Implement mouse-centered zooming and pan offset",
+    "message": "feat: Implement mouse-centered zooming and pan offset\n\n- Add `gridOffset` to AppConfig to support panning logic (pan interaction not yet fully implemented).\n- Update `centerViewToGrid` to reset `gridOffset` to `{0,0}`.\n- Refactor grid positioning in `updateGrid` to apply both center alignment and manual `gridOffset`.\n- Add helper `getCenterOffsetForScale` to calculate centering coordinates.\n- Update mouse wheel handler to zoom towards the mouse pointer instead of the grid center.\n- Add `Grid Offset` control to the Advanced settings panel.",
     "addedLines": 45,
     "removedLines": 4
   },
@@ -265,7 +292,7 @@
     "timestamp": 1767401215,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: Remove unused `getVertexAtPixel` and cleanup particle spawning",
+    "message": "refactor: Remove unused `getVertexAtPixel` and cleanup particle spawning\n\n- Remove `getVertexAtPixel` from `src/core/grid/grid-selection.ts` and its export in `src/core/grid/index.ts` as it's no longer used.\n- Refactor repeated random cell-edge particle spawning logic into `spawnParticleOnRandomCellEdge` method in `GridApp` to reduce code duplication.",
     "addedLines": 13,
     "removedLines": 33
   },
@@ -274,7 +301,7 @@
     "timestamp": 1767400635,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Optimize vertex highlighting",
+    "message": "feat: Optimize vertex highlighting\n\n- Replace expensive `getVertexAtPixel` search with a direct distance check against the endpoints of the currently highlighted edge.\n- Add \"Vertex Highlighting\" toggle to the Advanced settings panel.\n- This optimization avoids redundant grid searches when an edge is already identified.",
     "addedLines": 19,
     "removedLines": 13
   },
@@ -292,7 +319,7 @@
     "timestamp": 1767399600,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Use helpers for DOM element retrieval in Markdown Viewer",
+    "message": "Refactor: Use helpers for DOM element retrieval in Markdown Viewer\n\n- Replace direct `document.getElementById` calls and repetitive null checks with helper functions (`requireElement`, `requireInputElement`, `requireFormElement`).\n- Ensure type safety and cleaner error handling during initialization.",
     "addedLines": 29,
     "removedLines": 9
   },
@@ -301,7 +328,7 @@
     "timestamp": 1767398600,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Link User Manual from Main App",
+    "message": "feat: Link User Manual from Main App\n\n- Add a \"Documentation\" section to the \"About\" tab in the Main App.\n- Add a \"User Manual\" link pointing to the new Markdown Viewer, loading the Main App's manual page (`/documentation/user-manual/main/index.md`).",
     "addedLines": 102,
     "removedLines": 12
   },
@@ -310,7 +337,7 @@
     "timestamp": 1767396716,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Toggle meta controls in Markdown Viewer",
+    "message": "feat: Toggle meta controls in Markdown Viewer\n\n- Add a checkbox to hide the header and status bar (\"Meta Controls\") for a cleaner reading experience.\n- Implement 'm' keyboard shortcut to toggle visibility.\n- Controls are hidden by default when loading the app.\n- Update CSS to handle the `.hide-meta` state.\n- Update HTML to reflect default hidden state and improved label text.",
     "addedLines": 39,
     "removedLines": 2
   },
@@ -319,7 +346,7 @@
     "timestamp": 1767394998,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Allow internal navigation in Markdown Viewer",
+    "message": "feat: Allow internal navigation in Markdown Viewer\n\n- Remove `target=\"_blank\"` and `rel=\"noopener noreferrer\"` from links generated in the Markdown Viewer.\n- This allows relative links (which are rewritten to use the viewer) to open in the current tab instead of a new one, improving the navigation flow for documentation sets.",
     "addedLines": 0,
     "removedLines": 4
   },
@@ -328,7 +355,7 @@
     "timestamp": 1767394645,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Support relative links in Markdown Viewer",
+    "message": "feat: Support relative links in Markdown Viewer\n\n- Pass `baseUrl` (the URL of the current markdown file) down through `renderMarkdown` and `appendInline` to `appendLinksAndEmphasis`.\n- Resolve relative links in markdown against `baseUrl` so they point to the correct location.\n- If a link points to another `.md` file, rewrite it to open within the Markdown Viewer app (`?url=...`).",
     "addedLines": 6,
     "removedLines": 1
   },
@@ -337,7 +364,7 @@
     "timestamp": 1767394475,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Support relative links in Markdown Viewer",
+    "message": "feat: Support relative links in Markdown Viewer\n\n- Pass `baseUrl` (the URL of the current markdown file) down through `renderMarkdown` and `appendInline` to `appendLinksAndEmphasis`.\n- Resolve relative links in markdown against `baseUrl` so they point to the correct location.\n- If a link points to another `.md` file, rewrite it to open within the Markdown Viewer app (`?url=...`).",
     "addedLines": 21,
     "removedLines": 10
   },
@@ -346,7 +373,7 @@
     "timestamp": 1767394031,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add standalone Markdown Viewer app",
+    "message": "feat: Add standalone Markdown Viewer app\n\n- Implement `markdown-viewer.html` and `src/apps/markdown-viewer/index.ts` to render Markdown files directly in the browser.\n- Supports headings, paragraphs, lists (ordered/unordered), blockquotes, code blocks, inline code, links, bold, and italic text.\n- Provides a simple UI with a URL input field and support for the `?url=` query parameter.\n- Register `markdownViewer` in `vite.config.ts` as a new entry point.",
     "addedLines": 456,
     "removedLines": 0
   },
@@ -355,7 +382,7 @@
     "timestamp": 1767393132,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "docs: Create user manual pages for Main App and Statistics",
+    "message": "docs: Create user manual pages for Main App and Statistics\n\n- Create `public/documentation/user-manual/index.md` as the main entry point for the user manual.\n- Create `public/documentation/user-manual/main/index.md` detailing the Main App's layout, coordinates, controls, and interaction modes (Draw, Spawn Particle, Smart).\n- Initialize `public/documentation/user-manual/statistics/index.md` with an overview of the Project Statistics viewer.",
     "addedLines": 292,
     "removedLines": 0
   },
@@ -364,7 +391,7 @@
     "timestamp": 1767387832,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Improve statistics table layout and default exclusions",
+    "message": "feat: Improve statistics table layout and default exclusions\n\n- Update `statistics.html` and `src/apps/statistics/index.ts` to use fixed table layouts with defined `<colgroup>` widths for better column alignment and readability.\n- Add `.vscode` to the default `excludedFolders` list in `create-project-statistics.ts` to exclude editor configuration from statistics.",
     "addedLines": 704,
     "removedLines": 0
   },
@@ -391,7 +418,7 @@
     "timestamp": 1767384754,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: Mark optional fields in ProjectStatistics",
+    "message": "refactor: Mark optional fields in ProjectStatistics\n\n- Update `ProjectStatistics` interface in `types.ts` to mark `includedFiles`, `excludedFolders`, and `excludedFiles` as optional, ensuring compatibility with older statistics files that may lack these fields.\n- Update `index.ts` to correctly handle `undefined` values for `includedFiles` when sorting and rendering.",
     "addedLines": 23,
     "removedLines": 12
   },
@@ -400,7 +427,7 @@
     "timestamp": 1767384604,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Persist collapsible section state",
+    "message": "feat: Persist collapsible section state\n\n- Implement state tracking for collapsible sections (Overview, File Types, All Files, Excluded Paths, Repo Stats) in `StatisticsViewer`.\n- Preserve open/closed state of sections across re-renders (e.g., when sorting tables or switching files).\n- Add event listeners to `<details>` elements to update `sectionState` on toggle.",
     "addedLines": 34,
     "removedLines": 5
   },
@@ -409,7 +436,7 @@
     "timestamp": 1767383958,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Use collapsible sections for statistics",
+    "message": "feat: Use collapsible sections for statistics\n\n- Wrap major statistics sections (Overview, File Types, All Files, Excluded Paths, Repo Stats) in `<details>` elements for collapsible UI.\n- Ensure sections are open by default.\n- Handle legacy statistics data where `includedFiles` might be missing by conditionally rendering the \"All Files\" table or an \"unknown\" placeholder.",
     "addedLines": 45,
     "removedLines": 24
   },
@@ -418,7 +445,7 @@
     "timestamp": 1767383037,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Make file type breakdown table sortable",
+    "message": "feat: Make file type breakdown table sortable\n\n- Add sorting functionality to the \"File Types Breakdown\" table.\n- Implement `sortFileTypes` helper and state management for sort key and direction.\n- Update table headers to be interactive with sort indicators.\n- Use generic sort handling patterns consistent with the \"All Files\" table.",
     "addedLines": 97,
     "removedLines": 7
   },
@@ -436,7 +463,7 @@
     "timestamp": 1767378933,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Remove redundant file groupings from statistics",
+    "message": "Refactor: Remove redundant file groupings from statistics\n\n- Remove \"Included Files by Type\" section and related helper functions `renderIncludedFilesByType` and `groupFilesByType`.\n- Remove unused styles for file grouping from `statistics.html`.\n- The \"All Files\" table now serves as the primary view for file details, reducing clutter and redundancy.",
     "addedLines": 0,
     "removedLines": 58
   },
@@ -445,7 +472,7 @@
     "timestamp": 1767378246,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add sort direction to statistics file table",
+    "message": "feat: Add sort direction to statistics file table\n\n- Implement ascending/descending sort toggling for the \"All Files\" table in the statistics viewer.\n- Add sort indicators (arrows) to table headers.\n- Set sensible default sort directions: ascending for text columns, descending for numeric columns.\n- Refactor `renderAllFilesTable` and helper functions to support directional sorting.",
     "addedLines": 66,
     "removedLines": 15
   },
@@ -454,7 +481,7 @@
     "timestamp": 1767376841,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "docs: Update TODO lists and guidelines",
+    "message": "docs: Update TODO lists and guidelines\n\n- Add templating engine ideas to `docs/TODOS-asimov-core.md`.\n- Create `docs/TODOS-golden.md` with instructions for verifying CI failures.\n- Update `docs/TODOS-grid.md` with detailed smart click behavior specs and cleanup plans.\n- Archive old timeline todos into `docs/TODOS-timeline.md` and initialize a new history section.\n- Expand `docs/documentation/user-manual/ai-instructions.md` with comprehensive documentation guidelines for the main app and sub-apps.",
     "addedLines": 824,
     "removedLines": 501
   },
@@ -463,7 +490,7 @@
     "timestamp": 1767376680,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Enhance statistics report with detailed file breakdowns",
+    "message": "feat: Enhance statistics report with detailed file breakdowns\n\n- Update `ProjectStatistics` interface to include `includedFiles`, providing per-file stats (path, type, lines, words, bytes).\n- Enhance `StatisticsViewer` to display:\n  - \"Included Files by Type\": Grouped details in collapsible sections.\n  - \"All Files\": A sortable table listing every included file with its metrics.\n- Update styles in `statistics.html` to support sortable headers and file grouping UI.\n- Regenerate statistics JSON with new data structure.",
     "addedLines": 873,
     "removedLines": 23
   },
@@ -481,7 +508,7 @@
     "timestamp": 1767371135,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Simplify mouse handling using highlighted info",
+    "message": "Refactor: Simplify mouse handling using highlighted info\n\n- Remove redundant pixel-to-grid calculations in `handleMouseDown` by leveraging `highlightedEdgeInfo` and `highlightedCellInfo` computed in `updateHighlights`.\n- Simplify `spawnParticle` and `draw` mode logic to directly use pre-calculated highlight information.\n- Remove unused `canvas` and `rect` variables from `handleMouseDown`.",
     "addedLines": 18,
     "removedLines": 63
   },
@@ -490,7 +517,7 @@
     "timestamp": 1767370120,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Separate smart mode logic in click handlers",
+    "message": "Refactor: Separate smart mode logic in click handlers\n\n- Refactor `GridApp` left-click handling to isolate `smart` mode logic from `spawnParticle` and `draw` modes for better clarity.\n- Implement explicit checks for highlighted edges and cells in `smart` mode to handle particle spawning (edge click) and state drawing (cell click) or random particle spawning (Shift + cell click).\n- Adjust right-click + Shift behavior in `smart` mode to prioritize edge deletion over cell-wide deletion.",
     "addedLines": 45,
     "removedLines": 10
   },
@@ -499,7 +526,7 @@
     "timestamp": 1767365141,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Still buggy: feat: Enable cell-wide particle deletion in smart mode",
+    "message": "Still buggy: feat: Enable cell-wide particle deletion in smart mode\n\n- Update right-click + Shift behavior in 'smart' mode to remove particles from all edges of the highlighted cell, consistent with 'spawnParticle' mode functionality.",
     "addedLines": 7,
     "removedLines": 0
   },
@@ -508,7 +535,7 @@
     "timestamp": 1767362974,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Still buggy: Refactor: Refine particle deletion interactions",
+    "message": "Still buggy: Refactor: Refine particle deletion interactions\n\n- Update right-click logic in `GridApp` to better handle particle deletion in different modes.\n- In 'spawnParticle' mode, right-click now reliably removes particles from highlighted edges or cells without clearing cell state.\n- In 'smart' mode, right-click + Shift is now required to remove particles from a highlighted edge.",
     "addedLines": 20,
     "removedLines": 11
   },
@@ -526,7 +553,7 @@
     "timestamp": 1767361523,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: Add ability to delete particles with right-click",
+    "message": "feat: Add ability to delete particles with right-click\n\n- Implement `removeParticlesOnEdge` and `removeParticlesOnEdges` in `ParticleSystem`.\n- Update `GridApp` to track currently highlighted edge and cell info.\n- Bind right-click action to remove particles from the highlighted edge or cell's edges when in particle spawning modes.",
     "addedLines": 37,
     "removedLines": 1
   },
@@ -535,7 +562,7 @@
     "timestamp": 1767348039,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor: Move solver logic to dedicated directory",
+    "message": "Refactor: Move solver logic to dedicated directory\n\n- Move solver source and test files from `src/core/utils/` to `src/core/solver/` to improve project structure.\n- Update `eslint.config.js` to reflect the new directory structure in ignore patterns.\n- Fix imports in `src/apps/tile-editor/index.ts` to point to the new file locations.",
     "addedLines": 6,
     "removedLines": 8
   },
@@ -544,7 +571,7 @@
     "timestamp": 1767346430,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor config labels and scale-relative values",
+    "message": "refactor config labels and scale-relative values\n\n- rename config labels in Tweakpane for clarity (e.g., 'Grid Scale' -> 'Scale', 'Orbit Distance' -> 'Orbit Radius')\n- make particle speed and orbit radius relative to grid scale for consistent behavior at different zoom levels\n- update default values for particle speed and orbit radius to reflect scale-relative units\n- adjust Tweakpane slider ranges for new scale-relative values",
     "addedLines": 56,
     "removedLines": 22
   },
@@ -562,7 +589,7 @@
     "timestamp": 1767310207,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor tweakpane container for better sizing",
+    "message": "refactor tweakpane container for better sizing\n\n- add explicit `#pane-wrap` container in `index.html` to control Tweakpane width\n- style `#pane-wrap` with `width: min(40vw, 420px)` and fixed positioning\n- update `GridApp` to mount Tweakpane into the new container",
     "addedLines": 30,
     "removedLines": 1
   },
@@ -571,7 +598,7 @@
     "timestamp": 1767303601,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: add 'Center View' and 'Clear Particles' controls",
+    "message": "feat: add 'Center View' and 'Clear Particles' controls\n\n- add 'Center View' button to grid controls to automatically fit the grid to the screen\n- add 'Clear Particles' button to particle controls\n- auto-center view when changing grid type\n- expand grid scale range to 1-120\n- refactor grid bounds calculation for better reuse",
     "addedLines": 73,
     "removedLines": 6
   },
@@ -598,7 +625,7 @@
     "timestamp": 1767295070,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: allow spawning particles inside cells",
+    "message": "feat: allow spawning particles inside cells\n\n- enable cell highlighting in 'spawnParticle' mode\n- implement random edge selection within a cell when clicking inside it in 'spawnParticle' mode\n- add `spawnParticleOnEdge` method to `ParticleSystem` to support direct spawning",
     "addedLines": 56,
     "removedLines": 5
   },
@@ -607,7 +634,7 @@
     "timestamp": 1767293729,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "fix(orbit): update overlay visibility and style",
+    "message": "fix(orbit): update overlay visibility and style\n\n- update orbit overlay when edge selection rule or orbit distance changes\n- hide orbit overlay if edge selection rule is not 'orbitCursor'\n- increase orbit overlay stroke width for better visibility",
     "addedLines": 15,
     "removedLines": 13
   },
@@ -616,7 +643,7 @@
     "timestamp": 1767292546,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "add orbit distance visualization",
+    "message": "add orbit distance visualization\n\n- add 'showOrbit' toggle to configuration and UI\n- implement 'updateOrbitOverlay' to draw a circle representing the orbit distance around the mouse cursor\n- update the overlay position on mouse move and grid updates\n- reduce max orbit epsilon value to 2 in Tweakpane settings",
     "addedLines": 40,
     "removedLines": 1
   },
@@ -625,7 +652,7 @@
     "timestamp": 1767291556,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "add 3 and 4 step gradient orbit algorithms",
+    "message": "add 3 and 4 step gradient orbit algorithms\n\n- add 'threeStepGradient' and 'fourStepGradient' to OrbitAlgorithm type\n- update ParticleSystem to support variable path lengths for new gradient algorithms\n- update AppConfig and UI controls to include new algorithms\n- tweak default particle speed and orbit distance",
     "addedLines": 17,
     "removedLines": 4
   },
@@ -634,7 +661,7 @@
     "timestamp": 1767288904,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor orbit edge selection algorithms",
+    "message": "refactor orbit edge selection algorithms\n\n- refactor `findOrbitEdge` into `findOrbitEndpointEdge` and `findOrbitEdgeByPathLength`\n- implement DFS-based path search for `findOrbitEdgeByPathLength` to support variable path lengths (1 for gradient, 2 for 2-step gradient)\n- handle 'distanceToEndpoint', 'gradient', and 'twoStepGradient' algorithms distinctly in `update` loop",
     "addedLines": 126,
     "removedLines": 20
   },
@@ -643,7 +670,7 @@
     "timestamp": 1767287381,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "still buggy: add 2-step gradient orbit algorithm",
+    "message": "still buggy: add 2-step gradient orbit algorithm\n\n- implement twoStepGradient in findOrbitEdge within particle system\n- add '2 Step Gradient' to orbitAlgorithm type and main app configuration\n- update tweakpane controls to include the new algorithm option\n- update TODOS-grid.md with new tasks and algorithm notes",
     "addedLines": 27,
     "removedLines": 4
   },
@@ -652,7 +679,7 @@
     "timestamp": 1767278644,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: add orbit epsilon control and tune defaults",
+    "message": "feat: add orbit epsilon control and tune defaults\n\n- add `orbitEpsilon` to AppConfig and ParticleSystem to control gradient calculation precision\n- pass epsilon value to `getOrbitGradientPoint`\n- add UI control for `orbitEpsilon` in Advanced folder\n- update default particle speed to 200\n- reduce max orbit distance to 400",
     "addedLines": 29,
     "removedLines": 15
   },
@@ -661,7 +688,7 @@
     "timestamp": 1767276573,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "tweak orbit gradient calculation",
+    "message": "tweak orbit gradient calculation\n\n- reduce epsilon to 0.01 and simplify point calculation in `getOrbitGradientPoint`",
     "addedLines": 14,
     "removedLines": 6
   },
@@ -670,7 +697,7 @@
     "timestamp": 1767276159,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat: add orbit algorithm selection",
+    "message": "feat: add orbit algorithm selection\n\n- add `OrbitAlgorithm` type with 'gradient' and 'distanceToEndpoint' options\n- update `AppConfig` and `ParticleSystem` to support configurable orbit algorithms\n- implement `getOrbitGradientPoint` for smoother orbit path calculation\n- add UI control for selecting orbit algorithm in 'Advanced' folder",
     "addedLines": 60,
     "removedLines": 12
   },
@@ -679,7 +706,7 @@
     "timestamp": 1767274634,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "add comprehensive documentation for main app and todo lists - create dev perspective docs for Main app, including architecture, coordinate systems, and interactions - document Grid Controls implementation, including orbit distance and grid scale sync - document Main app types and implementation details like grid centering and smart input resolution - add documentation prompts to `TODOS-commit-messages.md` - create `TODOS-documentation.md` for tracking documentation tasks - create `TODOS-timeline.md` for analyzing file structure",
+    "message": "add comprehensive documentation for main app and todo lists\n- create dev perspective docs for Main app, including architecture, coordinate systems, and interactions\n- document Grid Controls implementation, including orbit distance and grid scale sync\n- document Main app types and implementation details like grid centering and smart input resolution\n- add documentation prompts to `TODOS-commit-messages.md`\n- create `TODOS-documentation.md` for tracking documentation tasks\n- create `TODOS-timeline.md` for analyzing file structure",
     "addedLines": 311,
     "removedLines": 0
   },
@@ -688,7 +715,7 @@
     "timestamp": 1767269391,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat(particles): add orbit cursor rule",
+    "message": "feat(particles): add orbit cursor rule\n\n- implement 'Orbit Cursor' edge selection rule in ParticleSystem\n- add `orbitDistance` parameter to control the target orbit radius\n- update UI to include orbit distance slider, visible only when orbit rule is selected\n- refactor particle update and vertex arrival logic to support the new rule",
     "addedLines": 112,
     "removedLines": 9
   },
@@ -697,7 +724,7 @@
     "timestamp": 1767267274,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "remove redundant labels from save/load buttons in tweakpane",
+    "message": "remove redundant labels from save/load buttons in tweakpane\n\n- simplify button configuration by removing explicit labels that duplicated the title",
     "addedLines": 18,
     "removedLines": 6
   },
@@ -706,7 +733,7 @@
     "timestamp": 1767267051,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "group particle controls in gui",
+    "message": "group particle controls in gui\n\n- create 'Particles' folder in Tweakpane\n- move particle speed and edge selection rule controls to the new folder",
     "addedLines": 3,
     "removedLines": 2
   },
@@ -724,7 +751,7 @@
     "timestamp": 1767229582,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "fix tweakpane imports",
+    "message": "fix tweakpane imports\n\n- update BindingApi import to use type-only import from @tweakpane/core",
     "addedLines": 5,
     "removedLines": 4
   },
@@ -733,7 +760,7 @@
     "timestamp": 1767229099,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "add commit scripts and update todos",
+    "message": "add commit scripts and update todos\n\n- add scripts/commit-staged-with-message-from-file-interactive.sh for interactive commits\n- refactor scripts/commit-staged-with-message-from-file.sh with dry-run and validation\n- add commit scripts to package.json\n- add UX issues to docs/TODOS-grid.md",
     "addedLines": 170,
     "removedLines": 69
   },
@@ -742,7 +769,7 @@
     "timestamp": 1767221858,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "add mouse wheel support for grid zooming",
+    "message": "add mouse wheel support for grid zooming\n\n- implement handleMouseWheel method in GridApp\n- add wheel event listener to canvas\n- enable zooming in/out by adjusting gridScale based on scroll direction",
     "addedLines": 46,
     "removedLines": 0
   },
@@ -751,7 +778,7 @@
     "timestamp": 1767221368,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor(main): reorganize Tweakpane controls into folders",
+    "message": "refactor(main): reorganize Tweakpane controls into folders\n\n- group grid controls into 'File', 'Grid', 'GUI', and 'Advanced' folders\n- move grid dimensions, scale, type, and particle speed to 'Grid' folder\n- move palette, edge style, and draw state to 'GUI' folder\n- move left click mode, debug options, and edge palette to 'Advanced' folder\n- improve overall UI organization for better usability",
     "addedLines": 108,
     "removedLines": 99
   },
@@ -769,7 +796,7 @@
     "timestamp": 1767210476,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "feat(main): implement 'Smart' left-click mode",
+    "message": "feat(main): implement 'Smart' left-click mode\n\n- add 'smart' option to `LeftClickMode` type and Tweakpane config\n- update `handleMouseMove` to prioritize edge highlighting over cell highlighting in smart mode\n- update `handleCanvasClick` to support both particle spawning (on edges) and cell drawing in smart mode",
     "addedLines": 43,
     "removedLines": 39
   },
@@ -778,7 +805,7 @@
     "timestamp": 1767210187,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "refactor: organize source files and update docs",
+    "message": "refactor: organize source files and update docs\n\n- move `draw-state-blade.ts` to `src/gui/` and update imports\n- move tests `grid.test.ts` and `triangle-grid-bug.test.ts` to `src/core/` and update imports\n- docs: update `TODOS-grid.md` with recent session logs and new tasks\n- docs: add `TODOD-grid-interface.md` outlining the Grid interface",
     "addedLines": 107,
     "removedLines": 6
   },
@@ -832,7 +859,7 @@
     "timestamp": 1767198649,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "chore: update dev scripts, vscode settings, and reorganize main app",
+    "message": "chore: update dev scripts, vscode settings, and reorganize main app\n\n- vscode: set tab size to 2\n- package.json: rename `prepare-for-release` to `update-statistics-and-timeline`\n- scripts: add execution guards to `load-github-key.sh` and `shell/hack.sh` to ensure sourcing\n- shell: cleanup `hack.sh` dependencies\n- docs: add commit message prompt template to `TODOS-commit-messages.md`\n- docs: add `TODOS-grid.md` with notes on lattices and periodic cell complexes\n- main: reorganize info panel links into \"Apps\" and \"Meta Apps\" sections",
     "addedLines": 152,
     "removedLines": 15
   },
@@ -850,7 +877,7 @@
     "timestamp": 1767143955,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "chore: add commit script and update commit message prompts",
+    "message": "chore: add commit script and update commit message prompts\n\n- **scripts/commit-staged-with-message-from-file.sh**: Add helper script to commit staged changes using a message from `temp/commit-message.txt`.\n- **docs/TODOS-commit-messages.md**: Update prompts for generating commit messages from `git diff` output.",
     "addedLines": 50,
     "removedLines": 4
   },
@@ -859,7 +886,7 @@
     "timestamp": 1767143520,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "chore: update project config and refine ssh key scripts",
+    "message": "chore: update project config and refine ssh key scripts\n\n- **.gitignore**: Add `temp` and `cache`, reorganize comments.\n- **.vscode/**:\n    - `settings.json`: Enable indentation detection, add spellcheck words.\n    - `extensions.json`: Add recommended extensions.\n- **Scripts**:\n  - Update `create-github-key-and-add-to-sshconfig.sh` to use `.env` for identity file and default to `github.com` alias.\n  - Enhance `load-github-key.sh` with robust guards for sourcing and bash shell usage.\n  - General cleanup and shellcheck directives.",
     "addedLines": 52,
     "removedLines": 18
   },
@@ -949,7 +976,7 @@
     "timestamp": 1767090872,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Refactor rendering to use screen-space coordinates for improved scaling and visual consistency. Implemented a \"screen-space rendering\" architecture where polygons, labels, axes, and hover highlights are drawn based on screen coordinates rather than world coordinates. This ensures that visual elements like stroke widths, hover radii, and dash patterns remain consistent and legible regardless of the zoom level. Added helper functions worldToScreen, getStrokeWidthPx, getStrokeWidthWorld, and getPolygonScreenPoints to facilitate this transformation and updated drawing logic across the Tile Editor to utilize these new helpers. Also adjusted hit testing and hover detection to align with the new coordinate system.",
+    "message": "Refactor rendering to use screen-space coordinates for improved scaling and visual consistency.\nImplemented a \"screen-space rendering\" architecture where polygons, labels, axes, and hover highlights are drawn based on screen coordinates rather than world coordinates. This ensures that visual elements like stroke widths, hover radii, and dash patterns remain consistent and legible regardless of the zoom level. Added helper functions worldToScreen, getStrokeWidthPx, getStrokeWidthWorld, and getPolygonScreenPoints to facilitate this transformation and updated drawing logic across the Tile Editor to utilize these new helpers. Also adjusted hit testing and hover detection to align with the new coordinate system.",
     "addedLines": 80,
     "removedLines": 48
   },
@@ -994,7 +1021,7 @@
     "timestamp": 1767076996,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "Update Tile Editor documentation with hover feature details Added \"Unit Cell Editor\" implementation notes covering hover detection for vertices and edges, including tolerance calculations and styling. Also updated the main Unit Cell Editor document to link to these new implementation details.",
+    "message": "Update Tile Editor documentation with hover feature details\nAdded \"Unit Cell Editor\" implementation notes covering hover detection for vertices and edges, including tolerance calculations and styling. Also updated the main Unit Cell Editor document to link to these new implementation details.",
     "addedLines": 34,
     "removedLines": 4
   },
@@ -3001,7 +3028,7 @@
     "timestamp": 1766439969,
     "authorName": "Philipp Tiefenbacher",
     "authorEmail": "wizards23+github@gmail.com",
-    "message": "fix buggy sorting of project stat filenames in index.json",
+    "message": "fix buggy sorting of project stat\nfilenames in index.json",
     "addedLines": 50,
     "removedLines": 46
   },

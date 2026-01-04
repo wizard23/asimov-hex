@@ -28,6 +28,7 @@ type ParseOptions = {
 type InternalCommit = ParsedCommit & {
   parents: string[];
   isMerge: boolean;
+  messageLines: string[];
 };
 
 const COMMIT_MARKER = "@@@";
@@ -37,7 +38,7 @@ const COMMIT_MARKER = "@@@";
  *
  *   git log <branch> \
  *     --no-decorate \
- *     --pretty=format:'@@@%n%H|%P|%ct|%an|%ae|%s' \
+ *     --pretty=format:'@@@%n%H|%P|%ct|%an|%ae%n%B' \
  *     --numstat
  */
 export async function getCommitsWithLineStats(
@@ -55,7 +56,7 @@ export async function getCommitsWithLineStats(
       "log",
       branch,
       "--no-decorate",
-      "--pretty=format:@@@%n%H|%P|%ct|%an|%ae|%s",
+      "--pretty=format:@@@%n%H|%P|%ct|%an|%ae%n%B",
       "--numstat",
     ],
     {
@@ -69,15 +70,18 @@ export async function getCommitsWithLineStats(
   const commits: ParsedCommit[] = [];
   let current: InternalCommit | null = null;
   let expectHeaderNext = false;
+  let collectingMessage = false;
 
   function finalizeCurrent() {
     if (!current) return;
+    current.message = current.messageLines.join("\n").replace(/\n+$/g, "");
     if (!(skipMerges && current.isMerge)) {
       // Drop internal fields
-      const { parents: _p, isMerge: _m, ...publicCommit } = current;
+      const { parents: _p, isMerge: _m, messageLines: _ml, ...publicCommit } = current;
       commits.push(publicCommit);
     }
     current = null;
+    collectingMessage = false;
   }
 
   rl.on("line", (line) => {
@@ -92,10 +96,9 @@ export async function getCommitsWithLineStats(
       if (line.trim() === "") return; // skip accidental blanks
       expectHeaderNext = false;
 
-      // Header format: %H|%P|%ct|%an|%ae|%s
-      // NOTE: %s is last so it may contain '|' — we join the tail back.
+      // Header format: %H|%P|%ct|%an|%ae
       const parts = line.split("|");
-      if (parts.length < 6) {
+      if (parts.length < 5) {
         throw new Error(`Malformed commit header: ${line}`);
       }
 
@@ -104,7 +107,6 @@ export async function getCommitsWithLineStats(
       const timestampRaw = parts[2];
       const authorName = parts[3];
       const authorEmail = parts[4];
-      const message = parts.slice(5).join("|"); // keep any '|' inside subject
 
       const parents = parentsRaw.trim() === "" ? [] : parentsRaw.trim().split(/\s+/);
       const isMerge = parents.length > 1;
@@ -114,12 +116,14 @@ export async function getCommitsWithLineStats(
         timestamp: Number(timestampRaw),
         authorName,
         authorEmail,
-        message,
+        message: "",
         addedLines: 0,
         removedLines: 0,
         parents,
         isMerge,
+        messageLines: [],
       };
+      collectingMessage = true;
 
       if (!Number.isFinite(current.timestamp)) {
         throw new Error(`Invalid timestamp in header: ${line}`);
@@ -131,11 +135,14 @@ export async function getCommitsWithLineStats(
     // If we don't currently have a commit, ignore stray lines.
     if (!current) return;
 
-    // numstat line: "<added>\t<removed>\t<path>"
-    // added/removed can be "-" for binaries.
-    // Example: "12\t3\tsrc/foo.ts"
     const m = /^(\d+|-)\t(\d+|-)\t/.exec(line);
-    if (!m) return; // ignore anything unexpected (shouldn’t happen much)
+    if (!m) {
+      if (collectingMessage) {
+        current.messageLines.push(line);
+      }
+      return;
+    }
+    collectingMessage = false;
 
     // Option: suppress stats for merge commits
     if (suppressMergeStats && current.isMerge) {
