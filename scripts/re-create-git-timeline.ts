@@ -212,10 +212,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
     getCommitsWithLineStats(process.cwd(), "main")
       .then(async (commits) => {
-              //   commits
-              //     .sort((a, b) => b.timestamp - a.timestamp)
-              //     .forEach((c) => console.log(c))
-
               const sorted = commits.sort((a, b) => b.timestamp - a.timestamp);
 
               const outDir = join(process.cwd(), "public/project-history");

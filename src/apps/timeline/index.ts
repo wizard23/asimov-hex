@@ -189,6 +189,10 @@ class TimelineViewer {
       this.updateCenterViewVisibility();
       this.updateScaleTickVisibility();
       this.updateGestureHintsVisibility();
+      this.updateFullscreenToggleVisibility();
+      if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
+        this.exitFullscreenMode();
+      }
       this.render();
     });
 
@@ -256,6 +260,7 @@ class TimelineViewer {
     this.updateScaleTickVisibility();
     this.updateGestureHintsVisibility();
     this.updateGestureHintsContent();
+    this.updateFullscreenToggleVisibility();
   }
 
   private initFullscreenToggle() {
@@ -276,6 +281,7 @@ class TimelineViewer {
   }
 
   private toggleFullscreenMode() {
+    if (this.config.displayMode !== 'Timeline') return;
     document.body.classList.toggle('fullscreen-mode');
     this.timelineApp?.resize();
     this.updateTimelineViewport();
@@ -285,6 +291,18 @@ class TimelineViewer {
       this.fullscreenToggleElement.textContent = document.body.classList.contains('fullscreen-mode')
         ? 'Exit Fullscreen'
         : 'Fullscreen Mode';
+    }
+  }
+
+  private exitFullscreenMode() {
+    if (!document.body.classList.contains('fullscreen-mode')) return;
+    document.body.classList.remove('fullscreen-mode');
+    this.timelineApp?.resize();
+    this.updateTimelineViewport();
+    this.updateTimelineVerticalOffset();
+    this.drawTimeline();
+    if (this.fullscreenToggleElement) {
+      this.fullscreenToggleElement.textContent = 'Fullscreen Mode';
     }
   }
 
@@ -355,6 +373,13 @@ class TimelineViewer {
     const display = this.config.groupBy === 'None' ? 'none' : '';
     if (this.gestureGroupScrollElement) {
       this.gestureGroupScrollElement.style.display = display;
+    }
+  }
+
+  private updateFullscreenToggleVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.fullscreenToggleElement) {
+      this.fullscreenToggleElement.style.display = display;
     }
   }
 
