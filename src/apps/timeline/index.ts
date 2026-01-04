@@ -350,6 +350,8 @@ class TimelineViewer {
   private isTextInputActive(): boolean {
     const active = document.activeElement;
     if (!active) return false;
+    const tweakpane = document.getElementById('tweakpane-container');
+    if (tweakpane && tweakpane.contains(active)) return true;
     if (active instanceof HTMLInputElement) return true;
     if (active instanceof HTMLTextAreaElement) return true;
     if (active instanceof HTMLSelectElement) return true;
