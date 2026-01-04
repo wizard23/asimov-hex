@@ -190,6 +190,10 @@
       border: 1px solid #666;
       margin-bottom: 15px;
     }
+    .commit-item-locked {
+      border-color: #ffca28;
+      box-shadow: 0 0 0 1px rgba(255, 202, 40, 0.4);
+    }
     .commit-header {
       display: flex;
       justify-content: space-between;
@@ -261,6 +265,8 @@
           <h3>Mouse Gestures</h3>
           <ul>
             <li><span class="gesture-key">Hover</span><span class="gesture-desc">Highlight a commit and show details.</span></li>
+            <li id="gesture-lock"><span class="gesture-key">Click</span><span class="gesture-desc">Lock the selected commit.</span></li>
+            <li id="gesture-unlock"><span class="gesture-key">Right-click / Esc</span><span class="gesture-desc">Clear locked commit.</span></li>
             <li><span class="gesture-key">Left-drag</span><span class="gesture-desc">Pan the timeline view.</span></li>
             <li><span class="gesture-key">Wheel</span><span class="gesture-desc">Zoom in/out on the timeline.</span></li>
             <li id="gesture-group-scroll"><span class="gesture-key">Ctrl + drag / wheel</span><span class="gesture-desc">Scroll through groups.</span></li>
@@ -271,7 +277,7 @@
             <li><span class="gesture-key">← / →</span><span class="gesture-desc">Previous/next commit.</span></li>
             <li><span class="gesture-key">↑ / ↓</span><span class="gesture-desc">Move between groups.</span></li>
             <li><span class="gesture-key">Home / End</span><span class="gesture-desc">First/last commit in group.</span></li>
-            <li><span class="gesture-key">Esc</span><span class="gesture-desc">Exit fullscreen mode.</span></li>
+            <li id="hotkey-esc"><span class="gesture-key">Esc</span><span class="gesture-desc">Clear locked commit.</span></li>
           </ul>
         </div>
       </div>
