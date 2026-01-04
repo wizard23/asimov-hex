@@ -1,5 +1,32 @@
 [
   {
+    "hash": "42c85ba18c96c02f3631e41e0a0470855d3f1c30",
+    "timestamp": 1767546218,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Implement group dragging and gesture hints\n- Add drag-to-scroll support for grouped timeline view (Ctrl+Drag) to complement Ctrl+Scroll.\n- Add \"Gesture Hints\" panel to the sidebar in `timeline.html` explaining available interactions (Scroll, Ctrl+Scroll, Drag, Ctrl+Drag).\n- Refactor sidebar layout to accommodate the new hints panel below Tweakpane controls.",
+    "addedLines": 63,
+    "removedLines": 2
+  },
+  {
+    "hash": "bc6af6316f8139e2abf986ff157850c58fbdce81",
+    "timestamp": 1767529374,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Add debug-git option to timeline script\n\n- Add `--debug-git` flag to `scripts/re-create-git-timeline.ts` to directly stream `git log` output to stdout for troubleshooting.\n- Refactor `getGitLogArgs` into a shared helper function.\n- Update the main execution block to handle the debug flag before processing commits.",
+    "addedLines": 52,
+    "removedLines": 35
+  },
+  {
+    "hash": "92cc5c1781d94015ae4b7cdc0bd08bc52a4f541f",
+    "timestamp": 1767528369,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: Support multiline commit messages in timeline\n\n- Update `scripts/re-create-git-timeline.ts` to capture the full commit message body (`%B`) instead of just the subject (`%s`).\n- Refactor the parser to handle multiline messages and stop collecting message lines when a `numstat` line is encountered.\n- Update `public/project-history/git-timeline.json` with the full message content for recent commits.",
+    "addedLines": 125,
+    "removedLines": 91
+  },
+  {
     "hash": "a72f00f9fbe9164edf0cfdd9aa2948709c74e3ac",
     "timestamp": 1767510564,
     "authorName": "Philipp Tiefenbacher",
