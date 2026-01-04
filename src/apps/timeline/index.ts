@@ -59,6 +59,8 @@ class TimelineViewer {
   private timelineDragging = false;
   private timelineDraggingGroups = false;
   private timelineDragStart = { x: 0, y: 0 };
+  private timelineDragLast = { x: 0, y: 0 };
+  private timelineEmptyClickCandidate = false;
   private timelineCommitPoints: Array<{ commit: Commit; screenX: number; screenY: number }> = [];
   private timelineRange = { startMs: 0, endMs: 0 };
   private timelineInfoContainer: HTMLElement | null = null;
@@ -299,10 +301,7 @@ class TimelineViewer {
   }
 
   private initContextMenuClear() {
-    document.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-      this.clearLockedCommit();
-    });
+    // Scoped to the Pixi canvas when it exists.
   }
 
   private initHotkeys() {
@@ -327,6 +326,7 @@ class TimelineViewer {
     }
 
     if (this.config.displayMode !== 'Timeline') return;
+    if (!this.lockedCommit) return;
 
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
@@ -560,33 +560,32 @@ class TimelineViewer {
 
   private navigateCommit(direction: -1 | 1) {
     if (this.filteredCommits.length === 0) return;
-    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    if (!this.lockedCommit) return;
+    const current = this.lockedCommit;
     const currentIndex = this.filteredCommits.findIndex(commit => commit.hash === current.hash);
     const startIndex = currentIndex >= 0 ? currentIndex : 0;
     const nextIndex = this.clamp(startIndex + (direction > 0 ? -1 : 1), 0, this.filteredCommits.length - 1);
     const nextCommit = this.filteredCommits[nextIndex];
     if (!nextCommit) return;
     if (nextCommit.hash === current.hash) return;
-    this.hoveredCommit = nextCommit;
+    this.setLockedCommit(nextCommit);
     this.centerOnCommitData(nextCommit);
-    this.updateTimelineInfo();
   }
 
   private navigateGroupEdge(direction: -1 | 1) {
-    if (this.filteredCommits.length === 0) return;
+    if (this.filteredCommits.length === 0 || !this.lockedCommit) return;
     if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') {
       const target = direction < 0 ? this.filteredCommits[this.filteredCommits.length - 1] : this.filteredCommits[0];
       if (!target) return;
-      if (this.hoveredCommit && target.hash === this.hoveredCommit.hash) return;
-      this.hoveredCommit = target;
+      if (target.hash === this.lockedCommit.hash) return;
+      this.setLockedCommit(target);
       this.centerOnCommitData(target);
-      this.updateTimelineInfo();
       return;
     }
 
     const grouped = this.getGroupedCommits();
     if (grouped.length === 0) return;
-    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    const current = this.lockedCommit;
     const currentGroupIndex = grouped.findIndex(group => (
       group.commits.some(commit => commit.hash === current.hash)
     ));
@@ -595,16 +594,16 @@ class TimelineViewer {
     if (!group || group.commits.length === 0) return;
     const target = direction < 0 ? this.getGroupEarliestCommit(group) : this.getGroupLatestCommit(group);
     if (target.hash === current.hash) return;
-    this.hoveredCommit = target;
+    this.setLockedCommit(target);
     this.centerOnCommitData(target);
-    this.updateTimelineInfo();
   }
 
   private navigateGroupRow(direction: -1 | 1) {
+    if (!this.lockedCommit) return;
     const grouped = this.getGroupedCommits();
     if (grouped.length === 0) return;
 
-    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    const current = this.lockedCommit;
     const currentGroupIndex = grouped.findIndex(group => (
       group.commits.some(commit => commit.hash === current.hash)
     ));
@@ -632,9 +631,8 @@ class TimelineViewer {
     }
 
     if (bestCommit.hash === current.hash) return;
-    this.hoveredCommit = bestCommit;
+    this.setLockedCommit(bestCommit);
     this.centerOnCommitData(bestCommit);
-    this.updateTimelineInfo();
   }
 
   private getCommitGroupPosition(commit: Commit, group: GroupedCommits): number {
@@ -716,8 +714,8 @@ class TimelineViewer {
     this.timelineLineGraphics.zIndex = 2;
     this.timelineChangeGraphics.zIndex = 3;
     this.timelineGraphics.zIndex = 4;
-    this.timelineLockedGraphics.zIndex = 5;
-    this.timelineHoverGraphics.zIndex = 6;
+    this.timelineHoverGraphics.zIndex = 5;
+    this.timelineLockedGraphics.zIndex = 6;
     this.timelineChangeScaleGraphics.zIndex = 7;
     this.timelineChangeTextContainer.zIndex = 9;
     this.timelineGroupLabelContainer.zIndex = 10;
@@ -728,8 +726,8 @@ class TimelineViewer {
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
     this.timelineApp.stage.addChild(this.timelineChangeGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
-    this.timelineApp.stage.addChild(this.timelineLockedGraphics);
     this.timelineApp.stage.addChild(this.timelineHoverGraphics);
+    this.timelineApp.stage.addChild(this.timelineLockedGraphics);
     this.timelineApp.stage.addChild(this.timelineChangeScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineTextContainer);
     this.timelineApp.stage.addChild(this.timelineChangeTextContainer);
@@ -741,11 +739,11 @@ class TimelineViewer {
     this.timelineApp.stage.on('pointermove', (e: FederatedPointerEvent) => {
       this.handleTimelinePointerMove(e);
     });
-    this.timelineApp.stage.on('pointerup', () => {
-      this.handleTimelinePointerUp();
+    this.timelineApp.stage.on('pointerup', (e: FederatedPointerEvent) => {
+      this.handleTimelinePointerUp(e);
     });
-    this.timelineApp.stage.on('pointerupoutside', () => {
-      this.handleTimelinePointerUp();
+    this.timelineApp.stage.on('pointerupoutside', (e: FederatedPointerEvent) => {
+      this.handleTimelinePointerUp(e);
     });
 
     this.timelineApp.canvas.addEventListener('wheel', this.handleTimelineWheel, { passive: false });
@@ -882,18 +880,14 @@ class TimelineViewer {
   }
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
-    if (e.button === 2) {
-      this.clearLockedCommit();
-      return;
-    }
     if (e.button !== 0) return;
-    const commitPoint = this.findCommitPointAt(e.global.x, e.global.y);
-    if (!e.ctrlKey && commitPoint) {
-      this.lockedCommit = commitPoint.commit;
-      this.hoveredCommit = commitPoint.commit;
-      this.updateTimelineInfo();
-      this.centerOnScreenPoint(commitPoint.screenX, commitPoint.screenY);
-      return;
+    if (!e.ctrlKey && this.hoveredCommit) {
+      const commitPoint = this.findCommitPointForCommit(this.hoveredCommit);
+      if (commitPoint) {
+        this.setLockedCommit(commitPoint.commit);
+        this.centerOnScreenPoint(commitPoint.screenX, commitPoint.screenY);
+        return;
+      }
     }
     this.cancelTimelineTransition();
     this.timelineDragging = true;
@@ -901,12 +895,15 @@ class TimelineViewer {
       && this.config.groupBy !== 'None'
       && e.ctrlKey;
     this.timelineDragStart = { x: e.global.x, y: e.global.y };
+    this.timelineDragLast = { x: e.global.x, y: e.global.y };
     this.timelineViewOffsetStart = { ...this.timelineViewOffset };
+    this.timelineEmptyClickCandidate = !this.hoveredCommit && !e.ctrlKey;
     this.timelineGroupScrollOffsetStart = this.timelineGroupScrollOffsetY;
   }
 
   private handleTimelinePointerMove(e: FederatedPointerEvent) {
     if (this.timelineDragging) {
+      this.timelineDragLast = { x: e.global.x, y: e.global.y };
       if (this.timelineDraggingGroups) {
         const grouped = this.getGroupedCommits();
         const gap = this.getLineGap();
@@ -935,7 +932,7 @@ class TimelineViewer {
   }
 
   private findCommitPointAt(screenX: number, screenY: number) {
-    const radius = 10;
+    const radius = 21;
     let best: { commit: Commit; screenX: number; screenY: number } | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
     for (const point of this.timelineCommitPoints) {
@@ -948,6 +945,10 @@ class TimelineViewer {
       }
     }
     return best;
+  }
+
+  private findCommitPointForCommit(commit: Commit) {
+    return this.timelineCommitPoints.find(point => point.commit.hash === commit.hash) ?? null;
   }
 
   private centerOnCommitData(commit: Commit) {
@@ -1033,9 +1034,18 @@ class TimelineViewer {
     this.timelineTransitionFrame = null;
   }
 
-  private handleTimelinePointerUp() {
+  private handleTimelinePointerUp(e: FederatedPointerEvent) {
+    if (this.timelineDragging) {
+      const dx = e.global.x - this.timelineDragStart.x;
+      const dy = e.global.y - this.timelineDragStart.y;
+      const moved = Math.hypot(dx, dy);
+      if (this.timelineEmptyClickCandidate && moved < 5) {
+        this.clearLockedCommit();
+      }
+    }
     this.timelineDragging = false;
     this.timelineDraggingGroups = false;
+    this.timelineEmptyClickCandidate = false;
   }
 
   private handleTimelineWheel = (e: WheelEvent) => {
@@ -1087,12 +1097,14 @@ class TimelineViewer {
   };
 
   private handleTimelineMouseLeave = () => {
-    // Keep the last highlighted commit when not hovering any other commit.
+    if (!this.hoveredCommit) return;
+    this.hoveredCommit = null;
+    this.updateTimelineInfo();
+    this.drawHoverCommit();
   };
 
   private handleTimelineContextMenu = (e: MouseEvent) => {
     e.preventDefault();
-    this.clearLockedCommit();
   };
 
   private clearLockedCommit() {
@@ -1101,8 +1113,14 @@ class TimelineViewer {
     this.updateTimelineInfo();
   }
 
+  private setLockedCommit(commit: Commit) {
+    this.lockedCommit = commit;
+    this.hoveredCommit = commit;
+    this.updateTimelineInfo();
+  }
+
   private updateHoverCommit(screenX: number, screenY: number) {
-    const radius = 10;
+    const radius = 21;
     let nextCommit: Commit | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
 
@@ -1117,6 +1135,10 @@ class TimelineViewer {
     }
 
     if (!nextCommit) {
+      if (!this.hoveredCommit) return;
+      this.hoveredCommit = null;
+      this.updateTimelineInfo();
+      this.drawHoverCommit();
       return;
     }
 
