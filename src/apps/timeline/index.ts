@@ -580,11 +580,12 @@ class TimelineViewer {
     const nextGroup = grouped[nextGroupIndex];
     if (!nextGroup || nextGroup.commits.length === 0) return;
 
-    const targetTs = current.timestamp;
+    const currentGroup = grouped[groupIndex];
+    const currentPosition = this.getCommitGroupPosition(current, currentGroup ?? nextGroup);
     let bestCommit = nextGroup.commits[0];
-    let bestDistance = Math.abs(bestCommit.timestamp - targetTs);
+    let bestDistance = Math.abs(this.getCommitGroupPosition(bestCommit, nextGroup) - currentPosition);
     for (const commit of nextGroup.commits) {
-      const distance = Math.abs(commit.timestamp - targetTs);
+      const distance = Math.abs(this.getCommitGroupPosition(commit, nextGroup) - currentPosition);
       if (distance < bestDistance) {
         bestDistance = distance;
         bestCommit = commit;
@@ -594,6 +595,11 @@ class TimelineViewer {
     this.hoveredCommit = bestCommit;
     this.centerOnCommitData(bestCommit);
     this.updateTimelineInfo();
+  }
+
+  private getCommitGroupPosition(commit: Commit, group: GroupedCommits): number {
+    const commitMs = commit.timestamp * 1000;
+    return Math.max(0, commitMs - group.startMs);
   }
 
   private buildCommitCard(commit: Commit): string {
