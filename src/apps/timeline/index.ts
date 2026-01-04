@@ -308,6 +308,20 @@ class TimelineViewer {
       return;
     }
 
+    if (event.key === 'ArrowUp') {
+      if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') return;
+      event.preventDefault();
+      this.navigateGroupRow(-1);
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      if (this.config.displayMode !== 'Timeline' || this.config.groupBy === 'None') return;
+      event.preventDefault();
+      this.navigateGroupRow(1);
+      return;
+    }
+
     if (event.key === 'Home') {
       event.preventDefault();
       this.navigateGroupEdge(-1);
@@ -528,6 +542,35 @@ class TimelineViewer {
     const target = direction < 0 ? group.commits[group.commits.length - 1] : group.commits[0];
     this.hoveredCommit = target;
     this.centerOnCommitData(target);
+    this.updateTimelineInfo();
+  }
+
+  private navigateGroupRow(direction: -1 | 1) {
+    const grouped = this.getGroupedCommits();
+    if (grouped.length === 0) return;
+
+    const current = this.hoveredCommit ?? this.filteredCommits[0];
+    const currentGroupIndex = grouped.findIndex(group => (
+      group.commits.some(commit => commit.hash === current.hash)
+    ));
+    const groupIndex = currentGroupIndex >= 0 ? currentGroupIndex : 0;
+    const nextGroupIndex = this.clamp(groupIndex + direction, 0, grouped.length - 1);
+    const nextGroup = grouped[nextGroupIndex];
+    if (!nextGroup || nextGroup.commits.length === 0) return;
+
+    const targetTs = current.timestamp;
+    let bestCommit = nextGroup.commits[0];
+    let bestDistance = Math.abs(bestCommit.timestamp - targetTs);
+    for (const commit of nextGroup.commits) {
+      const distance = Math.abs(commit.timestamp - targetTs);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestCommit = commit;
+      }
+    }
+
+    this.hoveredCommit = bestCommit;
+    this.centerOnCommitData(bestCommit);
     this.updateTimelineInfo();
   }
 
