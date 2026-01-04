@@ -55,16 +55,21 @@
       align-items: center;
       gap: 10px;
     }
-    #fullscreen-toggle {
+    .fullscreen-button {
+      appearance: none;
+      -webkit-appearance: none;
       padding: 8px 12px;
       border-radius: 6px;
-      border: 1px solid #4a9eff;
-      background: rgba(74, 158, 255, 0.15);
-      color: #dbeaff;
+      border: 1px solid #4a9eff !important;
+      background-color: rgba(74, 158, 255, 0.15) !important;
+      color: #dbeaff !important;
       font-size: 12px;
+      font-family: inherit;
+      line-height: 1;
       cursor: pointer;
+      box-shadow: none;
     }
-    #fullscreen-toggle:hover {
+    .fullscreen-button:hover {
       background: rgba(74, 158, 255, 0.28);
     }
     #fullscreen-exit {
@@ -73,16 +78,6 @@
       right: 18px;
       z-index: 20;
       display: none;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid #4a9eff;
-      background: rgba(74, 158, 255, 0.2);
-      color: #e6f1ff;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    #fullscreen-exit:hover {
-      background: rgba(74, 158, 255, 0.32);
     }
     #content {
       flex: 1;
@@ -234,6 +229,9 @@
     body.fullscreen-mode #timeline-panel {
       padding: 0;
     }
+    body.fullscreen-mode #timeline-panel h2 {
+      display: none;
+    }
     body.fullscreen-mode .timeline-canvas-container {
       border-radius: 0;
       border: none;
@@ -253,7 +251,7 @@
         <a href="index.html">← Back to Main App</a>
       </div>
       <div class="header-actions">
-        <button id="fullscreen-toggle" type="button">Fullscreen Mode</button>
+        <button id="fullscreen-toggle" class="fullscreen-button" type="button">Fullscreen Mode</button>
       </div>
     </div>
     <div id="content">
@@ -270,7 +268,7 @@
         </div>
       </div>
       <div id="timeline-panel">
-        <button id="fullscreen-exit" type="button">Exit Fullscreen</button>
+        <button id="fullscreen-exit" class="fullscreen-button" type="button">Exit Fullscreen</button>
         <div class="no-data">Loading timeline...</div>
       </div>
     </div>

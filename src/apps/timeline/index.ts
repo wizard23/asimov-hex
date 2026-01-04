@@ -400,7 +400,7 @@ class TimelineViewer {
     this.timelinePanel.innerHTML = `
       <h2>Timeline (${this.filteredCommits.length} commits)${searchSuffix}${dateSuffix}</h2>
       <div class="timeline-canvas-container">
-        <button id="fullscreen-exit" type="button">Exit Fullscreen</button>
+        <button id="fullscreen-exit" class="fullscreen-button" type="button">Exit Fullscreen</button>
         <div id="timeline-canvas"></div>
         <div id="timeline-info" class="timeline-info-overlay">${this.renderCommitInfo(null)}</div>
       </div>
