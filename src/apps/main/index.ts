@@ -1125,8 +1125,16 @@ class GridApp {
   }
 
   private handleMouseLeave() {
+    const bounds = this.getGridBounds(this.config.gridWidth, this.config.gridHeight);
+    const centerOffsetX = (this.app.screen.width - (bounds.maxX - bounds.minX)) / 2 - bounds.minX;
+    const centerOffsetY = (this.app.screen.height - (bounds.maxY - bounds.minY)) / 2 - bounds.minY;
+    const offsetX = centerOffsetX + this.config.gridOffset.x * this.config.gridScale;
+    const offsetY = centerOffsetY + this.config.gridOffset.y * this.config.gridScale;
+    const centerX = (bounds.minX + bounds.maxX) / 2 + offsetX;
+    const centerY = (bounds.minY + bounds.maxY) / 2 + offsetY;
+
     this.clearHighlights();
-    this.setOrbitMouse(0, 0);
+    this.setOrbitMouse(centerX - this.edgeContainer.x, centerY - this.edgeContainer.y);
   }
 
   private handleMouseDown(e: MouseEvent) {
