@@ -51,7 +51,9 @@ class TimelineViewer {
   private timelineScale = 1;
   private timelineScaleBounds = { min: 0.000001, max: 1 };
   private timelineGroupScrollOffsetY = 0;
+  private timelineGroupScrollOffsetStart = 0;
   private timelineDragging = false;
+  private timelineDraggingGroups = false;
   private timelineDragStart = { x: 0, y: 0 };
   private timelineCommitPoints: Array<{ commit: Commit; screenX: number; screenY: number }> = [];
   private timelineRange = { startMs: 0, endMs: 0 };
@@ -574,12 +576,31 @@ class TimelineViewer {
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
     if (e.button !== 0) return;
     this.timelineDragging = true;
+    this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
+      && this.config.groupBy !== 'None'
+      && e.ctrlKey;
     this.timelineDragStart = { x: e.global.x, y: e.global.y };
     this.timelineViewOffsetStart = { ...this.timelineViewOffset };
+    this.timelineGroupScrollOffsetStart = this.timelineGroupScrollOffsetY;
   }
 
   private handleTimelinePointerMove(e: FederatedPointerEvent) {
     if (this.timelineDragging) {
+      if (this.timelineDraggingGroups) {
+        const grouped = this.getGroupedCommits();
+        const gap = this.getLineGap();
+        const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
+        const dy = e.global.y - this.timelineDragStart.y;
+        this.timelineGroupScrollOffsetY = this.clamp(
+          this.timelineGroupScrollOffsetStart + dy,
+          -maxOffset,
+          maxOffset
+        );
+        this.updateTimelineVerticalOffset();
+        this.drawTimeline();
+        return;
+      }
+
       const dx = e.global.x - this.timelineDragStart.x;
       this.timelineViewOffset = {
         x: this.timelineViewOffsetStart.x + dx,
@@ -594,6 +615,7 @@ class TimelineViewer {
 
   private handleTimelinePointerUp() {
     this.timelineDragging = false;
+    this.timelineDraggingGroups = false;
   }
 
   private handleTimelineWheel = (e: WheelEvent) => {

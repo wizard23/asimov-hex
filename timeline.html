@@ -46,11 +46,38 @@
       display: flex;
       overflow: hidden;
     }
-    #tweakpane-container {
+    #controls-sidebar {
       width: 300px;
       border-right: 1px solid #555;
       background: rgba(30, 30, 30, 0.95);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #tweakpane-container {
+      flex: 1;
       overflow-y: auto;
+    }
+    #gesture-hints {
+      padding: 16px;
+      border-top: 1px solid #444;
+      background: rgba(24, 24, 24, 0.95);
+      font-size: 12px;
+      color: #bdbdbd;
+      line-height: 1.4;
+    }
+    #gesture-hints h3 {
+      margin-bottom: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #e0e0e0;
+    }
+    #gesture-hints ul {
+      list-style: none;
+    }
+    #gesture-hints li {
+      margin-bottom: 6px;
     }
     #timeline-panel {
       flex: 1;
@@ -144,7 +171,19 @@
       <a href="index.html">← Back to Main App</a>
     </div>
     <div id="content">
-      <div id="tweakpane-container"></div>
+      <div id="controls-sidebar">
+        <div id="tweakpane-container"></div>
+        <div id="gesture-hints">
+          <h3>Mouse Gestures</h3>
+          <ul>
+            <li>Hover: highlight a commit and show details.</li>
+            <li>Left-drag: pan the timeline view.</li>
+            <li>Ctrl + left-drag: scroll through groups (grouped mode).</li>
+            <li>Scroll wheel: zoom in/out on the timeline.</li>
+            <li>Ctrl + wheel: scroll through groups (grouped mode).</li>
+          </ul>
+        </div>
+      </div>
       <div id="timeline-panel">
         <div class="no-data">Loading timeline...</div>
       </div>
