@@ -78,6 +78,22 @@
       right: auto;
       left: 18px;
     }
+    .profiler-overlay {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 24;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #3b3b3b;
+      background: rgba(15, 15, 15, 0.85);
+      color: #d5d5d5;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre;
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+    }
     .fullscreen-button {
       appearance: none;
       -webkit-appearance: none;
@@ -311,6 +327,7 @@
       </div>
     </div>
   </div>
+  <div id="profiler-overlay" class="profiler-overlay" aria-live="polite"></div>
   <script type="module" src="/src/apps/timeline/index.ts"></script>
 </body>
 </html>

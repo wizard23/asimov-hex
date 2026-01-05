@@ -38,6 +38,7 @@ class TimelineViewer {
   private fullscreenExitElement: HTMLButtonElement | null = null;
   private performancePillElement: HTMLElement | null = null;
   private headerActionsElement: HTMLElement | null = null;
+  private profilerOverlayElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -88,6 +89,13 @@ class TimelineViewer {
   private performanceTickHandler: (() => void) | null = null;
   private lastPerformanceUpdate = 0;
   private readonly performanceUpdateInterval = 250;
+  private renderAccumMs = 0;
+  private frameSamples: number[] = [];
+  private renderSamples: number[] = [];
+  private otherSamples: number[] = [];
+  private lastFps = 0;
+  private lastDeltaMs = 0;
+  private readonly profilerSampleSize = 120;
   
   private config = {
     startDate: '',
@@ -102,6 +110,7 @@ class TimelineViewer {
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
+    showProfilerOverlay: false,
   };
 
   constructor() {
@@ -112,6 +121,7 @@ class TimelineViewer {
   private async init() {
     this.initFullscreenToggle();
     this.initPerformancePill();
+    this.initProfilerOverlay();
     this.initHotkeys();
     this.initContextMenuClear();
     await this.loadTimeline();
@@ -214,6 +224,7 @@ class TimelineViewer {
       this.updateGestureHintsVisibility();
       this.updateFullscreenToggleVisibility();
       this.updatePerformanceVisibility();
+      this.updateProfilerVisibility();
       this.updateTransitionDurationVisibility();
       this.updateLeftPanModeVisibility();
       if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
@@ -269,6 +280,12 @@ class TimelineViewer {
       this.updatePerformanceVisibility();
     });
 
+    this.pane.addBinding(this.config, 'showProfilerOverlay', {
+      label: 'PixiJS Profiler Overlay',
+    }).on('change', () => {
+      this.updateProfilerVisibility();
+    });
+
     const leftPanModeBinding = this.pane.addBinding(this.config, 'leftPanMode', {
       label: 'Left Pan',
       options: {
@@ -318,6 +335,7 @@ class TimelineViewer {
     this.updateGestureHintsContent();
     this.updateFullscreenToggleVisibility();
     this.updatePerformanceVisibility();
+    this.updateProfilerVisibility();
     this.updateTransitionDurationVisibility();
     this.updateLeftPanModeVisibility();
   }
@@ -332,6 +350,12 @@ class TimelineViewer {
     this.performancePillElement = document.getElementById('perf-pill');
     this.headerActionsElement = document.querySelector('#header .header-actions');
     this.setPerformanceText(null, null);
+  }
+
+  private initProfilerOverlay() {
+    this.profilerOverlayElement = document.getElementById('profiler-overlay');
+    this.setProfilerText('Profiler disabled');
+    this.updateProfilerVisibility();
   }
 
   private bindFullscreenExit() {
@@ -543,6 +567,15 @@ class TimelineViewer {
     this.performancePillElement.style.display = shouldShow ? '' : 'none';
     if (shouldShow) {
       this.updatePerformancePillPlacement();
+    }
+  }
+
+  private updateProfilerVisibility() {
+    if (!this.profilerOverlayElement) return;
+    const shouldShow = this.config.displayMode === 'Timeline' && this.config.showProfilerOverlay;
+    this.profilerOverlayElement.style.display = shouldShow ? '' : 'none';
+    if (shouldShow) {
+      this.updateProfilerOverlay();
     }
   }
 
@@ -892,6 +925,11 @@ class TimelineViewer {
     }
     this.lastPerformanceUpdate = 0;
     this.setPerformanceText(null, null);
+    this.renderAccumMs = 0;
+    this.frameSamples = [];
+    this.renderSamples = [];
+    this.otherSamples = [];
+    this.setProfilerText('Profiler disabled');
     this.timelineGraphics = null;
     this.timelineLineGraphics = null;
     this.timelineChangeGraphics = null;
@@ -913,12 +951,25 @@ class TimelineViewer {
     const app = this.timelineApp;
     const update = () => {
       const now = performance.now();
+      const fps = Number.isFinite(app.ticker.FPS) ? app.ticker.FPS : 0;
+      const deltaMs = Number.isFinite(app.ticker.deltaMS) ? app.ticker.deltaMS : 0;
+      this.lastFps = fps;
+      this.lastDeltaMs = deltaMs;
+
+      const renderMs = this.renderAccumMs;
+      this.renderAccumMs = 0;
+      const otherMs = Math.max(0, deltaMs - renderMs);
+      this.pushSample(this.frameSamples, deltaMs);
+      this.pushSample(this.renderSamples, renderMs);
+      this.pushSample(this.otherSamples, otherMs);
+
       if (now - this.lastPerformanceUpdate < this.performanceUpdateInterval) return;
       this.lastPerformanceUpdate = now;
-      const fps = Number.isFinite(app.ticker.FPS) ? app.ticker.FPS : null;
-      const deltaMs = Number.isFinite(app.ticker.deltaMS) ? app.ticker.deltaMS : null;
       if (this.config.showPerformanceMonitor) {
         this.setPerformanceText(fps, deltaMs);
+      }
+      if (this.config.showProfilerOverlay) {
+        this.updateProfilerOverlay();
       }
     };
     this.performanceTickHandler = update;
@@ -933,6 +984,52 @@ class TimelineViewer {
       return;
     }
     this.performancePillElement.textContent = `FPS ${fps.toFixed(1)} | dt ${deltaMs.toFixed(1)} ms`;
+  }
+
+  private setProfilerText(text: string) {
+    if (!this.profilerOverlayElement) return;
+    this.profilerOverlayElement.textContent = text;
+  }
+
+  private updateProfilerOverlay() {
+    if (!this.profilerOverlayElement) return;
+    const renderStats = this.getSampleStats(this.renderSamples);
+    const otherStats = this.getSampleStats(this.otherSamples);
+    const fpsText = this.formatValue(this.lastFps, 1);
+    const deltaText = this.formatValue(this.lastDeltaMs, 1);
+    const renderLine = `Render ms (last/avg/p95): ${this.formatValue(renderStats.last, 2)} / ${this.formatValue(renderStats.avg, 2)} / ${this.formatValue(renderStats.p95, 2)}`;
+    const otherLine = `Other ms  (last/avg/p95): ${this.formatValue(otherStats.last, 2)} / ${this.formatValue(otherStats.avg, 2)} / ${this.formatValue(otherStats.p95, 2)}`;
+    this.profilerOverlayElement.textContent = `FPS ${fpsText} | dt ${deltaText} ms\n${renderLine}\n${otherLine}`;
+  }
+
+  private pushSample(samples: number[], value: number) {
+    samples.push(value);
+    if (samples.length > this.profilerSampleSize) {
+      samples.shift();
+    }
+  }
+
+  private getSampleStats(samples: number[]): { last: number; avg: number; p95: number } {
+    if (samples.length === 0) {
+      return { last: 0, avg: 0, p95: 0 };
+    }
+    const last = samples[samples.length - 1] ?? 0;
+    const sum = samples.reduce((acc, item) => acc + item, 0);
+    const avg = sum / samples.length;
+    const sorted = [...samples].sort((a, b) => a - b);
+    const index = Math.max(0, Math.floor(0.95 * (sorted.length - 1)));
+    const p95 = sorted[index] ?? 0;
+    return { last, avg, p95 };
+  }
+
+  private formatValue(value: number, decimals: number): string {
+    if (!Number.isFinite(value)) return '--';
+    return value.toFixed(decimals);
+  }
+
+  private recordRenderTime(durationMs: number) {
+    if (!Number.isFinite(durationMs) || durationMs < 0) return;
+    this.renderAccumMs += durationMs;
   }
 
   private updatePerformancePillPlacement() {
@@ -1358,6 +1455,7 @@ class TimelineViewer {
       return;
     }
 
+    const renderStart = performance.now();
     const timelineApp = this.timelineApp;
     const timelineGraphics = this.timelineGraphics;
     const timelineLineGraphics = this.timelineLineGraphics;
@@ -1409,6 +1507,7 @@ class TimelineViewer {
     this.drawGroupLabels(grouped, lineYs);
     this.drawLockedCommit();
     this.drawHoverCommit();
+    this.recordRenderTime(performance.now() - renderStart);
   }
 
   private drawScale() {
