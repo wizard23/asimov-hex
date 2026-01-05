@@ -66,11 +66,15 @@ describe('resolveMarkdownHref', () => {
 
   it('rewrites relative links to the viewer url', () => {
     const resolved = resolveMarkdownHref('other.md', 'http://example.com/docs/guide.md');
-    expect(resolved).toBe('http://localhost/?url=http://example.com/docs/other.md');
+    const url = new URL(resolved);
+    expect(url.origin).toBe(window.location.origin);
+    expect(url.searchParams.get('url')).toBe('http://example.com/docs/other.md');
   });
 
   it('rewrites absolute links to the viewer url', () => {
     const resolved = resolveMarkdownHref('https://example.com/page', 'http://example.com/docs/guide.md');
-    expect(resolved).toBe('http://localhost/?url=https://example.com/page');
+    const url = new URL(resolved);
+    expect(url.origin).toBe(window.location.origin);
+    expect(url.searchParams.get('url')).toBe('https://example.com/page');
   });
 });
