@@ -57,8 +57,16 @@ Please put the commit message in this file:
 Please use `git diff --cached` to look at the staged changes in the repo in: 
 ./asimov-hex/asimov-hex
 Then create a commit message from that information. 
-If you need more information to create the commit message you can look at the files that got changed or other related files.
-Don't invent fancy labels like "feat(main)" or "fix(timeline)" or "feature/order-list".
+
+* If you need more information to create the commit message you can look at the files that got changed or other related files.
+* Don't invent fancy labels like "feat", "feat(main)", "fix(timeline)" or "feature/order-list".
+* Only use these labels if they apply: 
+  * refactor
+  * automated
+  * bugfix
+  * human
+* Don't put empty lines in the commit messages.
+
 Please put the commit message in this file: 
 ./asimov-hex/asimov-hex/temp/commit-message.txt
 

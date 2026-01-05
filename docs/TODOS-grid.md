@@ -863,6 +863,14 @@ There is a UX bug when "Show Coordinates" is selected. For some grid types the f
 Please suggest possible approaches to fix this. Don't change anything yet.
 
 
+
+# NEXT
+
+Particle Radius
+Particle Color
+Particle Style (line)
+
+
 Draw Style for Particles: linesegment or circle/disk 
 
 
@@ -873,7 +881,6 @@ timeout for particles in seconds or edges checkbox und slider in seconds
 Adwandced: Target FPS slider 1 bis 120 ?
 
 
-# NEXT
 
 
 Rulelist

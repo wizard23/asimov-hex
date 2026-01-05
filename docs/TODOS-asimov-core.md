@@ -76,3 +76,38 @@ So we could use the algebraic datastructures available there and have strong typ
 Finally an Application for HAskell!!!!
 
 Category Theory for vibe coding :)
+
+
+
+
+
+# Initial Prompt
+Please create a new webapp called "asimov-core"
+
+### Tech stack
+* TypeScript
+* vite
+* tweakpane
+* preact for gui
+
+### UI components
+Please extract all ui controls into separate files in an appropriate directory to ensure all pages use a consistent set of ui elements
+
+
+### The app
+* the app shows a grid consisting of cells
+* each cell can be in one of N states (states start with 0 and go up to N-1)
+* there is a palette that maps cell states to colors
+* when cells are left clicked the state of a cell is set to the currently selected "draw state"
+* when cells are right clicked the state of a cell is set to the currently selected "draw state"
+* when the mouse is over a cell edge this edge gets highlighted
+* the following options are configureable via a tweakpane sidebar
+  * "grid width": integer: horizontal size of the grid in cells
+  * "grid height": integer: vertical size of the grid in cells
+  * "grid type": enum: what kind of tesselation the grid uses: squares, hexagons, triangles
+  * "grid scale": float: the length of a cell edge. In other words: the length of one side of the square, hexagon, or triangle
+  * "draw state": integer: 
+  * "palette": Record<number, color>: a color for every possible state
+  * "edge color": color to use to draw the edges
+  * "edge highlight color": color to use to draw the highlighted edges
+
