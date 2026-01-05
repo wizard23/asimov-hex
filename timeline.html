@@ -80,19 +80,42 @@
     }
     .profiler-overlay {
       position: fixed;
-      bottom: 16px;
-      left: 16px;
-      z-index: 24;
-      padding: 8px 10px;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 26;
+      padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid #3b3b3b;
       background: rgba(15, 15, 15, 0.85);
       color: #d5d5d5;
       font-size: 12px;
       line-height: 1.4;
-      white-space: pre;
       font-variant-numeric: tabular-nums;
       pointer-events: none;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
+      gap: 14px;
+    }
+    .profiler-section {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 160px;
+    }
+    .profiler-title {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+      color: #9aa6b2;
+      margin-bottom: 4px;
+    }
+    .profiler-grid {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      column-gap: 12px;
+      row-gap: 2px;
     }
     .fullscreen-button {
       appearance: none;

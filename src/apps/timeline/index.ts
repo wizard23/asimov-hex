@@ -111,7 +111,7 @@ class TimelineViewer {
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
-    showProfilerOverlay: false,
+    showProfilerOverlay: true,
   };
 
   constructor() {
@@ -1001,27 +1001,30 @@ class TimelineViewer {
     const deltaText = this.formatValue(this.lastDeltaMs, 1);
     const renderLine = `Render ms (last/avg/p95): ${this.formatValue(renderStats.last, 2)} / ${this.formatValue(renderStats.avg, 2)} / ${this.formatValue(renderStats.p95, 2)}`;
     const otherLine = `Other ms  (last/avg/p95): ${this.formatValue(otherStats.last, 2)} / ${this.formatValue(otherStats.avg, 2)} / ${this.formatValue(otherStats.p95, 2)}`;
-    const layoutLine = this.formatSectionLine('Layout', this.getSectionStats('layout'));
-    const linesLine = this.formatSectionLine('Lines', this.getSectionStats('lines'));
-    const changesLine = this.formatSectionLine('Change', this.getSectionStats('change'));
-    const commitsLine = this.formatSectionLine('Commits', this.getSectionStats('commits'));
-    const scaleLine = this.formatSectionLine('Scale', this.getSectionStats('scale'));
-    const changeScaleLine = this.formatSectionLine('ChangeScale', this.getSectionStats('changeScale'));
-    const labelsLine = this.formatSectionLine('Labels', this.getSectionStats('labels'));
-    const overlayLine = this.formatSectionLine('Overlays', this.getSectionStats('overlays'));
-    this.profilerOverlayElement.textContent = [
-      `FPS ${fpsText} | dt ${deltaText} ms`,
-      renderLine,
-      otherLine,
-      layoutLine,
-      linesLine,
-      changesLine,
-      commitsLine,
-      scaleLine,
-      changeScaleLine,
-      labelsLine,
-      overlayLine,
-    ].filter(Boolean).join('\n');
+    const breakdownLines = [
+      this.formatSectionLine('Layout', this.getSectionStats('layout')),
+      this.formatSectionLine('Lines', this.getSectionStats('lines')),
+      this.formatSectionLine('Change', this.getSectionStats('change')),
+      this.formatSectionLine('Commits', this.getSectionStats('commits')),
+      this.formatSectionLine('Scale', this.getSectionStats('scale')),
+      this.formatSectionLine('ChangeScale', this.getSectionStats('changeScale')),
+      this.formatSectionLine('Labels', this.getSectionStats('labels')),
+      this.formatSectionLine('Overlays', this.getSectionStats('overlays')),
+    ].filter(Boolean);
+
+    const gridCells = breakdownLines.map(line => `<div>${line}</div>`).join('');
+    this.profilerOverlayElement.innerHTML = `
+      <div class="profiler-section">
+        <div class="profiler-title">Frame</div>
+        <div>FPS ${fpsText} | dt ${deltaText} ms</div>
+        <div>${renderLine}</div>
+        <div>${otherLine}</div>
+      </div>
+      <div class="profiler-section">
+        <div class="profiler-title">Render Breakdown</div>
+        <div class="profiler-grid">${gridCells}</div>
+      </div>
+    `;
   }
 
   private pushSample(samples: number[], value: number) {
