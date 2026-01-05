@@ -93,6 +93,7 @@ class TimelineViewer {
   private frameSamples: number[] = [];
   private renderSamples: number[] = [];
   private otherSamples: number[] = [];
+  private sectionSamples: Record<string, number[]> = {};
   private lastFps = 0;
   private lastDeltaMs = 0;
   private readonly profilerSampleSize = 120;
@@ -929,6 +930,7 @@ class TimelineViewer {
     this.frameSamples = [];
     this.renderSamples = [];
     this.otherSamples = [];
+    this.sectionSamples = {};
     this.setProfilerText('Profiler disabled');
     this.timelineGraphics = null;
     this.timelineLineGraphics = null;
@@ -999,7 +1001,27 @@ class TimelineViewer {
     const deltaText = this.formatValue(this.lastDeltaMs, 1);
     const renderLine = `Render ms (last/avg/p95): ${this.formatValue(renderStats.last, 2)} / ${this.formatValue(renderStats.avg, 2)} / ${this.formatValue(renderStats.p95, 2)}`;
     const otherLine = `Other ms  (last/avg/p95): ${this.formatValue(otherStats.last, 2)} / ${this.formatValue(otherStats.avg, 2)} / ${this.formatValue(otherStats.p95, 2)}`;
-    this.profilerOverlayElement.textContent = `FPS ${fpsText} | dt ${deltaText} ms\n${renderLine}\n${otherLine}`;
+    const layoutLine = this.formatSectionLine('Layout', this.getSectionStats('layout'));
+    const linesLine = this.formatSectionLine('Lines', this.getSectionStats('lines'));
+    const changesLine = this.formatSectionLine('Change', this.getSectionStats('change'));
+    const commitsLine = this.formatSectionLine('Commits', this.getSectionStats('commits'));
+    const scaleLine = this.formatSectionLine('Scale', this.getSectionStats('scale'));
+    const changeScaleLine = this.formatSectionLine('ChangeScale', this.getSectionStats('changeScale'));
+    const labelsLine = this.formatSectionLine('Labels', this.getSectionStats('labels'));
+    const overlayLine = this.formatSectionLine('Overlays', this.getSectionStats('overlays'));
+    this.profilerOverlayElement.textContent = [
+      `FPS ${fpsText} | dt ${deltaText} ms`,
+      renderLine,
+      otherLine,
+      layoutLine,
+      linesLine,
+      changesLine,
+      commitsLine,
+      scaleLine,
+      changeScaleLine,
+      labelsLine,
+      overlayLine,
+    ].filter(Boolean).join('\n');
   }
 
   private pushSample(samples: number[], value: number) {
@@ -1025,6 +1047,28 @@ class TimelineViewer {
   private formatValue(value: number, decimals: number): string {
     if (!Number.isFinite(value)) return '--';
     return value.toFixed(decimals);
+  }
+
+  private recordSectionTime(section: string, durationMs: number) {
+    if (!Number.isFinite(durationMs) || durationMs < 0) return;
+    if (!this.sectionSamples[section]) {
+      this.sectionSamples[section] = [];
+    }
+    this.pushSample(this.sectionSamples[section], durationMs);
+  }
+
+  private getSectionStats(section: string): { last: number; avg: number } {
+    const samples = this.sectionSamples[section];
+    if (!samples || samples.length === 0) return { last: 0, avg: 0 };
+    const last = samples[samples.length - 1] ?? 0;
+    const sum = samples.reduce((acc, item) => acc + item, 0);
+    const avg = sum / samples.length;
+    return { last, avg };
+  }
+
+  private formatSectionLine(label: string, stats: { last: number; avg: number }): string {
+    if (stats.last === 0 && stats.avg === 0) return '';
+    return `${label} ms (last/avg): ${this.formatValue(stats.last, 2)} / ${this.formatValue(stats.avg, 2)}`;
   }
 
   private recordRenderTime(durationMs: number) {
@@ -1460,6 +1504,7 @@ class TimelineViewer {
     const timelineGraphics = this.timelineGraphics;
     const timelineLineGraphics = this.timelineLineGraphics;
 
+    const layoutStart = performance.now();
     this.updateTimelineVerticalOffset();
     const grouped = this.getGroupedCommits();
     const rangeSeconds = this.getDisplayRangeSeconds(grouped);
@@ -1468,19 +1513,24 @@ class TimelineViewer {
     const lineYs = lineOffsets.map(offset => baseLineY + offset);
     const startX = this.worldToScreen(0, 0).x;
     const endX = this.worldToScreen(rangeSeconds, 0).x;
+    this.recordSectionTime('layout', performance.now() - layoutStart);
 
+    const linesStart = performance.now();
     timelineLineGraphics.clear();
     for (const lineY of lineYs) {
       timelineLineGraphics.moveTo(startX, lineY);
       timelineLineGraphics.lineTo(endX, lineY);
     }
     timelineLineGraphics.stroke({ color: 0x6b9cff, width: 2, alpha: 0.9 });
+    this.recordSectionTime('lines', performance.now() - linesStart);
 
+    const changeStart = performance.now();
     this.timelineChangeGraphics.clear();
     this.drawChangeLines(grouped, lineYs);
+    this.recordSectionTime('change', performance.now() - changeStart);
 
+    const commitsStart = performance.now();
     timelineGraphics.clear();
-
     const dotRadius = 7;
     this.timelineCommitPoints = [];
     grouped.forEach((group, index) => {
@@ -1501,12 +1551,25 @@ class TimelineViewer {
         });
       }
     });
+    this.recordSectionTime('commits', performance.now() - commitsStart);
 
+    const scaleStart = performance.now();
     this.drawScale();
+    this.recordSectionTime('scale', performance.now() - scaleStart);
+
+    const changeScaleStart = performance.now();
     this.drawChangeScale(grouped, lineYs);
+    this.recordSectionTime('changeScale', performance.now() - changeScaleStart);
+
+    const labelsStart = performance.now();
     this.drawGroupLabels(grouped, lineYs);
+    this.recordSectionTime('labels', performance.now() - labelsStart);
+
+    const overlaysStart = performance.now();
     this.drawLockedCommit();
     this.drawHoverCommit();
+    this.recordSectionTime('overlays', performance.now() - overlaysStart);
+
     this.recordRenderTime(performance.now() - renderStart);
   }
 
