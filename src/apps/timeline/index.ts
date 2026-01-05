@@ -37,6 +37,7 @@ class TimelineViewer {
   private fullscreenToggleElement: HTMLButtonElement | null = null;
   private fullscreenExitElement: HTMLButtonElement | null = null;
   private performancePillElement: HTMLElement | null = null;
+  private headerActionsElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -100,6 +101,7 @@ class TimelineViewer {
     extendedScaleTicks: true,
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
+    showPerformanceMonitor: true,
   };
 
   constructor() {
@@ -211,6 +213,7 @@ class TimelineViewer {
       this.updateScaleTickVisibility();
       this.updateGestureHintsVisibility();
       this.updateFullscreenToggleVisibility();
+      this.updatePerformanceVisibility();
       this.updateTransitionDurationVisibility();
       this.updateLeftPanModeVisibility();
       if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
@@ -258,6 +261,12 @@ class TimelineViewer {
       min: 0,
       max: 1,
       step: 0.01,
+    });
+
+    this.pane.addBinding(this.config, 'showPerformanceMonitor', {
+      label: 'PixiJS Performance Monitor',
+    }).on('change', () => {
+      this.updatePerformanceVisibility();
     });
 
     const leftPanModeBinding = this.pane.addBinding(this.config, 'leftPanMode', {
@@ -308,6 +317,7 @@ class TimelineViewer {
     this.updateGestureHintsVisibility();
     this.updateGestureHintsContent();
     this.updateFullscreenToggleVisibility();
+    this.updatePerformanceVisibility();
     this.updateTransitionDurationVisibility();
     this.updateLeftPanModeVisibility();
   }
@@ -320,6 +330,7 @@ class TimelineViewer {
 
   private initPerformancePill() {
     this.performancePillElement = document.getElementById('perf-pill');
+    this.headerActionsElement = document.querySelector('#header .header-actions');
     this.setPerformanceText(null, null);
   }
 
@@ -414,6 +425,7 @@ class TimelineViewer {
     this.updateTimelineViewport();
     this.updateTimelineVerticalOffset();
     this.drawTimeline();
+    this.updatePerformancePillPlacement();
     if (this.fullscreenToggleElement) {
       this.fullscreenToggleElement.textContent = document.body.classList.contains('fullscreen-mode')
         ? 'Exit Fullscreen'
@@ -428,6 +440,7 @@ class TimelineViewer {
     this.updateTimelineViewport();
     this.updateTimelineVerticalOffset();
     this.drawTimeline();
+    this.updatePerformancePillPlacement();
     if (this.fullscreenToggleElement) {
       this.fullscreenToggleElement.textContent = 'Fullscreen Mode';
     }
@@ -521,6 +534,15 @@ class TimelineViewer {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.fullscreenToggleElement) {
       this.fullscreenToggleElement.style.display = display;
+    }
+  }
+
+  private updatePerformanceVisibility() {
+    if (!this.performancePillElement) return;
+    const shouldShow = this.config.displayMode === 'Timeline' && this.config.showPerformanceMonitor;
+    this.performancePillElement.style.display = shouldShow ? '' : 'none';
+    if (shouldShow) {
+      this.updatePerformancePillPlacement();
     }
   }
 
@@ -895,7 +917,9 @@ class TimelineViewer {
       this.lastPerformanceUpdate = now;
       const fps = Number.isFinite(app.ticker.FPS) ? app.ticker.FPS : null;
       const deltaMs = Number.isFinite(app.ticker.deltaMS) ? app.ticker.deltaMS : null;
-      this.setPerformanceText(fps, deltaMs);
+      if (this.config.showPerformanceMonitor) {
+        this.setPerformanceText(fps, deltaMs);
+      }
     };
     this.performanceTickHandler = update;
     app.ticker.add(update);
@@ -909,6 +933,24 @@ class TimelineViewer {
       return;
     }
     this.performancePillElement.textContent = `FPS ${fps.toFixed(1)} | dt ${deltaMs.toFixed(1)} ms`;
+  }
+
+  private updatePerformancePillPlacement() {
+    if (!this.performancePillElement) return;
+    const isFullscreen = document.body.classList.contains('fullscreen-mode');
+    if (isFullscreen) {
+      if (this.performancePillElement.parentElement !== document.body) {
+        document.body.appendChild(this.performancePillElement);
+      }
+      this.performancePillElement.classList.add('perf-pill-floating');
+      return;
+    }
+    if (this.headerActionsElement) {
+      if (this.performancePillElement.parentElement !== this.headerActionsElement) {
+        this.headerActionsElement.insertBefore(this.performancePillElement, this.headerActionsElement.firstChild);
+      }
+      this.performancePillElement.classList.remove('perf-pill-floating');
+    }
   }
 
   private updateTimelineViewport() {

@@ -953,7 +953,54 @@ Please
 * remove the right click panning
 
 
+/////////////////////////////////// timeline-fps session 2025-01-05
 
+
+Please look at:
+package.json
+vite.config.ts
+timeline.html
+src/apps/timeline
+scripts/re-create-git-timeline.ts
+
+
+For performance monitoring we need to monitor the frames per second for src/apps/timeline
+Please suggest ways to collect the FPS and ways to display them to the user.
+
+
+Please implement fps monitoring and performance monitoring like this:
+* data collection: Pixi built-in app.ticker.FPS and app.ticker.deltaMS
+* display: add a pill to display FPS and deltaMS in #header next to fullscreen control.
+
+Yes, please add a tweakpane toggle labeled "PixiJS Performance Monitor" 
+Pleas also ensure that the Performance monitor is visible in fullscreen mode (if it is enabled)
+
+Ux issue: In fullscreen mode the performance monitor overlaps with the toggle fullscreen button.
+
+Now please add another tweakpane toggle labeled "stats.js Performance Monitor"
+use this library for it: https://mrdoob.github.io/stats.js/
+
+I want to compare our measurements with the results of this library so it's important for them to be independent.
+
+Please explain in detail how the animation that uses the "Transition Time (s)" is implemented.
+
+
+Please also monitor how much time the 
+
+## FUTURE
+
+
+
+
+
+center centers the locked commit group in the middle of the screen
+
+Dropdown "Center locked commit" 
+* "Never"
+* "Out of view"
+* "Always"
+
+linker und rechter scrollbereich bei groupd einschraenken auch beim jump to.
 
 
 
@@ -969,7 +1016,7 @@ Now please make sure that the help text is always in sync with what the user can
 
 
 
-## FUTURE
+
 Please add a dropdown list at the top of the "Timeline Controls" that allows selecting a specific project. 
 Atm the commit history is loaded from one fixed json file. This should be changed such that the program first loads an index.json from: public/project-history/index.json
 
@@ -1058,3 +1105,13 @@ package.json
 vite.config.ts
 timeline.html
 src/apps/timeline
+
+
+
+## INIT 2026/01/05
+Please look at:
+package.json
+vite.config.ts
+timeline.html
+src/apps/timeline
+scripts/re-create-git-timeline.ts
