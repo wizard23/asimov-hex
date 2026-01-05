@@ -16,6 +16,7 @@ interface Commit {
 type DisplayMode = 'List' | 'Timeline';
 type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'tenMinute' | 'minute';
 type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
+type LeftPanMode = 'Time Axis Only' | 'Naive Combined' | 'Smart Combined';
 
 interface GroupedCommits {
   key: string;
@@ -81,6 +82,8 @@ class TimelineViewer {
   private gestureLockElement: HTMLElement | null = null;
   private gestureUnlockElement: HTMLElement | null = null;
   private hotkeyEscElement: HTMLElement | null = null;
+  private leftPanModeElement: HTMLElement | null = null;
+  private gestureCombinedPanElement: HTMLElement | null = null;
   
   private config = {
     startDate: '',
@@ -93,6 +96,7 @@ class TimelineViewer {
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
     transitionDuration: 0.5,
+    leftPanMode: 'Time Axis Only' as LeftPanMode,
   };
 
   constructor() {
@@ -204,6 +208,7 @@ class TimelineViewer {
       this.updateGestureHintsVisibility();
       this.updateFullscreenToggleVisibility();
       this.updateTransitionDurationVisibility();
+      this.updateLeftPanModeVisibility();
       if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
         this.exitFullscreenMode();
       }
@@ -222,6 +227,7 @@ class TimelineViewer {
     }).on('change', () => {
       if (this.config.displayMode !== 'Timeline') return;
       this.updateGroupGapVisibility();
+      this.updateLeftPanModeVisibility();
       this.updateGestureHintsContent();
       this.render();
     });
@@ -250,6 +256,15 @@ class TimelineViewer {
       step: 0.01,
     });
 
+    const leftPanModeBinding = this.pane.addBinding(this.config, 'leftPanMode', {
+      label: 'Left Pan',
+      options: {
+        'Time Axis Only': 'Time Axis Only',
+        'Naive Combined': 'Naive Combined',
+        'Smart Combined': 'Smart Combined',
+      },
+    });
+
     const extendedScaleTicksBinding = this.pane.addBinding(this.config, 'extendedScaleTicks', {
       label: 'Extend Scale Ticks',
     }).on('change', () => {
@@ -271,6 +286,7 @@ class TimelineViewer {
     this.groupGapElement = groupGapBinding.element;
     this.groupScrollSpeedElement = groupScrollSpeedBinding.element;
     this.transitionDurationElement = transitionDurationBinding.element;
+    this.leftPanModeElement = leftPanModeBinding.element;
     this.extendedScaleTicksElement = extendedScaleTicksBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.gestureHintsElement = document.getElementById('gesture-hints');
@@ -278,6 +294,7 @@ class TimelineViewer {
     this.gestureLockElement = document.getElementById('gesture-lock');
     this.gestureUnlockElement = document.getElementById('gesture-unlock');
     this.hotkeyEscElement = document.getElementById('hotkey-esc');
+    this.gestureCombinedPanElement = document.getElementById('gesture-combined-pan');
     this.updateDateFilterVisibility();
     this.updateGroupByVisibility();
     this.updateCenterViewVisibility();
@@ -287,6 +304,7 @@ class TimelineViewer {
     this.updateGestureHintsContent();
     this.updateFullscreenToggleVisibility();
     this.updateTransitionDurationVisibility();
+    this.updateLeftPanModeVisibility();
   }
 
   private initFullscreenToggle() {
@@ -473,6 +491,9 @@ class TimelineViewer {
     if (this.gestureGroupScrollElement) {
       this.gestureGroupScrollElement.style.display = display;
     }
+    if (this.gestureCombinedPanElement) {
+      this.gestureCombinedPanElement.style.display = this.config.leftPanMode === 'Naive Combined' ? '' : 'none';
+    }
     const showLock = this.lockedCommit ? 'none' : '';
     const showUnlock = this.lockedCommit ? '' : 'none';
     if (this.gestureLockElement) {
@@ -497,6 +518,13 @@ class TimelineViewer {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.transitionDurationElement) {
       this.transitionDurationElement.style.display = display;
+    }
+  }
+
+  private updateLeftPanModeVisibility() {
+    const display = this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None' ? '' : 'none';
+    if (this.leftPanModeElement) {
+      this.leftPanModeElement.style.display = display;
     }
   }
 
@@ -908,7 +936,7 @@ class TimelineViewer {
     this.timelineDragging = true;
     this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
       && this.config.groupBy !== 'None'
-      && e.ctrlKey;
+      && (e.ctrlKey || this.config.leftPanMode === 'Naive Combined');
     this.timelineDragButton = 0;
     this.timelineDragStart = { x: e.global.x, y: e.global.y };
     this.timelineDragLast = { x: e.global.x, y: e.global.y };
@@ -931,8 +959,10 @@ class TimelineViewer {
           maxOffset
         );
         this.updateTimelineVerticalOffset();
-        this.drawTimeline();
-        return;
+        if (this.config.leftPanMode !== 'Naive Combined' || this.timelineDragButton === 2 || e.ctrlKey) {
+          this.drawTimeline();
+          return;
+        }
       }
 
       const dx = e.global.x - this.timelineDragStart.x;
