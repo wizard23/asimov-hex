@@ -977,15 +977,386 @@ Pleas also ensure that the Performance monitor is visible in fullscreen mode (if
 
 Ux issue: In fullscreen mode the performance monitor overlaps with the toggle fullscreen button.
 
-Now please add another tweakpane toggle labeled "stats.js Performance Monitor"
-use this library for it: https://mrdoob.github.io/stats.js/
 
-I want to compare our measurements with the results of this library so it's important for them to be independent.
 
 Please explain in detail how the animation that uses the "Transition Time (s)" is implemented.
 
+```
+ Here’s how the “Transition Time (s)” animation works in the timeline viewer, with the exact call path and logic.
 
-Please also monitor how much time the 
+  Where the value comes from
+
+  - The Tweakpane binding in src/apps/timeline/index.ts writes to config.transitionDuration (Transition Time (s) slider). That value is treated as seconds and then clamped to 0–1 before use in the animation.
+
+  When the animation is triggered
+
+  - The animation only runs when the viewer “recenters” on a commit. That happens in a few places:
+      - Clicking a commit in the timeline (handleTimelinePointerDown → centerOnScreenPoint).
+      - Keyboard navigation (arrow keys, Home/End) via navigateCommit, navigateGroupEdge, navigateGroupRow → centerOnCommitData → centerOnScreenPoint.
+  - These all end up calling animateToOffsets in src/apps/timeline/index.ts.
+
+  What gets animated
+
+  - Two values are animated:
+      - timelineViewOffset.x to pan horizontally to the target commit.
+      - timelineGroupScrollOffsetY to pan vertically between group rows when grouping is enabled.
+  - The targets are computed in centerOnScreenPoint based on where the commit’s screen position is relative to the viewport center. In grouped mode it also clamps the vertical scroll to valid bounds.
+
+  Animation implementation details
+
+  - animateToOffsets in src/apps/timeline/index.ts:
+      - Converts the slider value to milliseconds: duration = clamp(0..1) * 1000.
+      - If duration is 0, it jumps instantly to the target offsets and redraws.
+      - Otherwise, it:
+          - Cancels any in-flight animation (cancelTimelineTransition).
+          - Stores start offsets, deltas, and startTime = performance.now().
+          - Uses requestAnimationFrame(step) to interpolate.
+          - Computes normalized time t = (now - startTime) / duration, clamped to 1.
+          - Applies an ease-in-out quadratic curve:
+            eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+          - Updates offsets each frame, then calls:
+              - updateTimelineVerticalOffset() (to apply group scroll offsets), and
+              - drawTimeline() (to re-render everything).
+
+  How it gets interrupted
+
+  - Any manual interaction cancels the animation:
+      - Drag start (handleTimelinePointerDown) calls cancelTimelineTransition.
+      - Mouse wheel group scrolling (handleTimelineWheel when grouping + Ctrl) also cancels via cancelTimelineTransition.
+
+  If you want this to animate other operations (e.g., zoom to fit, reset view), we can call animateToOffsets from those paths too or add new tweened properties.
+```
+
+I am interested in performance monitoring. How much time does the actual rendering take? How much time does other periodic work take. Give me an overview of what we could monitor please.
+
+```
+• Here’s an overview of what you can monitor to answer “how much time is actual rendering vs other periodic work” in this timeline view.
+
+  What to measure (per frame or per interaction)
+
+  - Render time: time spent inside drawTimeline() and Pixi render (CPU prep + GPU submit). Use performance.now() around drawTimeline() and around app.renderer.render(app.stage) if you call it explicitly.
+  - Update time: time spent in non-render work like updateHoverCommit, filtering, layout calculations, grouping, and building commit points.
+  - Input handling time: pointer/keyboard handlers + pan/zoom logic.
+  - Ticker overhead: time spent in the ticker callbacks (your FPS updater, animations, etc.).
+  - GC pressure: memory allocations per frame (less direct, but you can sample JS heap size with performance.memory in Chromium).
+
+  How to separate “rendering” vs “other periodic work”
+
+  - Wrap drawTimeline() with timing to get “render prep + draw” on the CPU side.
+  - If you can split draw work, add timing sections inside drawTimeline() for:
+      - scale ticks rendering
+      - commit markers and labels
+      - change scale rendering
+      - overlays/hover/locked layers
+  - Wrap non-render periodic work (e.g., hover hit testing, animation step, layout recompute) in their own timing blocks.
+  - Use performance.mark()/performance.measure() to collect structured metrics, then aggregate averages and p95.
+
+  Helpful aggregate metrics
+
+  - Average frame time, p95 frame time, and worst frame time.
+  - Render time average vs update time average (can show as two numbers or % of frame).
+  - “Frames above budget” count (e.g., >16.7ms at 60Hz).
+  - Per-interaction latency (e.g., “pan start → next frame drawn” time).
+
+  Optional GPU-focused metrics (harder to get accurately)
+
+  - WebGL context info (renderer/vendor) for baselining.
+  - Draw call counts / geometry counts from Pixi (not always exposed directly unless you hook into renderer stats).
+
+  If you want, I can add a small profiler overlay that shows:
+
+  - FPS, dt
+  - render ms
+  - update ms
+  - last / avg / p95
+    …and a simple toggle in Tweakpane.
+```
+
+That sounds good. Please add this "small profiler overlay" that you just suggested with a tweakpane toggle.
+
+```
+• Added a small profiler overlay with a Tweakpane toggle, plus lightweight sampling of render vs other time.
+
+  What changed
+
+  - Profiler overlay is a fixed, bottom-left HUD that shows FPS/dt plus render and “other” ms with last/avg/p95.
+  - New Tweakpane toggle PixiJS Profiler Overlay controls visibility.
+  - Render timing is captured around drawTimeline(); per-frame “other” time is estimated as deltaMS - renderMs.
+  - Sampling uses a rolling window (120 samples) and updates the DOM ~4x/sec to keep overhead low.
+
+  Files updated
+
+  - timeline.html
+  - src/apps/timeline/index.ts
+
+  Notes
+
+  - “Render ms” is CPU time spent inside drawTimeline() (including Pixi draw calls).
+  - “Other ms” is the remaining portion of app.ticker.deltaMS for that tick.
+
+  If you want a more precise breakdown (e.g., separate scale ticks vs commit dots vs hover overlay), I can add sub‑section timers inside drawTimeline().
+```
+
+Yes please include more precise breakdown you suggested.
+
+please
+* enable it per default for now while we work on this feature
+* put it centered on top of the screen
+* try reducing the height by splitting it up into multiple columns or sections in a way that makes sense. We have plenty of width available at this new position but please use the height wisely. 
+
+
+
+Please explain in detail 
+* what gets done and/or what gets measured to get each of these values
+* how does the averaging work exactly
+* what parts of the code get profiled here
+please document all this in public/documentation/inline-help/timeline/profiler-overlay.md
+
+```
+• Wrote the requested documentation at public/documentation/inline-help/timeline/profiler-overlay.md, covering what each value measures, how averaging works, and which code paths are profiled.
+
+  If you want the doc to include a quick “how to enable/disable” note or screenshots, I can add that.
+```
+
+yes please!
+* add a quick “how to enable/disable” note 
+* add two screenshots
+  * one screenshot of the Performance Monitor and 
+  * one screenshot of the Profiler Overlay. 
+
+```
+• Added the enable/disable note and screenshot slots in public/documentation/inline-help/timeline/profiler-overlay.md, and created public/documentation/inline-help/timeline/assets/ for the images.
+
+  I still need the actual screenshot files to complete this. Please drop them at:
+
+  1. public/documentation/inline-help/timeline/assets/performance-monitor.png
+  2. public/documentation/inline-help/timeline/assets/profiler-overlay.png
+
+  Once they’re in place, I can verify and adjust the doc if needed.
+```
+
+
+
+Now we will implement a new feature in several stages.
+
+Our goal is to provide a system for providing popup help/documentation windows for some of the features of the app. 
+We will call this new system "inline help windows" because it is not a separate site providing the help but a popup "inline help window" in the app itself.
+
+The "inline help windows" should be overlays over the app that can be moved freely around by the user by dragging and dropping them anywhere in the browser window. This is needed so the user can have the inline help window open and positioned the way he needs it while he uses the app.
+
+The documentation/help comes from Markdown files that have been written for this purpose.
+
+We already have a standalone app for viewing and navigating markdown files in:
+markdown-viewer.html 
+src/apps/markdown-viewer
+vite.config.ts
+
+To avoid duplicated code and to ensure a clean architecture we will need to extract the parsing and html generation code from ther into a shared mardown library.
+
+The first use case for this new "inline help windows" system will be: Providing an inline help window for the the PixiJS Profiler Overlay.
+
+The "general plan" is to proceed in steps like this
+1. Read through all the existing code.
+2. Create tests for the shared markdown library
+3. Extract the shared markdown library
+4. Use the shared library in the existing app in src/apps/markdown-viewer
+5. Create the "inline help windows" system using the shared library
+6. Use the "inline help windows" system to provide the user with a popup help window about the PixiJS Profiler Overlay.
+
+I will guide you through the steps once we decide to start the implementation.
+
+For now I just want to know from you:
+* Is this plan well thought through? 
+* Do you see any inconsistencies? 
+* Do you have suggestions for improving the concept
+* Do you have suggestions for changing/reshuffling the "general plan"?
+* Do you need more information before we start?
+
+
+```
+• Your plan is solid and sequenced logically. A few notes and suggestions:
+
+  - Plan soundness: The steps are well thought through and de-risk the refactor by extracting + reusing. No inconsistencies spotted.
+  - Potential inconsistency: Writing tests before extraction can be tricky without a public API. I’d recommend first documenting the current markdown output behavior (fixtures), then write tests against that
+    output as the “contract” while extracting.
+  - Concept suggestions: Consider an “inline help window manager” with: z‑index stacking on focus, drag constraints to viewport, close/minimize, and optional persistence (last position) per help topic.
+  - Reshuffle idea: Step 2/3 could be merged into “create a thin wrapper API + tests from current markdown-viewer output, then extract.” This keeps tests aligned to real behavior.
+  - Info needed before starting:
+      - Where should inline help windows live in the DOM (root, app container, timeline only)?
+      - Should we allow multiple windows at once?
+      - Should the help content support images/relative links (e.g., public/documentation/inline-help/...)?
+      - Any UX expectations: close button, resize, remember position, keyboard shortcut?
+
+  If you want, I can start with a quick read of src/apps/markdown-viewer and report what the current parsing/rendering pipeline looks like so we can plan the shared library API.
+```
+
+
+Thanks for pointing out the flaws in my approach of beginning with the tests. We will adapt the plan according to your suggestion about this.
+
+I also like your ideas for the “inline help window manager”. Please use this idea once we arrive at that phase in the plan.
+
+We will also combine step 2 and 3 (and in general we will sometimes combine some items into one execution step. I just wanted to provide a guideline/concept. It is ok to modify the steps or reshuffle them on the fly)
+
+The info you asked for:
+* the inline help windows should live in root. they should be totally independent of the layout of the app.
+* yes we definitely need to allow multiple window at once.
+* yes we need to support images and relative links (and external links openening in a new browser tab/window). The markdown files need to be "compiled" into html. The html should be able to provide all these features.
+* UX expectations:
+  * close, minimize and maximize buttons
+  * snap to side (left, right, top, bottom)
+  * snap together (windows should arrange themself nicely when dragged on top of each other. For example. If two windows are snapped to the left side they should arrange themself on top of each other on the left side of the window. Here your idea of an “inline help window manager” will shine)
+  * remembering positions and sizes (and even scroll state) would be great!
+  * lets add a Ctrl+Q shortcut for closing and a Ctrl+M for minimizing, Ctrl+1 for snap to the left side Ctrl+2 for snap to right side Ctrl+3 for top side Ctrl+4 for bottom side.
+
+Yes please start by reading the existing code and tell me when you are ready for steps 2/3 combined and reshuffled the way you suggested with your “create a thin wrapper API + tests from current markdown-viewer output, then extract.” idea. 
+
+If anything is unclear please just ask.
+
+```
+• Explored
+  └ List markdown-viewer
+    Read index.ts
+
+─ Worked for 7s ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+• I’ve read src/apps/markdown-viewer/index.ts. The current markdown pipeline is a custom parser that:
+
+  - Splits lines and builds block elements (headings, paragraphs, lists, blockquotes, code fences, hr).
+  - Handles inline code (backticks), links [text](href), and emphasis/strong with */**.
+  - Resolves links via resolveMarkdownHref, which rewrites them to the markdown viewer URL with ?url=....
+
+  I’m ready to proceed with the combined steps 2/3: define a thin shared markdown API, capture current output as the contract, and extract with tests.
+```
+
+Yes, please make it so.
+
+
+```
+• Extracted the markdown renderer into a shared module and added jsdom tests that lock in the current output behavior, then switched the markdown viewer to use the shared module.
+
+  Details
+
+  - Shared renderer now lives at src/core/markdown/renderer.ts and exports renderMarkdown + resolveMarkdownHref.
+  - Tests in src/core/markdown/renderer.test.ts cover headings/paragraphs/inline formatting, lists/blockquote, code fences/hr, and link rewriting.
+  - src/apps/markdown-viewer/index.ts now imports the shared renderer instead of local helpers.
+
+  Files changed
+
+  - src/core/markdown/renderer.ts
+  - src/core/markdown/renderer.test.ts
+  - src/apps/markdown-viewer/index.ts
+
+  Next steps
+
+  1. Run npm run test to validate the new renderer tests.
+```
+
+
+Yes :)
+
+I forgot to tell you how to run the tests and how to validate your changes in general:
+
+Please look at the scripts in ./package.json
+If you need to you can also look at any code or file that is referenced there.
+
+Then run (using a 90 sec timeout):
+npm run verify
+
+You can also use the individual scripts to save time.
+* test
+* lint
+* build
+
+In the future when you change something please always use this method for finding out if there are still errors in the code that would fail in CI.
+
+Atm the tests fail so pleas fix this before we proceed
+
+```
+• All checks now pass with npm run verify.
+
+  Changes made after the failure
+
+  - Added jsdom dev dependency so Vitest can run the jsdom environment tests.
+  - Adjusted resolveMarkdownHref tests to assert via parsed URL and search params (handles encoded URLs and the dev server origin).
+
+  Files touched
+
+  - package.json
+  - package-lock.json
+  - src/core/markdown/renderer.test.ts
+
+  Ready for the next step whenever you are.
+```
+
+Yes, please proceed.
+
+
+```
+• I'm considering how to approach the inline help window system next. It looks like a complex multi-step task, so I'll create a detailed plan outlining inspecting current apps, designing a window manager
+  module, integrating it with the timeline app's profiler overlay, and then testing. Since the user said to proceed, I'll focus on planning thoroughly and then start exploring the code for integration points.
+
+• Updated Plan
+  └ Proceeding with inline help windows system and first usage in timeline profiler overlay.
+    □ Review existing app entry points/HTML to decide where to mount inline help window root and how to trigger it in timeline
+    □ Implement shared inline help window manager (drag, snap, z-order, persistence, shortcuts) and markdown rendering integration
+    □ Wire timeline app to open PixiJS Profiler Overlay help window using the shared manager
+    □ Run npm run verify and fix any issues
+
+• Explored
+  └ Search help|doc|inline in apps
+
+• Examining timeline app for help integration (34s • esc to interrupt)
+
+...
+
+• Implemented the inline help window manager and wired the timeline app to open the PixiJS Profiler Overlay help. The manager creates draggable, resizable, z‑stacked windows with snapping, minimize/maximize,
+  persistence (position/size/scroll), and keyboard shortcuts. The shared markdown renderer now supports images and configurable link resolution so inline help can handle relative assets and external links.
+
+  Details
+
+  - New inline help system in src/core/inline-help/inline-help-manager.ts (root overlay, drag, snap layout, persistence, Ctrl+Q/Ctrl+M/Ctrl+1..4).
+  - Markdown renderer extended with options and image support in src/core/markdown/renderer.ts plus updated tests in src/core/markdown/renderer.test.ts.
+  - Timeline adds “Open Profiler Help” in Tweakpane and opens /documentation/inline-help/timeline/profiler-overlay.md in a help window via src/apps/timeline/index.ts.
+
+  Validation
+
+  - npm run verify (tests/lint/build) passes.
+
+  Next steps
+
+  1. Open timeline.html, click “Open Profiler Help”, and try drag/snap/minimize/maximize + Ctrl shortcuts.
+  2. If you want images to render, place the screenshot assets at public/documentation/inline-help/timeline/assets/performance-monitor.png and public/documentation/inline-help/timeline/assets/profiler-
+     overlay.png.
+```
+
+I've added the images
+
+
+
+
+
+
+Please extract the markdown parser and html generator in a library that then will be used in the existing standalone markdown viewer app.
+Pleas write some tests for the library you extract.
+
+
+
+
+
+
+
+* possibilities what else we could measure
+* any other suggestions you might have
+
+
+change mouse curser accordingly when in horizontal scrolling mode.
+change mouse curser accordingly when in vertical scrolling mode.
+
+
+
+Now please add another tweakpane toggle labeled "stats.js Performance Monitor"
+use this library for it: https://mrdoob.github.io/stats.js/
+I want to compare our "PixiJS Performance Monitor" measurements with the results of the "stats.js Performance Monitor" so it's important for them to be independent of each other.
 
 ## FUTURE
 

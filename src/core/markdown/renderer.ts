@@ -1,6 +1,20 @@
 type RenderTarget = HTMLElement;
 
-export function renderMarkdown(markdown: string, container: RenderTarget, baseUrl: string): void {
+export type MarkdownRenderOptions = {
+  baseUrl: string;
+  resolveHref?: (rawHref: string, baseUrl: string) => string;
+  resolveImageSrc?: (rawSrc: string, baseUrl: string) => string;
+  onLinkCreated?: (link: HTMLAnchorElement, rawHref: string) => void;
+};
+
+type NormalizedRenderOptions = Required<MarkdownRenderOptions>;
+
+export function renderMarkdown(
+  markdown: string,
+  container: RenderTarget,
+  baseUrlOrOptions: string | MarkdownRenderOptions
+): void {
+  const options = normalizeOptions(baseUrlOrOptions);
   container.replaceChildren();
   const lines = markdown.replace(/\r\n/g, '\n').split('\n');
 
@@ -12,7 +26,7 @@ export function renderMarkdown(markdown: string, container: RenderTarget, baseUr
   const flushParagraph = () => {
     if (currentParagraph.length === 0) return;
     const p = document.createElement('p');
-    appendInline(p, currentParagraph.join(' '), baseUrl);
+    appendInline(p, currentParagraph.join(' '), options);
     container.appendChild(p);
     currentParagraph = [];
   };
@@ -22,7 +36,7 @@ export function renderMarkdown(markdown: string, container: RenderTarget, baseUr
     const list = document.createElement(currentList.type);
     currentList.items.forEach((item) => {
       const li = document.createElement('li');
-      appendInline(li, item, baseUrl);
+      appendInline(li, item, options);
       list.appendChild(li);
     });
     container.appendChild(list);
@@ -32,7 +46,7 @@ export function renderMarkdown(markdown: string, container: RenderTarget, baseUr
   const flushBlockquote = () => {
     if (currentBlockquote.length === 0) return;
     const block = document.createElement('blockquote');
-    appendInline(block, currentBlockquote.join(' '), baseUrl);
+    appendInline(block, currentBlockquote.join(' '), options);
     container.appendChild(block);
     currentBlockquote = [];
   };
@@ -67,7 +81,7 @@ export function renderMarkdown(markdown: string, container: RenderTarget, baseUr
       if (match) {
         const level = match[1].length;
         const heading = document.createElement(`h${level}`);
-        appendInline(heading, match[2].trim(), baseUrl);
+        appendInline(heading, match[2].trim(), options);
         container.appendChild(heading);
       }
       index += 1;
@@ -135,7 +149,24 @@ export function renderMarkdown(markdown: string, container: RenderTarget, baseUr
   flushBlockquote();
 }
 
-function appendInline(parent: HTMLElement, text: string, baseUrl: string): void {
+function normalizeOptions(baseUrlOrOptions: string | MarkdownRenderOptions): NormalizedRenderOptions {
+  if (typeof baseUrlOrOptions === 'string') {
+    return {
+      baseUrl: baseUrlOrOptions,
+      resolveHref: resolveMarkdownHref,
+      resolveImageSrc: resolveRelativeHref,
+      onLinkCreated: () => undefined,
+    };
+  }
+  return {
+    baseUrl: baseUrlOrOptions.baseUrl,
+    resolveHref: baseUrlOrOptions.resolveHref ?? resolveMarkdownHref,
+    resolveImageSrc: baseUrlOrOptions.resolveImageSrc ?? resolveRelativeHref,
+    onLinkCreated: baseUrlOrOptions.onLinkCreated ?? (() => undefined),
+  };
+}
+
+function appendInline(parent: HTMLElement, text: string, options: NormalizedRenderOptions): void {
   const parts = text.split('`');
   parts.forEach((segment, idx) => {
     if (idx % 2 === 1) {
@@ -144,24 +175,34 @@ function appendInline(parent: HTMLElement, text: string, baseUrl: string): void 
       parent.appendChild(code);
       return;
     }
-    appendLinksAndEmphasis(parent, segment, baseUrl);
+    appendLinksAndEmphasis(parent, segment, options);
   });
 }
 
-function appendLinksAndEmphasis(parent: HTMLElement, text: string, baseUrl: string): void {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+function appendLinksAndEmphasis(parent: HTMLElement, text: string, options: NormalizedRenderOptions): void {
+  const tokenRegex = /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null = null;
 
-  while ((match = linkRegex.exec(text)) !== null) {
+  while ((match = tokenRegex.exec(text)) !== null) {
     const prefix = text.slice(lastIndex, match.index);
     appendEmphasis(parent, prefix);
 
-    const link = document.createElement('a');
-    const rawHref = match[2].trim();
-    link.href = resolveMarkdownHref(rawHref, baseUrl);
-    link.textContent = match[1].trim();
-    parent.appendChild(link);
+    const isImage = Boolean(match[1]);
+    if (isImage) {
+      const img = document.createElement('img');
+      const rawSrc = match[2].trim();
+      img.src = options.resolveImageSrc(rawSrc, options.baseUrl);
+      img.alt = match[1].trim();
+      parent.appendChild(img);
+    } else {
+      const link = document.createElement('a');
+      const rawHref = match[4].trim();
+      link.href = options.resolveHref(rawHref, options.baseUrl);
+      link.textContent = match[3].trim();
+      options.onLinkCreated(link, rawHref);
+      parent.appendChild(link);
+    }
 
     lastIndex = match.index + match[0].length;
   }
@@ -206,6 +247,16 @@ function appendEmphasis(parent: HTMLElement, text: string): void {
     parent.appendChild(element);
 
     remaining = remaining.slice(nextMatch.index + nextMatch[0].length);
+  }
+}
+
+export function resolveRelativeHref(rawHref: string, baseUrl: string): string {
+  if (!rawHref) return rawHref;
+  if (rawHref.startsWith('#')) return rawHref;
+  try {
+    return new URL(rawHref, baseUrl).href;
+  } catch {
+    return rawHref;
   }
 }
 

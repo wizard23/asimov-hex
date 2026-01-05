@@ -2,6 +2,7 @@ import { Pane } from 'tweakpane';
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import type { FederatedPointerEvent } from 'pixi.js';
 import { showToast } from '../../core/utils/toast';
+import { InlineHelpWindowManager } from '../../core/inline-help/inline-help-manager';
 
 interface Commit {
   hash: string;
@@ -39,6 +40,8 @@ class TimelineViewer {
   private performancePillElement: HTMLElement | null = null;
   private headerActionsElement: HTMLElement | null = null;
   private profilerOverlayElement: HTMLElement | null = null;
+  private inlineHelpManager: InlineHelpWindowManager | null = null;
+  private profilerHelpElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -123,6 +126,7 @@ class TimelineViewer {
     this.initFullscreenToggle();
     this.initPerformancePill();
     this.initProfilerOverlay();
+    this.initInlineHelpManager();
     this.initHotkeys();
     this.initContextMenuClear();
     await this.loadTimeline();
@@ -226,6 +230,7 @@ class TimelineViewer {
       this.updateFullscreenToggleVisibility();
       this.updatePerformanceVisibility();
       this.updateProfilerVisibility();
+      this.updateProfilerHelpVisibility();
       this.updateTransitionDurationVisibility();
       this.updateLeftPanModeVisibility();
       if (this.config.displayMode !== 'Timeline' && document.body.classList.contains('fullscreen-mode')) {
@@ -287,6 +292,13 @@ class TimelineViewer {
       this.updateProfilerVisibility();
     });
 
+    const profilerHelpButton = this.pane.addButton({
+      title: 'Open Profiler Help',
+    }).on('click', () => {
+      this.openProfilerHelp();
+    });
+    this.profilerHelpElement = profilerHelpButton.element;
+
     const leftPanModeBinding = this.pane.addBinding(this.config, 'leftPanMode', {
       label: 'Left Pan',
       options: {
@@ -337,8 +349,10 @@ class TimelineViewer {
     this.updateFullscreenToggleVisibility();
     this.updatePerformanceVisibility();
     this.updateProfilerVisibility();
+    this.updateProfilerHelpVisibility();
     this.updateTransitionDurationVisibility();
     this.updateLeftPanModeVisibility();
+
   }
 
   private initFullscreenToggle() {
@@ -357,6 +371,18 @@ class TimelineViewer {
     this.profilerOverlayElement = document.getElementById('profiler-overlay');
     this.setProfilerText('Profiler disabled');
     this.updateProfilerVisibility();
+  }
+
+  private initInlineHelpManager() {
+    this.inlineHelpManager = new InlineHelpWindowManager();
+  }
+
+  private openProfilerHelp() {
+    this.inlineHelpManager?.openWindow({
+      id: 'timeline-profiler-overlay',
+      title: 'PixiJS Profiler Overlay',
+      markdownUrl: '/documentation/inline-help/timeline/profiler-overlay.md',
+    });
   }
 
   private bindFullscreenExit() {
@@ -578,6 +604,12 @@ class TimelineViewer {
     if (shouldShow) {
       this.updateProfilerOverlay();
     }
+  }
+
+  private updateProfilerHelpVisibility() {
+    if (!this.profilerHelpElement) return;
+    const shouldShow = this.config.displayMode === 'Timeline';
+    this.profilerHelpElement.style.display = shouldShow ? '' : 'none';
   }
 
   private updateTransitionDurationVisibility() {

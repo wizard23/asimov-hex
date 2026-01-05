@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 import { describe, it, expect } from 'vitest';
-import { renderMarkdown, resolveMarkdownHref } from './renderer';
+import { renderMarkdown, resolveMarkdownHref, resolveRelativeHref } from './renderer';
 
 describe('renderMarkdown', () => {
   it('renders headings, paragraphs, and inline formatting', () => {
@@ -54,6 +54,21 @@ describe('renderMarkdown', () => {
 
     expect(container.innerHTML).toBe(
       '<pre><code>const x = 1;</code></pre><hr>'
+    );
+  });
+
+  it('renders images and uses custom link resolver', () => {
+    const container = document.createElement('div');
+    const markdown = 'Image: ![Alt](./img.png) and [link](page.md).';
+
+    renderMarkdown(markdown, container, {
+      baseUrl: 'http://example.com/docs/guide.md',
+      resolveHref: (href) => `custom:${href}`,
+      resolveImageSrc: resolveRelativeHref,
+    });
+
+    expect(container.innerHTML).toBe(
+      '<p>Image: <img src="http://example.com/docs/img.png" alt="Alt"> and <a href="custom:page.md">link</a>.</p>'
     );
   });
 });
