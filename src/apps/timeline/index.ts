@@ -36,6 +36,7 @@ class TimelineViewer {
   private centerViewElement: HTMLElement | null = null;
   private fullscreenToggleElement: HTMLButtonElement | null = null;
   private fullscreenExitElement: HTMLButtonElement | null = null;
+  private performancePillElement: HTMLElement | null = null;
 
   private timelineApp: Application | null = null;
   private timelineGraphics: Graphics | null = null;
@@ -83,6 +84,9 @@ class TimelineViewer {
   private hotkeyEscElement: HTMLElement | null = null;
   private leftPanModeElement: HTMLElement | null = null;
   private gestureCombinedPanElement: HTMLElement | null = null;
+  private performanceTickHandler: (() => void) | null = null;
+  private lastPerformanceUpdate = 0;
+  private readonly performanceUpdateInterval = 250;
   
   private config = {
     startDate: '',
@@ -105,6 +109,7 @@ class TimelineViewer {
 
   private async init() {
     this.initFullscreenToggle();
+    this.initPerformancePill();
     this.initHotkeys();
     this.initContextMenuClear();
     await this.loadTimeline();
@@ -311,6 +316,11 @@ class TimelineViewer {
     this.fullscreenToggleElement = document.getElementById('fullscreen-toggle') as HTMLButtonElement | null;
     this.fullscreenToggleElement?.addEventListener('click', () => this.toggleFullscreenMode());
     this.bindFullscreenExit();
+  }
+
+  private initPerformancePill() {
+    this.performancePillElement = document.getElementById('perf-pill');
+    this.setPerformanceText(null, null);
   }
 
   private bindFullscreenExit() {
@@ -774,6 +784,7 @@ class TimelineViewer {
     this.timelineApp.stage.sortableChildren = true;
     this.timelineApp.stage.eventMode = 'static';
     this.timelineApp.stage.hitArea = this.timelineApp.screen;
+    this.bindPerformanceTicker();
 
     this.timelineScaleGraphics = new Graphics();
     this.timelineLineGraphics = new Graphics();
@@ -846,6 +857,10 @@ class TimelineViewer {
       this.timelineResizeObserver = null;
     }
     if (this.timelineApp) {
+      if (this.performanceTickHandler) {
+        this.timelineApp.ticker.remove(this.performanceTickHandler);
+        this.performanceTickHandler = null;
+      }
       this.timelineApp.canvas.removeEventListener('wheel', this.handleTimelineWheel);
       this.timelineApp.canvas.removeEventListener('mousemove', this.handleTimelineMouseMove);
       this.timelineApp.canvas.removeEventListener('mouseleave', this.handleTimelineMouseLeave);
@@ -853,6 +868,8 @@ class TimelineViewer {
       this.timelineApp.destroy(true);
       this.timelineApp = null;
     }
+    this.lastPerformanceUpdate = 0;
+    this.setPerformanceText(null, null);
     this.timelineGraphics = null;
     this.timelineLineGraphics = null;
     this.timelineChangeGraphics = null;
@@ -867,6 +884,31 @@ class TimelineViewer {
     this.timelineInfoContainer = null;
     this.hoveredCommit = null;
     this.lockedCommit = null;
+  }
+
+  private bindPerformanceTicker() {
+    if (!this.timelineApp || !this.performancePillElement) return;
+    const app = this.timelineApp;
+    const update = () => {
+      const now = performance.now();
+      if (now - this.lastPerformanceUpdate < this.performanceUpdateInterval) return;
+      this.lastPerformanceUpdate = now;
+      const fps = Number.isFinite(app.ticker.FPS) ? app.ticker.FPS : null;
+      const deltaMs = Number.isFinite(app.ticker.deltaMS) ? app.ticker.deltaMS : null;
+      this.setPerformanceText(fps, deltaMs);
+    };
+    this.performanceTickHandler = update;
+    app.ticker.add(update);
+    update();
+  }
+
+  private setPerformanceText(fps: number | null, deltaMs: number | null) {
+    if (!this.performancePillElement) return;
+    if (fps === null || deltaMs === null) {
+      this.performancePillElement.textContent = 'FPS -- | dt -- ms';
+      return;
+    }
+    this.performancePillElement.textContent = `FPS ${fps.toFixed(1)} | dt ${deltaMs.toFixed(1)} ms`;
   }
 
   private updateTimelineViewport() {

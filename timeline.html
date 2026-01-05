@@ -55,6 +55,19 @@
       align-items: center;
       gap: 10px;
     }
+    .perf-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #3b3b3b;
+      background: rgba(20, 20, 20, 0.7);
+      color: #d5d5d5;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
     .fullscreen-button {
       appearance: none;
       -webkit-appearance: none;
@@ -255,6 +268,7 @@
         <a href="index.html">← Back to Main App</a>
       </div>
       <div class="header-actions">
+        <div id="perf-pill" class="perf-pill" aria-live="polite">FPS -- | dt -- ms</div>
         <button id="fullscreen-toggle" class="fullscreen-button" type="button">Fullscreen Mode</button>
       </div>
     </div>
