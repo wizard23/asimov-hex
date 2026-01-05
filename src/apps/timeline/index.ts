@@ -58,9 +58,7 @@ class TimelineViewer {
   private timelineGroupScrollOffsetStart = 0;
   private timelineTransitionFrame: number | null = null;
   private timelineDragging = false;
-  private timelineDraggingGroups = false;
   private timelineDragStart = { x: 0, y: 0 };
-  private timelineDragLast = { x: 0, y: 0 };
   private timelineEmptyClickCandidate = false;
   private timelineDragButton: number | null = null;
   private timelineSmartPanAxis: 'none' | 'x' | 'y' = 'none';
@@ -968,13 +966,9 @@ class TimelineViewer {
     }
     this.cancelTimelineTransition();
     this.timelineDragging = true;
-    this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
-      && this.config.groupBy !== 'None'
-      && (e.ctrlKey || this.config.leftPanMode !== 'Time Axis Only');
     this.timelineDragButton = 0;
     this.timelineSmartPanAxis = 'none';
     this.timelineDragStart = { x: e.global.x, y: e.global.y };
-    this.timelineDragLast = { x: e.global.x, y: e.global.y };
     this.timelineViewOffsetStart = { ...this.timelineViewOffset };
     this.timelineEmptyClickCandidate = !this.hoveredCommit && !e.ctrlKey;
     this.timelineGroupScrollOffsetStart = this.timelineGroupScrollOffsetY;
@@ -982,10 +976,8 @@ class TimelineViewer {
 
   private handleTimelinePointerMove(e: FederatedPointerEvent) {
     if (this.timelineDragging) {
-      this.timelineDragLast = { x: e.global.x, y: e.global.y };
       const canGroupDrag = this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None';
       const isLeft = this.timelineDragButton === 0;
-      const isRight = this.timelineDragButton === 2;
       const smartMode = this.getSmartPanMode();
       const useCombined = isLeft && canGroupDrag && this.config.leftPanMode !== 'Time Axis Only';
     const groupOnly = canGroupDrag && (isLeft && e.ctrlKey);
@@ -1020,22 +1012,6 @@ class TimelineViewer {
     }
 
     this.updateHoverCommit(e.global.x, e.global.y);
-  }
-
-  private findCommitPointAt(screenX: number, screenY: number) {
-    const radius = 21;
-    let best: { commit: Commit; screenX: number; screenY: number } | null = null;
-    let bestDistance = Number.POSITIVE_INFINITY;
-    for (const point of this.timelineCommitPoints) {
-      const dx = screenX - point.screenX;
-      const dy = screenY - point.screenY;
-      const dist = Math.hypot(dx, dy);
-      if (dist <= radius && dist < bestDistance) {
-        bestDistance = dist;
-        best = point;
-      }
-    }
-    return best;
   }
 
   private findCommitPointForCommit(commit: Commit) {
@@ -1135,7 +1111,6 @@ class TimelineViewer {
       }
     }
     this.timelineDragging = false;
-    this.timelineDraggingGroups = false;
     this.timelineEmptyClickCandidate = false;
     this.timelineDragButton = null;
     this.timelineSmartPanAxis = 'none';
