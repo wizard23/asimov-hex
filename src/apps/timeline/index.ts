@@ -16,7 +16,7 @@ interface Commit {
 type DisplayMode = 'List' | 'Timeline';
 type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'tenMinute' | 'minute';
 type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
-type LeftPanMode = 'Time Axis Only' | 'Naive Combined' | 'Direction-lock on drag start' | 'Dead-zone + axis snapping' | 'Two-stage threshold';
+type LeftPanMode = 'Time Axis Only' | 'Naive Combined' | 'Direction-lock on drag start' | 'Dead-zone + axis snapping';
 
 interface GroupedCommits {
   key: string;
@@ -97,7 +97,7 @@ class TimelineViewer {
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
     transitionDuration: 0.5,
-    leftPanMode: 'Time Axis Only' as LeftPanMode,
+    leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
   };
 
   constructor() {
@@ -264,7 +264,6 @@ class TimelineViewer {
         'Naive Combined': 'Naive Combined',
         'Direction-lock on drag start': 'Direction-lock on drag start',
         'Dead-zone + axis snapping': 'Dead-zone + axis snapping',
-        'Two-stage threshold': 'Two-stage threshold',
       },
     });
 
@@ -687,7 +686,6 @@ class TimelineViewer {
   private getSmartPanMode(): LeftPanMode | null {
     if (this.config.leftPanMode === 'Direction-lock on drag start') return this.config.leftPanMode;
     if (this.config.leftPanMode === 'Dead-zone + axis snapping') return this.config.leftPanMode;
-    if (this.config.leftPanMode === 'Two-stage threshold') return this.config.leftPanMode;
     return null;
   }
 
@@ -714,16 +712,6 @@ class TimelineViewer {
         return 'y';
       }
       return 'none';
-    }
-
-    if (mode === 'Two-stage threshold') {
-      const switchThreshold = 24;
-      const switchRatio = 2.5;
-      if (this.timelineSmartPanAxis === 'x' && absY >= switchThreshold && absY >= absX * switchRatio) {
-        this.timelineSmartPanAxis = 'y';
-      } else if (this.timelineSmartPanAxis === 'y' && absX >= switchThreshold && absX >= absY * switchRatio) {
-        this.timelineSmartPanAxis = 'x';
-      }
     }
 
     return this.timelineSmartPanAxis;
@@ -969,21 +957,6 @@ class TimelineViewer {
   }
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
-    if (e.button === 2) {
-      if (this.config.groupBy === 'None') return;
-      this.cancelTimelineTransition();
-      this.timelineDragging = true;
-      this.timelineDraggingGroups = true;
-      this.timelineDragButton = 2;
-      this.timelineSmartPanAxis = 'none';
-      this.timelineDragStart = { x: e.global.x, y: e.global.y };
-      this.timelineDragLast = { x: e.global.x, y: e.global.y };
-      this.timelineViewOffsetStart = { ...this.timelineViewOffset };
-      this.timelineEmptyClickCandidate = false;
-      this.timelineGroupScrollOffsetStart = this.timelineGroupScrollOffsetY;
-      return;
-    }
-
     if (e.button !== 0) return;
     if (!e.ctrlKey && this.hoveredCommit) {
       const commitPoint = this.findCommitPointForCommit(this.hoveredCommit);
@@ -1015,7 +988,7 @@ class TimelineViewer {
       const isRight = this.timelineDragButton === 2;
       const smartMode = this.getSmartPanMode();
       const useCombined = isLeft && canGroupDrag && this.config.leftPanMode !== 'Time Axis Only';
-      const groupOnly = canGroupDrag && (isRight || (isLeft && e.ctrlKey));
+    const groupOnly = canGroupDrag && (isLeft && e.ctrlKey);
 
       if (groupOnly) {
         this.applyGroupDrag(e.global.y - this.timelineDragStart.y);
