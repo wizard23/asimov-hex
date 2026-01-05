@@ -1,5 +1,185 @@
 [
   {
+    "hash": "e43f880791fac65fba98ac71b427acd99e100b57",
+    "timestamp": 1767584704,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update todo lists and documentation from recent sessions\n- add initial prompt and feature specs to TODOS-asimov-core.md\n- create TODOS-chats.md with notes on vibe coding and project history\n- update clean-code.md with review checklists for timeline and general codebase\n- update commit-messages.md with latest formatting rules and labels\n- update grid.md with particle style and radius tasks\n- update timeline.md with detailed session history and feature requirements",
+    "addedLines": 521,
+    "removedLines": 3
+  },
+  {
+    "hash": "dab676be4752aafee2624eb81130a460e65a802a",
+    "timestamp": 1767583618,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: simplify timeline panning modes and input handling\n- remove 'Two-stage threshold' pan mode and associated logic\n- change default Left Pan mode to 'Direction-lock on drag start'\n- remove right-drag group scrolling support to streamline interaction\n- update dynamic gesture hints to reflect simplified controls\n- ensure smart pan axis is reset correctly on pointer up",
+    "addedLines": 4,
+    "removedLines": 31
+  },
+  {
+    "hash": "9062e48497b5079ea32ee6351e5bf45d26294d18",
+    "timestamp": 1767581484,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: implement advanced combined panning logic in timeline\n- introduce direction-lock, dead-zone, and two-stage threshold smart pan modes\n- add axis snapping logic to prevent unintended diagonal drifting when combined panning is enabled\n- refactor pointer event handlers to use shared applyGroupDrag and updateSmartPanAxis helpers\n- update UI config with granular left-pan mode options and dynamic gesture hints",
+    "addedLines": 90,
+    "removedLines": 17
+  },
+  {
+    "hash": "52f691494df6a4922e977bee31c996d2b67aa3a5",
+    "timestamp": 1767580356,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement configurable left-pan modes in timeline\n- introduce LeftPanMode with 'Time Axis Only', 'Naive Combined', and 'Smart Combined' options\n- enable 'Naive Combined' mode to allow simultaneously panning time and scrolling groups with left-drag\n- add UI control for left-pan mode and update dynamic gesture hints\n- refactor pointer event handlers to support combined panning logic",
+    "addedLines": 34,
+    "removedLines": 3
+  },
+  {
+    "hash": "a4af8b841e9375fd93cbda39d23c06261a999e43",
+    "timestamp": 1767576119,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement right-drag for group scrolling in timeline\n- capture right-click button to initiate group dragging when grouping is active\n- update pointer up logic to prevent right-click from clearing locked commits\n- update gesture hints UI to include right-drag interaction",
+    "addedLines": 19,
+    "removedLines": 2
+  },
+  {
+    "hash": "4081a7e160144f0ebd17d60c9b1b42cb4df992a6",
+    "timestamp": 1767568180,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: refine hover highlight and change scale behavior\n- hide hover highlight if it matches the locked commit\n- align change scale visibility with the locked commit instead of hover\n- hide change scale in grouped mode when no lock is active",
+    "addedLines": 5,
+    "removedLines": 4
+  },
+  {
+    "hash": "9765e80513c110cf0f584077e12812da82814e46",
+    "timestamp": 1767566185,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: refine timeline interaction and navigation logic\n- clicking empty space now clears the locked commit\n- keyboard navigation now correctly updates the locked commit state\n- z-index adjustment: render hover highlights below the locked commit marker\n- improve click detection by using hovered commit state during pointer down\n- ensure navigation shortcuts are consistently tied to the locked commit",
+    "addedLines": 63,
+    "removedLines": 41
+  },
+  {
+    "hash": "266a12d2510a996942426715449fc061b44c0707",
+    "timestamp": 1767563022,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement commit locking in timeline view\n- click a commit to lock its details in the info panel\n- use right-click or Escape to clear the locked commit\n- add visual markers and UI hints for lock/unlock state\n- update sidebar gesture list with new interaction patterns\n- ensure locked commit details persist during timeline navigation",
+    "addedLines": 98,
+    "removedLines": 15
+  },
+  {
+    "hash": "7c5c54e29c6619e8a9c4045da23dbbe7a068c08c",
+    "timestamp": 1767559623,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: refine timeline navigation logic and prevent redundant updates\n- add equality checks to prevent navigation to the currently active commit\n- introduce getGroupEarliestCommit and getGroupLatestCommit helpers\n- fix navigateGroupEdge to use new group boundary helpers\n- ensure navigation is idempotent when at group or timeline boundaries",
+    "addedLines": 31,
+    "removedLines": 9
+  },
+  {
+    "hash": "262dc422997cf7ccc1d0f415af8245ba48cdda04",
+    "timestamp": 1767558548,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: improve vertical navigation accuracy in grouped timeline\n- use relative time position within group instead of absolute timestamp for ArrowUp/ArrowDown navigation\n- implement getCommitGroupPosition helper to calculate time offset from group start",
+    "addedLines": 9,
+    "removedLines": 3
+  },
+  {
+    "hash": "8e9bd28c3896de8185e7ab5af87b0e4c52541544",
+    "timestamp": 1767558043,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: prevent hotkeys from triggering while interacting with Tweakpane controls\n- update isTextInputActive to return true if the focused element is within the Tweakpane container",
+    "addedLines": 2,
+    "removedLines": 0
+  },
+  {
+    "hash": "7706a17e08e8252a18fc509cc31f7b86ea30bc2b",
+    "timestamp": 1767557861,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement smooth animated transitions for timeline centering\n- add animateToOffsets helper using requestAnimationFrame and quadratic easing\n- introduce transitionDuration setting to control animation speed via UI\n- ensure ongoing animations are cancelled when user initiates manual drag or zoom\n- update centerOnScreenPoint to trigger animations when navigating between commits",
+    "addedLines": 68,
+    "removedLines": 4
+  },
+  {
+    "hash": "bba94686f7257746574949866784658189a6bd55",
+    "timestamp": 1767556273,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement vertical navigation in grouped timeline\n- add ArrowUp/ArrowDown to jump between groups while maintaining relative time position\n- find closest commit by timestamp in the target group when navigating vertically\n- update gesture hints in timeline.html to include vertical navigation shortcuts",
+    "addedLines": 44,
+    "removedLines": 0
+  },
+  {
+    "hash": "3eabd2f42f132cfd721597f3f93a5ec2f7948cab",
+    "timestamp": 1767554014,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement timeline keyboard navigation and hotkeys\n- add ArrowLeft/ArrowRight to navigate between commits and center view\n- add Home/End to jump to the start/end of the current group\n- add 'f' key to toggle fullscreen mode\n- implement centerOnCommitData and centerOnScreenPoint for precise view centering\n- add isTextInputActive check to prevent hotkey triggers while typing\n- ensure consistent navigation behavior in both grouped and flat timeline modes",
+    "addedLines": 159,
+    "removedLines": 0
+  },
+  {
+    "hash": "ed25d1a1190148c69e20a7838c9c701347f856cb",
+    "timestamp": 1767552666,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: ensure fullscreen mode consistency in timeline app\n- Automatically exit fullscreen when switching display modes.\n- Hide fullscreen toggle button when not in Timeline mode.\n- Clean up commented code in git timeline recreation script.\n- Remove redundant !important markers from fullscreen button styles.",
+    "addedLines": 28,
+    "removedLines": 8
+  },
+  {
+    "hash": "11bdf1b1e535dfccea6693aaaa411cf12ffc5644",
+    "timestamp": 1767550676,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: unify fullscreen button styles and improve UI\n- Create a shared `.fullscreen-button` class to unify styles for enter/exit fullscreen buttons.\n- Hide the main `<h2>` title in fullscreen mode for a cleaner view.\n- Add CSS resets to ensure consistent button appearance across browsers.",
+    "addedLines": 16,
+    "removedLines": 18
+  },
+  {
+    "hash": "1e5e7e7b168652b98f278d5d8b6e906008f7093e",
+    "timestamp": 1767549805,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: consolidate fullscreen logic and add exit mechanisms\n- Extract toggleFullscreenMode to unify fullscreen state transitions.\n- Add an overlay \"Exit Fullscreen\" button within the timeline container.\n- Implement Escape key listener to exit fullscreen mode.\n- Add CSS styles for the new exit button and handle its visibility.",
+    "addedLines": 50,
+    "removedLines": 9
+  },
+  {
+    "hash": "a88f3beb070c3dc92764af34727f98cace69ea0b",
+    "timestamp": 1767548709,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "implement fullscreen mode and dynamic gesture hints in timeline\n- Add fullscreen toggle button and state management to hide UI elements.\n- Show/hide group-specific gesture hints based on current grouping state.\n- Default extended scale ticks to enabled for improved cross-group alignment.\n- Update sidebar and header layout to accommodate new interactive controls.",
+    "addedLines": 110,
+    "removedLines": 8
+  },
+  {
+    "hash": "52ea5eebf7165b341acd93407046f9db2ead89e6",
+    "timestamp": 1767546425,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add AI agent context files (AGENTS.md, CLAUDE.md, GEMINI.md)",
+    "addedLines": 237,
+    "removedLines": 0
+  },
+  {
+    "hash": "614368491fc408c6d7361ef6b62d4b6a7f77f5a9",
+    "timestamp": 1767546328,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update git-timeline.json with latest commits",
+    "addedLines": 27,
+    "removedLines": 0
+  },
+  {
     "hash": "42c85ba18c96c02f3631e41e0a0470855d3f1c30",
     "timestamp": 1767546218,
     "authorName": "Philipp Tiefenbacher",
