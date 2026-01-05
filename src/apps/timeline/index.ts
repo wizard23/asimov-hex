@@ -61,6 +61,7 @@ class TimelineViewer {
   private timelineDragStart = { x: 0, y: 0 };
   private timelineDragLast = { x: 0, y: 0 };
   private timelineEmptyClickCandidate = false;
+  private timelineDragButton: number | null = null;
   private timelineCommitPoints: Array<{ commit: Commit; screenX: number; screenY: number }> = [];
   private timelineRange = { startMs: 0, endMs: 0 };
   private timelineInfoContainer: HTMLElement | null = null;
@@ -880,6 +881,20 @@ class TimelineViewer {
   }
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
+    if (e.button === 2) {
+      if (this.config.groupBy === 'None') return;
+      this.cancelTimelineTransition();
+      this.timelineDragging = true;
+      this.timelineDraggingGroups = true;
+      this.timelineDragButton = 2;
+      this.timelineDragStart = { x: e.global.x, y: e.global.y };
+      this.timelineDragLast = { x: e.global.x, y: e.global.y };
+      this.timelineViewOffsetStart = { ...this.timelineViewOffset };
+      this.timelineEmptyClickCandidate = false;
+      this.timelineGroupScrollOffsetStart = this.timelineGroupScrollOffsetY;
+      return;
+    }
+
     if (e.button !== 0) return;
     if (!e.ctrlKey && this.hoveredCommit) {
       const commitPoint = this.findCommitPointForCommit(this.hoveredCommit);
@@ -894,6 +909,7 @@ class TimelineViewer {
     this.timelineDraggingGroups = this.config.displayMode === 'Timeline'
       && this.config.groupBy !== 'None'
       && e.ctrlKey;
+    this.timelineDragButton = 0;
     this.timelineDragStart = { x: e.global.x, y: e.global.y };
     this.timelineDragLast = { x: e.global.x, y: e.global.y };
     this.timelineViewOffsetStart = { ...this.timelineViewOffset };
@@ -1039,13 +1055,14 @@ class TimelineViewer {
       const dx = e.global.x - this.timelineDragStart.x;
       const dy = e.global.y - this.timelineDragStart.y;
       const moved = Math.hypot(dx, dy);
-      if (this.timelineEmptyClickCandidate && moved < 5) {
+      if (this.timelineDragButton === 0 && this.timelineEmptyClickCandidate && moved < 5) {
         this.clearLockedCommit();
       }
     }
     this.timelineDragging = false;
     this.timelineDraggingGroups = false;
     this.timelineEmptyClickCandidate = false;
+    this.timelineDragButton = null;
   }
 
   private handleTimelineWheel = (e: WheelEvent) => {
