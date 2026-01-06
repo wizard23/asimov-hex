@@ -114,6 +114,7 @@ class TimelineViewer {
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
     extendedChangeScaleTicks: true,
+    extendedTicksContrast: 0,
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
@@ -333,6 +334,16 @@ class TimelineViewer {
 
     const extendedChangeScaleTicksBinding = this.pane.addBinding(this.config, 'extendedChangeScaleTicks', {
       label: 'Extend Change Scale Ticks',
+    }).on('change', () => {
+      if (this.config.displayMode !== 'Timeline') return;
+      this.drawTimeline();
+    });
+
+    this.pane.addBinding(this.config, 'extendedTicksContrast', {
+      label: 'Extended Ticks Contrast',
+      min: 0,
+      max: 100,
+      step: 5,
     }).on('change', () => {
       if (this.config.displayMode !== 'Timeline') return;
       this.drawTimeline();
@@ -1834,6 +1845,7 @@ class TimelineViewer {
     };
 
     if (this.config.extendedChangeScaleTicks) {
+      const overlayStyle = this.getExtendedTickStyle(false);
       for (const tick of ticks) {
         if (tick > maxValue) continue;
         const offset = valueToHeight(tick);
@@ -1845,9 +1857,9 @@ class TimelineViewer {
         });
       }
       timelineChangeScaleGraphics.stroke({
-        color: scaleStyle.ticks.extended.minor.color,
-        width: scaleStyle.ticks.extended.minor.width,
-        alpha: scaleStyle.ticks.extended.minor.alpha,
+        color: overlayStyle.color,
+        width: overlayStyle.width,
+        alpha: overlayStyle.alpha,
       });
     }
 
@@ -1911,7 +1923,7 @@ class TimelineViewer {
         continue;
       }
       if (this.config.extendedScaleTicks) {
-        const overlayStyle = isMajor ? scaleStyle.ticks.extended.major : scaleStyle.ticks.extended.minor;
+        const overlayStyle = this.getExtendedTickStyle(isMajor);
         timelineScaleGraphics.moveTo(screenX, scaleHeight);
         timelineScaleGraphics.lineTo(screenX, timelineApp.screen.height);
         timelineScaleGraphics.stroke({
@@ -2314,6 +2326,18 @@ class TimelineViewer {
     );
     return Math.max(scaleStyle.changeScale.rightPaddingBase, estimatedLabelWidth + tickPadding)
       + scaleStyle.changeScale.overlayExtraWidth;
+  }
+
+  private getExtendedTickStyle(isMajor: boolean): { color: number; alpha: number; width: number } {
+    const base = isMajor ? scaleStyle.ticks.extended.major : scaleStyle.ticks.extended.minor;
+    const contrast = this.clamp(this.config.extendedTicksContrast / 100, 0, 1);
+    const alphaBoost = 0.4 * contrast;
+    const widthBoost = 1 * contrast;
+    return {
+      color: base.color,
+      alpha: Math.min(1, base.alpha + alphaBoost),
+      width: base.width + widthBoost,
+    };
   }
 
   private getChangeScaleLineYs(grouped: GroupedCommits[], lineYs: number[]): number[] {
