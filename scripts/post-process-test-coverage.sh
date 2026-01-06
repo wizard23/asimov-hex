@@ -17,47 +17,73 @@ cat > "$CSS_FILE" <<'EOF'
   color-scheme: dark;
 }
 
-html {
-  filter: invert(1) hue-rotate(180deg);
-}
-
 body {
-  background: #ffffff; /* global-invert base (light -> dark) */
-  color: #000000; /* global-invert base (light -> dark) */
+  background: #000000; /* pseudo-invert (HSL L flip) of #ffffff */
+  color: #cccccc; /* pseudo-invert (HSL L flip) of #333333 */
 }
 
-img,
-video,
-canvas,
-svg {
-  filter: invert(1) hue-rotate(180deg);
+a {
+  color: #269aff; /* pseudo-invert (HSL L flip) of #0074D9 */
 }
 
-.low,
-.medium,
-.high,
-.cline-no,
-.cline-yes,
-.cstat-no,
-.fstat-no,
-.cstat-yes,
-.cbranch-no,
-.status-line.low,
-.status-line.medium,
-.status-line.high,
-.low .cover-fill,
-.medium .cover-fill,
-.high .cover-fill,
-.low .chart,
-.medium .chart,
-.high .chart,
-.red.solid,
-.highlighted,
-.highlighted .cstat-no,
-.highlighted .fstat-no,
-.highlighted .cbranch-no,
+a:hover {
+  color: #269aff; /* pseudo-invert (HSL L flip) of #0074D9 */
+}
+
+.quiet {
+  color: rgba(255, 255, 255, 0.5); /* pseudo-invert (HSL L flip) of rgba(0,0,0,0.5) */
+}
+
+.fraction {
+  color: #aaaaaa; /* pseudo-invert (HSL L flip) of #555555 */
+  background: #171717; /* pseudo-invert (HSL L flip) of #E8E8E8 */
+}
+
+div.path a:link,
+div.path a:visited {
+  color: #cccccc; /* pseudo-invert (HSL L flip) of #333333 */
+}
+
+table.coverage td {
+  color: #cccccc; /* pseudo-invert (HSL L flip) of #333333 */
+}
+
+.coverage-summary tr {
+  border-bottom: 1px solid #444444; /* pseudo-invert (HSL L flip) of #bbbbbb */
+}
+
+.coverage-summary td.empty {
+  color: #777777; /* pseudo-invert (HSL L flip) of #888888 */
+}
+
+span.cline-neutral {
+  background: #151515; /* pseudo-invert (HSL L flip) of #eaeaea */
+}
+
+.cstat-skip,
+.fstat-skip,
+.cbranch-skip {
+  background: #222222; /* pseudo-invert (HSL L flip) of #dddddd */
+  color: #eeeeee; /* pseudo-invert (HSL L flip) of #111111 */
+}
+
 .missing-if-branch {
-  filter: invert(1) hue-rotate(180deg);
+  background: #cccccc; /* pseudo-invert (HSL L flip) of #333333 */
+  color: #ffff00; /* pseudo-invert (HSL L flip) of #ffff00 */
+}
+
+.skip-if-branch {
+  background: #333333; /* pseudo-invert (HSL L flip) of #cccccc */
+  color: #000000; /* pseudo-invert (HSL L flip) of #ffffff */
+}
+
+.cover-empty {
+  background: #000000; /* pseudo-invert (HSL L flip) of #ffffff */
+}
+
+.com,
+.ignore-none {
+  color: #666666; /* pseudo-invert (HSL L flip) of #999999 */
 }
 
 .cbranch-no {
@@ -125,10 +151,6 @@ svg {
   color: #eeeeee; /* pseudo-invert (HSL L flip) of #111111 */
 }
 
-.missing-if-branch {
-  background: #cccccc; /* pseudo-invert (HSL L flip) of #333333 */
-  color: #ffff00; /* pseudo-invert (HSL L flip) of #ffff00 */
-}
 EOF
 
 mapfile -t html_files < <(find "$COVERAGE_DIR" -type f -name '*.html')
