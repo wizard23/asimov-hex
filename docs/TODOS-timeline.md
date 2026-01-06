@@ -1531,6 +1531,200 @@ Inconsistencies I notice between the top scale and the right-side change scale:
 
 Yes, please make it so.
 
+```
+• Implemented the right-side change-scale lane with a background panel + separator, reduced the right padding so the lane feels tighter (closer to the top scale), and added “Extend Change Scale Ticks” with the
+  same behavior as the top scale.
+
+  Changes
+
+  - Right-side change scale now draws in a dedicated panel with background + border and a separator line.
+  - Right padding reduced (timelineChangeScaleRightPadding and layout padding).
+  - New toggle: “Extend Change Scale Ticks” (draws horizontal guide lines from the panel into the timeline area).
+
+  Files updated
+
+  - src/apps/timeline/index.ts
+
+  Validation
+
+  - npm run verify
+
+  If you want the change scale panel width to lock to a fixed size (instead of scaling to max label width), I can adjust that too.
+```
+
+
+I want it to be consistent with the top scale. How is it done for the top scale?
+
+```
+• The top scale is drawn inside drawScale() in src/apps/timeline/index.ts. It creates a dedicated “scale lane” at the top by:
+
+  - Drawing a background panel:
+
+    timelineScaleGraphics.rect(0, 0, timelineApp.screen.width, scaleOverlayHeight);
+    timelineScaleGraphics.fill({ color: 0x141414, alpha: 0.92 });
+  - Adding a border + separator:
+
+    timelineScaleGraphics.stroke({ color: 0x2f2f2f, width: 1, alpha: 0.8 });
+    timelineScaleGraphics.moveTo(0, scaleHeight);
+    timelineScaleGraphics.lineTo(timelineApp.screen.width, scaleHeight);
+    timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
+  - Extending ticks into the timeline (when enabled):
+    For each tick, it draws a vertical line from the scale down through the timeline:
+
+    timelineScaleGraphics.moveTo(screenX, scaleHeight);
+    timelineScaleGraphics.lineTo(screenX, timelineApp.screen.height);
+    timelineScaleGraphics.stroke({ color: overlayColor, width: 1, alpha: overlayAlpha });
+
+  That “panel + separator + optional extended lines” pattern is what I mirrored for the right-side change scale. If you want the change scale to match the top scale even more tightly (e.g., fixed panel
+  thickness, line styles, or exact border colors), I can adjust it.
+```
+
+I want the change scale to be really consistent with the top scale. Line styles, border colors, paddings, margins, spacings should match. Ideally extract these settings into a scale-config.ts file so we don't have so many hardcoded, redundant values in the codebase. 
+
+What do you think about this plan? Do you see any issues with that?
+What would you propose to arrive at a consistent visual appearance and to be able to maintain this consistency even when new features are implemented?
+
+
+```
+• I think that plan is strong and low‑risk. No major issues — as long as the config stays “render‑focused” (colors, widths, padding, alphas) and not tangled with layout logic.
+
+  What I’d propose:
+
+  - Create src/apps/timeline/scale-config.ts that exports a single scaleStyle object (colors, alphas, line widths, paddings, label offsets) plus small helpers like drawScalePanel(...).
+  - Use the same panel draw helper for both top scale and right change scale.
+  - Centralize padding math: getScalePanelPadding() for top and getChangeScalePanelPadding() for right, both derived from the same base values and label widths.
+  - Move repeated colors (panel bg, border, separator, tick line, extended tick) into the config.
+
+  This gives you:
+
+  - Consistency via shared primitives.
+  - Easy maintenance (change one config to update both).
+  - A clear place to add future scale features without re‑introducing drift.
+
+  If you want, I can start by extracting the current styles into scale-config.ts and refactor drawScale() and drawChangeScale() to use those shared helpers.
+```
+
+I agree: The scale-config must stay “render‑focused”. Please add an important comment to the code to explicitly document this for future code maintainers.
+Your proposal is good: Please go ahead and implement it.
+
+```
+• Extracted scale styling into a shared render‑focused config and wired both top scale and change scale to use it, so line styles, border colors, paddings, and spacings stay consistent. The config includes the
+  explicit “render‑focused only” comment you asked for.
+
+  What changed
+
+  - New shared config: src/apps/timeline/scale-config.ts with a clear render‑only comment.
+  - Top scale now uses the shared panel/tick styles.
+  - Change scale panel, axis, tick marks, label padding, and extended tick lines use the same shared styles.
+  - Change scale padding derives from the same config values.
+
+  Files updated
+
+  - src/apps/timeline/scale-config.ts
+  - src/apps/timeline/index.ts
+
+  Validation
+
+  - npm run verify
+
+  If you want me to also centralize label font sizes/colors for the top scale in scale-config.ts (not just change scale), I can do that next.
+```
+
+Yes please, do that next.
+
+
+
+
+
+Please explain the two horizontal lines in the top scale. Where are they configured in the config?
+
+```
+• They’re the panel border and the separator line:
+
+  - Panel border: drawn by timelineScaleGraphics.stroke(...) right after the rect(...) in drawScale(). This is the rectangle outline around the top scale panel.
+    Config: scaleStyle.panel.borderColor, scaleStyle.panel.borderAlpha, scaleStyle.panel.borderWidth in src/apps/timeline/scale-config.ts.
+  - Separator line: drawn by moveTo(0, scaleHeight) → lineTo(width, scaleHeight) → stroke(...). This is the horizontal divider between the top scale panel and the timeline.
+    Config: scaleStyle.panel.separatorColor, scaleStyle.panel.separatorAlpha, scaleStyle.panel.separatorWidth in src/apps/timeline/scale-config.ts.
+
+  Code location: drawScale() in src/apps/timeline/index.ts.
+```
+
+Now the two vertical lines in the change scale
+
+```
+• There are two distinct vertical lines in the change scale area:
+
+  - Panel border(s): the rect(panelStartX, 0, panelWidth, height) is stroked, which draws the left and right edges of the change scale panel.
+    Config: scaleStyle.panel.borderColor, scaleStyle.panel.borderAlpha, scaleStyle.panel.borderWidth in src/apps/timeline/scale-config.ts.
+  - Separator line: an extra vertical line is drawn at panelStartX to separate the timeline from the change-scale panel.
+    Config: scaleStyle.panel.separatorColor, scaleStyle.panel.separatorAlpha, scaleStyle.panel.separatorWidth in src/apps/timeline/scale-config.ts.
+
+  Additionally, there’s the axis line inside the panel (the actual scale spine) at axisX, styled via:
+  scaleStyle.changeScale.axisColor, axisAlpha, axisWidth.
+```
+
+Just for debugging purposes:
+
+for the top scale
+* make the borders green
+* seperator line yellow
+
+for the change scale
+* borders red
+* seperator line purple
+
+
+in what positional relation are seperator and border for
+* top scale?
+* change scale?
+
+```
+• - Top scale: the border is the rectangle around the entire top scale panel (top/left/right/bottom of the panel). The separator is a horizontal line drawn at y = scaleHeight, i.e., along the bottom edge of the
+    scale lane where it meets the timeline content.
+  - Change scale: the border is the rectangle around the right‑side panel (left/right/top/bottom edges). The separator is a vertical line drawn at x = panelStartX, i.e., the left edge of the panel where it
+    meets the timeline content. This currently coincides with the panel’s left border edge.
+```
+
+
+why do they coincide for the change scale and not for the other.
+
+
+...
+
+I undid your last change because I misspoke when describing the bug. The top scale has nothing to do with the bug. I try to describe the bug better:
+
+* The bug only occurs when "Extend Change Scale Ticks" is active.
+* When "Extend Change Scale Ticks" is active the short ticks to the right of the change scale labels go missing. 
+* When "Extend Change Scale Ticks" is not active there are short gray ticks to the right of the change scale labels (inside the change scale). That's the behavior i would also expect when the change ticks are extended into the timeline.
+
+I made two screenshots of the relevant parts of the change scale if that helps:
+docs/bugs/extended-change-scale-bug/with-extend-change-scale-ticks.png  (shows the bug when "Extend Change Scale Ticks" is active)
+docs/bugs/extended-change-scale-bug/without-extend-change-scale-ticks.png (shows how it looks without the bug when "Extend Change Scale Ticks" is not active)
+
+
+
+Great! The bug is gone, Thanks!
+
+A UX issues now:
+On some monitors the extended ticks are hard to see. Please suggest ways to solve this ux issue.
+
+
+Would it be possible to have a "Extended Ticks Contrast" slider which represents a "contrast percentage" instead of just a tru/false checkbox like you suggested with the “High Contrast Extended Ticks” toggle?
+
+There is a misunderstanding. I did not intend to change the semantics of the existing "Extend Scale Ticks" and "Extend Change Scale Ticks" toggles.
+What I suggested was similar to a “High Contrast Extended Ticks” toggle. But instead of just tolling it on/off I suggested a slider representing a percentage 0 would be like off and 100 would be like on. Does this make sense?
+
+Not quite 0 would represent the visibility/strength we have now and 100 would be your suggested “High Contrast Extended Ticks” mode.
+
+
+Great this works very well.
+Now I noticed that the extended ticks get drawn on top of the commits, and the timeline but they should be drawn under those.
+
+
+The Ticks that come from "Extend Scale Ticks" are now behind commits and timeline but the ticks from "Extend Change Scale Ticks" are still drawn on top of the commits and timeline.
+
+
+please remove the debug colors we introduced for debugging the top and change scale.
 
 
 

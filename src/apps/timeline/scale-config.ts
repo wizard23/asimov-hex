@@ -4,16 +4,12 @@ export const scaleStyle = {
   panel: {
     fillColor: 0x141414,
     fillAlpha: 0.92,
-    borderColor: 0x00ff00,
+    borderColor: 0x2f2f2f,
     borderAlpha: 0.8,
     borderWidth: 1,
-    separatorColor: 0xffff00,
+    separatorColor: 0x7a7a7a,
     separatorAlpha: 0.9,
     separatorWidth: 1,
-  },
-  changeScalePanel: {
-    borderColor: 0xff0000,
-    separatorColor: 0x800080,
   },
   topScale: {
     overlayExtraHeight: 3,

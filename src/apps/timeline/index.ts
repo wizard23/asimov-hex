@@ -80,7 +80,7 @@ class TimelineViewer {
   private readonly timelineScaleHeight = 60;
   private readonly timelineChangeMaxHeight = 80;
   private readonly timelineLineGap = 28;
-  private readonly timelineGroupedLineGap = 48;
+  private readonly timelineGroupedLineGap = 100;
   private groupGapElement: HTMLElement | null = null;
   private groupScrollSpeedElement: HTMLElement | null = null;
   private extendedScaleTicksElement: HTMLElement | null = null;
@@ -116,7 +116,7 @@ class TimelineViewer {
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
     extendedChangeScaleTicks: true,
-    extendedTicksContrast: 0,
+    extendedTicksContrast: 30,
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
@@ -1822,14 +1822,14 @@ class TimelineViewer {
     timelineChangeScaleGraphics.rect(panelStartX, 0, panelWidth, timelineApp.screen.height);
     timelineChangeScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
     timelineChangeScaleGraphics.stroke({
-      color: scaleStyle.changeScalePanel.borderColor,
+      color: scaleStyle.panel.borderColor,
       width: scaleStyle.panel.borderWidth,
       alpha: scaleStyle.panel.borderAlpha,
     });
     timelineChangeScaleGraphics.moveTo(separatorX, 0);
     timelineChangeScaleGraphics.lineTo(separatorX, timelineApp.screen.height);
     timelineChangeScaleGraphics.stroke({
-      color: scaleStyle.changeScalePanel.separatorColor,
+      color: scaleStyle.panel.separatorColor,
       width: scaleStyle.panel.separatorWidth,
       alpha: scaleStyle.panel.separatorAlpha,
     });
