@@ -5,6 +5,10 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'test/**/*.test.ts', 'test/**/*.spec.ts'],
     exclude: ['**/docs/**', '**/public/**', '**/shell/**', '**/node_modules/**', '**/dist/**'],
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: './public/coverage',
+    },
   },
   build: {
     rollupOptions: {
