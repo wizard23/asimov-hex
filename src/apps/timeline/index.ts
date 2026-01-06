@@ -119,8 +119,8 @@ class TimelineViewer {
     extendedTicksContrast: 30,
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
-    showPerformanceMonitor: true,
-    showProfilerOverlay: true,
+    showPerformanceMonitor: false,
+    showProfilerOverlay: false,
     lockedCommitCentering: 'Vertical' as LockedCommitCentering,
   };
 
