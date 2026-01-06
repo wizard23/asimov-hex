@@ -75,7 +75,7 @@ class TimelineViewer {
   private timelineInfoContainer: HTMLElement | null = null;
   private hoveredCommit: Commit | null = null;
   private lockedCommit: Commit | null = null;
-  private readonly timelineScaleHeight = 50;
+  private readonly timelineScaleHeight = 60;
   private readonly timelineChangeMaxHeight = 80;
   private readonly timelineLineGap = 28;
   private readonly timelineGroupedLineGap = 48;
@@ -1786,6 +1786,7 @@ class TimelineViewer {
     const maxValue = Math.max(maxAdded, maxRemoved, 1);
     const panelWidth = this.getChangeScalePadding(maxValue);
     const panelStartX = Math.max(0, timelineApp.screen.width - panelWidth);
+    const separatorX = panelStartX + scaleStyle.changeScale.overlayExtraWidth;
     const axisX = timelineApp.screen.width - scaleStyle.changeScale.axisInset;
     const height = this.timelineChangeMaxHeight;
     const scaleLineYs = this.getChangeScaleLineYs(grouped, lineYs);
@@ -1794,14 +1795,14 @@ class TimelineViewer {
     timelineChangeScaleGraphics.rect(panelStartX, 0, panelWidth, timelineApp.screen.height);
     timelineChangeScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
     timelineChangeScaleGraphics.stroke({
-      color: scaleStyle.panel.borderColor,
+      color: scaleStyle.changeScalePanel.borderColor,
       width: scaleStyle.panel.borderWidth,
       alpha: scaleStyle.panel.borderAlpha,
     });
-    timelineChangeScaleGraphics.moveTo(panelStartX, 0);
-    timelineChangeScaleGraphics.lineTo(panelStartX, timelineApp.screen.height);
+    timelineChangeScaleGraphics.moveTo(separatorX, 0);
+    timelineChangeScaleGraphics.lineTo(separatorX, timelineApp.screen.height);
     timelineChangeScaleGraphics.stroke({
-      color: scaleStyle.panel.separatorColor,
+      color: scaleStyle.changeScalePanel.separatorColor,
       width: scaleStyle.panel.separatorWidth,
       alpha: scaleStyle.panel.separatorAlpha,
     });
@@ -1838,9 +1839,9 @@ class TimelineViewer {
       scaleLineYs.forEach(lineY => {
         if (this.config.extendedChangeScaleTicks) {
           timelineChangeScaleGraphics.moveTo(0, lineY - offset);
-          timelineChangeScaleGraphics.lineTo(panelStartX, lineY - offset);
+          timelineChangeScaleGraphics.lineTo(separatorX, lineY - offset);
           timelineChangeScaleGraphics.moveTo(0, lineY + offset);
-          timelineChangeScaleGraphics.lineTo(panelStartX, lineY + offset);
+          timelineChangeScaleGraphics.lineTo(separatorX, lineY + offset);
         }
         timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY - offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
@@ -1933,7 +1934,7 @@ class TimelineViewer {
         const label = new Text({ text: this.formatScaleTickLabel(date, unit, scaleStartMs), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + labelOffset;
-        label.y = scaleHeight - 4;
+        label.y = scaleHeight - scaleStyle.topScale.labelInset;
         this.timelineTextContainer.addChild(label);
         usedLabelPositions.add(labelKey);
         lastLabelX = screenX;
@@ -1979,7 +1980,7 @@ class TimelineViewer {
         const label = new Text({ text: this.formatScaleTickLabel(date, unit, scaleStartMs), style });
         label.rotation = -Math.PI / 2;
         label.x = screenX + 6;
-        label.y = scaleHeight - 4;
+        label.y = scaleHeight - scaleStyle.topScale.labelInset;
         this.timelineTextContainer.addChild(label);
         usedLabelPositions.add(labelKey);
         lastLabelX = screenX;
@@ -2302,8 +2303,12 @@ class TimelineViewer {
       maxTick = tick;
     }
     const estimatedLabelWidth = String(maxTick).length * 7;
-    const tickPadding = scaleStyle.changeScale.tickPadding;
-    return Math.max(scaleStyle.changeScale.rightPaddingBase, estimatedLabelWidth + tickPadding);
+    const tickPadding = Math.max(
+      scaleStyle.changeScale.tickPadding,
+      scaleStyle.changeScale.labelPad + scaleStyle.changeScale.axisInset
+    );
+    return Math.max(scaleStyle.changeScale.rightPaddingBase, estimatedLabelWidth + tickPadding)
+      + scaleStyle.changeScale.overlayExtraWidth;
   }
 
   private getChangeScaleLineYs(grouped: GroupedCommits[], lineYs: number[]): number[] {

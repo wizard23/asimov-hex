@@ -4,15 +4,20 @@ export const scaleStyle = {
   panel: {
     fillColor: 0x141414,
     fillAlpha: 0.92,
-    borderColor: 0x2f2f2f,
+    borderColor: 0x00ff00,
     borderAlpha: 0.8,
     borderWidth: 1,
-    separatorColor: 0x7a7a7a,
+    separatorColor: 0xffff00,
     separatorAlpha: 0.9,
     separatorWidth: 1,
   },
+  changeScalePanel: {
+    borderColor: 0xff0000,
+    separatorColor: 0x800080,
+  },
   topScale: {
-    overlayExtraHeight: 28,
+    overlayExtraHeight: 3,
+    labelInset: 5,
     labelMajor: {
       color: 0xf0f0f0,
       fontSize: 15,
@@ -51,9 +56,10 @@ export const scaleStyle = {
     },
   },
   changeScale: {
+    overlayExtraWidth: 3,
     rightPaddingBase: 12,
     axisInset: 12,
-    tickPadding: 18,
+    tickPadding: 22,
     axisColor: 0x777777,
     axisAlpha: 0.9,
     axisWidth: 1,
