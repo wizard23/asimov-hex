@@ -50,7 +50,9 @@ class TimelineViewer {
   private timelineLineGraphics: Graphics | null = null;
   private timelineChangeGraphics: Graphics | null = null;
   private timelineChangeScaleGraphics: Graphics | null = null;
+  private timelineChangeScaleExtendedGraphics: Graphics | null = null;
   private timelineScaleGraphics: Graphics | null = null;
+  private timelineScaleExtendedGraphics: Graphics | null = null;
   private timelineHoverGraphics: Graphics | null = null;
   private timelineLockedGraphics: Graphics | null = null;
   private timelineTextContainer: Container | null = null;
@@ -923,27 +925,33 @@ class TimelineViewer {
     this.timelineGraphics = new Graphics();
     this.timelineHoverGraphics = new Graphics();
     this.timelineLockedGraphics = new Graphics();
+    this.timelineScaleExtendedGraphics = new Graphics();
+    this.timelineChangeScaleExtendedGraphics = new Graphics();
     this.timelineTextContainer = new Container();
     this.timelineChangeTextContainer = new Container();
     this.timelineGroupLabelContainer = new Container();
 
+    this.timelineScaleExtendedGraphics.zIndex = 1;
     this.timelineLineGraphics.zIndex = 2;
     this.timelineChangeGraphics.zIndex = 3;
     this.timelineGraphics.zIndex = 4;
     this.timelineHoverGraphics.zIndex = 5;
     this.timelineLockedGraphics.zIndex = 6;
+    this.timelineChangeScaleExtendedGraphics.zIndex = 1;
     this.timelineChangeScaleGraphics.zIndex = 7;
     this.timelineChangeTextContainer.zIndex = 9;
     this.timelineGroupLabelContainer.zIndex = 10;
     this.timelineScaleGraphics.zIndex = 11;
     this.timelineTextContainer.zIndex = 12;
 
+    this.timelineApp.stage.addChild(this.timelineScaleExtendedGraphics);
     this.timelineApp.stage.addChild(this.timelineScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineLineGraphics);
     this.timelineApp.stage.addChild(this.timelineChangeGraphics);
     this.timelineApp.stage.addChild(this.timelineGraphics);
     this.timelineApp.stage.addChild(this.timelineHoverGraphics);
     this.timelineApp.stage.addChild(this.timelineLockedGraphics);
+    this.timelineApp.stage.addChild(this.timelineChangeScaleExtendedGraphics);
     this.timelineApp.stage.addChild(this.timelineChangeScaleGraphics);
     this.timelineApp.stage.addChild(this.timelineTextContainer);
     this.timelineApp.stage.addChild(this.timelineChangeTextContainer);
@@ -1011,6 +1019,8 @@ class TimelineViewer {
     this.timelineChangeGraphics = null;
     this.timelineChangeScaleGraphics = null;
     this.timelineScaleGraphics = null;
+    this.timelineScaleExtendedGraphics = null;
+    this.timelineChangeScaleExtendedGraphics = null;
     this.timelineHoverGraphics = null;
     this.timelineLockedGraphics = null;
     this.timelineTextContainer = null;
@@ -1656,8 +1666,9 @@ class TimelineViewer {
   }
 
   private drawScale() {
-    if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
+    if (!this.timelineScaleGraphics || !this.timelineScaleExtendedGraphics || !this.timelineTextContainer || !this.timelineApp) return;
     const timelineScaleGraphics = this.timelineScaleGraphics;
+    const timelineScaleExtendedGraphics = this.timelineScaleExtendedGraphics;
     const timelineApp = this.timelineApp;
     const scaleHeight = this.timelineScaleHeight;
     const grouped = this.getGroupedCommits();
@@ -1667,6 +1678,7 @@ class TimelineViewer {
     const pxPerSecond = this.timelineScale;
 
     timelineScaleGraphics.clear();
+    timelineScaleExtendedGraphics.clear();
     const scaleOverlayHeight = scaleHeight + scaleStyle.topScale.overlayExtraHeight;
     timelineScaleGraphics.rect(0, 0, timelineApp.screen.width, scaleOverlayHeight);
     timelineScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
@@ -1722,7 +1734,8 @@ class TimelineViewer {
       majorStyle,
       majorLabelSpacing,
       scaleRange.startMs,
-      usedLabelPositions
+      usedLabelPositions,
+      timelineScaleExtendedGraphics
     );
     if (unitSelection.minor) {
       this.drawScaleUnit(
@@ -1734,7 +1747,8 @@ class TimelineViewer {
         minorStyle,
         minorLabelSpacing,
         scaleRange.startMs,
-        usedLabelPositions
+        usedLabelPositions,
+        timelineScaleExtendedGraphics
       );
     }
 
@@ -1788,9 +1802,10 @@ class TimelineViewer {
   }
 
   private drawChangeScale(grouped: GroupedCommits[], lineYs: number[]) {
-    if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeTextContainer) return;
+    if (!this.timelineApp || !this.timelineChangeScaleGraphics || !this.timelineChangeScaleExtendedGraphics || !this.timelineChangeTextContainer) return;
     const timelineApp = this.timelineApp;
     const timelineChangeScaleGraphics = this.timelineChangeScaleGraphics;
+    const timelineChangeScaleExtendedGraphics = this.timelineChangeScaleExtendedGraphics;
 
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
     const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
@@ -1803,6 +1818,7 @@ class TimelineViewer {
     const scaleLineYs = this.getChangeScaleLineYs(grouped, lineYs);
 
     timelineChangeScaleGraphics.clear();
+    timelineChangeScaleExtendedGraphics.clear();
     timelineChangeScaleGraphics.rect(panelStartX, 0, panelWidth, timelineApp.screen.height);
     timelineChangeScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
     timelineChangeScaleGraphics.stroke({
@@ -1850,13 +1866,13 @@ class TimelineViewer {
         if (tick > maxValue) continue;
         const offset = valueToHeight(tick);
         scaleLineYs.forEach(lineY => {
-          timelineChangeScaleGraphics.moveTo(0, lineY - offset);
-          timelineChangeScaleGraphics.lineTo(separatorX, lineY - offset);
-          timelineChangeScaleGraphics.moveTo(0, lineY + offset);
-          timelineChangeScaleGraphics.lineTo(separatorX, lineY + offset);
+          timelineChangeScaleExtendedGraphics.moveTo(0, lineY - offset);
+          timelineChangeScaleExtendedGraphics.lineTo(separatorX, lineY - offset);
+          timelineChangeScaleExtendedGraphics.moveTo(0, lineY + offset);
+          timelineChangeScaleExtendedGraphics.lineTo(separatorX, lineY + offset);
         });
       }
-      timelineChangeScaleGraphics.stroke({
+      timelineChangeScaleExtendedGraphics.stroke({
         color: overlayStyle.color,
         width: overlayStyle.width,
         alpha: overlayStyle.alpha,
@@ -1904,7 +1920,8 @@ class TimelineViewer {
     style: TextStyle,
     minLabelSpacing: number,
     scaleStartMs: number,
-    usedLabelPositions: Set<number>
+    usedLabelPositions: Set<number>,
+    timelineScaleExtendedGraphics: Graphics
   ) {
     if (!this.timelineScaleGraphics || !this.timelineTextContainer || !this.timelineApp) return;
     const timelineScaleGraphics = this.timelineScaleGraphics;
@@ -1924,9 +1941,9 @@ class TimelineViewer {
       }
       if (this.config.extendedScaleTicks) {
         const overlayStyle = this.getExtendedTickStyle(isMajor);
-        timelineScaleGraphics.moveTo(screenX, scaleHeight);
-        timelineScaleGraphics.lineTo(screenX, timelineApp.screen.height);
-        timelineScaleGraphics.stroke({
+        timelineScaleExtendedGraphics.moveTo(screenX, scaleHeight);
+        timelineScaleExtendedGraphics.lineTo(screenX, timelineApp.screen.height);
+        timelineScaleExtendedGraphics.stroke({
           color: overlayStyle.color,
           width: overlayStyle.width,
           alpha: overlayStyle.alpha,
