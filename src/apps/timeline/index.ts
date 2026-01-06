@@ -116,7 +116,7 @@ class TimelineViewer {
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
     showProfilerOverlay: true,
-    lockedCommitCentering: 'Both' as LockedCommitCentering,
+    lockedCommitCentering: 'Vertical' as LockedCommitCentering,
   };
 
   constructor() {
@@ -314,10 +314,10 @@ class TimelineViewer {
     const leftPanModeBinding = this.pane.addBinding(this.config, 'leftPanMode', {
       label: 'Left Pan',
       options: {
-        'Time Axis Only': 'Time Axis Only',
-        'Naive Combined': 'Naive Combined',
-        'Direction-lock on drag start': 'Direction-lock on drag start',
-        'Dead-zone + axis snapping': 'Dead-zone + axis snapping',
+        'Horizontal': 'Time Axis Only',
+        'Both (Simple)': 'Naive Combined',
+        'Both (Lock-On)': 'Direction-lock on drag start',
+        'Both (Dead-Zone)': 'Dead-zone + axis snapping',
       },
     });
 
