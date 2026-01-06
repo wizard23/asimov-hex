@@ -17,7 +17,7 @@
     "commit-from-file-old": "git commit -F ./temp/commit-message.txt",
     "commit-from-file": "./scripts/commit-staged-with-message-from-file-interactive.sh",
     "commit-from-file-ext": "./scripts/scripts/commit-staged-with-message-from-file.sh",
-    "commit-refresh-generated": "npm run create-project-statistics && npm run re-create-git-timeline && npm run test-coverage && git add ./public/project-statistics && git add ./public/project-history && git add ./public/coverage && git commit -m 'automated: refresh project statistics, timeline, and Vitest code coverage'"
+    "commit-refresh-generated": "./scripts/commit-refresh-generated.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
