@@ -241,7 +241,7 @@ class GridApp {
 
     const coverageLink = document.createElement('a');
     coverageLink.href = 'coverage/index.html';
-    coverageLink.textContent = '🧪 Test Coverage Report';
+    coverageLink.textContent = '🧪 Test Coverage Report ↗';
     coverageLink.target = '_blank';
     coverageLink.rel = 'noopener noreferrer';
 
@@ -250,7 +250,7 @@ class GridApp {
 
     const manualLink = document.createElement('a');
     manualLink.href = 'markdown-viewer.html?url=/documentation/user-manual/main/index.md';
-    manualLink.textContent = '📖 User Manual';
+    manualLink.textContent = '📖 User Manual ↗';
     manualLink.target = '_blank';
     manualLink.rel = 'noopener noreferrer';
 
