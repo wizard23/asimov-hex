@@ -239,6 +239,12 @@ class GridApp {
     statisticsLink.href = 'statistics.html';
     statisticsLink.textContent = '📊 Project Statistics';
 
+    const coverageLink = document.createElement('a');
+    coverageLink.href = 'coverage/index.html';
+    coverageLink.textContent = '🧪 Test Coverage Report';
+    coverageLink.target = '_blank';
+    coverageLink.rel = 'noopener noreferrer';
+
     const docsHeader = document.createElement('h2');
     docsHeader.textContent = "Documentation"
 
@@ -261,6 +267,7 @@ class GridApp {
     links.appendChild(metaAppsHeader);
     links.appendChild(timelineLink);
     links.appendChild(statisticsLink);
+    links.appendChild(coverageLink);
     links.appendChild(docsHeader);
     links.appendChild(manualLink);
 
