@@ -102,3 +102,15 @@ Is this script idempotent?
 
 Most sites look good but the source code is unreadable with the theme. Can You improve the styles for the code?
 
+
+
+This did not really help. Can you try to invert all color that are not meant to signify the traffic-light color coding green-yellow-red?
+
+
+That looks quite good!
+Please document your approach for "inverting" the colors in docs/system-description/tasks/vitest-coverage-post-processing.md
+
+
+Now for the traffic-light coded colors. Please use the following approach to "pseudo invert" them: Keep Hue and Saturation but invert the Value.
+For each color that appears in the themed css plese add a comment with wich approach it was "inverted" so I can quickly identify any remaining inconsistent stylings.
+

@@ -1,0 +1,36 @@
+:root {
+  color-scheme: dark;
+}
+
+html {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+body {
+  background: #ffffff;
+  color: #000000;
+}
+
+img,
+video,
+canvas,
+svg {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.high,
+.medium,
+.low,
+.cline-no,
+.fstat-no,
+.cstat-no,
+.stmt-no,
+.branch-no,
+.cline-yes,
+.fstat-yes,
+.cstat-yes,
+.stmt-yes,
+.branch-yes,
+.missing-if-branch {
+  filter: invert(1) hue-rotate(180deg);
+}

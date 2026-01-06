@@ -17,57 +17,37 @@ cat > "$CSS_FILE" <<'EOF'
   color-scheme: dark;
 }
 
+html {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 body {
-  background: #0f1216;
-  color: #e6e6e6;
+  background: #ffffff;
+  color: #000000;
 }
 
-a {
-  color: #8bd5ff;
+img,
+video,
+canvas,
+svg {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-a:hover {
-  color: #b8e7ff;
-}
-
-table,
-.coverage-summary,
-.status-line {
-  background: #11161c;
-}
-
-thead {
-  background: #141a21;
-}
-
-td,
-th {
-  border-color: #223040;
-}
-
-pre,
-code {
-  background: #141a21;
-  color: #e6e6e6;
-}
-
-.quiet {
-  color: #9aa4b2;
-}
-
-.high {
-  background: #1f3b2f;
-  color: #bff0d4;
-}
-
-.medium {
-  background: #3b2d1f;
-  color: #f1d4a6;
-}
-
-.low {
-  background: #3b1f1f;
-  color: #f3b6b6;
+.high,
+.medium,
+.low,
+.cline-no,
+.fstat-no,
+.cstat-no,
+.stmt-no,
+.branch-no,
+.cline-yes,
+.fstat-yes,
+.cstat-yes,
+.stmt-yes,
+.branch-yes,
+.missing-if-branch {
+  filter: invert(1) hue-rotate(180deg);
 }
 EOF
 
