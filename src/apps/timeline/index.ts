@@ -1833,27 +1833,32 @@ class TimelineViewer {
       return scaled * height;
     };
 
-    for (const tick of ticks) {
-      if (tick > maxValue) continue;
-      const offset = valueToHeight(tick);
-      scaleLineYs.forEach(lineY => {
-        if (this.config.extendedChangeScaleTicks) {
+    if (this.config.extendedChangeScaleTicks) {
+      for (const tick of ticks) {
+        if (tick > maxValue) continue;
+        const offset = valueToHeight(tick);
+        scaleLineYs.forEach(lineY => {
           timelineChangeScaleGraphics.moveTo(0, lineY - offset);
           timelineChangeScaleGraphics.lineTo(separatorX, lineY - offset);
           timelineChangeScaleGraphics.moveTo(0, lineY + offset);
           timelineChangeScaleGraphics.lineTo(separatorX, lineY + offset);
-        }
-        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY - offset);
-        timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
-        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY + offset);
-        timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
-      });
-    }
-    if (this.config.extendedChangeScaleTicks) {
+        });
+      }
       timelineChangeScaleGraphics.stroke({
         color: scaleStyle.ticks.extended.minor.color,
         width: scaleStyle.ticks.extended.minor.width,
         alpha: scaleStyle.ticks.extended.minor.alpha,
+      });
+    }
+
+    for (const tick of ticks) {
+      if (tick > maxValue) continue;
+      const offset = valueToHeight(tick);
+      scaleLineYs.forEach(lineY => {
+        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY - offset);
+        timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
+        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY + offset);
+        timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
       });
     }
     timelineChangeScaleGraphics.stroke({
