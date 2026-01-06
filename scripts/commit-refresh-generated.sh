@@ -22,7 +22,9 @@ dirty_generated_dirs="$(git status --porcelain -- ./public/project-statistics ./
 if [[ -n "$dirty_generated_dirs" ]]; then
   echo "Abort: generated output directories already have changes."
   echo "Please commit, stash, or clean the following before running:"
-  echo "$dirty_generated_dirs"
+  # echo "$dirty_generated_dirs"
+  # better colors :)
+  git status --short -- ./public/project-statistics ./public/project-history ./public/coverage
   exit 1
 fi
 
