@@ -1,5 +1,212 @@
 [
   {
+    "hash": "fb13a0af30c53f58b7716252e6cd42e5cfa660ec",
+    "timestamp": 1767683130,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: unify panel styles and update timeline defaults\n- remove redundant changeScalePanel config in favor of shared panel styles\n- increase default timelineGroupedLineGap from 48 to 100 for better separation\n- set default extendedTicksContrast to 30% for improved visibility\n- revert temporary debug colors for panel borders and separators to production values",
+    "addedLines": 200,
+    "removedLines": 10
+  },
+  {
+    "hash": "8a1dfe4bb53f49a3feb610d026eb509eafe09bfb",
+    "timestamp": 1767683046,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: render extended ticks on separate background layers\n- introduce separate Graphics instances for extended scale ticks (timelineScaleExtendedGraphics, timelineChangeScaleExtendedGraphics)\n- set z-index of extended layers to 1 to ensure they render behind all other timeline elements\n- update drawScale and drawChangeScale to use new graphics objects for extended tick rendering\n- prevents extended lines from drawing over graph content and UI elements",
+    "addedLines": 30,
+    "removedLines": 13
+  },
+  {
+    "hash": "5fffd35d23f99dbbf6780b48f9cd7ef733987c31",
+    "timestamp": 1767682490,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: add contrast control for extended scale ticks\n- implement 'extendedTicksContrast' configuration option (0-100%)\n- dynamic adjustment of tick alpha and width based on contrast setting\n- apply contrast boosting to both time scale and change scale extended ticks\n- expose new control in tweakpane interface",
+    "addedLines": 28,
+    "removedLines": 4
+  },
+  {
+    "hash": "f87c2bb059122f70d9e70592add13ab045421b31",
+    "timestamp": 1767681887,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: optimize change scale tick rendering loop\n- split change scale tick rendering into separate passes for extended lines and axis ticks\n- reduce stroke calls by batching line drawing operations\n- prevent redundant state checks inside the tick loop",
+    "addedLines": 18,
+    "removedLines": 13
+  },
+  {
+    "hash": "27a8bbbfad09f245200cb9ce529137b8ca751d6a",
+    "timestamp": 1767680128,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: fine-tune scale geometry and panel styles\n- increase timeline scale height to 60px for better legibility\n- implement configurable panel overlays with extra width/height margins\n- add specific changeScalePanel config for distinct border and separator colors\n- adjust tick padding and label inset for change scale layout\n- update drawing logic to respect new geometry offsets and separators",
+    "addedLines": 26,
+    "removedLines": 15
+  },
+  {
+    "hash": "3db4151236b825ac8109234a83282810aeaab261",
+    "timestamp": 1767667515,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: use scale style config for top timeline labels\n- update drawScale to use centralized style constants for major, minor, and milestone labels\n- add label configuration properties to topScale section in scale-config.ts\n- remove hardcoded text styles from timeline index.ts",
+    "addedLines": 24,
+    "removedLines": 3
+  },
+  {
+    "hash": "675daadbcad2a9db1263132b44f3a4c8176be9f3",
+    "timestamp": 1767666202,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: extract scale configuration to dedicated config file\n- move scale styling constants to src/apps/timeline/scale-config.ts\n- update TimelineViewer to use centralized scale style configuration\n- decouple hardcoded style values from rendering logic for easier theme adjustments\n- improve consistency of tick styles and panel properties across scale renderings",
+    "addedLines": 114,
+    "removedLines": 29
+  },
+  {
+    "hash": "1d075f78b4f4b72f0d45ceef7575b606b56b20d5",
+    "timestamp": 1767664930,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add background panel and extended ticks to change scale\n- render opaque background panel for change scale area to improve readability\n- add option to extend change scale ticks across the entire timeline\n- adjust change scale padding and inset values for tighter layout\n- implement visibility toggling for extended change scale ticks configuration",
+    "addedLines": 45,
+    "removedLines": 3
+  },
+  {
+    "hash": "c91cbf81b3a62a9e36da5a99f513f4f08e571a18",
+    "timestamp": 1767663805,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update prompt collection; add AI generated glossary and cleanup docs",
+    "addedLines": 652,
+    "removedLines": 5
+  },
+  {
+    "hash": "b7e0173ec394b5a4bc591d45d7275167d11edd8f",
+    "timestamp": 1767662473,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: rename timeline pan modes and change default centering\n- rename Left Pan Mode options to more user-friendly labels (Horizontal, Both (Simple), Both (Lock-On), Both (Dead-Zone))\n- change default Locked Commit Centering from 'Both' to 'Vertical' to reduce disorientation on click",
+    "addedLines": 5,
+    "removedLines": 5
+  },
+  {
+    "hash": "a69112a18bc3a4ce4038bc83a564f141b4b367c5",
+    "timestamp": 1767661160,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add configurable commit centering behavior to timeline\n- implement LockedCommitCentering modes: None, Horizontal, Vertical, Both\n- update centerOnScreenPoint to respect the selected centering mode\n- expose centering configuration option in tweakpane settings\n- fix z-index stacking context for inline help root container",
+    "addedLines": 19,
+    "removedLines": 1
+  },
+  {
+    "hash": "764203ca87165d3daa773203a55b947f1202dc2b",
+    "timestamp": 1767659151,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "feat: enhance inline help window with opacity and resizing controls\n- add opacity slider to window header with persistence support\n- implement manual window resizing using 8-directional drag handles\n- prevent resizing when window is snapped, minimized, or maximized\n- ensure window opacity state is restored from local storage\n- add css styles for resize handles and range input control",
+    "addedLines": 170,
+    "removedLines": 0
+  },
+  {
+    "hash": "5349b32f85eb51548d9925863d0eb5590dd24df2",
+    "timestamp": 1767658430,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: add screenshot assets for timeline performance documentation\n- add performance-monitor.png showing the pill header widget\n- add profiler-overlay.png showing the detailed profiler breakdown\n- images are used in inline help documentation",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "626645c5aa7cbec1e1f2b76d9f5511c568449b3f",
+    "timestamp": 1767645502,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add draggable inline help window manager to timeline app\n- implement InlineHelpWindowManager and InlineHelpWindow classes for managing floating help windows\n- add window management features: dragging, snapping (edges/corners), minimizing, maximizing, and state persistence via localStorage\n- integrate inline help system with timeline app for profiler overlay documentation\n- extend markdown renderer to support images and customizable link resolution/handling\n- add keyboard shortcuts (Ctrl+1-4 snap, Ctrl+M minimize, Ctrl+Q close) for window control",
+    "addedLines": 1263,
+    "removedLines": 21
+  },
+  {
+    "hash": "17bf8e31b993448ccf3ba836820d5d8853811993",
+    "timestamp": 1767644022,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add jsdom dependency and update markdown renderer tests\n- add jsdom to devDependencies for vitest environment support\n- update markdown renderer tests to be more resilient to host origin changes\n- improve link resolution assertions by using URL search parameters instead of hardcoded strings",
+    "addedLines": 567,
+    "removedLines": 3
+  },
+  {
+    "hash": "9aa452ad5b431b912e12b28530afe538f65fcdd5",
+    "timestamp": 1767643723,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "buggy (tests fail): refactor: extract markdown rendering logic to shared core utility\n- move renderMarkdown and resolveMarkdownHref to src/core/markdown/renderer.ts\n- update src/apps/markdown-viewer/index.ts to use the extracted utility\n- add comprehensive unit tests for markdown rendering and link resolution\n- ensure consistent rendering behavior across different application contexts",
+    "addedLines": 303,
+    "removedLines": 224
+  },
+  {
+    "hash": "f75d74ccb9524362056411e362fcca05d8f1fc31",
+    "timestamp": 1767642657,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add technical documentation for timeline profiler overlay\n- describe measured metrics for frame timing and render breakdown sections\n- explain calculation methods for average and 95th percentile stats\n- define scope and limitations of the profiling implementation\n- provide details on sampling frequency and display update intervals",
+    "addedLines": 58,
+    "removedLines": 0
+  },
+  {
+    "hash": "f71cfbe54c57253a168462d18bb6cbfd780e4b8d",
+    "timestamp": 1767632416,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: modernize profiler overlay layout and positioning\n- center profiler overlay at the top of the viewport\n- restructure profiler content into distinct Frame and Render Breakdown sections\n- implement grid layout for render breakdown metrics\n- enable profiler overlay by default in configuration\n- add css for section titles and multi-column grid display",
+    "addedLines": 53,
+    "removedLines": 27
+  },
+  {
+    "hash": "09538526fd747c1f2c73bf53779b72b228cabc17",
+    "timestamp": 1767630144,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add granular profiling sections to timeline performance overlay\n- instrument drawTimeline method to measure execution time of distinct rendering phases\n- add support for tracking and displaying multiple section samples (layout, lines, change, commits, scale, etc.)\n- update profiler overlay text to include per-section last and average duration stats\n- hide zero-duration sections from profiler output to reduce noise",
+    "addedLines": 65,
+    "removedLines": 2
+  },
+  {
+    "hash": "cda10b98c2d55fc31bdbe3a58df9c61942ee7cef",
+    "timestamp": 1767629370,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add detailed pixijs profiler overlay to timeline\n- add configuration option and tweakpane control to toggle profiler overlay\n- implement sampling and calculation of render time and frame time stats (last, avg, p95)\n- instrument drawTimeline to measure actual rendering duration\n- add floating overlay element with tabular numeric display to timeline html",
+    "addedLines": 118,
+    "removedLines": 2
+  },
+  {
+    "hash": "0a4911a7cad43ca3c949ce22b878946eb8302b15",
+    "timestamp": 1767624650,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "allow toggling performance monitor in timeline view\n- add configuration option to show/hide performance monitor\n- implement dynamic placement of performance pill (header vs floating)\n- add css for floating performance pill position\n- optimize performance ticker to skip updates when hidden",
+    "addedLines": 111,
+    "removedLines": 2
+  },
+  {
+    "hash": "5a67cfd67b8bee3d7af7ca60601302519fbbd88e",
+    "timestamp": 1767609336,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add performance monitoring display to timeline viewer\n- add performance pill showing FPS and frame delta time in header\n- update metrics via PixiJS ticker at 250ms intervals\n- clean up ticker handler on timeline destruction\n- style pill with dark theme and pill-shaped border",
+    "addedLines": 56,
+    "removedLines": 0
+  },
+  {
+    "hash": "adcfb3c5b64a5108b67ec5c3869ad762f8dc2373",
+    "timestamp": 1767585510,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: update project statistics",
+    "addedLines": 717,
+    "removedLines": 0
+  },
+  {
     "hash": "5d1bd49701af3c190a3b7d8aba4cc70efd24b5d2",
     "timestamp": 1767585473,
     "authorName": "Philipp Tiefenbacher",

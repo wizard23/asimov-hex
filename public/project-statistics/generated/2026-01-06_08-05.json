@@ -1,0 +1,726 @@
+{
+  "timestamp": "2026-01-06T07:05:46.887Z",
+  "fileTypes": [
+    {
+      "fileType": ".ts",
+      "count": 36,
+      "totalLines": 12142,
+      "totalWords": 38937,
+      "totalBytes": 391513
+    },
+    {
+      "fileType": ".sh",
+      "count": 12,
+      "totalLines": 931,
+      "totalWords": 3644,
+      "totalBytes": 29046
+    },
+    {
+      "fileType": ".test.ts",
+      "count": 8,
+      "totalLines": 1378,
+      "totalWords": 6084,
+      "totalBytes": 44863
+    },
+    {
+      "fileType": ".html",
+      "count": 5,
+      "totalLines": 1294,
+      "totalWords": 2850,
+      "totalBytes": 30706
+    },
+    {
+      "fileType": ".md",
+      "count": 3,
+      "totalLines": 240,
+      "totalWords": 1504,
+      "totalBytes": 11108
+    },
+    {
+      "fileType": ".json",
+      "count": 3,
+      "totalLines": 130,
+      "totalWords": 279,
+      "totalBytes": 3321
+    },
+    {
+      "fileType": ".js",
+      "count": 1,
+      "totalLines": 37,
+      "totalWords": 56,
+      "totalBytes": 728
+    },
+    {
+      "fileType": ".gitignore",
+      "count": 1,
+      "totalLines": 14,
+      "totalWords": 25,
+      "totalBytes": 183
+    }
+  ],
+  "includedFiles": [
+    {
+      "path": ".gitignore",
+      "fileType": ".gitignore",
+      "lines": 14,
+      "words": 25,
+      "bytes": 183
+    },
+    {
+      "path": "AGENTS.md",
+      "fileType": ".md",
+      "lines": 37,
+      "words": 300,
+      "bytes": 2126
+    },
+    {
+      "path": "CLAUDE.md",
+      "fileType": ".md",
+      "lines": 130,
+      "words": 746,
+      "bytes": 5572
+    },
+    {
+      "path": "eslint.config.js",
+      "fileType": ".js",
+      "lines": 37,
+      "words": 56,
+      "bytes": 728
+    },
+    {
+      "path": "GEMINI.md",
+      "fileType": ".md",
+      "lines": 73,
+      "words": 458,
+      "bytes": 3410
+    },
+    {
+      "path": "index.html",
+      "fileType": ".html",
+      "lines": 264,
+      "words": 575,
+      "bytes": 5878
+    },
+    {
+      "path": "markdown-viewer.html",
+      "fileType": ".html",
+      "lines": 202,
+      "words": 462,
+      "bytes": 4559
+    },
+    {
+      "path": "package.json",
+      "fileType": ".json",
+      "lines": 39,
+      "words": 120,
+      "bytes": 1509
+    },
+    {
+      "path": "scripts/asimov-core/create-github-key-and-add-to-sshconfig.sh",
+      "fileType": ".sh",
+      "lines": 160,
+      "words": 477,
+      "bytes": 4618
+    },
+    {
+      "path": "scripts/asimov-core/create-github-key.sh",
+      "fileType": ".sh",
+      "lines": 43,
+      "words": 103,
+      "bytes": 907
+    },
+    {
+      "path": "scripts/asimov-core/load-github-key.sh",
+      "fileType": ".sh",
+      "lines": 136,
+      "words": 505,
+      "bytes": 4057
+    },
+    {
+      "path": "scripts/cleanup-ansi-junk.sh",
+      "fileType": ".sh",
+      "lines": 31,
+      "words": 72,
+      "bytes": 545
+    },
+    {
+      "path": "scripts/codex-with-autotranscript.sh",
+      "fileType": ".sh",
+      "lines": 47,
+      "words": 154,
+      "bytes": 1364
+    },
+    {
+      "path": "scripts/commit-staged-with-message-from-file-interactive.sh",
+      "fileType": ".sh",
+      "lines": 44,
+      "words": 119,
+      "bytes": 804
+    },
+    {
+      "path": "scripts/commit-staged-with-message-from-file.sh",
+      "fileType": ".sh",
+      "lines": 75,
+      "words": 187,
+      "bytes": 1589
+    },
+    {
+      "path": "scripts/create-project-statistics.ts",
+      "fileType": ".ts",
+      "lines": 410,
+      "words": 1141,
+      "bytes": 11315
+    },
+    {
+      "path": "scripts/deploy-dist-to-server.sh",
+      "fileType": ".sh",
+      "lines": 51,
+      "words": 173,
+      "bytes": 1397
+    },
+    {
+      "path": "scripts/re-create-git-timeline.ts",
+      "fileType": ".ts",
+      "lines": 234,
+      "words": 675,
+      "bytes": 6133
+    },
+    {
+      "path": "scripts/repo-statistics.sh",
+      "fileType": ".sh",
+      "lines": 67,
+      "words": 219,
+      "bytes": 1905
+    },
+    {
+      "path": "shell/aliases/git-aliases.sh",
+      "fileType": ".sh",
+      "lines": 159,
+      "words": 1012,
+      "bytes": 7149
+    },
+    {
+      "path": "shell/completions/npm-workspaces.sh",
+      "fileType": ".sh",
+      "lines": 83,
+      "words": 435,
+      "bytes": 3307
+    },
+    {
+      "path": "shell/hack.sh",
+      "fileType": ".sh",
+      "lines": 35,
+      "words": 188,
+      "bytes": 1404
+    },
+    {
+      "path": "src/apps/main/index.ts",
+      "fileType": ".ts",
+      "lines": 1376,
+      "words": 4071,
+      "bytes": 45380
+    },
+    {
+      "path": "src/apps/markdown-viewer/index.ts",
+      "fileType": ".ts",
+      "lines": 102,
+      "words": 296,
+      "bytes": 3297
+    },
+    {
+      "path": "src/apps/statistics/index.ts",
+      "fileType": ".ts",
+      "lines": 652,
+      "words": 1761,
+      "bytes": 21858
+    },
+    {
+      "path": "src/apps/statistics/types.ts",
+      "fileType": ".ts",
+      "lines": 80,
+      "words": 166,
+      "bytes": 1674
+    },
+    {
+      "path": "src/apps/tile-editor/draw-config.ts",
+      "fileType": ".ts",
+      "lines": 106,
+      "words": 250,
+      "bytes": 3023
+    },
+    {
+      "path": "src/apps/tile-editor/expression-parser.test.ts",
+      "fileType": ".test.ts",
+      "lines": 35,
+      "words": 126,
+      "bytes": 1088
+    },
+    {
+      "path": "src/apps/tile-editor/expression-parser.ts",
+      "fileType": ".ts",
+      "lines": 238,
+      "words": 739,
+      "bytes": 6771
+    },
+    {
+      "path": "src/apps/tile-editor/geometry-helpers.test.ts",
+      "fileType": ".test.ts",
+      "lines": 33,
+      "words": 158,
+      "bytes": 1020
+    },
+    {
+      "path": "src/apps/tile-editor/geometry-helpers.ts",
+      "fileType": ".ts",
+      "lines": 45,
+      "words": 194,
+      "bytes": 1273
+    },
+    {
+      "path": "src/apps/tile-editor/index.ts",
+      "fileType": ".ts",
+      "lines": 1880,
+      "words": 5734,
+      "bytes": 65427
+    },
+    {
+      "path": "src/apps/tile-editor/render-helpers.ts",
+      "fileType": ".ts",
+      "lines": 157,
+      "words": 720,
+      "bytes": 4972
+    },
+    {
+      "path": "src/apps/tile-editor/types.ts",
+      "fileType": ".ts",
+      "lines": 2,
+      "words": 10,
+      "bytes": 46
+    },
+    {
+      "path": "src/apps/tile-editor/ui-helpers.ts",
+      "fileType": ".ts",
+      "lines": 17,
+      "words": 49,
+      "bytes": 444
+    },
+    {
+      "path": "src/apps/timeline/index.ts",
+      "fileType": ".ts",
+      "lines": 2481,
+      "words": 8118,
+      "bytes": 93032
+    },
+    {
+      "path": "src/apps/timeline/scale-config.ts",
+      "fileType": ".ts",
+      "lines": 68,
+      "words": 146,
+      "bytes": 1318
+    },
+    {
+      "path": "src/assets/palettes.json",
+      "fileType": ".json",
+      "lines": 71,
+      "words": 120,
+      "bytes": 1299
+    },
+    {
+      "path": "src/core/grid.test.ts",
+      "fileType": ".test.ts",
+      "lines": 440,
+      "words": 2216,
+      "bytes": 14822
+    },
+    {
+      "path": "src/core/grid/cairo-grid.ts",
+      "fileType": ".ts",
+      "lines": 451,
+      "words": 1660,
+      "bytes": 11847
+    },
+    {
+      "path": "src/core/grid/grid-scan.ts",
+      "fileType": ".ts",
+      "lines": 21,
+      "words": 82,
+      "bytes": 570
+    },
+    {
+      "path": "src/core/grid/grid-search.ts",
+      "fileType": ".ts",
+      "lines": 60,
+      "words": 231,
+      "bytes": 1739
+    },
+    {
+      "path": "src/core/grid/grid-selection.ts",
+      "fileType": ".ts",
+      "lines": 48,
+      "words": 152,
+      "bytes": 992
+    },
+    {
+      "path": "src/core/grid/grid.ts",
+      "fileType": ".ts",
+      "lines": 37,
+      "words": 105,
+      "bytes": 860
+    },
+    {
+      "path": "src/core/grid/hex-grid.ts",
+      "fileType": ".ts",
+      "lines": 164,
+      "words": 670,
+      "bytes": 5017
+    },
+    {
+      "path": "src/core/grid/index.ts",
+      "fileType": ".ts",
+      "lines": 11,
+      "words": 65,
+      "bytes": 527
+    },
+    {
+      "path": "src/core/grid/square-grid.ts",
+      "fileType": ".ts",
+      "lines": 122,
+      "words": 399,
+      "bytes": 3134
+    },
+    {
+      "path": "src/core/grid/triangle-grid.ts",
+      "fileType": ".ts",
+      "lines": 198,
+      "words": 650,
+      "bytes": 4624
+    },
+    {
+      "path": "src/core/inline-help/inline-help-manager.ts",
+      "fileType": ".ts",
+      "lines": 897,
+      "words": 2388,
+      "bytes": 26629
+    },
+    {
+      "path": "src/core/markdown/renderer.test.ts",
+      "fileType": ".test.ts",
+      "lines": 96,
+      "words": 256,
+      "bytes": 3064
+    },
+    {
+      "path": "src/core/markdown/renderer.ts",
+      "fileType": ".ts",
+      "lines": 277,
+      "words": 746,
+      "bytes": 8104
+    },
+    {
+      "path": "src/core/particles/particle-system.ts",
+      "fileType": ".ts",
+      "lines": 650,
+      "words": 2371,
+      "bytes": 21018
+    },
+    {
+      "path": "src/core/rendering/grid-renderer.ts",
+      "fileType": ".ts",
+      "lines": 173,
+      "words": 708,
+      "bytes": 6739
+    },
+    {
+      "path": "src/core/solver/solver-cairo-pentagons-sorted.test.ts",
+      "fileType": ".test.ts",
+      "lines": 198,
+      "words": 775,
+      "bytes": 5513
+    },
+    {
+      "path": "src/core/solver/solver-cairo-pentagons-unsorted.test.ts",
+      "fileType": ".test.ts",
+      "lines": 211,
+      "words": 919,
+      "bytes": 6919
+    },
+    {
+      "path": "src/core/solver/solver-convex-concave-impossible.test.ts",
+      "fileType": ".test.ts",
+      "lines": 148,
+      "words": 543,
+      "bytes": 4749
+    },
+    {
+      "path": "src/core/solver/solver-types.ts",
+      "fileType": ".ts",
+      "lines": 83,
+      "words": 255,
+      "bytes": 1919
+    },
+    {
+      "path": "src/core/solver/solver.ts",
+      "fileType": ".ts",
+      "lines": 749,
+      "words": 3199,
+      "bytes": 21107
+    },
+    {
+      "path": "src/core/triangle-grid-bug.test.ts",
+      "fileType": ".test.ts",
+      "lines": 217,
+      "words": 1091,
+      "bytes": 7688
+    },
+    {
+      "path": "src/core/utils/color-utils.ts",
+      "fileType": ".ts",
+      "lines": 42,
+      "words": 191,
+      "bytes": 1266
+    },
+    {
+      "path": "src/core/utils/geometry.ts",
+      "fileType": ".ts",
+      "lines": 68,
+      "words": 255,
+      "bytes": 1917
+    },
+    {
+      "path": "src/core/utils/toast.ts",
+      "fileType": ".ts",
+      "lines": 80,
+      "words": 274,
+      "bytes": 2656
+    },
+    {
+      "path": "src/gui/draw-state-blade.ts",
+      "fileType": ".ts",
+      "lines": 114,
+      "words": 317,
+      "bytes": 3505
+    },
+    {
+      "path": "src/types/index.ts",
+      "fileType": ".ts",
+      "lines": 24,
+      "words": 88,
+      "bytes": 663
+    },
+    {
+      "path": "statistics.html",
+      "fileType": ".html",
+      "lines": 254,
+      "words": 529,
+      "bytes": 5671
+    },
+    {
+      "path": "tile-editor.html",
+      "fileType": ".html",
+      "lines": 217,
+      "words": 460,
+      "bytes": 4947
+    },
+    {
+      "path": "timeline.html",
+      "fileType": ".html",
+      "lines": 357,
+      "words": 824,
+      "bytes": 9651
+    },
+    {
+      "path": "tsconfig.json",
+      "fileType": ".json",
+      "lines": 20,
+      "words": 39,
+      "bytes": 513
+    },
+    {
+      "path": "vite.config.ts",
+      "fileType": ".ts",
+      "lines": 25,
+      "words": 61,
+      "bytes": 717
+    }
+  ],
+  "excludedFolders": [
+    ".vscode",
+    "docs",
+    "public"
+  ],
+  "excludedFiles": [
+    "package-lock.json"
+  ],
+  "repoSizeMetrics": {
+    "version": 1,
+    "timestamp": "2026-01-06T07:05:46Z",
+    "repo": {
+      "headCommit": "fb13a0af30c53f58b7716252e6cd42e5cfa660ec",
+      "headBranch": "main"
+    },
+    "intrinsic": {
+      "commitCount": 436,
+      "totalCommitCount": 436,
+      "trackedFileCount": 220,
+      "trackedDirCount": 47,
+      "trackedContentBytes": 60501539
+    },
+    "gitObjects": {
+      "looseObjectCount": 2187,
+      "looseObjectSizeKiB": 16192,
+      "packedObjectCount": 3267,
+      "packfileCount": 1,
+      "packfileSizeKiB": 3398,
+      "prunePackableSizeKiB": 0,
+      "garbageObjectCount": 0,
+      "garbageSizeKiB": 0
+    },
+    "largestBlobs": [
+      {
+        "path": "package-lock.json",
+        "sizeBytes": 136346
+      },
+      {
+        "path": "docs/codex_dump_2025-12-25_01-35.txt",
+        "sizeBytes": 144031
+      },
+      {
+        "path": "public/project-history/git-timeline.json",
+        "sizeBytes": 144324
+      },
+      {
+        "path": "public/project-history/git-timeline.json",
+        "sizeBytes": 146169
+      },
+      {
+        "path": "public/project-history/git-timeline.json",
+        "sizeBytes": 157426
+      },
+      {
+        "path": "public/project-history/git-timeline.json",
+        "sizeBytes": 158284
+      },
+      {
+        "path": "docs/generated/cairo_debug_0002.png",
+        "sizeBytes": 186764
+      },
+      {
+        "path": "docs/generated/cairo_draft_001.png",
+        "sizeBytes": 221948
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.md",
+        "sizeBytes": 747578
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0152.log",
+        "sizeBytes": 784074
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-22_23-59.json",
+        "sizeBytes": 942628
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.md",
+        "sizeBytes": 1024940
+      },
+      {
+        "path": "docs/transcripts/gemini/gemini_session_transcript_2025-12-24_11-53.json",
+        "sizeBytes": 1236904
+      },
+      {
+        "path": "docs/generated/gemini_session_transcript_2025-12-23_03-04.md",
+        "sizeBytes": 1444382
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0251.log",
+        "sizeBytes": 3715769
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_18-30.md",
+        "sizeBytes": 4414798
+      },
+      {
+        "path": "docs/generated/cursor_configurable_grid_application_de_2025-12-22_21-15.md",
+        "sizeBytes": 4474271
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0504.log",
+        "sizeBytes": 7024481
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-0320.log",
+        "sizeBytes": 14016075
+      },
+      {
+        "path": "docs/transcripts/codex/codex-2025-12-25-1400.log",
+        "sizeBytes": 22884804
+      }
+    ],
+    "diskUsage": {
+      "worktreeBytes": 414838784,
+      "worktreeExcludingGitBytes": 393179136,
+      "gitDirBytes": 21659648,
+      "topLevelDirs": [
+        {
+          "path": ".",
+          "sizeBytes": 414838784
+        },
+        {
+          "path": "./node_modules",
+          "sizeBytes": 206979072
+        },
+        {
+          "path": "./docs",
+          "sizeBytes": 182530048
+        },
+        {
+          "path": "./.git",
+          "sizeBytes": 21659648
+        },
+        {
+          "path": "./dist",
+          "sizeBytes": 1851392
+        },
+        {
+          "path": "./public",
+          "sizeBytes": 671744
+        },
+        {
+          "path": "./src",
+          "sizeBytes": 589824
+        },
+        {
+          "path": "./cache",
+          "sizeBytes": 184320
+        },
+        {
+          "path": "./scripts",
+          "sizeBytes": 69632
+        },
+        {
+          "path": "./shell",
+          "sizeBytes": 28672
+        },
+        {
+          "path": "./.secrets",
+          "sizeBytes": 20480
+        },
+        {
+          "path": "./temp",
+          "sizeBytes": 16384
+        },
+        {
+          "path": "./.vscode",
+          "sizeBytes": 12288
+        }
+      ]
+    }
+  },
+  "totals": {
+    "files": 69,
+    "lines": 16166,
+    "words": 53379,
+    "bytes": 511468
+  }
+}
