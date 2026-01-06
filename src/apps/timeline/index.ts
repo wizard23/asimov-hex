@@ -109,7 +109,7 @@ class TimelineViewer {
     startDate: '',
     endDate: '',
     displayMode: 'Timeline' as DisplayMode,
-    groupBy: 'Day' as GroupBy,
+    groupBy: 'None' as GroupBy,
     searchTerm: '',
     enableDateFilter: false,
     groupGap: this.timelineGroupedLineGap,
@@ -355,8 +355,7 @@ class TimelineViewer {
       title: 'Center View',
     }).on('click', () => {
       if (this.config.displayMode !== 'Timeline') return;
-      this.resetTimelineView();
-      this.drawTimeline();
+      this.centerTimelineView();
     });
 
     this.startDateElement = startDateBinding.element;
@@ -456,8 +455,7 @@ class TimelineViewer {
     if (event.key === 'c' || event.key === 'C') {
       if (this.config.displayMode !== 'Timeline') return;
       event.preventDefault();
-      this.resetTimelineView();
-      this.drawTimeline();
+      this.centerTimelineView();
       return;
     }
 
@@ -733,8 +731,7 @@ class TimelineViewer {
 
     await this.initTimelinePixi(canvasContainer);
     this.updateTimelineData();
-    this.resetTimelineView();
-    this.drawTimeline();
+    this.centerTimelineView();
   }
 
   private navigateCommit(direction: -1 | 1) {
@@ -1272,6 +1269,40 @@ class TimelineViewer {
     };
     this.timelineGroupScrollOffsetY = 0;
     this.updateTimelineVerticalOffset();
+  }
+
+  private centerTimelineView() {
+    if (!this.timelineApp) return;
+    this.resetTimelineView();
+
+    if (this.config.displayMode === 'Timeline' && this.config.groupBy !== 'None') {
+      const grouped = this.getGroupedCommits();
+      if (grouped.length > 0) {
+        let targetIndex = grouped.length - 1;
+        if (this.lockedCommit) {
+          const lockedIndex = grouped.findIndex(group => (
+            group.commits.some(commit => commit.hash === this.lockedCommit?.hash)
+          ));
+          if (lockedIndex >= 0) {
+            targetIndex = lockedIndex;
+          }
+        }
+        const lineOffsets = this.getLineOffsets(grouped.length);
+        const baseLineY = this.worldToScreen(0, 0).y;
+        const lineY = baseLineY + (lineOffsets[targetIndex] ?? 0);
+        const gap = this.getLineGap();
+        const maxOffset = Math.max(0, (grouped.length - 1) * gap * 0.5);
+        const dy = this.timelineViewportCenter.y - lineY;
+        this.timelineGroupScrollOffsetY = this.clamp(
+          this.timelineGroupScrollOffsetY + dy,
+          -maxOffset,
+          maxOffset
+        );
+        this.updateTimelineVerticalOffset();
+      }
+    }
+
+    this.drawTimeline();
   }
 
   private handleTimelinePointerDown(e: FederatedPointerEvent) {
