@@ -1329,19 +1329,236 @@ Yes, please proceed.
      overlay.png.
 ```
 
-I've added the images
+I've added the images and tested the profiler overlay inline help window. Everything works as expected! Great work! Of course there are things we will improve but you executed the plan very well!
+
+* What properties of the "inline help windows" get persisted now?
+* How does the persistence work exactly
+* When is this persisted/restored?
+* What is the exact algorithm used for minimizing?
+* Please name all the parts of an inline help window so I can easily describe the ux improvements I want to make.
+
+
+```
+• Here’s a precise breakdown based on src/core/inline-help/inline-help-manager.ts.
+
+  Persisted properties
+
+  - rect: { x, y, width, height }
+  - snapSide: 'left' | 'right' | 'top' | 'bottom' | 'none'
+  - snapIndex: numeric ordering within a snap side
+  - minimized: boolean
+  - maximized: boolean
+  - scrollTop: content scroll position
+  - markdownUrl: current markdown document (allows following links within the help window)
+
+  How persistence works
+
+  - Stored in localStorage under key inline-help-window:${id}.
+  - JSON is written by persistState() which is called on relevant state changes.
+
+  When it’s persisted
+
+  - On drag end (and during drag it only updates the DOM, not storage).
+  - On resize (via ResizeObserver).
+  - On minimize/maximize toggle.
+  - On snap changes.
+  - On scroll (debounced ~150ms).
+  - On markdown navigation within the window.
+
+  When it’s restored
+
+  - When a window is created in openWindow() → restoreState() reads localStorage.
+  - If maximized was stored, it forces full‑viewport size.
+  - If snapSide is stored, it re-enters the snap layout; otherwise it restores the stored rect.
+  - Scroll position is restored after markdown is rendered (restoreScroll()).
+
+  Minimize algorithm
+
+  - If not minimized:
+      - Set minimized = true, add .is-minimized.
+      - If not snapped and not maximized, store current rect into minimizedRestoreRect.
+      - Shrink height to the header height (min 36px), keep current x/y/width.
+  - If already minimized:
+      - Set minimized = false, remove .is-minimized.
+      - If minimizedRestoreRect exists, restore it and clear it.
+
+  Inline help window parts (naming for UX discussion)
+
+  - Root overlay: #inline-help-root (fixed full-viewport container).
+  - Window container: .inline-help-window
+  - Header / drag handle: .inline-help-header
+  - Title text: .inline-help-title
+  - Header actions group: .inline-help-actions
+  - Buttons: minimize / maximize / close buttons inside .inline-help-actions
+  - Body: .inline-help-body
+  - Scrollable content area: .inline-help-content
+
+  If you want, I can also add a short “inline help UX glossary” to docs so you can reference these parts consistently.
+```
+
+Yes please add a short “inline help UX glossary” to docs
+
+Some UX improvements:
+* Resizing the windows must be possible from all sides and from all corners. Atm it only works from the lower right corner.
+* Please add a small opacity slider to the window controls that controls the opacity of the window. this is needed since the windows cover parts of the app that the user is interacting with.
+  * opacity range from 10 to 100% in steps of 5%
+
+
+What is the z order for these:
+* Performance Monitor
+* Profiler Overlay
+* Inline Help Windows
+
+
+```
+
+• - Performance Monitor: .perf-pill uses z-index 25 only when floating (.perf-pill-floating in fullscreen); otherwise it sits in the normal header flow.
+  - Profiler Overlay: .profiler-overlay uses z-index 26.
+  - Inline Help Windows: each .inline-help-window is set to z-index 2000+ (incremented on focus), so they always sit above the other two.
+```
+
+I thought so. What could be the reason that the performance monitor appears to be on top of the inline help window?
+
+It's not a opacity thing. this happens even with opacity 100%
+
+```
+• Got it — then it’s almost certainly a stacking context issue. Right now .inline-help-window has a high z-index, but it lives inside #inline-help-root, which doesn’t set its own z-index. If another element
+  (like the performance pill) is in a higher stacking context, the help window can’t escape it even with z-index: 2000.
+
+  Fix: set a high z-index on the root container so the whole help system sits above the rest of the app:
+
+  .inline-help-root {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2000;
+  }
+
+  Want me to apply this?
+```
+
+Yes please.
+
+
+z order is as expected now, thanks!
+Please describe what happens now when a commit becomes locked
+
+```
+• When a commit becomes locked (timeline mode):
+
+  - The selected commit is stored as lockedCommit and the info overlay switches to that commit’s card, with a “locked” styling class. The gesture hints swap from “Click to lock” to “Click empty / Esc to clear”.
+  - The Pixi timeline redraw adds a highlighted ring on the locked commit (drawLockedCommit()), and if grouping is enabled, the change-scale axis is restricted to the locked group only.
+  - Keyboard navigation becomes active: Arrow keys move between commits/groups and Home/End jump to group edges, all centered via the animated pan.
+  - Clicking empty space (or pressing Esc) clears the locked commit, restoring hover-only behavior.
+
+  Code path: handleTimelinePointerDown → setLockedCommit → updateTimelineInfo/updateGestureHintsContent/drawTimeline.
+```
+
+please elaborate on the centering
+
+
+Please add a "Center Locked Commit" checkbox that determines if the centering you just described should happen or not. (default is checked to keep current behavior)
+
+Please change this new checkbox to a dropdown labeled "Locked Commit Centering" with these options:
+* (None)
+* Horizontal
+* Vertical
+* Both
+
+
+Ux issue:
+Nomenclature between "Locked Commit Centering" and "Left Pan" Dropdown box is inconsistent now. I prefer the nomenclature in the "Locked Commit Centering" dropdown.
+Please propose better labels for the "Left Pane" dropbox.
+
+```
+• Here’s a consistent naming scheme to match “Locked Commit Centering” (short, descriptive, no extra verbs):
+
+  Current “Left Pan” option → Proposed label
+
+  - Time Axis Only → Horizontal Only
+  - Naive Combined → Horizontal + Vertical (Naive)
+  - Direction-lock on drag start → Horizontal + Vertical (Lock-on-Start)
+  - Dead-zone + axis snapping → Horizontal + Vertical (Dead-Zone Snap)
+
+  If you want even shorter:
+
+  - Horizontal Only
+  - H+V Naive
+  - H+V Lock-Start
+  - H+V Dead-Zone
+```
+
+Please change to:
+* Horizontal
+* Both (Simple)
+* Both (Lock-On)
+* Both (Dead-Zone)
+
+
+UX issue
+The logarithmic scale on the right side gets drawn on top of the timeline(s) that's ok, but it gets confusing. please propose a solution similarly to how this is handled for the scale on top and for the group labels 
+
+```
+• Here are a few options that mirror how the top scale and group labels are handled (dedicated “lane” with background/padding):
+
+  - Add a right-side “change scale lane” background panel (like the top scale bar), so the log scale sits in its own strip instead of over the lines. This could be a semi‑opaque rectangle behind the scale and
+    ticks, with a border separating it from the timeline.
+  - Increase rightPadding when change scale is active to reserve a dedicated column (similar to group label padding on the left). The commit lines would stop before that column.
+  - Add a subtle vertical separator line between timeline and scale (like the top scale’s bottom border), plus a slight darken on the scale area.
+
+  If you want, I can implement option 1 (right-side lane with background + separator) to keep it consistent with the top scale treatment.
+```
+
+Yes, please implement option 1 (right-side lane with background + separator) and make it consistent with the top scale.
+About consistency: 
+* The empty space between the change scale and the right border of the window is way too large atm. Please also make this consistent with the top scale.
+* Please also add an "Extend Change Scale Ticks" that works just like the "Extend Scale Ticks" checkbox.
+
+Before you change anything:
+* Do you notice any other inconsistencies in the way the two scales are handled?
+
+
+```
+Inconsistencies I notice between the top scale and the right-side change scale:
+
+  - The top scale has a dedicated background panel and border; the change scale currently draws directly over the timeline with no dedicated lane or separator.
+  - The top scale has an “Extend Scale Ticks” option that draws vertical guide lines; the change scale has no equivalent.
+  - The top scale has a consistent padding and tight margin to the edge; the change scale uses a larger right padding (feels wider than necessary).
+  - The top scale’s overlay height is fixed and visually separated; the change scale text/lines float without a bounded panel.
+
+  If that matches your expectations, I’ll go ahead and implement the right-side lane + separator, reduce the right padding to match the top scale feel, and add “Extend Change Scale Ticks.”
+```
+
+Yes, please make it so.
 
 
 
 
 
 
-Please extract the markdown parser and html generator in a library that then will be used in the existing standalone markdown viewer app.
-Pleas write some tests for the library you extract.
+
+Please use the local storage api to Save/Restore these properties of "inline help windows"
+* open/close state
+* position
+* size
+* scroll position
 
 
 
 
+Please name all the parts of an inline help window so I can describe the ux improvements I want to make.
+
+changes we have 
+
+
+
+
+
+
+
+
+
+Center locked commit checkbox
 
 
 
@@ -1357,6 +1574,9 @@ change mouse curser accordingly when in vertical scrolling mode.
 Now please add another tweakpane toggle labeled "stats.js Performance Monitor"
 use this library for it: https://mrdoob.github.io/stats.js/
 I want to compare our "PixiJS Performance Monitor" measurements with the results of the "stats.js Performance Monitor" so it's important for them to be independent of each other.
+
+
+
 
 ## FUTURE
 

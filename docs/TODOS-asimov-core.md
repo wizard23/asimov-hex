@@ -87,8 +87,7 @@ Please create a new webapp called "asimov-core"
 ### Tech stack
 * TypeScript
 * vite
-* tweakpane
-* preact for gui
+* preact
 
 ### UI components
 Please extract all ui controls into separate files in an appropriate directory to ensure all pages use a consistent set of ui elements
