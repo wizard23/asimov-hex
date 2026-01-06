@@ -112,5 +112,20 @@ Please document your approach for "inverting" the colors in docs/system-descript
 
 
 Now for the traffic-light coded colors. Please use the following approach to "pseudo invert" them: Keep Hue and Saturation but invert the Value.
-For each color that appears in the themed css plese add a comment with wich approach it was "inverted" so I can quickly identify any remaining inconsistent stylings.
+For each color that appears in the themed css please add a comment with which approach it was "inverted" so I can quickly identify any remaining inconsistent stylings.
+
+
+That's quite good already. Lets try a slight modification. Use the HSL color space instead of HSV for the "pseudo invert" and invert the Lightness please :)
+
+
+Wow! That works really well! Now we just have to fix some misclassifications. 
+
+
+.__disabled__ { /* START CSS "block comment" */
+ 
+} /* END CSS "block comment" */
+
+git restore  public/coverage/
+
+
 
