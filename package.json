@@ -16,9 +16,8 @@
     "create-project-statistics": "tsx scripts/create-project-statistics.ts",
     "re-create-git-timeline": "tsx scripts/re-create-git-timeline.ts",
     "deploy-to-server": "./scripts/deploy-dist-to-server.sh",
-    "commit-from-file-old": "git commit -F ./temp/commit-message.txt",
     "commit-from-file": "./scripts/commit-staged-with-message-from-file-interactive.sh",
-    "commit-from-file-ext": "./scripts/scripts/commit-staged-with-message-from-file.sh",
+    "commit-from-file-automated": "./scripts/scripts/commit-staged-with-message-from-file.sh",
     "commit-refresh-generated": "./scripts/commit-refresh-generated.sh"
   },
   "devDependencies": {
