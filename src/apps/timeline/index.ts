@@ -76,12 +76,14 @@ class TimelineViewer {
   private lockedCommit: Commit | null = null;
   private readonly timelineScaleHeight = 50;
   private readonly timelineChangeMaxHeight = 80;
-  private readonly timelineChangeScaleRightPadding = 24;
+  private readonly timelineChangeScaleRightPadding = 12;
+  private readonly timelineChangeScaleRightInset = 12;
   private readonly timelineLineGap = 28;
   private readonly timelineGroupedLineGap = 48;
   private groupGapElement: HTMLElement | null = null;
   private groupScrollSpeedElement: HTMLElement | null = null;
   private extendedScaleTicksElement: HTMLElement | null = null;
+  private extendedChangeScaleTicksElement: HTMLElement | null = null;
   private gestureHintsElement: HTMLElement | null = null;
   private gestureGroupScrollElement: HTMLElement | null = null;
   private transitionDurationElement: HTMLElement | null = null;
@@ -112,6 +114,7 @@ class TimelineViewer {
     groupGap: this.timelineGroupedLineGap,
     groupScrollSpeed: 1,
     extendedScaleTicks: true,
+    extendedChangeScaleTicks: true,
     transitionDuration: 0.5,
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
@@ -228,6 +231,7 @@ class TimelineViewer {
       this.updateGroupByVisibility();
       this.updateCenterViewVisibility();
       this.updateScaleTickVisibility();
+      this.updateChangeScaleTickVisibility();
       this.updateGestureHintsVisibility();
       this.updateFullscreenToggleVisibility();
       this.updatePerformanceVisibility();
@@ -328,6 +332,13 @@ class TimelineViewer {
       this.drawTimeline();
     });
 
+    const extendedChangeScaleTicksBinding = this.pane.addBinding(this.config, 'extendedChangeScaleTicks', {
+      label: 'Extend Change Scale Ticks',
+    }).on('change', () => {
+      if (this.config.displayMode !== 'Timeline') return;
+      this.drawTimeline();
+    });
+
     const centerViewButton = this.pane.addButton({
       title: 'Center View',
     }).on('click', () => {
@@ -344,6 +355,7 @@ class TimelineViewer {
     this.transitionDurationElement = transitionDurationBinding.element;
     this.leftPanModeElement = leftPanModeBinding.element;
     this.extendedScaleTicksElement = extendedScaleTicksBinding.element;
+    this.extendedChangeScaleTicksElement = extendedChangeScaleTicksBinding.element;
     this.centerViewElement = centerViewButton.element;
     this.gestureHintsElement = document.getElementById('gesture-hints');
     this.gestureGroupScrollElement = document.getElementById('gesture-group-scroll');
@@ -356,6 +368,7 @@ class TimelineViewer {
     this.updateCenterViewVisibility();
     this.updateGroupGapVisibility();
     this.updateScaleTickVisibility();
+    this.updateChangeScaleTickVisibility();
     this.updateGestureHintsVisibility();
     this.updateGestureHintsContent();
     this.updateFullscreenToggleVisibility();
@@ -558,6 +571,13 @@ class TimelineViewer {
   private updateScaleTickVisibility() {
     const display = this.config.displayMode === 'Timeline' ? '' : 'none';
     if (this.extendedScaleTicksElement) this.extendedScaleTicksElement.style.display = display;
+  }
+
+  private updateChangeScaleTickVisibility() {
+    const display = this.config.displayMode === 'Timeline' ? '' : 'none';
+    if (this.extendedChangeScaleTicksElement) {
+      this.extendedChangeScaleTicksElement.style.display = display;
+    }
   }
 
   private updateGestureHintsVisibility() {
@@ -1208,7 +1228,7 @@ class TimelineViewer {
       const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
       const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
       const maxValue = Math.max(maxAdded, maxRemoved, 1);
-      rightPadding = Math.max(basePadding, this.getChangeScalePadding(maxValue) + 8);
+      rightPadding = Math.max(basePadding, this.getChangeScalePadding(maxValue) + 4);
     }
 
     const availableWidth = Math.max(1, this.timelineApp.screen.width - leftPadding - rightPadding);
@@ -1748,11 +1768,24 @@ class TimelineViewer {
     const maxAdded = Math.max(1, ...this.filteredCommits.map(commit => commit.addedLines));
     const maxRemoved = Math.max(1, ...this.filteredCommits.map(commit => commit.removedLines));
     const maxValue = Math.max(maxAdded, maxRemoved, 1);
-    const axisX = timelineApp.screen.width - this.getChangeScalePadding(maxValue);
+    const panelWidth = this.getChangeScalePadding(maxValue);
+    const panelStartX = Math.max(0, timelineApp.screen.width - panelWidth);
+    const axisX = timelineApp.screen.width - this.timelineChangeScaleRightInset;
     const height = this.timelineChangeMaxHeight;
     const scaleLineYs = this.getChangeScaleLineYs(grouped, lineYs);
 
     timelineChangeScaleGraphics.clear();
+    timelineChangeScaleGraphics.rect(panelStartX, 0, panelWidth, timelineApp.screen.height);
+    timelineChangeScaleGraphics.fill({ color: 0x141414, alpha: 0.92 });
+    timelineChangeScaleGraphics.stroke({ color: 0x2f2f2f, width: 1, alpha: 0.8 });
+    timelineChangeScaleGraphics.moveTo(panelStartX, 0);
+    timelineChangeScaleGraphics.lineTo(panelStartX, timelineApp.screen.height);
+    timelineChangeScaleGraphics.stroke({ color: 0x3a3a3a, width: 1, alpha: 0.9 });
+
+    if (scaleLineYs.length === 0) {
+      this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
+      return;
+    }
     scaleLineYs.forEach(lineY => {
       timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
       timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
@@ -1772,11 +1805,20 @@ class TimelineViewer {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
       scaleLineYs.forEach(lineY => {
+        if (this.config.extendedChangeScaleTicks) {
+          timelineChangeScaleGraphics.moveTo(0, lineY - offset);
+          timelineChangeScaleGraphics.lineTo(panelStartX, lineY - offset);
+          timelineChangeScaleGraphics.moveTo(0, lineY + offset);
+          timelineChangeScaleGraphics.lineTo(panelStartX, lineY + offset);
+        }
         timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
         timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
       });
+    }
+    if (this.config.extendedChangeScaleTicks) {
+      timelineChangeScaleGraphics.stroke({ color: 0x333333, width: 1, alpha: 0.22 });
     }
     timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
 
