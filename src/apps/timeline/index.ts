@@ -1673,8 +1673,14 @@ class TimelineViewer {
     });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
-    const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 15 });
-    const minorStyle = new TextStyle({ fill: 0xb0b0b0, fontSize: 13 });
+    const majorStyle = new TextStyle({
+      fill: scaleStyle.topScale.labelMajor.color,
+      fontSize: scaleStyle.topScale.labelMajor.fontSize,
+    });
+    const minorStyle = new TextStyle({
+      fill: scaleStyle.topScale.labelMinor.color,
+      fontSize: scaleStyle.topScale.labelMinor.fontSize,
+    });
 
     this.timelineTextContainer.removeChildren().forEach(child => child.destroy());
 
@@ -1687,7 +1693,10 @@ class TimelineViewer {
         visibleRange.startMs,
         visibleRange.endMs,
         scaleHeight,
-        new TextStyle({ fill: 0xe6e6e6, fontSize: 14 }),
+        new TextStyle({
+          fill: scaleStyle.topScale.milestoneLabel.color,
+          fontSize: scaleStyle.topScale.milestoneLabel.fontSize,
+        }),
         110,
         scaleRange.startMs,
         usedLabelPositions

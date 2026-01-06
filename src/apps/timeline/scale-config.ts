@@ -13,6 +13,18 @@ export const scaleStyle = {
   },
   topScale: {
     overlayExtraHeight: 28,
+    labelMajor: {
+      color: 0xf0f0f0,
+      fontSize: 15,
+    },
+    labelMinor: {
+      color: 0xb0b0b0,
+      fontSize: 13,
+    },
+    milestoneLabel: {
+      color: 0xe6e6e6,
+      fontSize: 14,
+    },
   },
   ticks: {
     major: {
