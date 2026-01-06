@@ -22,8 +22,8 @@ html {
 }
 
 body {
-  background: #ffffff;
-  color: #000000;
+  background: #ffffff; /* global-invert base (light -> dark) */
+  color: #000000; /* global-invert base (light -> dark) */
 }
 
 img,
@@ -33,21 +33,101 @@ svg {
   filter: invert(1) hue-rotate(180deg);
 }
 
-.high,
-.medium,
 .low,
+.medium,
+.high,
 .cline-no,
-.fstat-no,
-.cstat-no,
-.stmt-no,
-.branch-no,
 .cline-yes,
-.fstat-yes,
+.cstat-no,
+.fstat-no,
 .cstat-yes,
-.stmt-yes,
-.branch-yes,
+.cbranch-no,
+.status-line.low,
+.status-line.medium,
+.status-line.high,
+.low .cover-fill,
+.medium .cover-fill,
+.high .cover-fill,
+.low .chart,
+.medium .chart,
+.high .chart,
+.red.solid,
+.highlighted,
+.highlighted .cstat-no,
+.highlighted .fstat-no,
+.highlighted .cbranch-no,
 .missing-if-branch {
   filter: invert(1) hue-rotate(180deg);
+}
+
+.cbranch-no {
+  background: #000000; /* pseudo-invert (HSV V flip) of #ffff00 */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.red.solid,
+.status-line.low,
+.low .cover-fill,
+.highlighted,
+.highlighted .cstat-no,
+.highlighted .fstat-no,
+.highlighted .cbranch-no {
+  background: #3d0a12; /* pseudo-invert (HSV V flip) of #C21F39 */
+}
+
+.low .chart {
+  border-color: #3d0a12; /* pseudo-invert (HSV V flip) of #C21F39 */
+}
+
+.cstat-no,
+.fstat-no {
+  background: #090708; /* pseudo-invert (HSV V flip) of #F6C6CE */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.low,
+.cline-no {
+  background: #030303; /* pseudo-invert (HSV V flip) of #FCE1E5 */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.high,
+.cline-yes {
+  background: #090a08; /* pseudo-invert (HSV V flip) of #E6F5D0 */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.cstat-yes {
+  background: #1e2814; /* pseudo-invert (HSV V flip) of #A1D76A */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.status-line.high,
+.high .cover-fill {
+  background: #396d19; /* pseudo-invert (HSV V flip) of #4D9221 */
+}
+
+.high .chart {
+  border-color: #396d19; /* pseudo-invert (HSV V flip) of #4D9221 */
+}
+
+.status-line.medium,
+.medium .cover-fill {
+  background: #060500; /* pseudo-invert (HSV V flip) of #F9CD0B */
+}
+
+.medium .chart {
+  border-color: #060500; /* pseudo-invert (HSV V flip) of #F9CD0B */
+}
+
+.medium {
+  background: #000000; /* pseudo-invert (HSV V flip) of #FFF4C2 */
+  color: #eeeeee; /* pseudo-invert (HSV V flip) of #111111 */
+}
+
+.missing-if-branch {
+  background: #cccccc; /* pseudo-invert (HSV V flip) of #333333 */
+  color: #000000; /* pseudo-invert (HSV V flip) of #ffff00 */
 }
 EOF
 
