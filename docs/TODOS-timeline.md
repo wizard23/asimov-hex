@@ -1730,6 +1730,45 @@ please remove the debug colors we introduced for debugging the top and change sc
 
 
 
+// 2026-01-06
+
+
+
+Please add a hotkey C for "Center View". 
+
+"Center View" when "Group By" is active should change a bit:
+If no commit is locked it should center the last group.
+Else it should center the group that contains the locked commit.
+
+
+
+
+
+When grouping is not active Ce
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Please use the local storage api to Save/Restore these properties of "inline help windows"
 * open/close state

@@ -72,7 +72,9 @@ Please put the commit message in this file:
 
 If you need to create temporary files (diffs, etc.) please name them accordingly (something like gemini-temp-<what it is>.<ext>) and also put them in the temp folder so they don't clutter the repo.
 
-You just added another line to the previous commit message (that was already commited). Please create a commit message describing just what the staged files change. If you need an explanation about what a commit message is and how to write one and what to include and what not to put into a commit message please just ask me instead of just fumbling around like this.
+## New cokmmit message
+There are new staged changes. Please create a new commit message :)
+
 
 ## feedback if commit message is weird
 ### when he modified an existing commit message because of similarity

@@ -165,6 +165,19 @@ Please analyze the root cause of this and propose some different solutions for t
 Please implement this: "2. Fixed layout + min-widths on columns (hybrid)"
 
 
+
+
+
+
+// session 2026/01/06 statistics-file-filter
+
+
+Please answer these questions:
+
+
+
+
+
 ## INIT 2026/01/02
 
 Please look at:
