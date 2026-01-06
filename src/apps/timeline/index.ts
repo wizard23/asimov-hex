@@ -453,6 +453,14 @@ class TimelineViewer {
       return;
     }
 
+    if (event.key === 'c' || event.key === 'C') {
+      if (this.config.displayMode !== 'Timeline') return;
+      event.preventDefault();
+      this.resetTimelineView();
+      this.drawTimeline();
+      return;
+    }
+
     if (this.config.displayMode !== 'Timeline') return;
     if (!this.lockedCommit) return;
 
