@@ -23,6 +23,7 @@ type StoredWindowState = {
   maximized: boolean;
   scrollTop: number;
   markdownUrl: string;
+  opacity: number;
 };
 
 const STORAGE_PREFIX = 'inline-help-window:';
@@ -183,6 +184,7 @@ class InlineHelpWindow {
   readonly element: HTMLDivElement;
   readonly contentScroll: HTMLDivElement;
   readonly titleEl: HTMLSpanElement;
+  readonly opacityControl: HTMLInputElement;
   private manager: InlineHelpWindowManager;
   private header: HTMLDivElement;
   private isDragging = false;
@@ -190,8 +192,12 @@ class InlineHelpWindow {
   private rect: WindowRect;
   private restoreRect: WindowRect | null = null;
   private minimizedRestoreRect: WindowRect | null = null;
+  private opacity = 1;
   private markdownUrl: string;
   private scrollSaveTimer: number | null = null;
+  private isResizing = false;
+  private resizeDir: ResizeDirection | null = null;
+  private resizeStart: { x: number; y: number; rect: WindowRect } | null = null;
   snapSide: SnapSide = 'none';
   snapIndex = 0;
   minimized = false;
@@ -225,10 +231,23 @@ class InlineHelpWindow {
     const actions = document.createElement('div');
     actions.className = 'inline-help-actions';
 
+    this.opacityControl = document.createElement('input');
+    this.opacityControl.type = 'range';
+    this.opacityControl.min = '20';
+    this.opacityControl.max = '100';
+    this.opacityControl.step = '5';
+    this.opacityControl.value = String(this.opacity * 100);
+    this.opacityControl.className = 'inline-help-opacity';
+    this.opacityControl.title = 'Window Opacity';
+    this.opacityControl.addEventListener('input', () => {
+      this.setOpacity(Number(this.opacityControl.value) / 100);
+    });
+
     const minimizeButton = this.buildHeaderButton('Minimize', '_', () => this.toggleMinimize());
     const maximizeButton = this.buildHeaderButton('Maximize', '[]', () => this.toggleMaximize());
     const closeButton = this.buildHeaderButton('Close', 'x', () => this.close());
 
+    actions.appendChild(this.opacityControl);
     actions.appendChild(minimizeButton);
     actions.appendChild(maximizeButton);
     actions.appendChild(closeButton);
@@ -247,6 +266,7 @@ class InlineHelpWindow {
 
     this.element.appendChild(this.header);
     this.element.appendChild(body);
+    this.addResizeHandles();
 
     this.element.addEventListener('mousedown', () => this.setActive());
     const resizeObserver = new ResizeObserver(() => this.handleResize());
@@ -288,6 +308,13 @@ class InlineHelpWindow {
       this.applyRect(this.minimizedRestoreRect);
       this.minimizedRestoreRect = null;
     }
+    this.persistState();
+  }
+
+  setOpacity(value: number): void {
+    const clamped = Math.min(1, Math.max(0.2, value));
+    this.opacity = clamped;
+    this.element.style.opacity = String(clamped);
     this.persistState();
   }
 
@@ -383,6 +410,9 @@ class InlineHelpWindow {
     this.minimized = stored.minimized ?? false;
     this.maximized = stored.maximized ?? false;
     this.markdownUrl = stored.markdownUrl ?? this.markdownUrl;
+    this.opacity = typeof stored.opacity === 'number' ? stored.opacity : this.opacity;
+    this.element.style.opacity = String(this.opacity);
+    this.opacityControl.value = String(Math.round(this.opacity * 100));
     this.element.classList.toggle('is-minimized', this.minimized);
 
     if (this.maximized) {
@@ -393,6 +423,16 @@ class InlineHelpWindow {
 
     if (this.snapSide === 'none') {
       this.applyRect(this.rect);
+      if (this.minimized) {
+        this.minimizedRestoreRect = { ...this.rect };
+        const headerHeight = Math.max(36, this.header.offsetHeight);
+        this.applyRect({
+          x: this.rect.x,
+          y: this.rect.y,
+          width: this.rect.width,
+          height: headerHeight,
+        });
+      }
       return;
     }
     this.manager.syncSnapIndex(this.snapSide, this.snapIndex);
@@ -407,6 +447,8 @@ class InlineHelpWindow {
 
   handleDragStart(event: MouseEvent): void {
     if ((event.target as HTMLElement).closest('button')) return;
+    if ((event.target as HTMLElement).closest('.inline-help-opacity')) return;
+    if ((event.target as HTMLElement).closest('.inline-help-resize-handle')) return;
     if (this.maximized) {
       this.toggleMaximize();
     }
@@ -460,6 +502,59 @@ class InlineHelpWindow {
     this.persistState();
   };
 
+  handleResizeStart(event: MouseEvent, dir: ResizeDirection): void {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.maximized) return;
+    this.isResizing = true;
+    this.resizeDir = dir;
+    this.resizeStart = {
+      x: event.clientX,
+      y: event.clientY,
+      rect: { ...this.rect },
+    };
+    document.addEventListener('mousemove', this.handleResizeMove);
+    document.addEventListener('mouseup', this.handleResizeEnd);
+    document.body.style.userSelect = 'none';
+  }
+
+  handleResizeMove = (event: MouseEvent): void => {
+    if (!this.isResizing || !this.resizeDir || !this.resizeStart) return;
+    const dx = event.clientX - this.resizeStart.x;
+    const dy = event.clientY - this.resizeStart.y;
+    const start = this.resizeStart.rect;
+    const nextRect = { ...start };
+
+    if (this.resizeDir.includes('e')) {
+      nextRect.width = start.width + dx;
+    }
+    if (this.resizeDir.includes('s')) {
+      nextRect.height = start.height + dy;
+    }
+    if (this.resizeDir.includes('w')) {
+      nextRect.width = start.width - dx;
+      nextRect.x = start.x + dx;
+    }
+    if (this.resizeDir.includes('n')) {
+      nextRect.height = start.height - dy;
+      nextRect.y = start.y + dy;
+    }
+
+    this.applyRect(nextRect, false);
+  };
+
+  handleResizeEnd = (): void => {
+    if (!this.isResizing) return;
+    this.isResizing = false;
+    this.resizeDir = null;
+    this.resizeStart = null;
+    document.removeEventListener('mousemove', this.handleResizeMove);
+    document.removeEventListener('mouseup', this.handleResizeEnd);
+    document.body.style.userSelect = '';
+    this.persistState();
+  };
+
   handleResize(): void {
     if (this.snapSide !== 'none' || this.maximized) return;
     const rect = this.element.getBoundingClientRect();
@@ -505,8 +600,19 @@ class InlineHelpWindow {
       maximized: this.maximized,
       scrollTop: this.contentScroll.scrollTop,
       markdownUrl: this.markdownUrl,
+      opacity: this.opacity,
     };
     saveStoredState(this.id, stored);
+  }
+
+  private addResizeHandles(): void {
+    const directions: ResizeDirection[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+    directions.forEach((dir) => {
+      const handle = document.createElement('div');
+      handle.className = `inline-help-resize-handle inline-help-resize-${dir}`;
+      handle.addEventListener('mousedown', (event) => this.handleResizeStart(event, dir));
+      this.element.appendChild(handle);
+    });
   }
 
   private buildHeaderButton(title: string, label: string, onClick: () => void): HTMLButtonElement {
@@ -586,6 +692,10 @@ function ensureStyles(): void {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+    .inline-help-opacity {
+      width: 90px;
+      accent-color: #79b6ff;
     }
     .inline-help-actions button {
       appearance: none;
@@ -674,6 +784,64 @@ function ensureStyles(): void {
       border: 1px solid #2f2f2f;
       margin: 8px 0;
     }
+    .inline-help-resize-handle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      z-index: 2;
+    }
+    .inline-help-resize-n {
+      top: -6px;
+      left: 12px;
+      right: 12px;
+      height: 12px;
+      width: auto;
+      cursor: ns-resize;
+    }
+    .inline-help-resize-s {
+      bottom: -6px;
+      left: 12px;
+      right: 12px;
+      height: 12px;
+      width: auto;
+      cursor: ns-resize;
+    }
+    .inline-help-resize-e {
+      right: -6px;
+      top: 12px;
+      bottom: 12px;
+      width: 12px;
+      height: auto;
+      cursor: ew-resize;
+    }
+    .inline-help-resize-w {
+      left: -6px;
+      top: 12px;
+      bottom: 12px;
+      width: 12px;
+      height: auto;
+      cursor: ew-resize;
+    }
+    .inline-help-resize-ne {
+      top: -6px;
+      right: -6px;
+      cursor: nesw-resize;
+    }
+    .inline-help-resize-nw {
+      top: -6px;
+      left: -6px;
+      cursor: nwse-resize;
+    }
+    .inline-help-resize-se {
+      bottom: -6px;
+      right: -6px;
+      cursor: nwse-resize;
+    }
+    .inline-help-resize-sw {
+      bottom: -6px;
+      left: -6px;
+      cursor: nesw-resize;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -705,6 +873,8 @@ function clampRect(rect: WindowRect): WindowRect {
 function toWindowRect(rect: DOMRect): WindowRect {
   return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
 }
+
+type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 
 function getSnapSideForPoint(x: number, y: number): SnapSide {
   if (x <= SNAP_THRESHOLD) return 'left';
