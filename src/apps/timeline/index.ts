@@ -3,6 +3,7 @@ import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import type { FederatedPointerEvent } from 'pixi.js';
 import { showToast } from '../../core/utils/toast';
 import { InlineHelpWindowManager } from '../../core/inline-help/inline-help-manager';
+import { scaleStyle } from './scale-config';
 
 interface Commit {
   hash: string;
@@ -76,8 +77,6 @@ class TimelineViewer {
   private lockedCommit: Commit | null = null;
   private readonly timelineScaleHeight = 50;
   private readonly timelineChangeMaxHeight = 80;
-  private readonly timelineChangeScaleRightPadding = 12;
-  private readonly timelineChangeScaleRightInset = 12;
   private readonly timelineLineGap = 28;
   private readonly timelineGroupedLineGap = 48;
   private groupGapElement: HTMLElement | null = null;
@@ -1657,13 +1656,21 @@ class TimelineViewer {
     const pxPerSecond = this.timelineScale;
 
     timelineScaleGraphics.clear();
-    const scaleOverlayHeight = scaleHeight + 28;
+    const scaleOverlayHeight = scaleHeight + scaleStyle.topScale.overlayExtraHeight;
     timelineScaleGraphics.rect(0, 0, timelineApp.screen.width, scaleOverlayHeight);
-    timelineScaleGraphics.fill({ color: 0x141414, alpha: 0.92 });
-    timelineScaleGraphics.stroke({ color: 0x2f2f2f, width: 1, alpha: 0.8 });
+    timelineScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
+    timelineScaleGraphics.stroke({
+      color: scaleStyle.panel.borderColor,
+      width: scaleStyle.panel.borderWidth,
+      alpha: scaleStyle.panel.borderAlpha,
+    });
     timelineScaleGraphics.moveTo(0, scaleHeight);
     timelineScaleGraphics.lineTo(timelineApp.screen.width, scaleHeight);
-    timelineScaleGraphics.stroke({ color: 0x7a7a7a, width: 1, alpha: 0.9 });
+    timelineScaleGraphics.stroke({
+      color: scaleStyle.panel.separatorColor,
+      width: scaleStyle.panel.separatorWidth,
+      alpha: scaleStyle.panel.separatorAlpha,
+    });
 
     const unitSelection = this.pickScaleUnits(pxPerSecond);
     const majorStyle = new TextStyle({ fill: 0xf0f0f0, fontSize: 15 });
@@ -1770,17 +1777,25 @@ class TimelineViewer {
     const maxValue = Math.max(maxAdded, maxRemoved, 1);
     const panelWidth = this.getChangeScalePadding(maxValue);
     const panelStartX = Math.max(0, timelineApp.screen.width - panelWidth);
-    const axisX = timelineApp.screen.width - this.timelineChangeScaleRightInset;
+    const axisX = timelineApp.screen.width - scaleStyle.changeScale.axisInset;
     const height = this.timelineChangeMaxHeight;
     const scaleLineYs = this.getChangeScaleLineYs(grouped, lineYs);
 
     timelineChangeScaleGraphics.clear();
     timelineChangeScaleGraphics.rect(panelStartX, 0, panelWidth, timelineApp.screen.height);
-    timelineChangeScaleGraphics.fill({ color: 0x141414, alpha: 0.92 });
-    timelineChangeScaleGraphics.stroke({ color: 0x2f2f2f, width: 1, alpha: 0.8 });
+    timelineChangeScaleGraphics.fill({ color: scaleStyle.panel.fillColor, alpha: scaleStyle.panel.fillAlpha });
+    timelineChangeScaleGraphics.stroke({
+      color: scaleStyle.panel.borderColor,
+      width: scaleStyle.panel.borderWidth,
+      alpha: scaleStyle.panel.borderAlpha,
+    });
     timelineChangeScaleGraphics.moveTo(panelStartX, 0);
     timelineChangeScaleGraphics.lineTo(panelStartX, timelineApp.screen.height);
-    timelineChangeScaleGraphics.stroke({ color: 0x3a3a3a, width: 1, alpha: 0.9 });
+    timelineChangeScaleGraphics.stroke({
+      color: scaleStyle.panel.separatorColor,
+      width: scaleStyle.panel.separatorWidth,
+      alpha: scaleStyle.panel.separatorAlpha,
+    });
 
     if (scaleLineYs.length === 0) {
       this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
@@ -1790,12 +1805,19 @@ class TimelineViewer {
       timelineChangeScaleGraphics.moveTo(axisX, lineY - height);
       timelineChangeScaleGraphics.lineTo(axisX, lineY + height);
     });
-    timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+    timelineChangeScaleGraphics.stroke({
+      color: scaleStyle.changeScale.axisColor,
+      width: scaleStyle.changeScale.axisWidth,
+      alpha: scaleStyle.changeScale.axisAlpha,
+    });
 
     this.timelineChangeTextContainer.removeChildren().forEach(child => child.destroy());
 
     const ticks = [1, 10, 100, 1000, 10000, 100000];
-    const labelStyle = new TextStyle({ fill: 0xcfcfcf, fontSize: 12 });
+    const labelStyle = new TextStyle({
+      fill: scaleStyle.changeScale.labelColor,
+      fontSize: scaleStyle.changeScale.labelFontSize,
+    });
     const valueToHeight = (value: number) => {
       const scaled = Math.log10(1 + value) / Math.log10(1 + maxValue);
       return scaled * height;
@@ -1811,28 +1833,36 @@ class TimelineViewer {
           timelineChangeScaleGraphics.moveTo(0, lineY + offset);
           timelineChangeScaleGraphics.lineTo(panelStartX, lineY + offset);
         }
-        timelineChangeScaleGraphics.moveTo(axisX - 6, lineY - offset);
+        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY - offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY - offset);
-        timelineChangeScaleGraphics.moveTo(axisX - 6, lineY + offset);
+        timelineChangeScaleGraphics.moveTo(axisX - scaleStyle.changeScale.tickSize, lineY + offset);
         timelineChangeScaleGraphics.lineTo(axisX, lineY + offset);
       });
     }
     if (this.config.extendedChangeScaleTicks) {
-      timelineChangeScaleGraphics.stroke({ color: 0x333333, width: 1, alpha: 0.22 });
+      timelineChangeScaleGraphics.stroke({
+        color: scaleStyle.ticks.extended.minor.color,
+        width: scaleStyle.ticks.extended.minor.width,
+        alpha: scaleStyle.ticks.extended.minor.alpha,
+      });
     }
-    timelineChangeScaleGraphics.stroke({ color: 0x8a8a8a, width: 1, alpha: 0.9 });
+    timelineChangeScaleGraphics.stroke({
+      color: scaleStyle.changeScale.axisColor,
+      width: scaleStyle.changeScale.axisWidth,
+      alpha: scaleStyle.changeScale.axisAlpha,
+    });
 
     const labelLineY = scaleLineYs[Math.floor(scaleLineYs.length / 2)] ?? 0;
     for (const tick of ticks) {
       if (tick > maxValue) continue;
       const offset = valueToHeight(tick);
       const labelUp = new Text({ text: `${tick}`, style: labelStyle });
-      labelUp.x = axisX - 8 - labelUp.width;
+      labelUp.x = axisX - scaleStyle.changeScale.labelPad - labelUp.width;
       labelUp.y = labelLineY - offset - labelUp.height / 2;
       this.timelineChangeTextContainer.addChild(labelUp);
 
       const labelDown = new Text({ text: `${tick}`, style: labelStyle });
-      labelDown.x = axisX - 8 - labelDown.width;
+      labelDown.x = axisX - scaleStyle.changeScale.labelPad - labelDown.width;
       labelDown.y = labelLineY + offset - labelDown.height / 2;
       this.timelineChangeTextContainer.addChild(labelDown);
     }
@@ -1866,23 +1896,25 @@ class TimelineViewer {
         continue;
       }
       if (this.config.extendedScaleTicks) {
-        const overlayAlpha = isMajor ? 0.35 : 0.22;
-        const overlayColor = isMajor ? 0x4a4a4a : 0x333333;
+        const overlayStyle = isMajor ? scaleStyle.ticks.extended.major : scaleStyle.ticks.extended.minor;
         timelineScaleGraphics.moveTo(screenX, scaleHeight);
         timelineScaleGraphics.lineTo(screenX, timelineApp.screen.height);
-        timelineScaleGraphics.stroke({ color: overlayColor, width: 1, alpha: overlayAlpha });
+        timelineScaleGraphics.stroke({
+          color: overlayStyle.color,
+          width: overlayStyle.width,
+          alpha: overlayStyle.alpha,
+        });
       }
-      const tickColor = isMajor ? 0x777777 : 0x4b4b4b;
-      const tickAlpha = isMajor ? 0.9 : 0.7;
+      const tickStyle = isMajor ? scaleStyle.ticks.major : scaleStyle.ticks.minor;
       timelineScaleGraphics.moveTo(screenX, scaleHeight);
       timelineScaleGraphics.lineTo(screenX, scaleHeight - lineHeight);
       timelineScaleGraphics.stroke({
-        color: tickColor,
-        width: 1,
-        alpha: tickAlpha,
+        color: tickStyle.color,
+        width: tickStyle.width,
+        alpha: tickStyle.alpha,
       });
       timelineScaleGraphics.rect(screenX - 0.5, scaleHeight - lineHeight, 1, lineHeight);
-      timelineScaleGraphics.fill({ color: tickColor, alpha: tickAlpha });
+      timelineScaleGraphics.fill({ color: tickStyle.color, alpha: tickStyle.alpha });
 
       if (screenX - lastLabelX >= minLabelSpacing) {
         const labelKey = Math.round(screenX);
@@ -2261,8 +2293,8 @@ class TimelineViewer {
       maxTick = tick;
     }
     const estimatedLabelWidth = String(maxTick).length * 7;
-    const tickPadding = 18;
-    return Math.max(this.timelineChangeScaleRightPadding, estimatedLabelWidth + tickPadding);
+    const tickPadding = scaleStyle.changeScale.tickPadding;
+    return Math.max(scaleStyle.changeScale.rightPaddingBase, estimatedLabelWidth + tickPadding);
   }
 
   private getChangeScaleLineYs(grouped: GroupedCommits[], lineYs: number[]): number[] {
