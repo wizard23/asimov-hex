@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { promises as fs } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, relative } from "node:path";
 
 const COVERAGE_DIR = join(process.cwd(), "public/coverage");
 const COVERAGE_DARK_CSS = join(COVERAGE_DIR, "coverage-dark.css");
@@ -285,6 +285,23 @@ const listCssFiles = async (dir: string): Promise<string[]> => {
   return files;
 };
 
+const listHtmlFiles = async (dir: string): Promise<string[]> => {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const files: string[] = [];
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await listHtmlFiles(fullPath)));
+    } else if (entry.isFile() && entry.name.endsWith(".html")) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+};
+
+const relativeTo = (fromFile: string, toFile: string) =>
+  relative(dirname(fromFile), toFile).replace(/\\/g, "/");
+
 const run = async () => {
   try {
     await fs.stat(COVERAGE_DIR);
@@ -304,6 +321,20 @@ const run = async () => {
     const css = await fs.readFile(cssFile, "utf8");
     const transformed = transformCss(css);
     await fs.writeFile(cssFile, transformed, "utf8");
+  }
+
+  const htmlFiles = await listHtmlFiles(COVERAGE_DIR);
+  for (const htmlFile of htmlFiles) {
+    const html = await fs.readFile(htmlFile, "utf8");
+    if (html.includes("coverage-dark.css")) {
+      continue;
+    }
+    const relPath = relativeTo(htmlFile, COVERAGE_DARK_CSS);
+    const updated = html.replace(
+      /<\/head>/i,
+      `  <link rel="stylesheet" href="${relPath}">\n</head>`,
+    );
+    await fs.writeFile(htmlFile, updated, "utf8");
   }
 };
 
