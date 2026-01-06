@@ -1,5 +1,32 @@
 [
   {
+    "hash": "c38f596cce127f9277acf349088e42a3b770ed69",
+    "timestamp": 1767705449,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: extract automated refresh command to dedicated shell script\n- move 'commit-refresh-generated' logic from package.json to scripts/commit-refresh-generated.sh\n- add safety check to abort execution if staged changes are present\n- use bash script for better readability and error handling (set -euo pipefail)",
+    "addedLines": 21,
+    "removedLines": 1
+  },
+  {
+    "hash": "3806487fef2fa834920492adac31c21c3e6887de",
+    "timestamp": 1767704473,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add test coverage reporting with v8 and vitest\n- add @vitest/coverage-v8 dependency\n- configure vitest coverage provider to v8 and output to ./public/coverage\n- add test-coverage npm script\n- update commit-refresh-generated script to include test coverage generation and stage coverage directory",
+    "addedLines": 683,
+    "removedLines": 1
+  },
+  {
+    "hash": "f696a3ecd8d213068319ae49fb5ca9ea12e613fb",
+    "timestamp": 1767704219,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: refresh project statistics, timeline, and Vitest code coverage",
+    "addedLines": 54281,
+    "removedLines": 0
+  },
+  {
     "hash": "14bad44cd70c7f1ff4cf4f0ca0eb4543fa759513",
     "timestamp": 1767683661,
     "authorName": "Philipp Tiefenbacher",
