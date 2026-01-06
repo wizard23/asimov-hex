@@ -18,6 +18,7 @@ type DisplayMode = 'List' | 'Timeline';
 type ScaleUnit = 'decade' | 'year' | 'month' | 'day' | 'hour' | 'tenMinute' | 'minute';
 type GroupBy = 'None' | 'Day' | 'Week' | 'Month' | 'Year';
 type LeftPanMode = 'Time Axis Only' | 'Naive Combined' | 'Direction-lock on drag start' | 'Dead-zone + axis snapping';
+type LockedCommitCentering = 'None' | 'Horizontal' | 'Vertical' | 'Both';
 
 interface GroupedCommits {
   key: string;
@@ -115,6 +116,7 @@ class TimelineViewer {
     leftPanMode: 'Direction-lock on drag start' as LeftPanMode,
     showPerformanceMonitor: true,
     showProfilerOverlay: true,
+    lockedCommitCentering: 'Both' as LockedCommitCentering,
   };
 
   constructor() {
@@ -278,6 +280,16 @@ class TimelineViewer {
       min: 0,
       max: 1,
       step: 0.01,
+    });
+
+    this.pane.addBinding(this.config, 'lockedCommitCentering', {
+      label: 'Locked Commit Centering',
+      options: {
+        '(None)': 'None',
+        'Horizontal': 'Horizontal',
+        'Vertical': 'Vertical',
+        'Both': 'Both',
+      },
     });
 
     this.pane.addBinding(this.config, 'showPerformanceMonitor', {
@@ -1279,6 +1291,7 @@ class TimelineViewer {
   }
 
   private centerOnCommitData(commit: Commit) {
+    if (this.config.lockedCommitCentering === 'None') return;
     if (!this.timelineApp) return;
     const grouped = this.getGroupedCommits();
     const lineOffsets = this.getLineOffsets(grouped.length);
@@ -1301,6 +1314,7 @@ class TimelineViewer {
   }
 
   private centerOnScreenPoint(screenX: number, screenY: number) {
+    if (this.config.lockedCommitCentering === 'None') return;
     const dx = this.timelineViewportCenter.x - screenX;
     const targetViewOffsetX = this.timelineViewOffset.x + dx;
     let targetGroupScrollOffsetY = this.timelineGroupScrollOffsetY;
@@ -1317,7 +1331,10 @@ class TimelineViewer {
       );
     }
 
-    this.animateToOffsets(targetViewOffsetX, targetGroupScrollOffsetY);
+    const centeringMode = this.config.lockedCommitCentering;
+    const nextX = centeringMode === 'Vertical' ? this.timelineViewOffset.x : targetViewOffsetX;
+    const nextY = centeringMode === 'Horizontal' ? this.timelineGroupScrollOffsetY : targetGroupScrollOffsetY;
+    this.animateToOffsets(nextX, nextY);
   }
 
   private animateToOffsets(targetViewOffsetX: number, targetGroupScrollOffsetY: number) {

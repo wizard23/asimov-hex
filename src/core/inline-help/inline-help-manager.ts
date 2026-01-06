@@ -649,6 +649,7 @@ function ensureStyles(): void {
       inset: 0;
       pointer-events: none;
       font-family: inherit;
+      z-index: 2000;
     }
     .inline-help-window {
       position: absolute;
