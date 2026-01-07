@@ -118,7 +118,61 @@ For each color that appears in the themed css please add a comment with which ap
 That's quite good already. Lets try a slight modification. Use the HSL color space instead of HSV for the "pseudo invert" and invert the Lightness please :)
 
 
-Wow! That works really well! Now we just have to fix some misclassifications. 
+Wow! That works really well! 
+
+Now we just have to fix some misclassifications: 
+* high
+* medium
+* low 
+should be treated as traffic-light coded class. 
+
+
+Let's try something else: We don't need to distinguish between traffic light colors and others! Please just use the HSL "pseudo invert" for everything :)
+
+
+Looks great! 
+Now for some specific fixes: you forgot the "pln" class that is styled in public/coverage/prettify.css
+Please go through every css file under public/coverage and make sure that every color is "pseudo inverted".
+
+
+The script seems to have a bug. I get this output when I run it:
+
+wizard23@DESKTOP-QT8A32B:~/projects/asimov/asimov-hex/asimov-hex$ npm run post-process-test-coverage 
+
+> asimov-hex@1.0.0 post-process-test-coverage
+> ./scripts/post-process-test-coverage.sh
+
+node:fs:441
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '-'
+    at Object.readFileSync (node:fs:441:20)
+    at [stdin]:3:16
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [stdin]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_stdin:53:5
+    at Socket.<anonymous> (node:internal/process/execution:201:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '-'
+}
+
+Node.js v22.19.0
+
+
+Since it now uses node please convert it to typescript.
+Please have a look at the npm script "re-create-git-timeline" and the corresponding script scripts/re-create-git-timeline.ts as an example of how to use typescript for scripts in this project.
+
+Are you sure that the new script does the same thing as the old script? when I run it not a single html file gets touched.
+
+
+
 
 
 .__disabled__ { /* START CSS "block comment" */

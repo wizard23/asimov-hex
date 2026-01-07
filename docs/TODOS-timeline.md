@@ -1736,27 +1736,29 @@ please remove the debug colors we introduced for debugging the top and change sc
 
 Please add a hotkey C for "Center View". 
 
+
+
+
 "Center View" when "Group By" is active should change a bit:
 If no commit is locked it should center the last group.
 Else it should center the group that contains the locked commit.
 
 
 
+On the initial page load how is the View determined? Is "Center View" called?
 
 
-When grouping is not active Ce
-
-
-
-
-
-
-
+I see that resetTimelineView is also called in centerTimelineView.
+Please describe what each function does exactly:
+* resetTimelineView
+* centerTimelineView
 
 
 
+Please call centerTimelineView on the initial load
 
 
+How is the font size/style of the tick labels for the top scale determined?
 
 
 
