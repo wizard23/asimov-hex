@@ -118,7 +118,7 @@ const replaceColors = (value: string) => {
   });
 
   output = output.replace(/rgba?\(([^)]+)\)/gi, (match, inner) => {
-    const parts = inner.split(",").map((part) => part.trim());
+    const parts = inner.split(",").map((part: string) => part.trim());
     if (parts.length < 3) return match;
     const toChannel = (raw: string) => {
       if (raw.endsWith("%")) {
