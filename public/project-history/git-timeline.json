@@ -1,5 +1,176 @@
 [
   {
+    "hash": "0c22dba00610a8974bf05415e52575074eabd443",
+    "timestamp": 1767744438,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update todo lists and documentation for screenshot tool, tests, and timeline\n- add library availability and visual appearance specs to screenshot bookmarklet tool todos\n- specify detailed templating and selection rules for screenshot tool elements\n- update test todos with feedback on coverage post-processing script bugs and requested typescript migration\n- document requested behavior for timeline centering and scale tick styling",
+    "addedLines": 101,
+    "removedLines": 21
+  },
+  {
+    "hash": "2451d0cd2056de6ecf5fdf19c395c0292cecdf79",
+    "timestamp": 1767744055,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "bugfix: implement HTML injection in coverage post-processing script\n- add recursive HTML file discovery in coverage directory\n- inject coverage-dark.css link into all report pages\n- ensure relative paths are correctly calculated for CSS links\n- prevents missing dark theme on sub-pages of the coverage report",
+    "addedLines": 32,
+    "removedLines": 1
+  },
+  {
+    "hash": "707f837bd721ff85380f29520401e26dd87a0edc",
+    "timestamp": 1767743114,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "buggy: refactor: convert coverage post-processing script to TypeScript\n- replace scripts/post-process-test-coverage.sh with scripts/post-process-test-coverage.ts\n- rewrite color inversion logic in TypeScript using fs/promises and path utilities\n- update package.json to execute the new script using tsx\n- remove bash-specific mapfile and perl dependencies for better portability\n- ensures consistent HSL lightness inversion for all generated coverage CSS files",
+    "addedLines": 316,
+    "removedLines": 320
+  },
+  {
+    "hash": "099e6cb851937513706d7cf190470f26a89c3a16",
+    "timestamp": 1767740299,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: tweak scale label font sizes and colors",
+    "addedLines": 7,
+    "removedLines": 5
+  },
+  {
+    "hash": "e4949ef445e03e55eeea3644fa43bdce21ebb7e3",
+    "timestamp": 1767739603,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: improve timeline centering logic and default grouping\n- implement centerTimelineView to handle vertical alignment when grouping is active\n- center on the locked commit's group or the most recent group by default\n- change default groupBy setting to 'None'\n- use improved centering for initialization, 'C' hotkey, and UI button",
+    "addedLines": 38,
+    "removedLines": 7
+  },
+  {
+    "hash": "bf4b68e34ba66baf811e9121e968791ff5ddc457",
+    "timestamp": 1767735775,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: automated dark mode generation for coverage report\n- replace manual CSS overrides with a Node.js script that parses and inverts HSL lightness of existing CSS files\n- ensures all coverage styles (including syntax highlighting) are automatically adapted to dark mode without manual maintenance\n- updates coverage-dark.css generation to only set the color-scheme property\n- injects the generated dark theme into all coverage HTML files",
+    "addedLines": 275,
+    "removedLines": 124
+  },
+  {
+    "hash": "6ba66d8c757047c1d33ac55e7dff1afd8b1c60cc",
+    "timestamp": 1767734286,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: rewrite coverage post-processing to manual CSS override\n- remove unstable global invert filter approach\n- implement comprehensive manual dark theme overrides for istanbul-reports HTML output\n- add styles for missing elements: table rows, skipped branches, neutral lines, and fraction labels\n- normalize colors using HSL L-flip logic for consistent dark mode appearance",
+    "addedLines": 60,
+    "removedLines": 38
+  },
+  {
+    "hash": "4e4c8177d12c80c747405f313c994f11b9254668",
+    "timestamp": 1767729666,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: adjust coverage dark theme colors for better visibility\n- switch color derivation logic from HSV V-flip to HSL L-flip approximations\n- ensure brighter indicators for better readability against dark backgrounds\n- update comments to reflect the new color derivation approach",
+    "addedLines": 36,
+    "removedLines": 21
+  },
+  {
+    "hash": "fd00645acdf62a643715e73ef7eff3bc8a4e565e",
+    "timestamp": 1767729355,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: improve contrast and visibility of coverage status colors in dark theme\n- manually override pseudo-inverted background colors for high/medium/low coverage status elements\n- ensure text color contrast against dark backgrounds for coverage metrics\n- add comprehensive re-invert selectors for charts, status lines, and branch indicators",
+    "addedLines": 91,
+    "removedLines": 11
+  },
+  {
+    "hash": "4ab85d1fc02d51f015cb4da56430049c7c93ec94",
+    "timestamp": 1767728068,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: implement filter-based dark theme for test coverage\n- switch to global invert filter approach in post-processing script\n- add documentation for the dark theme implementation strategy in docs/system-description\n- re-invert semantic coverage classes to preserve red/yellow/green colors\nhuman: document vitest coverage post-processing task and strategy",
+    "addedLines": 91,
+    "removedLines": 45
+  },
+  {
+    "hash": "b283a00f17b433d7576975e3c7b6cc97c7b3c8ae",
+    "timestamp": 1767724603,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: clean up and rename commit scripts in package.json\n- remove obsolete commit-from-file-old script\n- rename commit-from-file-ext to commit-from-file-automated for better clarity on its purpose",
+    "addedLines": 1,
+    "removedLines": 2
+  },
+  {
+    "hash": "6f2c52ba281d93c0f1889cb2d5e44f40af9c5436",
+    "timestamp": 1767724283,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: update todo lists and documentation from recent sessions\n- add initial specs for screenshot bookmarklet tool\n- create TODOS-tests.md with notes on vitest coverage implementation\n- create TODOS-ideas.md and TODOS-shared-local-storage.md\n- update chats, commit-messages, statistics, and timeline todos with recent progress\n- archive screenshots for extended change scale bug in docs/bugs/extended-change-scale-bug/",
+    "addedLines": 266,
+    "removedLines": 2
+  },
+  {
+    "hash": "f1398927e5d58e3e4cb26c5d2579fed7105d0337",
+    "timestamp": 1767723112,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add dark mode post-processing for test coverage reports\n- create scripts/post-process-test-coverage.sh to generate and inject dark theme CSS\n- add coverage-dark.css with dark backgrounds and adjusted status colors\n- add npm scripts to automate coverage generation and styling",
+    "addedLines": 87,
+    "removedLines": 0
+  },
+  {
+    "hash": "e1ae40c51689d2d284f1680227e15fc230498a67",
+    "timestamp": 1767722380,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: add external link indicators to dashboard\n- append '↗' symbol to Test Coverage and User Manual links in the main app dashboard\n- standardizes visual cue for links opening in new tabs",
+    "addedLines": 2,
+    "removedLines": 2
+  },
+  {
+    "hash": "e2854a21e9d9fe995cd58be867d941141ed3c488",
+    "timestamp": 1767722141,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add hotkey to center timeline view\n- implement 'C' key handler to reset timeline viewport to the most recent commit\n- update gesture hints sidebar to include the new hotkey\n- ensure hotkey is only active in timeline mode",
+    "addedLines": 9,
+    "removedLines": 0
+  },
+  {
+    "hash": "647a25cd04698b8edd2ba4bb284120013bfe9d83",
+    "timestamp": 1767720819,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "add test coverage report link to main app dashboard\n- add link to 'coverage/index.html' in the meta apps section of the main landing page\n- ensure link opens in a new tab with secure rel attributes",
+    "addedLines": 7,
+    "removedLines": 0
+  },
+  {
+    "hash": "81c9e75ec3cb04242b897a4ef5ee91b2ab6ca2a5",
+    "timestamp": 1767706801,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: improve status output in refresh script\n- replace raw porcelain output echo with colored `git status --short` for better readability when generated directories are dirty\n- comment out the old echo statement instead of removing it (for reference)",
+    "addedLines": 3,
+    "removedLines": 1
+  },
+  {
+    "hash": "cb6cb698fecdce2a061aad18c5af6487c2d3ae44",
+    "timestamp": 1767706421,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: add safety checks to refresh generation script\n- add --enforce-clean-repo flag to optionally ensure working tree is clean\n- pre-check generated directories for existing changes to avoid partial or mixed commits\n- abort early if target paths are dirty to prevent accidental inclusions",
+    "addedLines": 15,
+    "removedLines": 0
+  },
+  {
+    "hash": "a9c044c29d3bfe62075454609c78932170284f5e",
+    "timestamp": 1767705462,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: refresh project statistics, timeline, and Vitest code coverage",
+    "addedLines": 814,
+    "removedLines": 53
+  },
+  {
     "hash": "c38f596cce127f9277acf349088e42a3b770ed69",
     "timestamp": 1767705449,
     "authorName": "Philipp Tiefenbacher",
