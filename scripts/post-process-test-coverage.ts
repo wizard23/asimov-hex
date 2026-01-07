@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { promises as fs } from "node:fs";
 import { dirname, join, relative } from "node:path";
+import { Hsluv } from "hsluv";
 
 const COVERAGE_DIR = join(process.cwd(), "public/coverage");
 const COVERAGE_DARK_CSS = join(COVERAGE_DIR, "coverage-dark.css");
@@ -98,7 +99,79 @@ const hslToRgb = (h: number, s: number, l: number) => {
   };
 };
 
-const invertRgb = (r: number, g: number, b: number) => {
+type InvertAlgorithm = "hsluv" | "hsl" | "hsv";
+
+const rgbToHsv = (r: number, g: number, b: number) => {
+  const rr = r / 255;
+  const gg = g / 255;
+  const bb = b / 255;
+  const max = Math.max(rr, gg, bb);
+  const min = Math.min(rr, gg, bb);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    switch (max) {
+      case rr:
+        h = (gg - bb) / d + (gg < bb ? 6 : 0);
+        break;
+      case gg:
+        h = (bb - rr) / d + 2;
+        break;
+      case bb:
+        h = (rr - gg) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  const s = max === 0 ? 0 : d / max;
+  return { h, s, v: max };
+};
+
+const hsvToRgb = (h: number, s: number, v: number) => {
+  if (s === 0) {
+    const val = Math.round(v * 255);
+    return { r: val, g: val, b: val };
+  }
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  const mod = i % 6;
+  const map = [
+    [v, t, p],
+    [q, v, p],
+    [p, v, t],
+    [p, q, v],
+    [t, p, v],
+    [v, p, q],
+  ][mod];
+  return {
+    r: Math.round(map[0] * 255),
+    g: Math.round(map[1] * 255),
+    b: Math.round(map[2] * 255),
+  };
+};
+
+const invertRgb = (r: number, g: number, b: number, algorithm: InvertAlgorithm) => {
+  if (algorithm === "hsv") {
+    const { h, s, v } = rgbToHsv(r, g, b);
+    return hsvToRgb(h, s, 1 - v);
+  }
+  if (algorithm === "hsluv") {
+    const converter = new Hsluv();
+    converter.rgb_r = r / 255;
+    converter.rgb_g = g / 255;
+    converter.rgb_b = b / 255;
+    converter.rgbToHsluv();
+    converter.hsluv_l = 100 - converter.hsluv_l;
+    converter.hsluvToRgb();
+    return {
+      r: Math.round(converter.rgb_r * 255),
+      g: Math.round(converter.rgb_g * 255),
+      b: Math.round(converter.rgb_b * 255),
+    };
+  }
   const { h, s, l } = rgbToHsl(r, g, b);
   return hslToRgb(h, s, 1 - l);
 };
@@ -106,13 +179,13 @@ const invertRgb = (r: number, g: number, b: number) => {
 const toHex = (r: number, g: number, b: number) =>
   `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 
-const replaceColors = (value: string) => {
+const replaceColors = (value: string, algorithm: InvertAlgorithm) => {
   let output = value;
 
   output = output.replace(/#([0-9a-fA-F]{3,8})\b/g, (match, hex) => {
     const parsed = parseHexColor(hex);
     if (!parsed) return match;
-    const inverted = invertRgb(parsed.r, parsed.g, parsed.b);
+    const inverted = invertRgb(parsed.r, parsed.g, parsed.b, algorithm);
     const rgbHex = toHex(inverted.r, inverted.g, inverted.b);
     return parsed.a ? `${rgbHex}${parsed.a}` : rgbHex;
   });
@@ -134,7 +207,7 @@ const replaceColors = (value: string) => {
     const g = toChannel(parts[1]);
     const b = toChannel(parts[2]);
     if (r === null || g === null || b === null) return match;
-    const inverted = invertRgb(r, g, b);
+    const inverted = invertRgb(r, g, b, algorithm);
     const alpha = parts[3] !== undefined ? parts[3].trim() : null;
     if (alpha !== null) {
       return `rgba(${inverted.r}, ${inverted.g}, ${inverted.b}, ${alpha})`;
@@ -148,7 +221,7 @@ const replaceColors = (value: string) => {
       const key = match.toLowerCase();
       const rgb = namedColors[key];
       if (!rgb) return match;
-      const inverted = invertRgb(rgb[0], rgb[1], rgb[2]);
+      const inverted = invertRgb(rgb[0], rgb[1], rgb[2], algorithm);
       return toHex(inverted.r, inverted.g, inverted.b);
     },
   );
@@ -156,7 +229,7 @@ const replaceColors = (value: string) => {
   return output;
 };
 
-const transformCss = (css: string) => {
+const transformCss = (css: string, algorithm: InvertAlgorithm) => {
   let out = "";
   let inComment = false;
   let inString: string | null = null;
@@ -226,14 +299,14 @@ const transformCss = (css: string) => {
         continue;
       }
       if (ch === ";") {
-        out += replaceColors(valueBuffer);
+        out += replaceColors(valueBuffer, algorithm);
         out += ch;
         inValue = false;
         valueBuffer = "";
         continue;
       }
       if (ch === "}") {
-        out += replaceColors(valueBuffer);
+        out += replaceColors(valueBuffer, algorithm);
         out += ch;
         inValue = false;
         valueBuffer = "";
@@ -265,7 +338,7 @@ const transformCss = (css: string) => {
   }
 
   if (inValue && valueBuffer) {
-    out += replaceColors(valueBuffer);
+    out += replaceColors(valueBuffer, algorithm);
   }
 
   return out;
@@ -302,7 +375,22 @@ const listHtmlFiles = async (dir: string): Promise<string[]> => {
 const relativeTo = (fromFile: string, toFile: string) =>
   relative(dirname(fromFile), toFile).replace(/\\/g, "/");
 
+const parseAlgorithm = (args: string[]): InvertAlgorithm => {
+  const algoArg = args.find((arg) => arg.startsWith("--algo=") || arg.startsWith("--algorithm="));
+  const indexArg = args.findIndex((arg) => arg === "--algo" || arg === "--algorithm");
+  const value =
+    (algoArg ? algoArg.split("=", 2)[1] : undefined) ?? (indexArg >= 0 ? args[indexArg + 1] : undefined);
+  if (!value) return "hsluv";
+  const normalized = value.toLowerCase();
+  if (normalized === "hsluv" || normalized === "hsl" || normalized === "hsv") {
+    return normalized as InvertAlgorithm;
+  }
+  console.warn(`Unknown algorithm "${value}", falling back to "hsluv".`);
+  return "hsluv";
+};
+
 const run = async () => {
+  const algorithm = parseAlgorithm(process.argv.slice(2));
   try {
     await fs.stat(COVERAGE_DIR);
   } catch (error) {
@@ -319,7 +407,7 @@ const run = async () => {
   for (const cssFile of cssFiles) {
     if (cssFile === COVERAGE_DARK_CSS) continue;
     const css = await fs.readFile(cssFile, "utf8");
-    const transformed = transformCss(css);
+    const transformed = transformCss(css, algorithm);
     await fs.writeFile(cssFile, transformed, "utf8");
   }
 
