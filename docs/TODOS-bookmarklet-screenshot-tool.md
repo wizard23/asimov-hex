@@ -1,6 +1,8 @@
 # Instructions
 Please create a js bookmarklet app for the purpose specified below. 
 
+TODO: browser plugin is probably more realistic :)
+
 ## Coding Standards
 The bookmarklet is quite extensive and bookmarklets are notoriously hard to debug so it's very important that the code follows these conventions meticulously:
 * multiline, human readable
@@ -80,12 +82,14 @@ Use the current Date for <LABEL> and <DAY> and then replace the templates like t
 ## Taking the screenshots
 When the user clicks the "Take Screenshot" button then the way the screenshot is taken is dependent on what "Screenshot Type" is selected
 
-###
 
+
+###
 
 
 * Show a Label counting down the ammount of seconds that was entered in the "Delay" input.
 Depending on the option the user selected
+
 
 
 

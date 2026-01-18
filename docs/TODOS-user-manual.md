@@ -101,6 +101,12 @@ No this does not look good. Please put it back to the other links but give it it
 
 
 
+better
+coordinates where applicable
+
+ad screenshots for all dialogs
+
+
 ## UNUSED
 
 ## Overview

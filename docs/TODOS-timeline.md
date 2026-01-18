@@ -1763,7 +1763,16 @@ How is the font size/style of the tick labels for the top scale determined?
 
 
 
+scrollwheel for rauf runter?
+shift scrollwheel for zoom?
+configurable?
 
+Wie Left Pan:
+* Scrollwheel
+* Strg + Scrollwheel
+* Alt + Scrollwheel
+* Shift + Scrollwheel
+* ...
 
 
 

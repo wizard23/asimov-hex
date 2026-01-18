@@ -172,6 +172,28 @@ Please have a look at the npm script "re-create-git-timeline" and the correspond
 Are you sure that the new script does the same thing as the old script? when I run it not a single html file gets touched.
 
 
+The script now works as expected and it is really good already!
+To make it perfect: 
+Please add the possibility to use different algorithms for "inverting" the colors by passing command line args to the script. 
+For now please implement these 
+* the existing HSV implementation
+* please add a new algorithm using the same idea but using the HSLuv color space instead of HSL (use this as default if no cmd line args are passed)
+
+Info about HSLuv color space:
+* https://www.hsluv.org/
+* Library to use: https://github.com/hsluv/hsluv-javascript
+
+
+The new coorspace selection works very well! Thank you!
+Does this use the latest hsluv library version?
+
+
+
+Please add flags for 
+* --run-code-coverage
+* --post-process
+
+
 
 
 

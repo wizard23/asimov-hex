@@ -54,8 +54,7 @@ Please put the commit message in this file:
 
 
 ## no fancy labels (relative dir)
-Please look at the staged changes in the repo in: 
-./asimov-hex/asimov-hex
+Please look at the staged changes in the repo.
 Then create a commit message from that information. 
 
 * If you need more information to create the commit message you can look at the files that got changed or other related files.
@@ -68,7 +67,7 @@ Then create a commit message from that information.
 * Don't put empty lines in the commit messages.
 
 Please put the commit message in this file: 
-./asimov-hex/asimov-hex/temp/commit-message.txt
+./temp/commit-message.txt
 
 If you need to create temporary files (diffs, etc.) please name them accordingly (something like gemini-temp-<what it is>.<ext>) and also put them in the temp folder so they don't clutter the repo.
 
@@ -122,7 +121,7 @@ please explain why you wrote this in the commit message:
 
 
 ## after changes
-Please give me a concise commit message for the changes we made now in the script.
+Please give me a commit message for the changes we made now in the script.
 Please put the commit message in this file: 
 ./temp/commit-message.txt
 
