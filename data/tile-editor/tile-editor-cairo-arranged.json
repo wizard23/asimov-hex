@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "config": {
+    "numSides": 7,
+    "sideLengthExpression": "1",
+    "edgeWidth": 2,
+    "closedPolygonEpsilon": 0.0001,
+    "constantsText": "",
+    "drawAxes": true,
+    "axesColor": "#444444",
+    "axesLineWidth": 1
+  },
+  "descriptions": [
+    {
+      "id": "desc_1",
+      "sides": 4,
+      "sideLengthExpressions": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "interiorAngleExpressions": [
+        "(2 / 4) * PI",
+        "(2 / 4) * PI",
+        "(2 / 4) * PI",
+        "(2 / 4) * PI"
+      ]
+    },
+    {
+      "id": "desc_2",
+      "sides": 4,
+      "sideLengthExpressions": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "interiorAngleExpressions": [
+        "(2 / 4) * PI",
+        "(2 / 4) * PI",
+        "(2 / 4) * PI",
+        "(2 / 4) * PI"
+      ]
+    },
+    {
+      "id": "desc_3",
+      "sides": 6,
+      "sideLengthExpressions": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "interiorAngleExpressions": [
+        "150,deg",
+        "?",
+        "60,deg",
+        "?",
+        "?",
+        "60,deg"
+      ]
+    },
+    {
+      "id": "desc_4",
+      "sides": 5,
+      "sideLengthExpressions": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "interiorAngleExpressions": [
+        "?",
+        "?",
+        "90,d",
+        "?",
+        "90,d"
+      ]
+    },
+    {
+      "id": "desc_5",
+      "sides": 5,
+      "sideLengthExpressions": [
+        "sqrt(3)-1",
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "interiorAngleExpressions": [
+        "?",
+        "?",
+        "90,d",
+        "?",
+        "90,d"
+      ]
+    }
+  ],
+  "instances": [
+    {
+      "descriptionId": "desc_1",
+      "x": -2.750978354361899,
+      "y": -1.4674706998617604,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_2",
+      "x": -3.7456970929541225,
+      "y": 0.36068181055012505,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_3",
+      "x": -5.531424545925322,
+      "y": -0.6573985271218588,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_4",
+      "x": 4.03195015427839,
+      "y": -2.2649493399766403,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_4",
+      "x": 4.610932779558581,
+      "y": 0.9604278317671429,
+      "rotationExpression": "180,d"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": 0.4347039179496911,
+      "y": -0.5992353461137244,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_4",
+      "x": 5.005200421954516,
+      "y": -0.8525956801735167,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": -0.2991477967071101,
+      "y": -1.7342389127414253,
+      "rotationExpression": "(180-30-30),d"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": 1.071758253160921,
+      "y": -1.7857133707092292,
+      "rotationExpression": "(180+60),d"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": -0.8386894143278029,
+      "y": 2.411438041610924,
+      "rotationExpression": "(180),d"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": -1.9927069418993935,
+      "y": 1.7948639829821555,
+      "rotationExpression": "(90),d"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": -0.8408469552161383,
+      "y": 1.1241879942678021,
+      "rotationExpression": "0"
+    },
+    {
+      "descriptionId": "desc_5",
+      "x": 0.29638410089443334,
+      "y": 1.780927893278252,
+      "rotationExpression": "(-90),d"
+    }
+  ]
+}
