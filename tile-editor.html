@@ -61,14 +61,11 @@
     }
     #editor-panel {
       flex: 1;
-      padding: 20px;
+      padding: 0;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-    }
-    #editor-panel h2 {
-      margin-bottom: 0;
-      color: #fff;
+      position: relative;
     }
     .section-header {
       display: flex;
@@ -174,7 +171,19 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
-      margin-top: 20px;
+    }
+    #values-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      pointer-events: none;
+      padding: 20px;
+    }
+    #values-overlay .section-header,
+    #values-overlay .value-display {
+      pointer-events: auto;
     }
     #pixi-container {
       flex: 1;
@@ -195,16 +204,15 @@
     <div id="content">
       <div id="tweakpane-container"></div>
       <div id="editor-panel">
-        <div class="section-header">
-          <h2>Current Values</h2>
-          <button id="toggle-values" aria-label="Toggle values display">▼</button>
+        <div id="values-overlay">
+          <div class="section-header">
+            <button id="toggle-values" aria-label="Toggle values display">▼</button>
+          </div>
+          <div id="values-display" class="value-display">
+            <!-- Values will be injected here -->
+          </div>
         </div>
-        <div id="values-display" class="value-display">
-          <!-- Values will be injected here -->
-        </div>
-        
         <div class="canvas-section">
-          <h2>Unit Cell Editor</h2>
           <div id="pixi-container"></div>
         </div>
       </div>
