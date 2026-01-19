@@ -98,7 +98,7 @@
     }
     .values-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: auto auto auto auto;
       gap: 10px;
     }
     .values-column {
@@ -108,6 +108,12 @@
       padding: 10px;
       min-width: 0;
     }
+    .values-column-compact {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 6px;
+    }
     .column-header {
       color: #fff;
       font-weight: 600;
@@ -115,6 +121,9 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
       margin-bottom: 6px;
+    }
+    .values-column-compact .column-header {
+      grid-column: 1 / -1;
     }
     .value-display.collapsed {
       max-height: 0;
@@ -130,17 +139,23 @@
       align-items: baseline;
       gap: 8px;
     }
+    .values-column-compact .value-row {
+      display: contents;
+    }
     .value-row:last-child {
       margin-bottom: 0;
     }
     .value-label {
-      width: 110px;
+      width: 150px;
       color: #aaa;
       font-weight: 600;
       text-transform: uppercase;
       font-size: 12px;
       letter-spacing: 0.5px;
-      flex: 0 0 auto;
+      align-self: baseline;
+    }
+    .values-column-compact .value-label {
+      width: auto;
     }
     .value-content {
       font-family: monospace;
@@ -149,6 +164,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      align-self: baseline;
     }
     .error {
       color: #ff6b6b;

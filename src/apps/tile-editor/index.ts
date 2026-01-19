@@ -393,11 +393,11 @@ class TileEditor {
           <div class="column-header">Polygon Info</div>
           ${polygonInfoDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
         </div>
-        <div class="values-column">
+        <div class="values-column values-column-compact">
           <div class="column-header">Side Lengths</div>
           ${polygonSidesDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
         </div>
-        <div class="values-column">
+        <div class="values-column values-column-compact">
           <div class="column-header">Angles</div>
           ${polygonAnglesDisplay || '<div class="value-row"><div class="value-content">No polygon selected</div></div>'}
         </div>
