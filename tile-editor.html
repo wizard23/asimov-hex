@@ -80,7 +80,11 @@
       font-size: 16px;
       cursor: pointer;
       transition: transform 0.2s;
-      padding: 5px;
+      padding: 2px;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      z-index: 4;
     }
     #toggle-values.collapsed {
       transform: rotate(-90deg);
@@ -204,7 +208,7 @@
       pointer-events: none;
       padding: 20px;
     }
-    #values-overlay .section-header,
+    #values-overlay #toggle-values,
     #values-overlay .value-display {
       pointer-events: auto;
     }
@@ -228,9 +232,7 @@
       <div id="tweakpane-container"></div>
       <div id="editor-panel">
         <div id="values-overlay">
-          <div class="section-header">
-            <button id="toggle-values" aria-label="Toggle values display">▼</button>
-          </div>
+          <button id="toggle-values" aria-label="Toggle values display">▤</button>
           <div id="values-display" class="value-display">
             <!-- Values will be injected here -->
           </div>
