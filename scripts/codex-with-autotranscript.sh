@@ -31,9 +31,9 @@ SANITIZED_LABEL="$(printf '%s' "$RAW_LABEL" | tr -cs 'A-Za-z0-9-_' '_' | sed 's/
 TIMESTAMP="$(date +%F-%H%M)"
 RESUME_SUFFIX=""
 if [ -n "$SESSION_ID" ]; then
-  RESUME_SUFFIX="-resumed-from-$SESSION_ID"
+  RESUME_SUFFIX="--resumed-from-$SESSION_ID"
 fi
-OUT_FILE="$TRANSCRIPT_DIR/codex-$SANITIZED_LABEL-$TIMESTAMP$RESUME_SUFFIX.log"
+OUT_FILE="$TRANSCRIPT_DIR/codex--$TIMESTAMP--$SANITIZED_LABEL$RESUME_SUFFIX.log"
 
 # Ensure output directory exists
 mkdir -p "$TRANSCRIPT_DIR"
