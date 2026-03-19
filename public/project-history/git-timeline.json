@@ -1,5 +1,221 @@
 [
   {
+    "hash": "d5261037295aea3a9a207ff8682314082c8086a7",
+    "timestamp": 1773938664,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update document-current-system.md",
+    "addedLines": 5,
+    "removedLines": 1
+  },
+  {
+    "hash": "55ae2f74f5a5177113d45a7c171d09a1c1907333",
+    "timestamp": 1773938509,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+git@gmail.com",
+    "message": "Add files via upload",
+    "addedLines": 48,
+    "removedLines": 1
+  },
+  {
+    "hash": "fb61593c8bb4124ff54bd787bd4c20a30eb9ba1e",
+    "timestamp": 1773938416,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update and rename verify,md to verify.md",
+    "addedLines": 2,
+    "removedLines": 1
+  },
+  {
+    "hash": "80db3a053edbe38b89caa2eb462a5876b743ce9a",
+    "timestamp": 1773938319,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Delete docs/flows/refactor,md",
+    "addedLines": 0,
+    "removedLines": 0
+  },
+  {
+    "hash": "1aac0fe371343d061be728908ba1fbcfb6fc0f61",
+    "timestamp": 1773938284,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Rename add-feature.md to _deprecated_add-feature.md",
+    "addedLines": 1,
+    "removedLines": 1
+  },
+  {
+    "hash": "6a5cb0aa1560243b4476ef463a10f3a621b621bb",
+    "timestamp": 1773932092,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update README.md",
+    "addedLines": 2,
+    "removedLines": 0
+  },
+  {
+    "hash": "e9abcc9e3c7fc35c0a5f9b2a32b3d24a539cf238",
+    "timestamp": 1773932050,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update README.md",
+    "addedLines": 8,
+    "removedLines": 2
+  },
+  {
+    "hash": "a585f87e3b856be54816172e1ee42efba7de4b42",
+    "timestamp": 1773931943,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update README.md",
+    "addedLines": 4,
+    "removedLines": 5
+  },
+  {
+    "hash": "7b3364a31dbe14a4e3fc4522684872f0a82492df",
+    "timestamp": 1773931890,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Update README.md",
+    "addedLines": 12,
+    "removedLines": 0
+  },
+  {
+    "hash": "c42eb6a172caebfc5e23f19a3226d12f7eb4f932",
+    "timestamp": 1773931808,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "Create README.md",
+    "addedLines": 8,
+    "removedLines": 0
+  },
+  {
+    "hash": "4cf4227d0cf4dc4454bc3fc60974ae21960f16fa",
+    "timestamp": 1773704221,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizard23@Philipps-iMac.local",
+    "message": "ignore",
+    "addedLines": 3,
+    "removedLines": 0
+  },
+  {
+    "hash": "8f664aa4c0b56b930d0269d15ba7e74eea85a439",
+    "timestamp": 1769955727,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "fixed naming of saved contexts",
+    "addedLines": 44,
+    "removedLines": 2
+  },
+  {
+    "hash": "95135241efd9ca5735af97c9fc3feeb0f1118b7c",
+    "timestamp": 1768874881,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "better minimize/open icon :)",
+    "addedLines": 7,
+    "removedLines": 5
+  },
+  {
+    "hash": "9d4dba2f7c62464dc759b581eaebcc4b3c6a33fa",
+    "timestamp": 1768853470,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "make it work at least ok :)",
+    "addedLines": 45,
+    "removedLines": 8
+  },
+  {
+    "hash": "8eaec11d0959077bfde060889b0f208ee0062700",
+    "timestamp": 1768849817,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "side length and angles is better but not really good yet",
+    "addedLines": 21,
+    "removedLines": 5
+  },
+  {
+    "hash": "4a0450978932730f0dfe358382160b5764eb352f",
+    "timestamp": 1768779277,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "committing changes in docs before creating branches for overlay compactification :)",
+    "addedLines": 62,
+    "removedLines": 7
+  },
+  {
+    "hash": "61578d967b95789812679c55ced18f5320bffbb1",
+    "timestamp": 1768754024,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "made #values-overlay more compact...still wastes a lot of space but it's better already :)",
+    "addedLines": 55,
+    "removedLines": 7
+  },
+  {
+    "hash": "eaa48beeae1cbfdde0f0062efbf2724ca0fc0791",
+    "timestamp": 1768750082,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "tile editor: make \"current values\" a values overlay :) remove space wasting headers and give editor-panel with canvas as much space as possible",
+    "addedLines": 22,
+    "removedLines": 14
+  },
+  {
+    "hash": "42112cd5564c811f786715cb7a20e9467110693b",
+    "timestamp": 1768721431,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: detailed prompt for screenshot tool (either bookmarklet or browser plugin)",
+    "addedLines": 2,
+    "removedLines": 0
+  },
+  {
+    "hash": "fbbc59c23e9238bddc762f0c4fcb9e20590c369c",
+    "timestamp": 1768721386,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: save context prompt",
+    "addedLines": 48,
+    "removedLines": 0
+  },
+  {
+    "hash": "c2c1b9baf0776adfcd3a2e5f17364c66ecb5274e",
+    "timestamp": 1768721302,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "human: nice exported tile editor file with cairo arrangement :)",
+    "addedLines": 183,
+    "removedLines": 0
+  },
+  {
+    "hash": "7b9381ad46f93f9bc71ae9043e5c979faaa3dd8c",
+    "timestamp": 1767768006,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: support multiple color inversion algorithms in coverage post-processing\n- add hsluv dependency for perceptually uniform color inversion\n- implement HSLuv, HSL, and HSV pseudo-invert algorithms\n- add --algo command line argument to select inversion strategy (default: hsluv)\n- update technical documentation with new algorithm details and usage instructions\n- document available pseudo-invert algorithms for vitest coverage theme",
+    "addedLines": 119,
+    "removedLines": 13
+  },
+  {
+    "hash": "3426746eab6d24f21e346beb439166da92087e03",
+    "timestamp": 1767744967,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "refactor: add explicit type annotation to coverage post-processing script\n- add string type to map callback parameter in rgba color replacement logic to satisfy strict typing",
+    "addedLines": 1,
+    "removedLines": 1
+  },
+  {
+    "hash": "15daa639b5c52effa86945360ca1c501b9c7502c",
+    "timestamp": 1767744596,
+    "authorName": "Philipp Tiefenbacher",
+    "authorEmail": "wizards23+github@gmail.com",
+    "message": "automated: refresh project statistics, timeline, and Vitest code coverage",
+    "addedLines": 916,
+    "removedLines": 0
+  },
+  {
     "hash": "0c22dba00610a8974bf05415e52575074eabd443",
     "timestamp": 1767744438,
     "authorName": "Philipp Tiefenbacher",
