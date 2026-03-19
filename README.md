@@ -20,6 +20,8 @@ hab mir seit 4 jahren gedacht, dass ich das gern mal programmieren und ausprobie
 
 
 #### Numeric Polygon Solver
+http://hex.wizard23.net/coverage/src/core/solver/index.html
+
 Der numerische solver fuer polygone hat die ur schoe implementierung...war wirklich begeistert von dem code...das haette ich selber nie gekonnt...finde ai generierten code zum teil extrem schoen strukturiert
 
 
