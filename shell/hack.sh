@@ -28,7 +28,9 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   return 1 2>/dev/null || exit 1
 fi
 
+_hack_script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+_hack_root_dir="$(cd -- "${_hack_script_dir}/.." && pwd)"
 
-. ./scripts/asimov-core/load-github-key.sh
-. ./shell/aliases/git-aliases.sh
-. ./shell/completions/npm-workspaces.sh 
+. "${_hack_root_dir}/scripts/asimov-core/load-github-key.sh"
+. "${_hack_root_dir}/shell/aliases/git-aliases.sh"
+. "${_hack_root_dir}/shell/completions/npm-workspaces.sh"

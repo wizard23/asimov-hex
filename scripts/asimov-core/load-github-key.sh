@@ -45,7 +45,8 @@ DEFAULT_EMAIL="wizards23+github@gmail.com"
 DEFAULT_HOSTNAME="$(hostname)"
 #DEFAULT_GITHUB_HOST_ALIAS="github-<SAFE_HOSTNAME>-<SAFE_EMAIL>"
 
-IDENTITY_FILE="./secrets/identity.env"
+_load_github_key_script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+IDENTITY_FILE="${_load_github_key_script_dir}/../../secrets/identity.env"
 
 EMAIL=""
 HOSTNAME=""
