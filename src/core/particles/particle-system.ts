@@ -1,7 +1,8 @@
 import { Graphics, Container } from 'pixi.js';
-import { Point, EdgeInfo, EdgeSelectionRule, OrbitAlgorithm } from '../../types';
+import { Point, EdgeInfo, EdgeSelectionRule, OrbitAlgorithm, ColorValue } from '../../types';
 import { edgesEqual, getOtherPoint, pointsClose } from '../utils/geometry';
 import { Grid } from '../grid';
+import { colorToHex } from '../utils/color-utils';
 
 export interface Particle {
   x: number;
@@ -16,9 +17,23 @@ export class ParticleSystem {
   private particles: Particle[] = [];
   private particleContainer: Container;
   private particleGraphics: Map<Particle, Graphics> = new Map();
+  private particleColor: ColorValue = '#00ff00';
+  private particleSize: number = 4;
 
   constructor(container: Container) {
     this.particleContainer = container;
+  }
+
+  setParticleStyle(color: ColorValue, size: number): void {
+    this.particleColor = color;
+    this.particleSize = size;
+
+    // Update all existing particles
+    for (const graphics of this.particleGraphics.values()) {
+      graphics.clear();
+      graphics.circle(0, 0, this.particleSize);
+      graphics.fill({ color: colorToHex(this.particleColor) });
+    }
   }
 
   spawnParticle(edge: EdgeInfo, clickX: number, clickY: number): void {
@@ -88,8 +103,8 @@ export class ParticleSystem {
 
   private createParticleGraphics(particle: Particle): void {
     const graphics = new Graphics();
-    graphics.circle(0, 0, 4);
-    graphics.fill({ color: 0x00ff00 });
+    graphics.circle(0, 0, this.particleSize);
+    graphics.fill({ color: colorToHex(this.particleColor) });
     graphics.x = particle.x;
     graphics.y = particle.y;
     this.particleContainer.addChild(graphics);

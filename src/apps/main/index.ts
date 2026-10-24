@@ -41,6 +41,8 @@ interface AppConfig {
   visualizeEdgeDelta: boolean;             // New: for delta visualization
   showCoordinates: boolean;
   particleSpeed: number;
+  particleSize: number;
+  particleColor: ColorValue;
   leftClickMode: LeftClickMode;
   edgeSelectionRule: EdgeSelectionRule;
   orbitDistance: number;
@@ -121,6 +123,8 @@ class GridApp {
       visualizeEdgeDelta: false,             // New: Initialize delta visualization
       showCoordinates: false,
       particleSpeed: 5,
+      particleSize: 4,
+      particleColor: '#00ff00',
       leftClickMode: 'smart',
       edgeSelectionRule: 'orbitCursor',
       orbitDistance: 3.25,
@@ -409,6 +413,7 @@ class GridApp {
 
     // Initialize particle system
     this.particleSystem = new ParticleSystem(this.particleContainer);
+    this.particleSystem.setParticleStyle(this.config.particleColor, this.config.particleSize);
 
     // Setup particle update loop
     this.app.ticker.add((ticker) => {
@@ -534,6 +539,23 @@ class GridApp {
       max: 12,
       step: 0.05,
       label: 'Speed',
+    });
+
+    // Add particle size control
+    particlesFolder.addBinding(this.config, 'particleSize', {
+      min: 1,
+      max: 20,
+      step: 0.5,
+      label: 'Size',
+    }).on('change', () => {
+      this.particleSystem.setParticleStyle(this.config.particleColor, this.config.particleSize);
+    });
+
+    // Add particle color control
+    particlesFolder.addBinding(this.config, 'particleColor', {
+      label: 'Color',
+    }).on('change', () => {
+      this.particleSystem.setParticleStyle(this.config.particleColor, this.config.particleSize);
     });
 
     // Add edge selection rule dropdown
